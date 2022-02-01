@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<org.zeam.CellLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" android:layout_width="match_parent" android:layout_height="match_parent" launcher:cellWidth="80dp" launcher:cellHeight="100dp" launcher:longAxisStartPadding="0dp" launcher:longAxisEndPadding="55dp" launcher:shortAxisStartPadding="0dp" launcher:shortAxisEndPadding="0dp" launcher:shortAxisCells="4" launcher:longAxisCells="4"/>

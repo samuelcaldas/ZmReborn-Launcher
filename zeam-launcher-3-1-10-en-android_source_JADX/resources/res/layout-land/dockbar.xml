@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<org.zeam.Dock xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" android:layout_gravity="top|right|center_vertical|center_horizontal|center" android:padding="0dp" android:paddingTop="2dp" android:saveEnabled="false" android:layout_width="wrap_content" android:layout_height="match_parent" launcher:cellWidth="54dp" launcher:cellHeight="58dp" launcher:orientation="horizontal">
+    <ScrollView android:id="@+id/dock_scroll_view" android:scrollbars="none" android:fadingEdge="none" android:saveEnabled="false" android:layout_width="match_parent" android:layout_height="match_parent">
+        <LinearLayout android:orientation="vertical" android:id="@+id/dock_item_holder" android:paddingLeft="0dp" android:saveEnabled="false" android:layout_width="match_parent" android:layout_height="match_parent"/>
+    </ScrollView>
+</org.zeam.Dock>

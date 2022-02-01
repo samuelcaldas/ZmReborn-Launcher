@@ -1,0 +1,2 @@
+<?xml version="1.0" encoding="utf-8"?>
+<org.zeam.ApplicationsPageView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" android:orientation="vertical" android:background="#00000000" android:paddingLeft="3dp" android:paddingRight="3dp" android:layout_width="match_parent" android:layout_height="match_parent"/>

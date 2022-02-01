@@ -1,0 +1,448 @@
+Signature-Version: 1.0
+Created-By: 1.0 (Android)
+SHA1-Digest-Manifest: p7ZBtgpCXab4Q9riIRg0NNvyPRo=
+
+Name: res/drawable-hdpi/preview_bg.9.png
+SHA1-Digest: dCkjophPdGXrdr/F71A5u5CoOJM=
+
+Name: res/anim/dock_fade_in.xml
+SHA1-Digest: //o3ObQqCjBkt6bn+HhiXHrnTzM=
+
+Name: res/drawable-mdpi/ic_launcher_settings.png
+SHA1-Digest: IbQp4QX9Uh7wrUM6YSVf9uqkS7Q=
+
+Name: res/layout-port/dockbar.xml
+SHA1-Digest: /ahCAECT8QwN3k9nEw+k9juQMjo=
+
+Name: res/drawable-mdpi/ic_menu_edit.png
+SHA1-Digest: MhcAxjU7TMqsQq1asjQVw/Jm+LQ=
+
+Name: res/drawable/timepicker_input_selected.9.png
+SHA1-Digest: J8znIwx5ZGlQ3uQqY9WYl209AXc=
+
+Name: res/drawable/timepicker_down_disabled.9.png
+SHA1-Digest: WjIZ/zteoCyTwsv51LQFRMGcCUQ=
+
+Name: res/xml/default_workspace.xml
+SHA1-Digest: ywAgG6lRS7LihVaOyMXivMB7aQo=
+
+Name: res/drawable-mdpi/placeholder_google.png
+SHA1-Digest: fzAdNiOwT+ZB+2VPglCTC1rVjZE=
+
+Name: res/layout-land/apps_page_view.xml
+SHA1-Digest: t9s1HAul6c81f+D1D6lgl4GcE90=
+
+Name: res/drawable-hdpi/bg_appwidget_error.9.png
+SHA1-Digest: 3aVlMm/qnp63O3Qn9WWrbNpy1qs=
+
+Name: res/layout-land/apps_paging_view.xml
+SHA1-Digest: 2MTwkm+9VsO2uVVRMN+C4rlMmf8=
+
+Name: res/drawable-port/dock_bg_glow.xml
+SHA1-Digest: Bc9l5771y748W60Hvig8IcRjf74=
+
+Name: res/drawable-hdpi/pager_dot_selected.png
+SHA1-Digest: 1mpfkFGtsQgQ3xWyz4UxKlLxlak=
+
+Name: res/drawable/timepicker_up_disabled.9.png
+SHA1-Digest: n/IB1GXrDqUl/VPucZanRvYmLBw=
+
+Name: res/anim/screen_indicator_fade_out.xml
+SHA1-Digest: AtDJjYCW0Eebxr23HWOhnUibWTQ=
+
+Name: res/drawable-mdpi/textfield_searchwidget_selected.9.png
+SHA1-Digest: 5nPxWzj9eIdp+yHpzZ1erICpFhE=
+
+Name: res/drawable-mdpi/preview_bg_focus.9.png
+SHA1-Digest: Wx8kfr7j8NV3BQITE3zyR98RhGs=
+
+Name: res/drawable/timepicker_up_pressed.9.png
+SHA1-Digest: 1lgbCmI2idtWAqc+pgNqYyanUSE=
+
+Name: res/layout-port/workspace_screen.xml
+SHA1-Digest: YNt355ykZJRcC7aqK/PR+9OY26k=
+
+Name: res/drawable-hdpi/normal_application_background.9.png
+SHA1-Digest: g26P4SQzQTi7fgYm7rGZvkPPi+U=
+
+Name: res/drawable/pager_dots.xml
+SHA1-Digest: 7Jsv7KC87pswUb0Nc1/GLlx5IkI=
+
+Name: res/drawable-mdpi/bg_appwidget_error.9.png
+SHA1-Digest: fLFAGnbaViSXcW/NNAkUsVx8Mqc=
+
+Name: res/drawable-hdpi/search_button_voice.png
+SHA1-Digest: KXJPKqvO4/SyFvx6xekhB9bUKO8=
+
+Name: res/layout-land/live_folder_grid.xml
+SHA1-Digest: KgWbdafNHryVQVD7A9RyKxhUoWk=
+
+Name: res/layout-port/apps_paging_view.xml
+SHA1-Digest: 6V3emUoRth7x1SWjMlAbaQDec1Q=
+
+Name: res/layout-land/dockbar.xml
+SHA1-Digest: O5fbr4RK0OY/thehG4FcQz/FX2U=
+
+Name: res/layout-port/folder_icon.xml
+SHA1-Digest: USq6J81g9AT4uBE4ecx3igQrLpY=
+
+Name: res/drawable-mdpi/ic_launcher_add_folder.png
+SHA1-Digest: jZ0VlT/bvZj9jYRhF7+OvjRP/YM=
+
+Name: res/drawable-mdpi/ic_launcher_application.png
+SHA1-Digest: s/86f6qIaylz18ouX39ks60nEbM=
+
+Name: res/drawable/textfield_searchwidget.xml
+SHA1-Digest: N4ekOswgyUkwF1ijFuPrQw9uDUg=
+
+Name: res/layout-land/apps_grid_view.xml
+SHA1-Digest: oIUoGAy+3xtKnq9WtkSEkEd2ogg=
+
+Name: res/drawable-hdpi/ic_launcher_add_folder.png
+SHA1-Digest: e/hDl7UhGmi2lNeqfIZ1/e3ivmQ=
+
+Name: res/drawable-hdpi/home_button_normal.png
+SHA1-Digest: rlQtvtn2XiToAR11Y4mGUrWfslM=
+
+Name: res/layout-port/application_boxed_grid.xml
+SHA1-Digest: +OjM6jViE8QoZ5Jx/lQUf8xY/QM=
+
+Name: res/drawable/timepicker_down_selected.9.png
+SHA1-Digest: 19TlnwarptCW1s80ks7KDPd5hxM=
+
+Name: res/anim/home_button_fade_out.xml
+SHA1-Digest: bFxCV2OO2EIkOHwhWAqXWTxLf/8=
+
+Name: res/layout/widget_search.xml
+SHA1-Digest: jBJLvWKTICiNZohxQnSMocGAyXc=
+
+Name: res/drawable-hdpi/ic_launcher.png
+SHA1-Digest: 2sBkyADZM43111M33xbURdBUHXE=
+
+Name: res/drawable-hdpi/ic_launcher_settings.png
+SHA1-Digest: /wGQPpviw9cvhd0w6Sdf1SuQ0cI=
+
+Name: res/drawable-hdpi/applications_grid.png
+SHA1-Digest: F7muJ4bmV4fKFL8T65620tnOZpU=
+
+Name: res/drawable/timepicker_up_normal.9.png
+SHA1-Digest: 4Hy9Vbk79UeYuxtA4NygVMi4xQQ=
+
+Name: res/drawable-mdpi/ic_menu_close_clear_cancel.png
+SHA1-Digest: fQs5kfL4TvaKdjklzOP8SjAVDwY=
+
+Name: resources.arsc
+SHA1-Digest: DAj9vpvWL8kaXSOIG9K0Gti8jpU=
+
+Name: res/drawable-hdpi/ic_launcher_folder.png
+SHA1-Digest: jyXq2y1MHwpAiIiLlIKDAs33W+A=
+
+Name: res/layout-land/folder_icon.xml
+SHA1-Digest: qtg2EmkCy80Dw4BdWD+wUXnp2nE=
+
+Name: res/drawable-port-hdpi/delete_handle_normal.png
+SHA1-Digest: QzQXeBSzARtRWvMvnBedwIEwDFg=
+
+Name: res/drawable-land/dock_bg_glow.xml
+SHA1-Digest: gvwHwLKcqRchl3SWibntJRZUL0o=
+
+Name: res/drawable-land-mdpi/delete_handle_normal.png
+SHA1-Digest: Wo5re5j6UIFpmAnpYY8pyl12Mmg=
+
+Name: AndroidManifest.xml
+SHA1-Digest: Z+cqetYy4sciHL0dZwnwZDTG/ao=
+
+Name: res/drawable/timepicker_input_pressed.9.png
+SHA1-Digest: /xSiaJgiQOr5iTIWHwdq7A4sBYw=
+
+Name: res/drawable/timepicker_up_btn.xml
+SHA1-Digest: J7T+HeF+iwBCuvYUydWt9DNknM0=
+
+Name: res/drawable/delete_zone_selector.xml
+SHA1-Digest: r2aeaPOzRFfs2kYQrpKCvbbrN+E=
+
+Name: res/anim/apps_scale_in.xml
+SHA1-Digest: SeYaCKGLjyzLYPE6o+DcPw5nx00=
+
+Name: res/layout/dialog_list_item.xml
+SHA1-Digest: FLt/lLoA2RqDICQ1pxWFjOJFkHw=
+
+Name: res/drawable-hdpi/ic_menu_close_clear_cancel.png
+SHA1-Digest: EcnnYQzMaTSlAB0jx/0YcvvcKzk=
+
+Name: res/layout-land/launcher.xml
+SHA1-Digest: mTPpcvpdwADByO5qfcUc46SuHJ8=
+
+Name: res/drawable-hdpi/ic_menu_edit.png
+SHA1-Digest: QR5KYkoYH/ktf1hOk1D5ImEhGLs=
+
+Name: res/layout/list_item_2.xml
+SHA1-Digest: YjHGksTq8O+77rX4crw43DItBbU=
+
+Name: res/drawable-mdpi/ic_launcher_shortcut.png
+SHA1-Digest: ox4z8n54pvS/K0S43wGA9CT5Qsw=
+
+Name: res/drawable-hdpi/preview_bg_press.9.png
+SHA1-Digest: +Pc5feZy8ItKheKCy16T1jBwp2M=
+
+Name: res/layout-land/application_boxed_grid.xml
+SHA1-Digest: wRU4UsdBu260Dwx/bXJLPbcsqXw=
+
+Name: res/drawable/timepicker_input.xml
+SHA1-Digest: NYuSBhb158QYuH+lkEn3rwnM8h4=
+
+Name: res/drawable-mdpi/trashcan_hover.png
+SHA1-Digest: 6vy2pz42Kv7LzJ2cAEYBbjnrYUY=
+
+Name: res/drawable-mdpi/preview_bg.9.png
+SHA1-Digest: 8jqu6283pD2He/gdvB75MlZcOWY=
+
+Name: res/drawable/folder_background.xml
+SHA1-Digest: CBLnSY5+JoovrwuwOlcsFClC5xE=
+
+Name: res/drawable-port-mdpi/delete_handle_normal.png
+SHA1-Digest: FxaclL2kQclSgrdZIeHr7YmUx6M=
+
+Name: res/drawable/timepicker_up_disabled_focused.9.png
+SHA1-Digest: 52CD9X+y3+xLOoSzRCdTF4eAHo0=
+
+Name: res/layout-land/dialog_colour_picker.xml
+SHA1-Digest: lH0EfRDi6DL9673aIx5rpVfKHU0=
+
+Name: classes.dex
+SHA1-Digest: jAKk3PeCOgVirmdwki46Dr7/3L0=
+
+Name: res/drawable/timepicker_down_normal.9.png
+SHA1-Digest: HMBP2moszHNoAUVsa+fMjpg+W5c=
+
+Name: res/drawable-hdpi/ic_launcher_appwidget.png
+SHA1-Digest: lr4Y9Xkoc5SayJtYaIJxlBbQB/M=
+
+Name: res/layout/small_application.xml
+SHA1-Digest: JjUt+fgnUZ+bMdPtMm43qJDh0qo=
+
+Name: res/drawable-hdpi/preview_bg_focus.9.png
+SHA1-Digest: QJx5DAN/ztYjqGq2C2eMOxgei6A=
+
+Name: res/drawable-mdpi/applications_grid.png
+SHA1-Digest: bzw4je1s65Gdd62Qn0JcUluPhPM=
+
+Name: res/layout/live_folder_list.xml
+SHA1-Digest: I/x6QQHHM2Is30q8fscakKKTuyo=
+
+Name: res/anim/dock_fade_out.xml
+SHA1-Digest: KWx7YRce7b6ol87k7fh5wFTNCME=
+
+Name: res/drawable-mdpi/textfield_searchwidget_pressed.9.png
+SHA1-Digest: XoVr8JKvr5JPdTOyNVrNoBmYEfQ=
+
+Name: res/layout-land/user_folder.xml
+SHA1-Digest: Q+QBTAmjCqEXkA9WTJxPvPeEyas=
+
+Name: res/xml/preferences.xml
+SHA1-Digest: zURA3QBNwt0zpKvvjAyurImsb6o=
+
+Name: res/layout-land/application.xml
+SHA1-Digest: 6nWLaZ9t76V5mahsc+Jp/niCf1g=
+
+Name: res/layout-port/apps_page_view.xml
+SHA1-Digest: HZAEMylFM24CCMvmw8p/qgsAKTc=
+
+Name: res/drawable-mdpi/ic_search_widget.png
+SHA1-Digest: OW/ShpgR5BowNTBkWcnwoGoph3Y=
+
+Name: res/layout/rename_folder.xml
+SHA1-Digest: fMZd9aRAEhG4FEqNMpyLbWfe28I=
+
+Name: res/layout/dialog_seekbar_preference.xml
+SHA1-Digest: h47B4zNPp0kt5siRpaKqkXNFrgM=
+
+Name: res/drawable-hdpi/pager_dot_normal.png
+SHA1-Digest: CNtNYibtg7YmokSHlbOUq5IBB3k=
+
+Name: res/layout-land/workspace_screen.xml
+SHA1-Digest: +/72zqxJiS4WTPy09l7u75NMVhc=
+
+Name: res/layout-port/application_boxed_page.xml
+SHA1-Digest: Pqjni/eDQIZoTP7CyN/B/9kEHIg=
+
+Name: res/drawable-hdpi/placeholder_google.png
+SHA1-Digest: ap6feemZqBmcomH2LdytB0n1Jys=
+
+Name: res/drawable-mdpi/search_floater.9.png
+SHA1-Digest: eZkjM8z5NLLH/ZTYoMlD0xTdokk=
+
+Name: res/layout-port/dialog_colour_picker.xml
+SHA1-Digest: pQa0OLUfi4iBk4asQctwzjT9e/0=
+
+Name: res/layout/widget_span.xml
+SHA1-Digest: qDXhzEhK7JyOyuS7LxeQyboXr5Y=
+
+Name: res/layout-port/live_folder_grid.xml
+SHA1-Digest: TJS6lOjvs1FqwzmEt7cMwGmf+XU=
+
+Name: res/drawable-mdpi/trashcan.png
+SHA1-Digest: jA67erbueaxQn6Qori3dEWzKrQ0=
+
+Name: res/layout/number_picker.xml
+SHA1-Digest: f8Lo4X9Ni9UyjeLsrCoOU3qNpEo=
+
+Name: res/drawable-port/dock_bg_bar_grey.xml
+SHA1-Digest: yz1Y8oZSYYSiu+LM2uc3bn3OLGc=
+
+Name: res/drawable/timepicker_input_disabled.9.png
+SHA1-Digest: kuBzQRdYM8nRLWcyLJqxOvsqies=
+
+Name: res/drawable-hdpi/trashcan_hover.png
+SHA1-Digest: 774Rsg1fAXhlrqO38cG7CUYRk+4=
+
+Name: res/layout-land/live_folder_icon.xml
+SHA1-Digest: i7G+bxJqfQeqicOX/m53q1n9ROw=
+
+Name: res/drawable-mdpi/normal_application_background.9.png
+SHA1-Digest: dAiv+JYuZRsXEqbTox3UCawtRuQ=
+
+Name: res/drawable-mdpi/pager_dot_normal.png
+SHA1-Digest: 8BFYreRJBAV6IrATBY9msbcDtII=
+
+Name: res/drawable-mdpi/ic_launcher_appwidget.png
+SHA1-Digest: 3XQDnvz6IoGifdnrJ1JzZcHfDYQ=
+
+Name: res/layout/wallpaper_item.xml
+SHA1-Digest: F5AyHXcOTLBsnEeI//kR0+6CfH8=
+
+Name: res/drawable/timepicker_down_disabled_focused.9.png
+SHA1-Digest: TCShB+Gv5PUzkWaHKPMLfhchzIA=
+
+Name: res/color/bright_text_dark_focused.xml
+SHA1-Digest: bxa9v0Ku6JC0jfqbycJUVGWvjIk=
+
+Name: res/layout/wallpaper_chooser.xml
+SHA1-Digest: FroumjAXjS5mJxTILPEOv9zN8/E=
+
+Name: res/drawable-land/dock_bg_bar_grey.xml
+SHA1-Digest: UQUyh28Pubofzlwb0g0a0RTZ2XM=
+
+Name: res/layout-land/application_boxed_page.xml
+SHA1-Digest: z0LnIPPCUgtJdvBV5v32JEtvm4A=
+
+Name: res/drawable-mdpi/pager_dot_selected.png
+SHA1-Digest: N09X8Qu9TaRi5tndPqVfHTBLLjA=
+
+Name: res/drawable-hdpi/ic_search_widget.png
+SHA1-Digest: 77zHe15ItuP/rHzg0gXKRx+/yZ8=
+
+Name: res/drawable-land/dock_bg_fade_to_black.xml
+SHA1-Digest: gbyP4IkV2/wr8NgFO4ps+kL4518=
+
+Name: res/anim/apps_scale_out.xml
+SHA1-Digest: My5sl+F7oVXlECRUryb2OD1Gpew=
+
+Name: res/layout-port/live_folder_icon.xml
+SHA1-Digest: B0Hr0nmPz/b9kQkkf1b8dC9/UL0=
+
+Name: res/layout-port/launcher.xml
+SHA1-Digest: Tr2zIXNOJQOHXV9yM5qPq2jkq48=
+
+Name: res/drawable-mdpi/ic_launcher_folder_open.png
+SHA1-Digest: HA6miv02keTWNqTy9stMBFxFGWg=
+
+Name: res/drawable-mdpi/ic_launcher_wallpaper.png
+SHA1-Digest: Np3mXK9SEb0m0FYOHGj6OLlD3P8=
+
+Name: res/drawable-hdpi/trashcan.png
+SHA1-Digest: +VMPUIVhDG1sL4INrtdGVi/hlMo=
+
+Name: res/drawable/timepicker_up_selected.9.png
+SHA1-Digest: R2ZsX8Gx4Da/YrrrYqWBGNBdmSY=
+
+Name: res/drawable-mdpi/preview_bg_press.9.png
+SHA1-Digest: nxyGCX3w7hfDSzS/CoLtN4ZTtsw=
+
+Name: res/drawable-mdpi/search_button_voice.png
+SHA1-Digest: gjYMPNYkfU5Cwqh4LJqb8tbtFL4=
+
+Name: res/drawable-port/dock_bg_fade_to_black.xml
+SHA1-Digest: BkKWM7r6ZuhOZtyI+EnuLQP631E=
+
+Name: res/drawable-hdpi/textfield_searchwidget_pressed.9.png
+SHA1-Digest: Ln6pke0Q9/xOQmCe2Ci+yf/QWUU=
+
+Name: res/layout-port/apps_grid_view.xml
+SHA1-Digest: 0GocRK24vRmfMDTkPfaTAtbLFEA=
+
+Name: res/drawable-hdpi/ic_launcher_wallpaper.png
+SHA1-Digest: wduIhd+812rzjWFeJTE+m13wg6I=
+
+Name: res/layout/appwidget_error.xml
+SHA1-Digest: XdF8HxqdYiVbd4t9VrMaHbmSYXc=
+
+Name: res/drawable/timepicker_down_btn.xml
+SHA1-Digest: 25YGpJ7tnxpbNQz9a+L3iQhgu6s=
+
+Name: res/drawable-hdpi/ic_launcher_folder_open.png
+SHA1-Digest: DAubsH63jBpJZDQgleQVvRbIkZ0=
+
+Name: res/layout-port/application.xml
+SHA1-Digest: jbJB71fFRbBhpwMNKP7Hmy4xOHY=
+
+Name: res/anim/home_button_fade_in.xml
+SHA1-Digest: Byl+RIYKeYG3fFdvm4ohmibfppY=
+
+Name: res/drawable-mdpi/overlay_uninstall.png
+SHA1-Digest: cLdy8in/5iwMrf0fZZI6cGtsIt8=
+
+Name: res/layout-port/user_folder.xml
+SHA1-Digest: FgBEmJ9+j8UV/liPYxDcHTO+0R8=
+
+Name: res/drawable-hdpi/textfield_searchwidget_default.9.png
+SHA1-Digest: 61V5z3sCXt695RLFpWh/hy2/KiI=
+
+Name: res/drawable-hdpi/overlay_uninstall.png
+SHA1-Digest: eqA+NUoaNedwZ4s5yMxhlS2A49s=
+
+Name: res/drawable-mdpi/ic_launcher_folder.png
+SHA1-Digest: xFVEcSNp16ctcktYsuoXpJdNnxs=
+
+Name: res/drawable-hdpi/ic_launcher_shortcut.png
+SHA1-Digest: 1iey76IyU6FxScbz2CQzAXmd0IY=
+
+Name: res/drawable-mdpi/search_button_bg.9.png
+SHA1-Digest: +Lwtjao7cfj2gVsvKjey8Unanc4=
+
+Name: res/drawable-hdpi/textfield_searchwidget_selected.9.png
+SHA1-Digest: z5DoOmC1mVT/7U+QRx+AUKdZ7j0=
+
+Name: res/drawable-mdpi/textfield_searchwidget_default.9.png
+SHA1-Digest: M5qqqys6aP4UTrPWTLkevtVUJBI=
+
+Name: res/drawable-mdpi/ic_launcher.png
+SHA1-Digest: FtGTo2PU3rNKYFp0Yxg+Nq5sJsU=
+
+Name: res/drawable/timepicker_input_normal.9.png
+SHA1-Digest: OF/OJ86XHMTn5QxMhCfvyU7mr7w=
+
+Name: res/drawable-land-hdpi/delete_handle_normal.png
+SHA1-Digest: +5o8Ijp1pH3zGyBF7k+TZi3CVbc=
+
+Name: res/layout/application_list.xml
+SHA1-Digest: MesK+5gllMSJ6DCH3/LB3pl+uQE=
+
+Name: res/drawable-mdpi/home_button_normal.png
+SHA1-Digest: FY/aYMzSRpT6PpogtIlgcPaNhtY=
+
+Name: res/drawable-hdpi/search_floater.9.png
+SHA1-Digest: d5kbfyeEiDkgzkCcWfDbQonFtl0=
+
+Name: res/drawable-hdpi/search_button_bg.9.png
+SHA1-Digest: ynUv2CRBZl0WQPoCL5cGyQUTJao=
+
+Name: res/drawable/timepicker_down_pressed.9.png
+SHA1-Digest: sMM0akayPZgLDual4SRncjvcwTU=
+
+Name: res/layout/list_category.xml
+SHA1-Digest: HDct4neNwWubVPuhpusIFksnnBg=
+
+Name: res/drawable-hdpi/ic_launcher_application.png
+SHA1-Digest: vWJ6Zqr6DOOOXo2KaB/EXQM3ouY=
+

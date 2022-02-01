@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" android:orientation="vertical" android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
+    <org.zeam.ColourPickerView android:id="@+id/colour_picker_view" android:tag="portrait" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_centerHorizontal="true"/>
+    <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:gravity="left" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="6dp" android:layout_marginRight="6dp" android:layout_marginBottom="5dp" android:text="@string/dialog_colour_picker_press_colour_to_apply"/>
+    <LinearLayout android:orientation="horizontal" android:layout_width="wrap_content" android:layout_height="40dp" android:layout_marginBottom="10dp" android:layout_below="@+id/colour_picker_view">
+        <org.zeam.ColourPickerPanelView android:id="@+id/old_colour_panel" android:layout_width="0px" android:layout_height="match_parent" android:layout_weight="0.5"/>
+        <TextView android:textSize="20sp" android:gravity="center" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_marginLeft="10dp" android:layout_marginRight="10dp" android:text="→"/>
+        <org.zeam.ColourPickerPanelView android:id="@+id/new_colour_panel" android:layout_width="0px" android:layout_height="wrap_content" android:layout_weight="0.5"/>
+    </LinearLayout>
+</LinearLayout>

@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="extra_wallpapers">
+    </array>
+    <array name="preferences_entries_actions">
+        <item>None</item>
+        <item>Open applications</item>
+        <item>Move to default screen</item>
+        <item>Expand notifications</item>
+        <item>Screen previews</item>
+        <item>Toggle fullscreen</item>
+        <item>Open dialer</item>
+    </array>
+    <array name="preferences_entry_values_actions">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+    </array>
+    <array name="preferences_values_workspace_screen_indicator_types">
+        <item>None</item>
+        <item>Slider</item>
+        <item>Dots</item>
+    </array>
+    <array name="preferences_entries_apps_grid_types">
+        <item>Vertical scrolling</item>
+        <item>Horizontal paging</item>
+    </array>
+    <array name="preferences_entry_values_apps_grid_types">
+        <item>1</item>
+        <item>2</item>
+    </array>
+    <array name="preferences_values_dock_backgrounds">
+        <item>Dark</item>
+        <item>Dark fade</item>
+        <item>Transparent</item>
+        <item>Black solid</item>
+        <item>Grey solid</item>
+        <item>Grey bar</item>
+        <item>Frost</item>
+    </array>
+    <array name="preferences_values_dock_item_alignments_resets">
+        <item>Start</item>
+        <item>Center</item>
+        <item>End</item>
+    </array>
+    <array name="preferences_values_dock_item_widths">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+    </array>
+    <array name="wallpapers">
+    </array>
+</resources>
