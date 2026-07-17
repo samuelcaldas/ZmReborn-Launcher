@@ -120,7 +120,7 @@ public class Preferences extends PreferenceActivity {
             appsGridContentColumnsPortrait.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 public boolean onPreferenceChange(Preference preference, Object value) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Preferences.this).edit();
-                    editor.putInt(Preferences.this.getString(R.string.f14x51b1f069), ((Integer) value).intValue() + appsGridContentColumnsPortrait.getMin());
+                    editor.putInt(Preferences.this.getString(R.string.preferences_key_apps_grid_vertical_scrolling_content_columns_port), ((Integer) value).intValue() + appsGridContentColumnsPortrait.getMin());
                     editor.commit();
                     return true;
                 }
@@ -128,7 +128,7 @@ public class Preferences extends PreferenceActivity {
             appsGridContentColumnsLandscape.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 public boolean onPreferenceChange(Preference preference, Object value) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Preferences.this).edit();
-                    editor.putInt(Preferences.this.getString(R.string.f13x51afe9d3), ((Integer) value).intValue() + appsGridContentColumnsLandscape.getMin());
+                    editor.putInt(Preferences.this.getString(R.string.preferences_key_apps_grid_vertical_scrolling_content_columns_land), ((Integer) value).intValue() + appsGridContentColumnsLandscape.getMin());
                     editor.commit();
                     return true;
                 }

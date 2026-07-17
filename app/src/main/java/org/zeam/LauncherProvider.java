@@ -411,25 +411,19 @@ public class LauncherProvider extends ContentProvider {
         }
 
         private boolean addAppShortcut(SQLiteDatabase db, ContentValues contentValues, TypedArray typedArray, PackageManager packageManager, Intent intent) {
+            ComponentName componentName = new ComponentName(typedArray.getString(1), typedArray.getString(0));
             try {
-                ComponentName componentName = new ComponentName(typedArray.getString(1), typedArray.getString(0));
-                try {
-                    ActivityInfo activityInfo = packageManager.getActivityInfo(componentName, 0);
-                    intent.setComponent(componentName);
-                    intent.setFlags(270532608);
-                    contentValues.put(LauncherSettings.BaseLauncherColumns.INTENT, intent.toUri(0));
-                    contentValues.put(LauncherSettings.BaseLauncherColumns.TITLE, activityInfo.loadLabel(packageManager).toString());
-                    contentValues.put(LauncherSettings.BaseLauncherColumns.ITEM_TYPE, 0);
-                    contentValues.put("spanX", 1);
-                    contentValues.put("spanY", 1);
-                    db.insert(TAG_FAVORITES, (String) null, contentValues);
-                    ComponentName componentName2 = componentName;
-                    return LauncherProvider.LOGD;
-                } catch (PackageManager.NameNotFoundException e) {
-                    ComponentName componentName3 = componentName;
-                    return false;
-                }
-            } catch (PackageManager.NameNotFoundException e2) {
+                ActivityInfo activityInfo = packageManager.getActivityInfo(componentName, 0);
+                intent.setComponent(componentName);
+                intent.setFlags(270532608);
+                contentValues.put(LauncherSettings.BaseLauncherColumns.INTENT, intent.toUri(0));
+                contentValues.put(LauncherSettings.BaseLauncherColumns.TITLE, activityInfo.loadLabel(packageManager).toString());
+                contentValues.put(LauncherSettings.BaseLauncherColumns.ITEM_TYPE, 0);
+                contentValues.put("spanX", 1);
+                contentValues.put("spanY", 1);
+                db.insert(TAG_FAVORITES, (String) null, contentValues);
+                return LauncherProvider.LOGD;
+            } catch (PackageManager.NameNotFoundException e) {
                 return false;
             }
         }
@@ -474,7 +468,7 @@ public class LauncherProvider extends ContentProvider {
                 contentValues.put("appWidgetId", Integer.valueOf(appWidgetId));
                 db.insert(TAG_FAVORITES, (String) null, contentValues);
                 allocatedAppWidgets = LauncherProvider.LOGD;
-                appWidgetManager.bindAppWidgetId(appWidgetId, componentName);
+                appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, componentName);
                 return LauncherProvider.LOGD;
             } catch (RuntimeException ex) {
                 Log.e(LauncherProvider.LOG_TAG, "Problem allocating appWidgetId", ex);

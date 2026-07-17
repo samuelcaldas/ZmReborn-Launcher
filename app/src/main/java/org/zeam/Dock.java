@@ -152,7 +152,7 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
     }
 
     private synchronized void addItemViewAt(ItemInfo itemInfo, int position) {
-        View view;
+        View view = null;
         switch (itemInfo.itemType) {
             case 0:
             case 1:

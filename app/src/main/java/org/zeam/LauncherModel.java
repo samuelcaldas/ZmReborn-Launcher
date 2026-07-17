@@ -191,7 +191,7 @@ public class LauncherModel {
     }
 
     private class DesktopItemsLoader implements Runnable {
-        static final /* synthetic */ boolean $assertionsDisabled = (!LauncherModel.class.desiredAssertionStatus());
+        final /* synthetic */ boolean $assertionsDisabled = (!LauncherModel.class.desiredAssertionStatus());
         private volatile boolean mFinished;
         private final int mId = LauncherModel.sWorkspaceLoaderCount.getAndIncrement();
         private final WeakReference<Launcher> mLauncher;

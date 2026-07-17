@@ -337,7 +337,6 @@ public class ColourPickerView extends View {
                         update = false;
                         break;
                     }
-                    break;
             }
         }
         if (!update) {

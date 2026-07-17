@@ -117,27 +117,27 @@ public class PreferencesUtil {
     }
 
     static int getAppsGridVerticalScrollingContentColumnsPortrait(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(R.string.f14x51b1f069), Integer.parseInt(context.getString(R.string.f12x744d074b)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_vertical_scrolling_content_columns_port), Integer.parseInt(context.getString(R.string.preferences_default_apps_grid_vertical_scrolling_content_columns_port)));
     }
 
     static int getAppsGridVerticalScrollingContentColumnsLandscape(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(R.string.f13x51afe9d3), Integer.parseInt(context.getString(R.string.f11x744b00b5)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_vertical_scrolling_content_columns_land), Integer.parseInt(context.getString(R.string.preferences_default_apps_grid_vertical_scrolling_content_columns_land)));
     }
 
     static int getAppsGridHorizontalPagingContentRowsPortrait(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_rows_port), Integer.parseInt(context.getString(R.string.f10xb4e613d8)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_rows_port), Integer.parseInt(context.getString(R.string.preferences_default_apps_grid_horizontal_paging_content_rows_port)));
     }
 
     static int getAppsGridHorizontalPagingContentColumnsPortrait(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_columns_port), Integer.parseInt(context.getString(R.string.f8xe2a30d52)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_columns_port), Integer.parseInt(context.getString(R.string.preferences_default_apps_grid_horizontal_paging_content_columns_port)));
     }
 
     static int getAppsGridHorizontalPagingContentRowsLandscape(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_rows_land), Integer.parseInt(context.getString(R.string.f9xb4e40d42)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_rows_land), Integer.parseInt(context.getString(R.string.preferences_default_apps_grid_horizontal_paging_content_rows_land)));
     }
 
     static int getAppsGridHorizontalPagingContentColumnsLandscape(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_columns_land), Integer.parseInt(context.getString(R.string.f7xe2a106bc)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_columns_land), Integer.parseInt(context.getString(R.string.preferences_default_apps_grid_horizontal_paging_content_columns_land)));
     }
 
     static boolean rememberApplicationsPosition(Context context) {

@@ -509,10 +509,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 case 7:
                     processShortcut(data, 6, 1);
                     return;
-                case R.styleable.Favorite_title:
+                case 8:
                     addLiveFolder(data);
                     return;
-                case R.styleable.Favorite_uri:
+                case 9:
                     addAppWidget(data);
                     return;
                 default:
@@ -1197,10 +1197,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             case 6:
                 startPreferences();
                 return LOGD;
-            case R.styleable.Favorite_title:
+            case 8:
                 startActivitySafely(new Intent("android.intent.action.MANAGE_PACKAGE_STORAGE"));
                 return LOGD;
-            case R.styleable.Favorite_uri:
+            case 9:
                 this.mApplicationsView.setMode(1);
                 return LOGD;
             default:

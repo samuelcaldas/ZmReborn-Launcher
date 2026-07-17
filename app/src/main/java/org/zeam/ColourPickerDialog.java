@@ -60,13 +60,10 @@ public class ColourPickerDialog extends Dialog implements ColourPickerView.OnCol
     }
 
     public void onClick(View view) {
-        switch (view.getId()) {
-            case R.id.new_colour_panel /*2131099659*/:
-                if (this.mOnColourChangedListener != null) {
-                    this.mOnColourChangedListener.onColourChanged(this.mNewColour.getColor());
-                    break;
-                }
-                break;
+        if (view.getId() == R.id.new_colour_panel) {
+            if (this.mOnColourChangedListener != null) {
+                this.mOnColourChangedListener.onColourChanged(this.mNewColour.getColor());
+            }
         }
         dismiss();
     }

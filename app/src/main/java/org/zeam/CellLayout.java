@@ -543,6 +543,7 @@ public class CellLayout extends ViewGroup {
                 } else {
                     available = true;
                 }
+                available2 = available;
                 for (int i = x; i < (x + spanX) - 1 && x < xCount; i++) {
                     for (int j = y; j < (y + spanY) - 1 && y < yCount; j++) {
                         if (!available2 || occupied[i][j]) {

@@ -136,7 +136,8 @@ public class XmlUtils {
         if (name != null) {
             out.attribute((String) null, "name", name);
         }
-        for (Map.Entry e : val.entrySet()) {
+        for (Object entryObj : val.entrySet()) {
+            Map.Entry e = (Map.Entry) entryObj;
             writeValueXml(e.getValue(), (String) e.getKey(), out);
         }
         out.endTag((String) null, "map");
@@ -170,7 +171,7 @@ public class XmlUtils {
         if (name != null) {
             out.attribute((String) null, "name", name);
         }
-        out.attribute((String) null, "num", Integer.toString(N));
+        out.attribute((String) null, "num", Integer.toString(val.length));
         StringBuilder sb = new StringBuilder(val.length * 2);
         for (byte b : val) {
             int h = b >> 4;
@@ -197,7 +198,7 @@ public class XmlUtils {
         if (name != null) {
             out.attribute((String) null, "name", name);
         }
-        out.attribute((String) null, "num", Integer.toString(N));
+        out.attribute((String) null, "num", Integer.toString(val.length));
         for (int num : val) {
             out.startTag((String) null, "item");
             out.attribute((String) null, "value", Integer.toString(num));
