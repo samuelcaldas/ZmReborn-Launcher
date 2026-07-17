@@ -28,10 +28,11 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell monkey -p org.zeam -c android.intent.category.LAUNCHER 1
 ```
 
-No tracked unit, instrumentation, or UI tests currently exist. When a local unit test exists, run one with:
+Run unit tests or a single test:
 
 ```sh
-./gradlew :app:testDebugUnitTest --tests 'org.zeam.ExampleTest.test_name' --no-daemon
+./gradlew :app:testDebugUnitTest --no-daemon
+./gradlew :app:testDebugUnitTest --tests 'org.zeam.FastXmlSerializerTest' --no-daemon
 ```
 
 ## Architecture and Runtime Flow

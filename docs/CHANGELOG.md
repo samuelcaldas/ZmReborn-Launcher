@@ -67,3 +67,11 @@ Zeam has zero app or runtime third-party dependencies. The Android Gradle Plugin
 - [ ] Verify the app drawer on API 10 and API 35.
 - [ ] Verify Preferences on API 10 and API 35.
 - [ ] Review logcat for fatal exceptions, `UnsupportedOperationException`, verifier failures, and missing-method errors.
+
+## CI/CD and JVM Test Harness Implementation — 2026-07-17
+
+A GitHub Actions pipeline and JUnit unit test suite were added:
+- GitHub Actions CI workflow config at `.github/workflows/ci.yml` triggers on push/PR for `dev` and `main` branches. It validates the code formatting, compiles the codebase, runs unit tests, builds the debug APK, and verifies the build output.
+- JUnit 4 JVM-based test cases implemented at `app/src/test/java/org/zeam/FastXmlSerializerTest.java` (basic serialization, character escaping, XML attribute/entity encoding, and unsupported methods exceptions) and `app/src/test/java/org/zeam/XmlUtilsTest.java` (primitive type conversion, default handling, hex parsing, and null input boundaries).
+- Local Gradle task execution validation successfully passes all lint checks, compiler verification, and JUnit tests within the `zeam-emu` container.
+
