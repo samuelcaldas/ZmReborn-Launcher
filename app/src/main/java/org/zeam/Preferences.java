@@ -14,10 +14,16 @@ import android.preference.PreferenceManager;
 import java.io.File;
 
 public class Preferences extends PreferenceActivity {
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleUtil.wrap(base));
+    }
+
     /* access modifiers changed from: protected */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
+        bindLanguagePreference();
         Preference.OnPreferenceChangeListener restartChangeListener = new Preference.OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object object) {
                 Launcher.sRestart = true;
@@ -89,11 +95,26 @@ public class Preferences extends PreferenceActivity {
             }
         });
         Preference applicationPreference = findPreference(getString(R.string.preferences_key_application));
-        applicationPreference.setTitle(String.valueOf(getString(R.string.application_name)) + " " + LauncherApplication.getVersionName(this));
+        applicationPreference.setTitle(getString(
+                R.string.preferences_application_version_format,
+                getString(R.string.application_name),
+                LauncherApplication.getVersionName(this)));
         applicationPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
                 Preferences.this.startActivity(new Intent("android.intent.action.VIEW", Uri.parse("http://zeam.org/")));
                 return true;
+            }
+        });
+    }
+
+    private void bindLanguagePreference() {
+        Preference languagePreference = findPreference(getString(R.string.preferences_key_application_language));
+        languagePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            public boolean onPreferenceChange(Preference preference, Object value) {
+                if (LocaleUtil.persistSelectedLanguage(Preferences.this, String.valueOf(value))) {
+                    Preferences.restart();
+                }
+                return false;
             }
         });
     }
