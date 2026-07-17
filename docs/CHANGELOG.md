@@ -42,8 +42,8 @@ The following runtime-validation changes are present as pending working-tree cha
 
 | Platform | Image | Validation | Result |
 |---|---|---|---|
-| API 10 / Android 2.3.3 | x86; oldest Google system image available | Install, explicit `Launcher` activity launch, workspace loading, app drawer, Preferences, and logcat review | Final APK installed on a clean emulator. The explicit Launcher activity displayed in 918 ms. Loader completed. `apps_grid` was `VISIBLE` in a view-server dump. Preferences opened successfully. Logcat contained no Zeam fatal exception, `UnsupportedOperationException`, verifier, or missing-method lines. |
-| API 35 / Android 15 | x86_64 | Install, HOME-role selection, launcher display timing, populated app drawer, Preferences, and fatal-exception review | Final APK installed successfully. Zeam was selected as the actual HOME role and displayed in 426 ms. UI Automator verified populated drawer entries including Calendar, Camera, Chrome, Gmail, and Settings. Preferences resumed successfully. No fatal exceptions occurred. |
+| API 10 / Android 2.3.3 | Google APIs x86; oldest Google system image available | Install, explicit `Launcher` activity launch, workspace loading, app drawer, Preferences, locale instrumentation, and logcat review | Final APK and test APK installed on a clean emulator. Launcher and Brazilian Portuguese Preferences instrumentation tests passed. Earlier view-server validation confirmed `apps_grid` was `VISIBLE`; explicit Launcher launch, loader completion, and Preferences remained functional. No Zeam fatal exception, `VerifyError`, `NoSuchMethodError`, or `UnsupportedOperationException` occurred. |
+| API 35 / Android 15 | Google APIs x86_64 | Install, HOME-role selection, populated app drawer, Preferences, locale instrumentation, and fatal-exception review | Final APK and test APK installed successfully. Both instrumentation tests passed. Zeam operated as HOME; UI Automator verified populated drawer entries including Calendar, Camera, Chrome, Gmail, and Settings. Brazilian Portuguese Preferences rendered successfully. No Zeam fatal exception, `VerifyError`, `NoSuchMethodError`, or `UnsupportedOperationException` occurred. |
 
 ## Known Limitations
 
@@ -51,11 +51,27 @@ The following runtime-validation changes are present as pending working-tree cha
 - API 8 remains untested because no API 8 system image is available.
 - The widget add/bind path has not been manually exercised.
 - Custom static-wallpaper bitmap drawing falls back on API 35 because storage permission is unavailable; the system or window wallpaper background is used instead.
-- No automated UI tests exist.
+- Legacy Android instrumentation covers launcher inflation and Brazilian Portuguese Preferences rendering on API 10 and API 35. Broader interaction flows remain manually validated.
 
 ## Dependencies
 
-Zeam has zero app or runtime third-party dependencies. The Android Gradle Plugin is the only build dependency.
+Zeam has zero app or runtime third-party dependencies. Build validation uses Android Gradle Plugin and JUnit 4; instrumentation compilation uses Android SDK optional test-framework jars.
+
+## Multilingual Support — 2026-07-17
+
+Added persisted in-app language selection for System default, English, and Brazilian Portuguese (`pt-BR`):
+
+- Extracted remaining user-visible Java strings and changed dynamic formats to indexed Android placeholders.
+- Marked preference keys, defaults, and entry values non-translatable. Localized display-entry arrays remain separate, preserving existing stored values such as `Slider`, `Dark`, `Center`, `Start`, and `Medium`.
+- Added `LocaleUtil` with API 8–16 `Resources.updateConfiguration` handling and an API 17+ configuration-context bridge. Locale wrapping occurs before application, launcher, and Preferences resources inflate.
+- Persisted language changes synchronously before process restart. Empty, malformed, or unsupported values normalize safely to System default.
+- Included complete Brazilian Portuguese strings and display arrays under `values-pt-rBR`.
+- Restricted packaged locales to English and Brazilian Portuguese while disabling App Bundle language splits so in-app selection always has local resources.
+- Added JUnit tests for normalization, parsing, locale fingerprints, translation parity, placeholder parity, array parity, and stable metadata. Added legacy instrumentation for Portuguese Preferences rendering.
+- API 10 exercised legacy locale application; API 35 exercised configuration-context locale application. All three instrumentation tests (launcher inflation, Portuguese rendering, and unsupported-value repair) passed on both platforms when selected explicitly through runner class filters.
+- Full unfiltered test discovery on API 10 hits an Android 2.3 test-runner reflection defect, while all tests pass together when their classes are explicitly selected. API 35 unfiltered discovery passes.
+- API 8 remains compile/minimum-SDK compatible but runtime-untested because no API 8 image was available.
+- Supported locales are left-to-right. RTL layout work remains deferred; no partial RTL declaration or mirroring was added.
 
 ## Regression Checklist
 
