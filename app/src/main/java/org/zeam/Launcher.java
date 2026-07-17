@@ -60,9 +60,14 @@ import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -278,165 +283,50 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         }
     }
 
-    /* JADX WARNING: Removed duplicated region for block: B:12:0x002b A[SYNTHETIC, Splitter:B:12:0x002b] */
-    /* JADX WARNING: Removed duplicated region for block: B:17:0x0034 A[SYNTHETIC, Splitter:B:17:0x0034] */
-    /* JADX WARNING: Removed duplicated region for block: B:22:0x003d A[SYNTHETIC, Splitter:B:22:0x003d] */
-    /* JADX WARNING: Removed duplicated region for block: B:37:? A[RETURN, SYNTHETIC] */
-    /* JADX WARNING: Removed duplicated region for block: B:38:? A[RETURN, SYNTHETIC] */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    private static void readConfiguration(android.content.Context r4, org.zeam.Launcher.LocaleConfiguration r5) {
-        /*
-            if (r4 != 0) goto L_0x0003
-        L_0x0002:
-            return
-        L_0x0003:
-            r0 = 0
-            java.io.DataInputStream r1 = new java.io.DataInputStream     // Catch:{ FileNotFoundException -> 0x0028, IOException -> 0x0031, all -> 0x003a }
-            java.lang.String r2 = "launcher.preferences"
-            java.io.FileInputStream r2 = r4.openFileInput(r2)     // Catch:{ FileNotFoundException -> 0x0028, IOException -> 0x0031, all -> 0x003a }
-            r1.<init>(r2)     // Catch:{ FileNotFoundException -> 0x0028, IOException -> 0x0031, all -> 0x003a }
-            java.lang.String r2 = r1.readUTF()     // Catch:{ FileNotFoundException -> 0x004c, IOException -> 0x0049, all -> 0x0046 }
-            r5.locale = r2     // Catch:{ FileNotFoundException -> 0x004c, IOException -> 0x0049, all -> 0x0046 }
-            int r2 = r1.readInt()     // Catch:{ FileNotFoundException -> 0x004c, IOException -> 0x0049, all -> 0x0046 }
-            r5.mcc = r2     // Catch:{ FileNotFoundException -> 0x004c, IOException -> 0x0049, all -> 0x0046 }
-            int r2 = r1.readInt()     // Catch:{ FileNotFoundException -> 0x004c, IOException -> 0x0049, all -> 0x0046 }
-            r5.mnc = r2     // Catch:{ FileNotFoundException -> 0x004c, IOException -> 0x0049, all -> 0x0046 }
-            if (r1 == 0) goto L_0x004f
-            r1.close()     // Catch:{ IOException -> 0x0041 }
-            r0 = r1
-            goto L_0x0002
-        L_0x0028:
-            r2 = move-exception
-        L_0x0029:
-            if (r0 == 0) goto L_0x0002
-            r0.close()     // Catch:{ IOException -> 0x002f }
-            goto L_0x0002
-        L_0x002f:
-            r2 = move-exception
-            goto L_0x0002
-        L_0x0031:
-            r2 = move-exception
-        L_0x0032:
-            if (r0 == 0) goto L_0x0002
-            r0.close()     // Catch:{ IOException -> 0x0038 }
-            goto L_0x0002
-        L_0x0038:
-            r2 = move-exception
-            goto L_0x0002
-        L_0x003a:
-            r2 = move-exception
-        L_0x003b:
-            if (r0 == 0) goto L_0x0040
-            r0.close()     // Catch:{ IOException -> 0x0044 }
-        L_0x0040:
-            throw r2
-        L_0x0041:
-            r2 = move-exception
-            r0 = r1
-            goto L_0x0002
-        L_0x0044:
-            r3 = move-exception
-            goto L_0x0040
-        L_0x0046:
-            r2 = move-exception
-            r0 = r1
-            goto L_0x003b
-        L_0x0049:
-            r2 = move-exception
-            r0 = r1
-            goto L_0x0032
-        L_0x004c:
-            r2 = move-exception
-            r0 = r1
-            goto L_0x0029
-        L_0x004f:
-            r0 = r1
-            goto L_0x0002
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.zeam.Launcher.readConfiguration(android.content.Context, org.zeam.Launcher$LocaleConfiguration):void");
+    private static void readConfiguration(Context context, LocaleConfiguration configuration) {
+        if (context == null) {
+            return;
+        }
+        DataInputStream stream = null;
+        try {
+            stream = new DataInputStream(context.openFileInput(PREFERENCES));
+            configuration.locale = stream.readUTF();
+            configuration.mcc = stream.readInt();
+            configuration.mnc = stream.readInt();
+        } catch (FileNotFoundException e) {
+        } catch (IOException e2) {
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e3) {
+                }
+            }
+        }
     }
 
-    /* JADX WARNING: Removed duplicated region for block: B:12:0x002c A[SYNTHETIC, Splitter:B:12:0x002c] */
-    /* JADX WARNING: Removed duplicated region for block: B:20:0x003e A[SYNTHETIC, Splitter:B:20:0x003e] */
-    /* JADX WARNING: Removed duplicated region for block: B:25:0x0047 A[SYNTHETIC, Splitter:B:25:0x0047] */
-    /* JADX WARNING: Removed duplicated region for block: B:40:? A[RETURN, SYNTHETIC] */
-    /* JADX WARNING: Removed duplicated region for block: B:41:? A[RETURN, SYNTHETIC] */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    private static void writeConfiguration(android.content.Context r5, org.zeam.Launcher.LocaleConfiguration r6) {
-        /*
-            if (r5 != 0) goto L_0x0003
-        L_0x0002:
-            return
-        L_0x0003:
-            r0 = 0
-            java.io.DataOutputStream r1 = new java.io.DataOutputStream     // Catch:{ FileNotFoundException -> 0x0029, IOException -> 0x0032 }
-            java.lang.String r3 = "launcher.preferences"
-            r4 = 0
-            java.io.FileOutputStream r3 = r5.openFileOutput(r3, r4)     // Catch:{ FileNotFoundException -> 0x0029, IOException -> 0x0032 }
-            r1.<init>(r3)     // Catch:{ FileNotFoundException -> 0x0029, IOException -> 0x0032 }
-            java.lang.String r3 = r6.locale     // Catch:{ FileNotFoundException -> 0x0056, IOException -> 0x0053, all -> 0x0050 }
-            r1.writeUTF(r3)     // Catch:{ FileNotFoundException -> 0x0056, IOException -> 0x0053, all -> 0x0050 }
-            int r3 = r6.mcc     // Catch:{ FileNotFoundException -> 0x0056, IOException -> 0x0053, all -> 0x0050 }
-            r1.writeInt(r3)     // Catch:{ FileNotFoundException -> 0x0056, IOException -> 0x0053, all -> 0x0050 }
-            int r3 = r6.mnc     // Catch:{ FileNotFoundException -> 0x0056, IOException -> 0x0053, all -> 0x0050 }
-            r1.writeInt(r3)     // Catch:{ FileNotFoundException -> 0x0056, IOException -> 0x0053, all -> 0x0050 }
-            r1.flush()     // Catch:{ FileNotFoundException -> 0x0056, IOException -> 0x0053, all -> 0x0050 }
-            if (r1 == 0) goto L_0x0059
-            r1.close()     // Catch:{ IOException -> 0x004b }
-            r0 = r1
-            goto L_0x0002
-        L_0x0029:
-            r3 = move-exception
-        L_0x002a:
-            if (r0 == 0) goto L_0x0002
-            r0.close()     // Catch:{ IOException -> 0x0030 }
-            goto L_0x0002
-        L_0x0030:
-            r3 = move-exception
-            goto L_0x0002
-        L_0x0032:
-            r2 = move-exception
-        L_0x0033:
-            java.lang.String r3 = "launcher.preferences"
-            java.io.File r3 = r5.getFileStreamPath(r3)     // Catch:{ all -> 0x0044 }
-            r3.delete()     // Catch:{ all -> 0x0044 }
-            if (r0 == 0) goto L_0x0002
-            r0.close()     // Catch:{ IOException -> 0x0042 }
-            goto L_0x0002
-        L_0x0042:
-            r3 = move-exception
-            goto L_0x0002
-        L_0x0044:
-            r3 = move-exception
-        L_0x0045:
-            if (r0 == 0) goto L_0x004a
-            r0.close()     // Catch:{ IOException -> 0x004e }
-        L_0x004a:
-            throw r3
-        L_0x004b:
-            r3 = move-exception
-            r0 = r1
-            goto L_0x0002
-        L_0x004e:
-            r4 = move-exception
-            goto L_0x004a
-        L_0x0050:
-            r3 = move-exception
-            r0 = r1
-            goto L_0x0045
-        L_0x0053:
-            r2 = move-exception
-            r0 = r1
-            goto L_0x0033
-        L_0x0056:
-            r3 = move-exception
-            r0 = r1
-            goto L_0x002a
-        L_0x0059:
-            r0 = r1
-            goto L_0x0002
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.zeam.Launcher.writeConfiguration(android.content.Context, org.zeam.Launcher$LocaleConfiguration):void");
+    private static void writeConfiguration(Context context, LocaleConfiguration configuration) {
+        if (context == null) {
+            return;
+        }
+        DataOutputStream stream = null;
+        try {
+            stream = new DataOutputStream(context.openFileOutput(PREFERENCES, 0));
+            stream.writeUTF(configuration.locale);
+            stream.writeInt(configuration.mcc);
+            stream.writeInt(configuration.mnc);
+            stream.flush();
+        } catch (FileNotFoundException e) {
+        } catch (IOException e2) {
+            context.getFileStreamPath(PREFERENCES).delete();
+        } finally {
+            if (stream != null) {
+                try {
+                    stream.close();
+                } catch (IOException e3) {
+                }
+            }
+        }
     }
 
     static int getScreen() {
@@ -757,86 +647,42 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         dock.invalidate();
     }
 
-    /* JADX WARNING: Removed duplicated region for block: B:29:? A[RETURN, SYNTHETIC] */
-    /* JADX WARNING: Removed duplicated region for block: B:5:0x0019  */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
     private void loadIndicator() {
-        /*
-            r9 = this;
-            r8 = 0
-            r7 = 1
-            android.content.res.Resources r4 = r9.getResources()
-            java.lang.String r2 = org.zeam.PreferencesUtil.getScreenIndicator(r9)
-            r5 = 2131296259(0x7f090003, float:1.821043E38)
-            java.lang.String[] r3 = r4.getStringArray(r5)
-            r1 = 0
-        L_0x0012:
-            int r5 = r3.length
-            if (r1 < r5) goto L_0x0033
-        L_0x0015:
-            org.zeam.ScreenIndicator r5 = r9.mScreenIndicator
-            if (r5 == 0) goto L_0x0032
-            org.zeam.ScreenIndicator r5 = r9.mScreenIndicator
-            r5.setAutoHide(r7)
-            org.zeam.Workspace r5 = r9.mWorkspace
-            if (r5 == 0) goto L_0x0032
-            org.zeam.ScreenIndicator r5 = r9.mScreenIndicator
-            org.zeam.Workspace r6 = r9.mWorkspace
-            int r6 = r6.getChildCount()
-            r5.setItems(r6)
-            org.zeam.Workspace r5 = r9.mWorkspace
-            r5.indicateCurrent()
-        L_0x0032:
-            return
-        L_0x0033:
-            r5 = r3[r1]
-            boolean r5 = r5.equals(r2)
-            if (r5 == 0) goto L_0x004f
-            switch(r1) {
-                case 0: goto L_0x0052;
-                case 1: goto L_0x005a;
-                case 2: goto L_0x006c;
-                default: goto L_0x003e;
+        Resources resources = getResources();
+        String screenIndicator = PreferencesUtil.getScreenIndicator(this);
+        String[] screenIndicatorTypes = resources.getStringArray(R.array.preferences_values_workspace_screen_indicator_types);
+        try {
+            for (int i = 0; i < screenIndicatorTypes.length; i++) {
+                if (screenIndicatorTypes[i].equals(screenIndicator)) {
+                    switch (i) {
+                        case 0:
+                            this.mScreenIndicator = null;
+                            break;
+                        case 1:
+                            this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.workspace_screen_indicator);
+                            this.mScreenIndicator.setType(2);
+                            break;
+                        case 2:
+                            this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.workspace_screen_indicator);
+                            this.mScreenIndicator.setType(1);
+                            break;
+                        default:
+                            this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.workspace_screen_indicator);
+                            this.mScreenIndicator.setType(2);
+                            break;
+                    }
+                }
             }
-        L_0x003e:
-            r5 = 2131099677(0x7f06001d, float:1.7811714E38)
-            android.view.View r5 = r9.findViewById(r5)     // Catch:{ ClassCastException -> 0x0056 }
-            org.zeam.ScreenIndicator r5 = (org.zeam.ScreenIndicator) r5     // Catch:{ ClassCastException -> 0x0056 }
-            r9.mScreenIndicator = r5     // Catch:{ ClassCastException -> 0x0056 }
-            org.zeam.ScreenIndicator r5 = r9.mScreenIndicator     // Catch:{ ClassCastException -> 0x0056 }
-            r6 = 2
-            r5.setType(r6)     // Catch:{ ClassCastException -> 0x0056 }
-        L_0x004f:
-            int r1 = r1 + 1
-            goto L_0x0012
-        L_0x0052:
-            r5 = 0
-            r9.mScreenIndicator = r5     // Catch:{ ClassCastException -> 0x0056 }
-            goto L_0x004f
-        L_0x0056:
-            r0 = move-exception
-            r9.mScreenIndicator = r8
-            goto L_0x0015
-        L_0x005a:
-            r5 = 2131099677(0x7f06001d, float:1.7811714E38)
-            android.view.View r5 = r9.findViewById(r5)     // Catch:{ ClassCastException -> 0x0056 }
-            org.zeam.ScreenIndicator r5 = (org.zeam.ScreenIndicator) r5     // Catch:{ ClassCastException -> 0x0056 }
-            r9.mScreenIndicator = r5     // Catch:{ ClassCastException -> 0x0056 }
-            org.zeam.ScreenIndicator r5 = r9.mScreenIndicator     // Catch:{ ClassCastException -> 0x0056 }
-            r6 = 2
-            r5.setType(r6)     // Catch:{ ClassCastException -> 0x0056 }
-            goto L_0x004f
-        L_0x006c:
-            r5 = 2131099677(0x7f06001d, float:1.7811714E38)
-            android.view.View r5 = r9.findViewById(r5)     // Catch:{ ClassCastException -> 0x0056 }
-            org.zeam.ScreenIndicator r5 = (org.zeam.ScreenIndicator) r5     // Catch:{ ClassCastException -> 0x0056 }
-            r9.mScreenIndicator = r5     // Catch:{ ClassCastException -> 0x0056 }
-            org.zeam.ScreenIndicator r5 = r9.mScreenIndicator     // Catch:{ ClassCastException -> 0x0056 }
-            r6 = 1
-            r5.setType(r6)     // Catch:{ ClassCastException -> 0x0056 }
-            goto L_0x004f
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.zeam.Launcher.loadIndicator():void");
+        } catch (ClassCastException e) {
+            this.mScreenIndicator = null;
+        }
+        if (this.mScreenIndicator != null) {
+            this.mScreenIndicator.setAutoHide(true);
+            if (this.mWorkspace != null) {
+                this.mScreenIndicator.setItems(this.mWorkspace.getChildCount());
+                this.mWorkspace.indicateCurrent();
+            }
+        }
     }
 
     /* access modifiers changed from: package-private */
@@ -1459,11 +1305,33 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         startActivity(chooser);
     }
 
+    private static void registerReceiverCompat(Context context, BroadcastReceiver receiver, IntentFilter filter) {
+        try {
+            Method method = Context.class.getMethod("registerReceiver", new Class[]{BroadcastReceiver.class, IntentFilter.class, Integer.TYPE});
+            method.invoke(context, new Object[]{receiver, filter, Integer.valueOf(4)});
+        } catch (NoSuchMethodException e) {
+            context.registerReceiver(receiver, filter);
+        } catch (IllegalAccessException e2) {
+            throw new IllegalStateException("Cannot access flagged receiver registration", e2);
+        } catch (InvocationTargetException e3) {
+            Throwable cause = e3.getCause();
+            if (cause instanceof RuntimeException) {
+                throw (RuntimeException) cause;
+            }
+            if (cause instanceof Error) {
+                throw (Error) cause;
+            }
+            throw new IllegalStateException("Flagged receiver registration failed", cause);
+        } catch (SecurityException e4) {
+            throw new IllegalStateException("Cannot access flagged receiver registration", e4);
+        }
+    }
+
     private void registerIntentReceivers() {
         if (sWallpaperReceiver == null) {
             Application application = getApplication();
             sWallpaperReceiver = new WallpaperIntentReceiver(application, this);
-            application.registerReceiver(sWallpaperReceiver, new IntentFilter("android.intent.action.WALLPAPER_CHANGED"));
+            registerReceiverCompat(application, sWallpaperReceiver, new IntentFilter("android.intent.action.WALLPAPER_CHANGED"));
         } else {
             sWallpaperReceiver.setLauncher(this);
         }
@@ -1471,12 +1339,12 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         intentFilter.addAction("android.intent.action.PACKAGE_REMOVED");
         intentFilter.addAction("android.intent.action.PACKAGE_CHANGED");
         intentFilter.addDataScheme("package");
-        registerReceiver(this.mApplicationsReceiver, intentFilter);
-        registerReceiver(this.mCloseSystemDialogsReceiver, new IntentFilter("android.intent.action.CLOSE_SYSTEM_DIALOGS"));
+        registerReceiverCompat(this, this.mApplicationsReceiver, intentFilter);
+        registerReceiverCompat(this, this.mCloseSystemDialogsReceiver, new IntentFilter("android.intent.action.CLOSE_SYSTEM_DIALOGS"));
         IntentFilter intentFilter2 = new IntentFilter();
         intentFilter2.addAction("android.intent.action.EXTERNAL_APPLICATIONS_AVAILABLE");
         intentFilter2.addAction("android.intent.action.EXTERNAL_APPLICATIONS_UNAVAILABLE");
-        registerReceiver(this.mApplicationsReceiver, intentFilter2);
+        registerReceiverCompat(this, this.mApplicationsReceiver, intentFilter2);
     }
 
     private void registerContentObservers() {

@@ -224,508 +224,253 @@ public class LauncherModel {
             throw new AssertionError();
         }
 
-        /* JADX WARNING: Can't fix incorrect switch cases order */
-        /* Code decompiled incorrectly, please refer to instructions dump. */
         private void loadWorkspace() {
-            /*
-                r49 = this;
-                java.lang.String r4 = org.zeam.LauncherModel.LOG_TAG
-                java.lang.StringBuilder r6 = new java.lang.StringBuilder
-                java.lang.String r12 = "  ----> running workspace loader ("
-                r6.<init>(r12)
-                r0 = r49
-                int r12 = r0.mId
-                java.lang.StringBuilder r6 = r6.append(r12)
-                java.lang.String r12 = ")"
-                java.lang.StringBuilder r6 = r6.append(r12)
-                java.lang.String r6 = r6.toString()
-                android.util.Log.d(r4, r6)
-                r4 = 0
-                android.os.Process.setThreadPriority(r4)
-                r0 = r49
-                java.lang.ref.WeakReference<org.zeam.Launcher> r4 = r0.mLauncher
-                java.lang.Object r11 = r4.get()
-                org.zeam.Launcher r11 = (org.zeam.Launcher) r11
-                android.content.ContentResolver r3 = r11.getContentResolver()
-                android.content.pm.PackageManager r40 = r11.getPackageManager()
-                r0 = r49
-                boolean r4 = r0.mLocaleChanged
-                if (r4 == 0) goto L_0x0041
-                r0 = r49
-                r1 = r40
-                r0.updateShortcutLabels(r3, r1)
-            L_0x0041:
-                java.util.ArrayList r27 = new java.util.ArrayList
-                r27.<init>()
-                java.util.ArrayList r26 = new java.util.ArrayList
-                r26.<init>()
-                java.util.HashMap r31 = new java.util.HashMap
-                r31.<init>()
-                android.net.Uri r4 = org.zeam.LauncherSettings.Favorites.CONTENT_URI
-                r5 = 0
-                r6 = 0
-                r7 = 0
-                r8 = 0
-                android.database.Cursor r5 = r3.query(r4, r5, r6, r7, r8)
-                java.lang.String r4 = "_id"
-                int r34 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "intent"
-                int r37 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "title"
-                int r44 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "iconType"
-                int r7 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "icon"
-                int r10 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "iconPackage"
-                int r8 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "iconResource"
-                int r9 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "container"
-                int r25 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "itemType"
-                int r39 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "appWidgetId"
-                int r18 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "screen"
-                int r41 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "cellX"
-                int r22 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "cellY"
-                int r23 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "spanX"
-                int r42 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "spanY"
-                int r43 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "uri"
-                int r47 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-                java.lang.String r4 = "displayMode"
-                int r28 = r5.getColumnIndexOrThrow(r4)     // Catch:{ all -> 0x01c8 }
-            L_0x00c0:
-                r0 = r49
-                boolean r4 = r0.mStopped     // Catch:{ all -> 0x01c8 }
-                if (r4 != 0) goto L_0x00cc
-                boolean r4 = r5.moveToNext()     // Catch:{ all -> 0x01c8 }
-                if (r4 != 0) goto L_0x012c
-            L_0x00cc:
-                r5.close()
-                r0 = r49
-                org.zeam.LauncherModel r6 = org.zeam.LauncherModel.this
-                monitor-enter(r6)
-                r0 = r49
-                boolean r4 = r0.mStopped     // Catch:{ all -> 0x0400 }
-                if (r4 != 0) goto L_0x012a
-                java.util.ArrayList r45 = new java.util.ArrayList     // Catch:{ all -> 0x0400 }
-                r0 = r45
-                r1 = r27
-                r0.<init>(r1)     // Catch:{ all -> 0x0400 }
-                java.util.ArrayList r46 = new java.util.ArrayList     // Catch:{ all -> 0x0400 }
-                r0 = r46
-                r1 = r26
-                r0.<init>(r1)     // Catch:{ all -> 0x0400 }
-                r0 = r49
-                boolean r4 = r0.mStopped     // Catch:{ all -> 0x0400 }
-                if (r4 != 0) goto L_0x0107
-                java.lang.String r4 = org.zeam.LauncherModel.LOG_TAG     // Catch:{ all -> 0x0400 }
-                java.lang.String r12 = "  ----> items cloned, ready to refresh UI"
-                android.util.Log.d(r4, r12)     // Catch:{ all -> 0x0400 }
-                org.zeam.LauncherModel$DesktopItemsLoader$1 r4 = new org.zeam.LauncherModel$DesktopItemsLoader$1     // Catch:{ all -> 0x0400 }
-                r0 = r49
-                r1 = r45
-                r2 = r46
-                r4.<init>(r11, r1, r2)     // Catch:{ all -> 0x0400 }
-                r11.runOnUiThread(r4)     // Catch:{ all -> 0x0400 }
-            L_0x0107:
-                r0 = r49
-                org.zeam.LauncherModel r4 = org.zeam.LauncherModel.this     // Catch:{ all -> 0x0400 }
-                r0 = r27
-                r4.mDesktopItems = r0     // Catch:{ all -> 0x0400 }
-                r0 = r49
-                org.zeam.LauncherModel r4 = org.zeam.LauncherModel.this     // Catch:{ all -> 0x0400 }
-                r0 = r26
-                r4.mDesktopAppWidgets = r0     // Catch:{ all -> 0x0400 }
-                r0 = r49
-                org.zeam.LauncherModel r4 = org.zeam.LauncherModel.this     // Catch:{ all -> 0x0400 }
-                r0 = r31
-                r4.mFolders = r0     // Catch:{ all -> 0x0400 }
-                r0 = r49
-                org.zeam.LauncherModel r4 = org.zeam.LauncherModel.this     // Catch:{ all -> 0x0400 }
-                r12 = 1
-                r4.mDesktopItemsLoaded = r12     // Catch:{ all -> 0x0400 }
-            L_0x012a:
-                monitor-exit(r6)     // Catch:{ all -> 0x0400 }
-                return
-            L_0x012c:
-                r0 = r39
-                int r38 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                switch(r38) {
-                    case 0: goto L_0x0136;
-                    case 1: goto L_0x0136;
-                    case 2: goto L_0x023b;
-                    case 3: goto L_0x0296;
-                    case 4: goto L_0x038c;
-                    case 6: goto L_0x01cd;
-                    case 1001: goto L_0x0327;
-                    default: goto L_0x0135;
-                }     // Catch:{ Exception -> 0x01bc }
-            L_0x0135:
-                goto L_0x00c0
-            L_0x0136:
-                r0 = r37
-                java.lang.String r36 = r5.getString(r0)     // Catch:{ Exception -> 0x01bc }
-                r4 = 0
-                r0 = r36
-                android.content.Intent r35 = android.content.Intent.parseUri(r0, r4)     // Catch:{ URISyntaxException -> 0x0224 }
-                if (r38 != 0) goto L_0x0227
-                r0 = r40
-                r1 = r35
-                org.zeam.ApplicationItemInfo r20 = org.zeam.LauncherModel.getApplicationInfo(r0, r1, r11)     // Catch:{ Exception -> 0x01bc }
-            L_0x014d:
-                if (r20 != 0) goto L_0x015c
-                org.zeam.ApplicationItemInfo r20 = new org.zeam.ApplicationItemInfo     // Catch:{ Exception -> 0x01bc }
-                r20.<init>()     // Catch:{ Exception -> 0x01bc }
-                android.graphics.drawable.Drawable r4 = r40.getDefaultActivityIcon()     // Catch:{ Exception -> 0x01bc }
-                r0 = r20
-                r0.icon = r4     // Catch:{ Exception -> 0x01bc }
-            L_0x015c:
-                if (r20 == 0) goto L_0x00c0
-                r0 = r44
-                java.lang.String r4 = r5.getString(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r20
-                r0.title = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r35
-                r1 = r20
-                r1.intent = r0     // Catch:{ Exception -> 0x01bc }
-                r0 = r34
-                long r12 = r5.getLong(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r20
-                r0.f3id = r12     // Catch:{ Exception -> 0x01bc }
-                r0 = r25
-                int r24 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r24
-                long r12 = (long) r0     // Catch:{ Exception -> 0x01bc }
-                r0 = r20
-                r0.container = r12     // Catch:{ Exception -> 0x01bc }
-                r0 = r41
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r20
-                r0.screen = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r22
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r20
-                r0.cellX = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r23
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r20
-                r0.cellY = r4     // Catch:{ Exception -> 0x01bc }
-                switch(r24) {
-                    case -200: goto L_0x0232;
-                    case -100: goto L_0x0232;
-                    default: goto L_0x01a6;
-                }     // Catch:{ Exception -> 0x01bc }
-            L_0x01a6:
-                r0 = r49
-                org.zeam.LauncherModel r4 = org.zeam.LauncherModel.this     // Catch:{ Exception -> 0x01bc }
-                r0 = r24
-                long r12 = (long) r0     // Catch:{ Exception -> 0x01bc }
-                r0 = r31
-                org.zeam.UserFolderInfo r30 = r4.findOrMakeUserFolder(r0, r12)     // Catch:{ Exception -> 0x01bc }
-                r0 = r30
-                r1 = r20
-                r0.add(r1)     // Catch:{ Exception -> 0x01bc }
-                goto L_0x00c0
-            L_0x01bc:
-                r29 = move-exception
-                java.lang.String r4 = org.zeam.Launcher.LOG_TAG     // Catch:{ all -> 0x01c8 }
-                java.lang.String r6 = "Desktop items loading interrupted:"
-                r0 = r29
-                android.util.Log.w(r4, r6, r0)     // Catch:{ all -> 0x01c8 }
-                goto L_0x00c0
-            L_0x01c8:
-                r4 = move-exception
-                r5.close()
-                throw r4
-            L_0x01cd:
-                org.zeam.ApplicationsGridItemInfo r21 = new org.zeam.ApplicationsGridItemInfo     // Catch:{ Exception -> 0x01bc }
-                r0 = r21
-                r0.<init>(r11)     // Catch:{ Exception -> 0x01bc }
-                r0 = r34
-                long r12 = r5.getLong(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r21
-                r0.f3id = r12     // Catch:{ Exception -> 0x01bc }
-                r0 = r25
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                long r12 = (long) r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r21
-                r0.container = r12     // Catch:{ Exception -> 0x01bc }
-                r0 = r41
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r21
-                r0.screen = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r22
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r21
-                r0.cellX = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r23
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r21
-                r0.cellY = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r42
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r21
-                r0.spanX = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r43
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r21
-                r0.spanY = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r27
-                r1 = r21
-                r0.add(r1)     // Catch:{ Exception -> 0x01bc }
-                goto L_0x00c0
-            L_0x0224:
-                r29 = move-exception
-                goto L_0x00c0
-            L_0x0227:
-                r0 = r49
-                org.zeam.LauncherModel r4 = org.zeam.LauncherModel.this     // Catch:{ Exception -> 0x01bc }
-                r6 = r11
-                org.zeam.ApplicationItemInfo r20 = r4.getApplicationInfoShortcut(r5, r6, r7, r8, r9, r10)     // Catch:{ Exception -> 0x01bc }
-                goto L_0x014d
-            L_0x0232:
-                r0 = r27
-                r1 = r20
-                r0.add(r1)     // Catch:{ Exception -> 0x01bc }
-                goto L_0x00c0
-            L_0x023b:
-                r0 = r34
-                long r32 = r5.getLong(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r49
-                org.zeam.LauncherModel r4 = org.zeam.LauncherModel.this     // Catch:{ Exception -> 0x01bc }
-                r0 = r31
-                r1 = r32
-                org.zeam.UserFolderInfo r30 = r4.findOrMakeUserFolder(r0, r1)     // Catch:{ Exception -> 0x01bc }
-                r0 = r44
-                java.lang.String r4 = r5.getString(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r30
-                r0.title = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r32
-                r2 = r30
-                r2.f3id = r0     // Catch:{ Exception -> 0x01bc }
-                r0 = r25
-                int r24 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r24
-                long r12 = (long) r0     // Catch:{ Exception -> 0x01bc }
-                r0 = r30
-                r0.container = r12     // Catch:{ Exception -> 0x01bc }
-                r0 = r41
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r30
-                r0.screen = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r22
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r30
-                r0.cellX = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r23
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r30
-                r0.cellY = r4     // Catch:{ Exception -> 0x01bc }
-                switch(r24) {
-                    case -200: goto L_0x028d;
-                    case -100: goto L_0x028d;
-                    default: goto L_0x028b;
-                }     // Catch:{ Exception -> 0x01bc }
-            L_0x028b:
-                goto L_0x00c0
-            L_0x028d:
-                r0 = r27
-                r1 = r30
-                r0.add(r1)     // Catch:{ Exception -> 0x01bc }
-                goto L_0x00c0
-            L_0x0296:
-                r0 = r34
-                long r32 = r5.getLong(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r49
-                org.zeam.LauncherModel r4 = org.zeam.LauncherModel.this     // Catch:{ Exception -> 0x01bc }
-                r0 = r31
-                r1 = r32
-                org.zeam.LiveFolderInfo r16 = r4.findOrMakeLiveFolder(r0, r1)     // Catch:{ Exception -> 0x01bc }
-                r0 = r37
-                java.lang.String r36 = r5.getString(r0)     // Catch:{ Exception -> 0x01bc }
-                r35 = 0
-                if (r36 == 0) goto L_0x02b9
-                r4 = 0
-                r0 = r36
-                android.content.Intent r35 = android.content.Intent.parseUri(r0, r4)     // Catch:{ URISyntaxException -> 0x0403 }
-            L_0x02b9:
-                r0 = r44
-                java.lang.String r4 = r5.getString(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r16
-                r0.title = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r32
-                r2 = r16
-                r2.f3id = r0     // Catch:{ Exception -> 0x01bc }
-                r0 = r25
-                int r24 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r24
-                long r12 = (long) r0     // Catch:{ Exception -> 0x01bc }
-                r0 = r16
-                r0.container = r12     // Catch:{ Exception -> 0x01bc }
-                r0 = r41
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r16
-                r0.screen = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r22
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r16
-                r0.cellX = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r23
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r16
-                r0.cellY = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r47
-                java.lang.String r4 = r5.getString(r0)     // Catch:{ Exception -> 0x01bc }
-                android.net.Uri r4 = android.net.Uri.parse(r4)     // Catch:{ Exception -> 0x01bc }
-                r0 = r16
-                r0.uri = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r35
-                r1 = r16
-                r1.baseIntent = r0     // Catch:{ Exception -> 0x01bc }
-                r0 = r28
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r16
-                r0.displayMode = r4     // Catch:{ Exception -> 0x01bc }
-                r12 = r5
-                r13 = r7
-                r14 = r8
-                r15 = r9
-                org.zeam.LauncherModel.loadLiveFolderIcon(r11, r12, r13, r14, r15, r16)     // Catch:{ Exception -> 0x01bc }
-                switch(r24) {
-                    case -200: goto L_0x031e;
-                    case -100: goto L_0x031e;
-                    default: goto L_0x031c;
-                }     // Catch:{ Exception -> 0x01bc }
-            L_0x031c:
-                goto L_0x00c0
-            L_0x031e:
-                r0 = r27
-                r1 = r16
-                r0.add(r1)     // Catch:{ Exception -> 0x01bc }
-                goto L_0x00c0
-            L_0x0327:
-                org.zeam.Widget r48 = org.zeam.Widget.makeSearch()     // Catch:{ Exception -> 0x01bc }
-                r0 = r25
-                int r24 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r4 = -100
-                r0 = r24
-                if (r0 == r4) goto L_0x0340
-                java.lang.String r4 = org.zeam.Launcher.LOG_TAG     // Catch:{ Exception -> 0x01bc }
-                java.lang.String r6 = "Widget found where container != CONTAINER_DESKTOP  ignoring!"
-                android.util.Log.e(r4, r6)     // Catch:{ Exception -> 0x01bc }
-                goto L_0x00c0
-            L_0x0340:
-                r0 = r34
-                long r12 = r5.getLong(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r48
-                r0.f3id = r12     // Catch:{ Exception -> 0x01bc }
-                r0 = r41
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r48
-                r0.screen = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r24
-                long r12 = (long) r0     // Catch:{ Exception -> 0x01bc }
-                r0 = r48
-                r0.container = r12     // Catch:{ Exception -> 0x01bc }
-                r0 = r22
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r48
-                r0.cellX = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r23
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r48
-                r0.cellY = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r42
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r48
-                r0.spanX = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r43
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r48
-                r0.spanY = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r27
-                r1 = r48
-                r0.add(r1)     // Catch:{ Exception -> 0x01bc }
-                goto L_0x00c0
-            L_0x038c:
-                r0 = r18
-                int r17 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                org.zeam.LauncherAppWidgetInfo r19 = new org.zeam.LauncherAppWidgetInfo     // Catch:{ Exception -> 0x01bc }
-                r0 = r19
-                r1 = r17
-                r0.<init>(r1)     // Catch:{ Exception -> 0x01bc }
-                r0 = r34
-                long r12 = r5.getLong(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r19
-                r0.f3id = r12     // Catch:{ Exception -> 0x01bc }
-                r0 = r41
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r19
-                r0.screen = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r22
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r19
-                r0.cellX = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r23
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r19
-                r0.cellY = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r42
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r19
-                r0.spanX = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r43
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r0 = r19
-                r0.spanY = r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r25
-                int r24 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                r4 = -100
-                r0 = r24
-                if (r0 == r4) goto L_0x03ec
-                java.lang.String r4 = org.zeam.Launcher.LOG_TAG     // Catch:{ Exception -> 0x01bc }
-                java.lang.String r6 = "Widget found where container != CONTAINER_DESKTOP -- ignoring!"
-                android.util.Log.e(r4, r6)     // Catch:{ Exception -> 0x01bc }
-                goto L_0x00c0
-            L_0x03ec:
-                r0 = r25
-                int r4 = r5.getInt(r0)     // Catch:{ Exception -> 0x01bc }
-                long r12 = (long) r4     // Catch:{ Exception -> 0x01bc }
-                r0 = r19
-                r0.container = r12     // Catch:{ Exception -> 0x01bc }
-                r0 = r26
-                r1 = r19
-                r0.add(r1)     // Catch:{ Exception -> 0x01bc }
-                goto L_0x00c0
-            L_0x0400:
-                r4 = move-exception
-                monitor-exit(r6)     // Catch:{ all -> 0x0400 }
-                throw r4
-            L_0x0403:
-                r4 = move-exception
-                goto L_0x02b9
-            */
-            throw new UnsupportedOperationException("Method not decompiled: org.zeam.LauncherModel.DesktopItemsLoader.loadWorkspace():void");
+            Log.d(LauncherModel.LOG_TAG, "  ----> running workspace loader (" + this.mId + ")");
+            Process.setThreadPriority(0);
+
+            Launcher launcher = this.mLauncher.get();
+            ContentResolver resolver = launcher.getContentResolver();
+            PackageManager packageManager = launcher.getPackageManager();
+
+            if (this.mLocaleChanged) {
+                updateShortcutLabels(resolver, packageManager);
+            }
+
+            ArrayList<ItemInfo> items = new ArrayList<>();
+            ArrayList<LauncherAppWidgetInfo> appWidgets = new ArrayList<>();
+            HashMap<Long, FolderInfo> folders = new HashMap<>();
+            Cursor cursor = resolver.query(
+                    LauncherSettings.Favorites.CONTENT_URI,
+                    null,
+                    null,
+                    null,
+                    null
+            );
+
+            try {
+                int idIndex = cursor.getColumnIndexOrThrow("_id");
+                int intentIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.INTENT);
+                int titleIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.TITLE);
+                int iconTypeIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.ICON_TYPE);
+                int iconIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.ICON);
+                int iconPackageIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.ICON_PACKAGE);
+                int iconResourceIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.ICON_RESOURCE);
+                int containerIndex = cursor.getColumnIndexOrThrow(LauncherSettings.Favorites.CONTAINER);
+                int itemTypeIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.ITEM_TYPE);
+                int appWidgetIdIndex = cursor.getColumnIndexOrThrow(LauncherSettings.Favorites.APPWIDGET_ID);
+                int screenIndex = cursor.getColumnIndexOrThrow(LauncherSettings.Favorites.SCREEN);
+                int cellXIndex = cursor.getColumnIndexOrThrow(LauncherSettings.Favorites.CELLX);
+                int cellYIndex = cursor.getColumnIndexOrThrow(LauncherSettings.Favorites.CELLY);
+                int spanXIndex = cursor.getColumnIndexOrThrow(LauncherSettings.Favorites.SPANX);
+                int spanYIndex = cursor.getColumnIndexOrThrow(LauncherSettings.Favorites.SPANY);
+                int uriIndex = cursor.getColumnIndexOrThrow(LauncherSettings.Favorites.URI);
+                int displayModeIndex = cursor.getColumnIndexOrThrow(LauncherSettings.Favorites.DISPLAY_MODE);
+
+                while (!this.mStopped && cursor.moveToNext()) {
+                    try {
+                        int itemType = cursor.getInt(itemTypeIndex);
+
+                        switch (itemType) {
+                            case LauncherSettings.BaseLauncherColumns.ITEM_TYPE_APPLICATION:
+                            case LauncherSettings.BaseLauncherColumns.ITEM_TYPE_SHORTCUT:
+                                String intentUri = cursor.getString(intentIndex);
+                                Intent intent;
+
+                                try {
+                                    intent = Intent.parseUri(intentUri, 0);
+                                } catch (URISyntaxException e) {
+                                    continue;
+                                }
+
+                                ApplicationItemInfo applicationItemInfo;
+                                if (itemType == LauncherSettings.BaseLauncherColumns.ITEM_TYPE_APPLICATION) {
+                                    applicationItemInfo = LauncherModel.getApplicationInfo(packageManager, intent, launcher);
+                                } else {
+                                    applicationItemInfo = LauncherModel.this.getApplicationInfoShortcut(
+                                            cursor,
+                                            launcher,
+                                            iconTypeIndex,
+                                            iconPackageIndex,
+                                            iconResourceIndex,
+                                            iconIndex
+                                    );
+                                }
+
+                                if (applicationItemInfo == null) {
+                                    applicationItemInfo = new ApplicationItemInfo();
+                                    applicationItemInfo.icon = packageManager.getDefaultActivityIcon();
+                                }
+
+                                applicationItemInfo.title = cursor.getString(titleIndex);
+                                applicationItemInfo.intent = intent;
+                                applicationItemInfo.f3id = cursor.getLong(idIndex);
+                                int applicationContainer = cursor.getInt(containerIndex);
+                                applicationItemInfo.container = applicationContainer;
+                                applicationItemInfo.screen = cursor.getInt(screenIndex);
+                                applicationItemInfo.cellX = cursor.getInt(cellXIndex);
+                                applicationItemInfo.cellY = cursor.getInt(cellYIndex);
+
+                                if (applicationContainer == LauncherSettings.Favorites.CONTAINER_DESKTOP
+                                        || applicationContainer == LauncherSettings.Favorites.CONTAINER_DOCKBAR) {
+                                    items.add(applicationItemInfo);
+                                    continue;
+                                }
+
+                                LauncherModel.this.findOrMakeUserFolder(folders, applicationContainer)
+                                        .add(applicationItemInfo);
+                                continue;
+
+                            case LauncherSettings.Favorites.ITEM_TYPE_APPS_GRID:
+                                ApplicationsGridItemInfo applicationsGridItemInfo = new ApplicationsGridItemInfo(launcher);
+                                applicationsGridItemInfo.f3id = cursor.getLong(idIndex);
+                                applicationsGridItemInfo.container = cursor.getInt(containerIndex);
+                                applicationsGridItemInfo.screen = cursor.getInt(screenIndex);
+                                applicationsGridItemInfo.cellX = cursor.getInt(cellXIndex);
+                                applicationsGridItemInfo.cellY = cursor.getInt(cellYIndex);
+                                applicationsGridItemInfo.spanX = cursor.getInt(spanXIndex);
+                                applicationsGridItemInfo.spanY = cursor.getInt(spanYIndex);
+                                items.add(applicationsGridItemInfo);
+                                continue;
+
+                            case LauncherSettings.Favorites.ITEM_TYPE_USER_FOLDER:
+                                long userFolderId = cursor.getLong(idIndex);
+                                UserFolderInfo userFolderInfo = LauncherModel.this.findOrMakeUserFolder(folders, userFolderId);
+                                userFolderInfo.title = cursor.getString(titleIndex);
+                                userFolderInfo.f3id = userFolderId;
+                                int userFolderContainer = cursor.getInt(containerIndex);
+                                userFolderInfo.container = userFolderContainer;
+                                userFolderInfo.screen = cursor.getInt(screenIndex);
+                                userFolderInfo.cellX = cursor.getInt(cellXIndex);
+                                userFolderInfo.cellY = cursor.getInt(cellYIndex);
+
+                                if (userFolderContainer == LauncherSettings.Favorites.CONTAINER_DESKTOP
+                                        || userFolderContainer == LauncherSettings.Favorites.CONTAINER_DOCKBAR) {
+                                    items.add(userFolderInfo);
+                                }
+                                continue;
+
+                            case LauncherSettings.Favorites.ITEM_TYPE_LIVE_FOLDER:
+                                long liveFolderId = cursor.getLong(idIndex);
+                                LiveFolderInfo liveFolderInfo = LauncherModel.this.findOrMakeLiveFolder(folders, liveFolderId);
+                                String liveFolderIntentUri = cursor.getString(intentIndex);
+                                Intent baseIntent = null;
+
+                                if (liveFolderIntentUri != null) {
+                                    try {
+                                        baseIntent = Intent.parseUri(liveFolderIntentUri, 0);
+                                    } catch (URISyntaxException e) {
+                                    }
+                                }
+
+                                liveFolderInfo.title = cursor.getString(titleIndex);
+                                liveFolderInfo.f3id = liveFolderId;
+                                int liveFolderContainer = cursor.getInt(containerIndex);
+                                liveFolderInfo.container = liveFolderContainer;
+                                liveFolderInfo.screen = cursor.getInt(screenIndex);
+                                liveFolderInfo.cellX = cursor.getInt(cellXIndex);
+                                liveFolderInfo.cellY = cursor.getInt(cellYIndex);
+                                liveFolderInfo.uri = Uri.parse(cursor.getString(uriIndex));
+                                liveFolderInfo.baseIntent = baseIntent;
+                                liveFolderInfo.displayMode = cursor.getInt(displayModeIndex);
+                                LauncherModel.loadLiveFolderIcon(
+                                        launcher,
+                                        cursor,
+                                        iconTypeIndex,
+                                        iconPackageIndex,
+                                        iconResourceIndex,
+                                        liveFolderInfo
+                                );
+
+                                if (liveFolderContainer == LauncherSettings.Favorites.CONTAINER_DESKTOP
+                                        || liveFolderContainer == LauncherSettings.Favorites.CONTAINER_DOCKBAR) {
+                                    items.add(liveFolderInfo);
+                                }
+                                continue;
+
+                            case LauncherSettings.Favorites.ITEM_TYPE_WIDGET_SEARCH:
+                                Widget searchWidget = Widget.makeSearch();
+                                int searchWidgetContainer = cursor.getInt(containerIndex);
+
+                                if (searchWidgetContainer != LauncherSettings.Favorites.CONTAINER_DESKTOP) {
+                                    Log.e(Launcher.LOG_TAG, "Widget found where container != CONTAINER_DESKTOP  ignoring!");
+                                    continue;
+                                }
+
+                                searchWidget.f3id = cursor.getLong(idIndex);
+                                searchWidget.screen = cursor.getInt(screenIndex);
+                                searchWidget.container = searchWidgetContainer;
+                                searchWidget.cellX = cursor.getInt(cellXIndex);
+                                searchWidget.cellY = cursor.getInt(cellYIndex);
+                                searchWidget.spanX = cursor.getInt(spanXIndex);
+                                searchWidget.spanY = cursor.getInt(spanYIndex);
+                                items.add(searchWidget);
+                                continue;
+
+                            case LauncherSettings.Favorites.ITEM_TYPE_APPWIDGET:
+                                LauncherAppWidgetInfo appWidgetInfo = new LauncherAppWidgetInfo(cursor.getInt(appWidgetIdIndex));
+                                appWidgetInfo.f3id = cursor.getLong(idIndex);
+                                appWidgetInfo.screen = cursor.getInt(screenIndex);
+                                appWidgetInfo.cellX = cursor.getInt(cellXIndex);
+                                appWidgetInfo.cellY = cursor.getInt(cellYIndex);
+                                appWidgetInfo.spanX = cursor.getInt(spanXIndex);
+                                appWidgetInfo.spanY = cursor.getInt(spanYIndex);
+                                int appWidgetContainer = cursor.getInt(containerIndex);
+
+                                if (appWidgetContainer != LauncherSettings.Favorites.CONTAINER_DESKTOP) {
+                                    Log.e(Launcher.LOG_TAG, "Widget found where container != CONTAINER_DESKTOP -- ignoring!");
+                                    continue;
+                                }
+
+                                appWidgetInfo.container = appWidgetContainer;
+                                appWidgets.add(appWidgetInfo);
+                                continue;
+
+                            default:
+                                continue;
+                        }
+                    } catch (Exception e) {
+                        Log.w(Launcher.LOG_TAG, "Desktop items loading interrupted:", e);
+                    }
+                }
+            } finally {
+                cursor.close();
+            }
+
+            synchronized (LauncherModel.this) {
+                if (this.mStopped) {
+                    return;
+                }
+
+                final ArrayList<ItemInfo> itemsToBind = new ArrayList<>(items);
+                final ArrayList<LauncherAppWidgetInfo> appWidgetsToBind = new ArrayList<>(appWidgets);
+
+                if (!this.mStopped) {
+                    Log.d(LauncherModel.LOG_TAG, "  ----> items cloned, ready to refresh UI");
+                    final Launcher launcherToBind = launcher;
+                    launcherToBind.runOnUiThread(new Runnable() {
+                        public void run() {
+                            launcherToBind.onDesktopItemsLoaded(itemsToBind, appWidgetsToBind);
+                        }
+                    });
+                }
+
+                LauncherModel.this.mDesktopItems = items;
+                LauncherModel.this.mDesktopAppWidgets = appWidgets;
+                LauncherModel.this.mFolders = folders;
+                LauncherModel.this.mDesktopItemsLoaded = true;
+            }
         }
 
         private void updateShortcutLabels(ContentResolver resolver, PackageManager manager) {
             String intentUri;
             ComponentName name;
             Cursor cursor = resolver.query(LauncherSettings.Favorites.CONTENT_URI, new String[]{"_id", LauncherSettings.BaseLauncherColumns.TITLE, LauncherSettings.BaseLauncherColumns.INTENT, LauncherSettings.BaseLauncherColumns.ITEM_TYPE}, (String) null, (String[]) null, (String) null);
-            int idIndex = cursor.getColumnIndexOrThrow("_id");
-            int intentIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.INTENT);
-            int itemTypeIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.ITEM_TYPE);
-            int titleIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.TITLE);
-            while (!this.mStopped && cursor.moveToNext()) {
-                try {
+            try {
+                int idIndex = cursor.getColumnIndexOrThrow("_id");
+                int intentIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.INTENT);
+                int itemTypeIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.ITEM_TYPE);
+                int titleIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.TITLE);
+                while (!this.mStopped && cursor.moveToNext()) {
                     try {
                         if (cursor.getInt(itemTypeIndex) == 0 && (intentUri = cursor.getString(intentIndex)) != null) {
                             Intent shortcut = Intent.parseUri(intentUri, 0);
@@ -742,9 +487,9 @@ public class LauncherModel {
                         }
                     } catch (PackageManager.NameNotFoundException | URISyntaxException e) {
                     }
-                } finally {
-                    cursor.close();
                 }
+            } finally {
+                cursor.close();
             }
         }
     }

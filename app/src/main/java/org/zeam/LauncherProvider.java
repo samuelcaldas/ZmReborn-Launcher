@@ -27,6 +27,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Xml;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import org.xmlpull.v1.XmlPullParserException;
@@ -457,6 +459,44 @@ public class LauncherProvider extends ContentProvider {
             return addAppWidget(db, contentValues, componentName, typedArray.getInt(5, 0), typedArray.getInt(6, 0));
         }
 
+        private boolean bindAppWidgetId(AppWidgetManager appWidgetManager, int appWidgetId, ComponentName componentName) {
+            try {
+                Method method = AppWidgetManager.class.getMethod("bindAppWidgetIdIfAllowed", Integer.TYPE, ComponentName.class);
+                return ((Boolean) method.invoke(appWidgetManager, Integer.valueOf(appWidgetId), componentName)).booleanValue();
+            } catch (NoSuchMethodException e) {
+                return bindLegacyAppWidgetId(appWidgetManager, appWidgetId, componentName);
+            } catch (IllegalAccessException e2) {
+                throw new IllegalStateException("Unable to access AppWidgetManager binding method", e2);
+            } catch (InvocationTargetException e3) {
+                throw bindingException(e3, "AppWidgetManager binding method failed");
+            }
+        }
+
+        private boolean bindLegacyAppWidgetId(AppWidgetManager appWidgetManager, int appWidgetId, ComponentName componentName) {
+            try {
+                Method method = AppWidgetManager.class.getMethod("bindAppWidgetId", Integer.TYPE, ComponentName.class);
+                method.invoke(appWidgetManager, Integer.valueOf(appWidgetId), componentName);
+                return LauncherProvider.LOGD;
+            } catch (NoSuchMethodException e) {
+                throw new IllegalStateException("AppWidgetManager does not support widget binding", e);
+            } catch (IllegalAccessException e2) {
+                throw new IllegalStateException("Unable to access legacy AppWidgetManager binding method", e2);
+            } catch (InvocationTargetException e3) {
+                throw bindingException(e3, "Legacy AppWidgetManager binding method failed");
+            }
+        }
+
+        private RuntimeException bindingException(InvocationTargetException exception, String message) {
+            Throwable cause = exception.getCause();
+            if (cause instanceof RuntimeException) {
+                return (RuntimeException) cause;
+            }
+            if (cause instanceof Error) {
+                throw (Error) cause;
+            }
+            return new IllegalStateException(message, cause);
+        }
+
         private boolean addAppWidget(SQLiteDatabase db, ContentValues contentValues, ComponentName componentName, int spanX, int spanY) {
             boolean allocatedAppWidgets = false;
             AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this.mContext);
@@ -468,7 +508,9 @@ public class LauncherProvider extends ContentProvider {
                 contentValues.put("appWidgetId", Integer.valueOf(appWidgetId));
                 db.insert(TAG_FAVORITES, (String) null, contentValues);
                 allocatedAppWidgets = LauncherProvider.LOGD;
-                appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, componentName);
+                if (!bindAppWidgetId(appWidgetManager, appWidgetId, componentName)) {
+                    Log.w(LauncherProvider.LOG_TAG, "App widget binding was not allowed for " + componentName);
+                }
                 return LauncherProvider.LOGD;
             } catch (RuntimeException ex) {
                 Log.e(LauncherProvider.LOG_TAG, "Problem allocating appWidgetId", ex);

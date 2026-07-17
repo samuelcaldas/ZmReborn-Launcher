@@ -441,61 +441,21 @@ public class XmlUtils {
         throw new XmlPullParserException("Unexpected start tag in <" + tagName + ">: " + parser.getName());
     }
 
-    /* JADX WARNING: Removed duplicated region for block: B:6:0x000c  */
-    /* JADX WARNING: Removed duplicated region for block: B:8:0x0014  */
-    /* Code decompiled incorrectly, please refer to instructions dump. */
-    public static final void beginDocument(org.xmlpull.v1.XmlPullParser r4, java.lang.String r5) throws org.xmlpull.v1.XmlPullParserException, java.io.IOException {
-        /*
-            r2 = 2
-        L_0x0001:
-            int r0 = r4.next()
-            if (r0 == r2) goto L_0x000a
-            r1 = 1
-            if (r0 != r1) goto L_0x0001
-        L_0x000a:
-            if (r0 == r2) goto L_0x0014
-            org.xmlpull.v1.XmlPullParserException r1 = new org.xmlpull.v1.XmlPullParserException
-            java.lang.String r2 = "No start tag found"
-            r1.<init>(r2)
-            throw r1
-        L_0x0014:
-            java.lang.String r1 = r4.getName()
-            boolean r1 = r1.equals(r5)
-            if (r1 != 0) goto L_0x0041
-            org.xmlpull.v1.XmlPullParserException r1 = new org.xmlpull.v1.XmlPullParserException
-            java.lang.StringBuilder r2 = new java.lang.StringBuilder
-            java.lang.String r3 = "Unexpected start tag: found "
-            r2.<init>(r3)
-            java.lang.String r3 = r4.getName()
-            java.lang.StringBuilder r2 = r2.append(r3)
-            java.lang.String r3 = ", expected "
-            java.lang.StringBuilder r2 = r2.append(r3)
-            java.lang.StringBuilder r2 = r2.append(r5)
-            java.lang.String r2 = r2.toString()
-            r1.<init>(r2)
-            throw r1
-        L_0x0041:
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.zeam.XmlUtils.beginDocument(org.xmlpull.v1.XmlPullParser, java.lang.String):void");
+    public static final void beginDocument(XmlPullParser parser, String firstElementName) throws XmlPullParserException, IOException {
+        int type;
+        while ((type = parser.next()) != XmlPullParser.START_TAG && type != XmlPullParser.END_DOCUMENT) {
+        }
+        if (type != XmlPullParser.START_TAG) {
+            throw new XmlPullParserException("No start tag found");
+        }
+        if (!parser.getName().equals(firstElementName)) {
+            throw new XmlPullParserException("Unexpected start tag: found " + parser.getName() + ", expected " + firstElementName);
+        }
     }
 
-    /*  JADX ERROR: StackOverflow in pass: RegionMakerVisitor
-        jadx.core.utils.exceptions.JadxOverflowException: 
-        	at jadx.core.utils.ErrorsCounter.addError(ErrorsCounter.java:47)
-        	at jadx.core.utils.ErrorsCounter.methodError(ErrorsCounter.java:81)
-        */
-    public static final void nextElement(org.xmlpull.v1.XmlPullParser r2) throws org.xmlpull.v1.XmlPullParserException, java.io.IOException {
-        /*
-        L_0x0000:
-            int r0 = r2.next()
-            r1 = 2
-            if (r0 == r1) goto L_0x000a
-            r1 = 1
-            if (r0 != r1) goto L_0x0000
-        L_0x000a:
-            return
-        */
-        throw new UnsupportedOperationException("Method not decompiled: org.zeam.XmlUtils.nextElement(org.xmlpull.v1.XmlPullParser):void");
+    public static final void nextElement(XmlPullParser parser) throws XmlPullParserException, IOException {
+        int type;
+        while ((type = parser.next()) != XmlPullParser.START_TAG && type != XmlPullParser.END_DOCUMENT) {
+        }
     }
 }

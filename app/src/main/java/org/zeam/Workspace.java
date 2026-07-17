@@ -16,6 +16,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 import android.os.SystemClock;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
@@ -1286,10 +1287,19 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
             this.mLiveWallpaperSupport = true;
         } else {
             if (fromIntentReceiver || this.mWallpaperDrawable == null) {
-                this.mWallpaperDrawable = (BitmapDrawable) this.mWallpaperManager.getDrawable();
-                this.mWallpaperLoaded = true;
+                try {
+                    this.mWallpaperDrawable = (BitmapDrawable) this.mWallpaperManager.getDrawable();
+                    this.mWallpaperLoaded = true;
+                    this.mLiveWallpaperSupport = false;
+                } catch (SecurityException e) {
+                    this.mWallpaperDrawable = null;
+                    this.mWallpaperLoaded = false;
+                    this.mLiveWallpaperSupport = true;
+                    Log.w(Launcher.LOG_TAG, "Wallpaper drawable unavailable", e);
+                }
+            } else {
+                this.mLiveWallpaperSupport = false;
             }
-            this.mLiveWallpaperSupport = false;
         }
         this.mLauncher.setWindowBackground(this.mLiveWallpaperSupport);
         invalidate();
