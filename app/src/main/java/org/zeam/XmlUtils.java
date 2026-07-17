@@ -161,7 +161,6 @@ public class XmlUtils {
     }
 
     public static final void writeByteArrayXml(byte[] val, String name, XmlSerializer out) throws XmlPullParserException, IOException {
-        int i;
         if (val == null) {
             out.startTag((String) null, "null");
             out.endTag((String) null, "null");
@@ -173,16 +172,10 @@ public class XmlUtils {
         }
         out.attribute((String) null, "num", Integer.toString(val.length));
         StringBuilder sb = new StringBuilder(val.length * 2);
-        for (byte b : val) {
-            int h = b >> 4;
-            sb.append(h >= 10 ? (h + 97) - 10 : h + 48);
-            int h2 = b & 255;
-            if (h2 >= 10) {
-                i = (h2 + 97) - 10;
-            } else {
-                i = h2 + 48;
-            }
-            sb.append(i);
+        for (byte item : val) {
+            int value = item & 255;
+            sb.append(Character.forDigit((value >>> 4) & 15, 16));
+            sb.append(Character.forDigit(value & 15, 16));
         }
         out.text(sb.toString());
         out.endTag((String) null, "byte-array");

@@ -79,7 +79,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     }
 
     public void setBackgroundAlpha(int alpha) {
-        setBackgroundColor(Color.argb(alpha, 0, 0, 0));
+        setBackgroundColor(Color.argb(alpha, 18, 26, 33));
         invalidate();
     }
 

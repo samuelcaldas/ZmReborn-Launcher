@@ -30,6 +30,9 @@ public class XmlUtilsTest {
 
     @Test
     public void testConvertValueToList() {
-        assertNull(XmlUtils.convertValueToList(null, "name"));
+        String[] options = new String[]{"a", "b", "c"};
+        assertEquals(1, XmlUtils.convertValueToList("b", options, -1));
+        assertEquals(-1, XmlUtils.convertValueToList(null, options, -1));
+        assertEquals(-1, XmlUtils.convertValueToList("d", options, -1));
     }
 }

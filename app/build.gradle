@@ -2,23 +2,57 @@ plugins {
     id 'com.android.application'
 }
 
+def releaseSigningRequired = providers.gradleProperty('releaseSigningRequired')
+        .map { it.toBoolean() }
+        .orElse(false)
+def releaseKeystorePath = providers.gradleProperty('releaseKeystorePath')
+        .orElse(providers.environmentVariable('RELEASE_KEYSTORE_PATH'))
+def releaseKeystorePassword = providers.gradleProperty('releaseKeystorePassword')
+        .orElse(providers.environmentVariable('RELEASE_KEYSTORE_PASSWORD'))
+def releaseKeyAlias = providers.gradleProperty('releaseKeyAlias')
+        .orElse(providers.environmentVariable('RELEASE_KEY_ALIAS'))
+def releaseKeyPassword = providers.gradleProperty('releaseKeyPassword')
+        .orElse(providers.environmentVariable('RELEASE_KEY_PASSWORD'))
+def releaseSigningValues = [
+        'releaseKeystorePath/RELEASE_KEYSTORE_PATH': releaseKeystorePath,
+        'releaseKeystorePassword/RELEASE_KEYSTORE_PASSWORD': releaseKeystorePassword,
+        'releaseKeyAlias/RELEASE_KEY_ALIAS': releaseKeyAlias,
+        'releaseKeyPassword/RELEASE_KEY_PASSWORD': releaseKeyPassword
+]
+def missingReleaseSigningValues = releaseSigningValues.findAll { !it.value.isPresent() }
+def hasReleaseSigning = missingReleaseSigningValues.isEmpty()
+
 android {
     namespace 'org.zeam'
     compileSdk 35
 
     defaultConfig {
         applicationId "org.zeam"
-        minSdkVersion 8
+        minSdkVersion 23
         targetSdkVersion 35
         testInstrumentationRunner "android.test.InstrumentationTestRunner"
         versionCode 112
         versionName "3.1.10"
     }
 
+    signingConfigs {
+        if (hasReleaseSigning) {
+            release {
+                storeFile file(releaseKeystorePath.get())
+                storePassword releaseKeystorePassword.get()
+                keyAlias releaseKeyAlias.get()
+                keyPassword releaseKeyPassword.get()
+            }
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            if (hasReleaseSigning) {
+                signingConfig signingConfigs.release
+            }
         }
     }
 
@@ -28,6 +62,18 @@ android {
     }
 
     lint {
-        abortOnError false
+        baseline = file("lint-baseline.xml")
+        abortOnError true
+        warningsAsErrors true
     }
+}
+
+dependencies {
+    testImplementation 'junit:junit:4.13.2'
+}
+
+if (releaseSigningRequired.get() && !hasReleaseSigning) {
+    throw new GradleException(
+            "Release signing required but missing: ${missingReleaseSigningValues.keySet().join(', ')}"
+    )
 }
