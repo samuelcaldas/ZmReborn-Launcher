@@ -171,6 +171,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     /* access modifiers changed from: private */
     public Workspace mWorkspace;
 
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleUtil.wrap(base));
+    }
+
     /* access modifiers changed from: protected */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -253,7 +258,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         readConfiguration(this, localeConfiguration);
         Configuration configuration = getResources().getConfiguration();
         String previousLocale = localeConfiguration.locale;
-        String locale = configuration.locale.toString();
+        String locale = LocaleUtil.currentLocaleFingerprint(this);
         int previousMcc = localeConfiguration.mcc;
         int mcc = configuration.mcc;
         int previousMnc = localeConfiguration.mnc;
@@ -1071,7 +1076,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             startActivity(new Intent("android.intent.action.DELETE", Uri.parse("package:" + resolveInfo.activityInfo.packageName)));
             return;
         }
-        Toast.makeText(this, "Unable to find ActivityInfo for " + applicationItemInfo.title, 1).show();
+        Toast.makeText(this, getString(R.string.toast_activity_info_not_found, applicationItemInfo.title), 1).show();
     }
 
     public boolean onSearchRequested() {

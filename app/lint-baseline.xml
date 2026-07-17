@@ -613,7 +613,7 @@
         errorLine2="                                                     ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="997"
+            line="1002"
             column="54"/>
     </issue>
 
@@ -624,7 +624,7 @@
         errorLine2="                                                           ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="998"
+            line="1003"
             column="60"/>
     </issue>
 
@@ -635,7 +635,7 @@
         errorLine2="                                                        ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="999"
+            line="1004"
             column="57"/>
     </issue>
 
@@ -646,7 +646,7 @@
         errorLine2="                                                              ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1000"
+            line="1005"
             column="63"/>
     </issue>
 
@@ -657,7 +657,7 @@
         errorLine2="                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1001"
+            line="1006"
             column="62"/>
     </issue>
 
@@ -668,7 +668,7 @@
         errorLine2="                                                                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1002"
+            line="1007"
             column="110"/>
     </issue>
 
@@ -679,7 +679,7 @@
         errorLine2="                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1003"
+            line="1008"
             column="62"/>
     </issue>
 
@@ -690,7 +690,7 @@
         errorLine2="                                                                ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1004"
+            line="1009"
             column="65"/>
     </issue>
 
@@ -701,7 +701,7 @@
         errorLine2="                                                       ~~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="379"
+            line="383"
             column="56"/>
     </issue>
 
@@ -712,7 +712,7 @@
         errorLine2="                                                         ~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="385"
+            line="389"
             column="58"/>
     </issue>
 
@@ -723,7 +723,7 @@
         errorLine2="                                                        ~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="386"
+            line="390"
             column="57"/>
     </issue>
 
@@ -734,7 +734,7 @@
         errorLine2="                                                        ~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="387"
+            line="391"
             column="57"/>
     </issue>
 
@@ -745,7 +745,7 @@
         errorLine2="                                                                                 ~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="414"
+            line="418"
             column="82"/>
     </issue>
 
@@ -756,7 +756,7 @@
         errorLine2="                                                      ~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="444"
+            line="448"
             column="55"/>
     </issue>
 
@@ -767,7 +767,7 @@
         errorLine2="                                                                                    ~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="457"
+            line="461"
             column="85"/>
     </issue>
 
@@ -778,7 +778,7 @@
         errorLine2="                                                                                                             ~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="457"
+            line="461"
             column="110"/>
     </issue>
 
@@ -789,7 +789,7 @@
         errorLine2="                                            ~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="487"
+            line="516"
             column="45"/>
     </issue>
 
@@ -800,7 +800,7 @@
         errorLine2="                                             ~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="488"
+            line="517"
             column="46"/>
     </issue>
 
@@ -811,7 +811,7 @@
         errorLine2="                                  ~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="491"
+            line="520"
             column="35"/>
     </issue>
 
@@ -877,7 +877,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Preferences.java"
-            line="124"
+            line="145"
             column="28"/>
     </issue>
 
@@ -888,7 +888,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Preferences.java"
-            line="132"
+            line="153"
             column="28"/>
     </issue>
 
@@ -899,7 +899,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Preferences.java"
-            line="157"
+            line="178"
             column="28"/>
     </issue>
 
@@ -910,7 +910,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Preferences.java"
-            line="165"
+            line="186"
             column="28"/>
     </issue>
 
@@ -921,7 +921,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Preferences.java"
-            line="173"
+            line="194"
             column="28"/>
     </issue>
 
@@ -932,7 +932,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Preferences.java"
-            line="181"
+            line="202"
             column="28"/>
     </issue>
 
@@ -965,7 +965,7 @@
         errorLine2="                                                                       ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/LauncherApplication.java"
-            line="12"
+            line="17"
             column="72"/>
     </issue>
 
@@ -1422,7 +1422,7 @@
         errorLine2="               ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Preferences.java"
-            line="211"
+            line="232"
             column="16"/>
     </issue>
 
@@ -1484,12 +1484,12 @@
     <issue
         id="ShowToast"
         message="Expected duration `Toast.LENGTH_SHORT` or `Toast.LENGTH_LONG`, a custom duration value is not supported"
-        errorLine1="        Toast.makeText(this, &quot;Unable to find ActivityInfo for &quot; + applicationItemInfo.title, 1).show();"
-        errorLine2="                                                                                             ~">
+        errorLine1="        Toast.makeText(this, getString(R.string.toast_activity_info_not_found, applicationItemInfo.title), 1).show();"
+        errorLine2="                                                                                                           ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1074"
-            column="94"/>
+            line="1079"
+            column="108"/>
     </issue>
 
     <issue
@@ -1499,7 +1499,7 @@
         errorLine2="                                                                       ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1278"
+            line="1283"
             column="72"/>
     </issue>
 
@@ -1510,7 +1510,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1682"
+            line="1687"
             column="63"/>
     </issue>
 
@@ -1521,7 +1521,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1689"
+            line="1694"
             column="63"/>
     </issue>
 
@@ -1532,7 +1532,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1691"
+            line="1696"
             column="63"/>
     </issue>
 
@@ -1545,6 +1545,17 @@
             file="src/main/java/org/zeam/UninstallShortcutReceiver.java"
             line="47"
             column="115"/>
+    </issue>
+
+    <issue
+        id="UnusedAttribute"
+        message="Attribute `hardwareAccelerated` is only used in API level 11 and higher (current min is 8)"
+        errorLine1="    &lt;application android:label=&quot;@string/application_name&quot; android:icon=&quot;@drawable/ic_launcher&quot; android:name=&quot;.LauncherApplication&quot; android:process=&quot;org.zeam.core&quot; android:hardwareAccelerated=&quot;true&quot;>"
+        errorLine2="                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/AndroidManifest.xml"
+            line="27"
+            column="164"/>
     </issue>
 
     <issue
@@ -1928,7 +1939,7 @@
         errorLine2="                                    ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="204"
+            line="209"
             column="37"/>
     </issue>
 
@@ -1939,7 +1950,7 @@
         errorLine2="                                    ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="206"
+            line="211"
             column="37"/>
     </issue>
 
@@ -1950,7 +1961,7 @@
         errorLine2="                                                                                ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="357"
+            line="362"
             column="81"/>
     </issue>
 
@@ -1961,7 +1972,7 @@
         errorLine2="                                                                        ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="448"
+            line="453"
             column="73"/>
     </issue>
 
@@ -1972,7 +1983,7 @@
         errorLine2="                                                   ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="472"
+            line="477"
             column="52"/>
     </issue>
 
@@ -1983,19 +1994,19 @@
         errorLine2="                                                           ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="904"
+            line="909"
             column="60"/>
     </issue>
 
     <issue
         id="WrongConstant"
         message="Must be one of: Toast.LENGTH_SHORT, Toast.LENGTH_LONG"
-        errorLine1="        Toast.makeText(this, &quot;Unable to find ActivityInfo for &quot; + applicationItemInfo.title, 1).show();"
-        errorLine2="                                                                                             ~">
+        errorLine1="        Toast.makeText(this, getString(R.string.toast_activity_info_not_found, applicationItemInfo.title), 1).show();"
+        errorLine2="                                                                                                           ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1074"
-            column="94"/>
+            line="1079"
+            column="108"/>
     </issue>
 
     <issue
@@ -2005,7 +2016,7 @@
         errorLine2="                                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1103"
+            line="1108"
             column="78"/>
     </issue>
 
@@ -2016,7 +2027,7 @@
         errorLine2="                                          ~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1117"
+            line="1122"
             column="43"/>
     </issue>
 
@@ -2027,7 +2038,7 @@
         errorLine2="                                                                       ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1278"
+            line="1283"
             column="72"/>
     </issue>
 
@@ -2038,7 +2049,7 @@
         errorLine2="                                              ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1287"
+            line="1292"
             column="47"/>
     </issue>
 
@@ -2049,7 +2060,7 @@
         errorLine2="                                                                           ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1303"
+            line="1308"
             column="76"/>
     </issue>
 
@@ -2060,7 +2071,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1682"
+            line="1687"
             column="63"/>
     </issue>
 
@@ -2071,7 +2082,7 @@
         errorLine2="                        ~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1685"
+            line="1690"
             column="25"/>
     </issue>
 
@@ -2082,7 +2093,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1689"
+            line="1694"
             column="63"/>
     </issue>
 
@@ -2093,7 +2104,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1691"
+            line="1696"
             column="63"/>
     </issue>
 
@@ -2104,7 +2115,7 @@
         errorLine2="                                           ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="2320"
+            line="2325"
             column="44"/>
     </issue>
 
@@ -2115,7 +2126,7 @@
         errorLine2="                                               ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="2350"
+            line="2355"
             column="48"/>
     </issue>
 
@@ -2126,7 +2137,7 @@
         errorLine2="                                                                                                              ~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="2359"
+            line="2364"
             column="111"/>
     </issue>
 
@@ -2159,7 +2170,7 @@
         errorLine2="                            ~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="351"
+            line="355"
             column="29"/>
     </issue>
 
@@ -2170,7 +2181,7 @@
         errorLine2="                                ~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="418"
+            line="422"
             column="33"/>
     </issue>
 
@@ -2181,7 +2192,7 @@
         errorLine2="                                ~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/LauncherProvider.java"
-            line="497"
+            line="526"
             column="33"/>
     </issue>
 
@@ -2478,8 +2489,38 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1314"
+            line="1319"
             column="13"/>
+    </issue>
+
+    <issue
+        id="EllipsizeMaxLines"
+        message="Combining `ellipsize=marquee` and `maxLines=1` can lead to crashes. Use `singleLine=true` instead."
+        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res/org.zeam&quot; android:textSize=&quot;12dp&quot; android:textColor=&quot;@color/bright_text_dark_focused&quot; android:ellipsize=&quot;marquee&quot; android:gravity=&quot;top|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/name&quot; android:paddingLeft=&quot;5dp&quot; android:paddingTop=&quot;5dp&quot; android:paddingRight=&quot;5dp&quot; android:paddingBottom=&quot;0dp&quot; android:fadingEdge=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;88dp&quot; android:maxLines=&quot;1&quot; android:singleLine=&quot;true&quot; android:drawablePadding=&quot;0dp&quot;/>"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout-land/application_boxed_grid.xml"
+            line="2"
+            column="524"/>
+        <location
+            file="src/main/res/layout-land/application_boxed_grid.xml"
+            line="2"
+            column="207"/>
+    </issue>
+
+    <issue
+        id="EllipsizeMaxLines"
+        message="Combining `ellipsize=marquee` and `maxLines=1` can lead to crashes. Use `singleLine=true` instead."
+        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res/org.zeam&quot; android:textSize=&quot;12dp&quot; android:textColor=&quot;@color/bright_text_dark_focused&quot; android:ellipsize=&quot;marquee&quot; android:gravity=&quot;top|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/name&quot; android:paddingLeft=&quot;5dp&quot; android:paddingTop=&quot;5dp&quot; android:paddingRight=&quot;5dp&quot; android:paddingBottom=&quot;0dp&quot; android:fadingEdge=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:maxLines=&quot;1&quot; android:singleLine=&quot;true&quot; android:drawablePadding=&quot;0dp&quot;/>"
+        errorLine2="                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout-land/application_boxed_page.xml"
+            line="2"
+            column="532"/>
+        <location
+            file="src/main/res/layout-land/application_boxed_page.xml"
+            line="2"
+            column="207"/>
     </issue>
 
     <issue
@@ -2577,7 +2618,7 @@
         errorLine2="                                                           ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="849"
+            line="854"
             column="60"/>
     </issue>
 
@@ -2588,7 +2629,7 @@
         errorLine2="                                                       ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1244"
+            line="1249"
             column="56"/>
     </issue>
 
@@ -2676,11 +2717,11 @@
         errorLine2="                                                                  ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="364"
+            line="369"
             column="67"/>
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1190"
+            line="1195"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -2692,11 +2733,11 @@
         errorLine2="                                                                  ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="364"
+            line="369"
             column="67"/>
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1201"
+            line="1206"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -2708,11 +2749,11 @@
         errorLine2="                                                                  ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="364"
+            line="369"
             column="67"/>
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1190"
+            line="1195"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -2724,11 +2765,11 @@
         errorLine2="                                                                  ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="364"
+            line="369"
             column="67"/>
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="1201"
+            line="1206"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -2834,42 +2875,42 @@
 
     <issue
         id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 23. Merge all the resources in this folder into `values-hdpi`.">
+        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-hdpi`.">
         <location
             file="src/main/res/values-hdpi-v4"/>
     </issue>
 
     <issue
         id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 23. Merge all the resources in this folder into `values-land-hdpi`.">
+        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-land-hdpi`.">
         <location
             file="src/main/res/values-land-hdpi-v4"/>
     </issue>
 
     <issue
         id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 23. Merge all the resources in this folder into `values-land-mdpi`.">
+        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-land-mdpi`.">
         <location
             file="src/main/res/values-land-mdpi-v4"/>
     </issue>
 
     <issue
         id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 23. Merge all the resources in this folder into `values-mdpi`.">
+        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-mdpi`.">
         <location
             file="src/main/res/values-mdpi-v4"/>
     </issue>
 
     <issue
         id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 23. Merge all the resources in this folder into `values-port-hdpi`.">
+        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-port-hdpi`.">
         <location
             file="src/main/res/values-port-hdpi-v4"/>
     </issue>
 
     <issue
         id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 23. Merge all the resources in this folder into `values-port-mdpi`.">
+        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-port-mdpi`.">
         <location
             file="src/main/res/values-port-mdpi-v4"/>
     </issue>
@@ -2881,7 +2922,7 @@
         errorLine2="                    ^">
         <location
             file="src/main/java/org/zeam/Launcher.java"
-            line="2408"
+            line="2413"
             column="21"/>
     </issue>
 
@@ -3915,7 +3956,7 @@
 
     <issue
         id="LabelFor"
-        message="Missing accessibility label: provide either a view with an `android:labelFor` that references this view or provide an `android:hint`"
+        message="Missing accessibility label: where minSdk &lt; 17, you should provide an `android:hint`"
         errorLine1="    &lt;EditText android:textSize=&quot;30sp&quot; android:textColor=&quot;@android:color/primary_text_light&quot; android:gravity=&quot;center&quot; android:id=&quot;@+id/timepicker_input&quot; android:background=&quot;@drawable/timepicker_input&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:singleLine=&quot;true&quot; style=&quot;?android:attr/textAppearanceLargeInverse&quot;/>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -3926,7 +3967,7 @@
 
     <issue
         id="LabelFor"
-        message="Missing accessibility label: provide either a view with an `android:labelFor` that references this view or provide an `android:hint`"
+        message="Missing accessibility label: where minSdk &lt; 17, you should provide an `android:hint`"
         errorLine1="    &lt;EditText android:textAppearance=&quot;?android:attr/textAppearanceMedium&quot; android:gravity=&quot;fill_horizontal&quot; android:id=&quot;@+id/folder_name&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:scrollHorizontally=&quot;true&quot; android:maxLength=&quot;30&quot; android:capitalize=&quot;none&quot; android:autoText=&quot;false&quot;/>"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4036,7 +4077,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;10dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingStart=&quot;10dp&quot;` to better support right-to-left layouts"
         errorLine1="&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:orientation=&quot;horizontal&quot; android:paddingLeft=&quot;10dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;?android:attr/listPreferredItemHeight&quot;>"
         errorLine2="                                                                                                          ~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4047,7 +4088,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_alignLeft` with `android:layout_alignStart=&quot;@+id/name&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:layout_alignStart=&quot;@+id/name&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceSmall&quot; android:textColor=&quot;?android:attr/textColorSecondary&quot; android:ellipsize=&quot;end&quot; android:id=&quot;@+id/description&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:singleLine=&quot;true&quot; android:layout_below=&quot;@+id/name&quot; android:layout_alignLeft=&quot;@+id/name&quot;/>"
         errorLine2="                                                                                                                                                                                                                                                                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4058,7 +4099,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;40dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingEnd=&quot;40dp&quot;` to better support right-to-left layouts"
         errorLine1="&lt;org.zeam.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res/org.zeam&quot; android:background=&quot;@color/zeam_slate&quot; android:paddingRight=&quot;40dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/all_apps_view&quot; android:nextFocusDown=&quot;@+id/all_apps_view&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;1dp&quot; android:numColumns=&quot;5&quot;/>"
         errorLine2="                                                                                                                                                                                              ~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4069,24 +4110,24 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;3dp&quot;` to better support right-to-left layouts"
-        errorLine1="&lt;org.zeam.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res/org.zeam&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingLeft=&quot;3dp&quot; android:paddingRight=&quot;30dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
-        errorLine2="                                                                                                                                                                                                                     ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/apps_page_view.xml"
-            line="2"
-            column="214"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;30dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingEnd=&quot;30dp&quot;` to better support right-to-left layouts"
         errorLine1="&lt;org.zeam.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res/org.zeam&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingLeft=&quot;3dp&quot; android:paddingRight=&quot;30dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
         errorLine2="                                                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/apps_page_view.xml"
             line="2"
             column="240"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingStart=&quot;3dp&quot;` to better support right-to-left layouts"
+        errorLine1="&lt;org.zeam.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res/org.zeam&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingLeft=&quot;3dp&quot; android:paddingRight=&quot;30dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
+        errorLine2="                                                                                                                                                                                                                     ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout-land/apps_page_view.xml"
+            line="2"
+            column="214"/>
     </issue>
 
     <issue
@@ -4102,18 +4143,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;7dp&quot;` to better support right-to-left layouts"
-        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:textAppearance=&quot;?android:attr/textAppearanceLargeInverse&quot; android:gravity=&quot;center_vertical&quot; android:paddingLeft=&quot;7dp&quot; android:paddingRight=&quot;15dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:minHeight=&quot;?android:attr/listPreferredItemHeight&quot; android:drawablePadding=&quot;14dp&quot;/>"
-        errorLine2="                                                                                                                                                                         ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_list_item.xml"
-            line="2"
-            column="170"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;15dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingEnd=&quot;15dp&quot;` to better support right-to-left layouts"
         errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:textAppearance=&quot;?android:attr/textAppearanceLargeInverse&quot; android:gravity=&quot;center_vertical&quot; android:paddingLeft=&quot;7dp&quot; android:paddingRight=&quot;15dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:minHeight=&quot;?android:attr/listPreferredItemHeight&quot; android:drawablePadding=&quot;14dp&quot;/>"
         errorLine2="                                                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4124,7 +4154,18 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;?android:attr/scrollbarSize&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingStart=&quot;7dp&quot;` to better support right-to-left layouts"
+        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:textAppearance=&quot;?android:attr/textAppearanceLargeInverse&quot; android:gravity=&quot;center_vertical&quot; android:paddingLeft=&quot;7dp&quot; android:paddingRight=&quot;15dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:minHeight=&quot;?android:attr/listPreferredItemHeight&quot; android:drawablePadding=&quot;14dp&quot;/>"
+        errorLine2="                                                                                                                                                                         ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_list_item.xml"
+            line="2"
+            column="170"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingEnd=&quot;?android:attr/scrollbarSize&quot;` to better support right-to-left layouts"
         errorLine1="&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:gravity=&quot;center_vertical&quot; android:paddingRight=&quot;?android:attr/scrollbarSize&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:minHeight=&quot;?android:attr/listPreferredItemHeight&quot;>"
         errorLine2="                                                                                                           ~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4135,18 +4176,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;15dp&quot;` to better support right-to-left layouts"
-        errorLine1="    &lt;RelativeLayout android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:layout_marginLeft=&quot;15dp&quot; android:layout_marginTop=&quot;6dp&quot; android:layout_marginRight=&quot;16dp&quot; android:layout_marginBottom=&quot;6dp&quot; android:layout_weight=&quot;1&quot;>"
-        errorLine2="                                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_seekbar_preference.xml"
-            line="3"
-            column="94"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;16dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:layout_marginEnd=&quot;16dp&quot;` to better support right-to-left layouts"
         errorLine1="    &lt;RelativeLayout android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:layout_marginLeft=&quot;15dp&quot; android:layout_marginTop=&quot;6dp&quot; android:layout_marginRight=&quot;16dp&quot; android:layout_marginBottom=&quot;6dp&quot; android:layout_weight=&quot;1&quot;>"
         errorLine2="                                                                                                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4157,7 +4187,18 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_alignLeft` with `android:layout_alignStart=&quot;@android:id/title&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:layout_marginStart=&quot;15dp&quot;` to better support right-to-left layouts"
+        errorLine1="    &lt;RelativeLayout android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:layout_marginLeft=&quot;15dp&quot; android:layout_marginTop=&quot;6dp&quot; android:layout_marginRight=&quot;16dp&quot; android:layout_marginBottom=&quot;6dp&quot; android:layout_weight=&quot;1&quot;>"
+        errorLine2="                                                                                             ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_seekbar_preference.xml"
+            line="3"
+            column="94"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_alignStart=&quot;@android:id/title&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceSmall&quot; android:id=&quot;@+id/dialog_message&quot; android:paddingLeft=&quot;7dp&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:maxLines=&quot;2&quot; android:layout_below=&quot;@android:id/title&quot; android:layout_alignLeft=&quot;@android:id/title&quot;/>"
         errorLine2="                                                                                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4168,7 +4209,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;7dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingStart=&quot;7dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceSmall&quot; android:id=&quot;@+id/dialog_message&quot; android:paddingLeft=&quot;7dp&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:maxLines=&quot;2&quot; android:layout_below=&quot;@android:id/title&quot; android:layout_alignLeft=&quot;@android:id/title&quot;/>"
         errorLine2="                                                                                                              ~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4179,7 +4220,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_alignLeft` with `android:layout_alignStart=&quot;@+id/dialog_message&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:layout_alignStart=&quot;@+id/dialog_message&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;SeekBar android:id=&quot;@+id/my_bar&quot; android:paddingLeft=&quot;7dp&quot; android:paddingTop=&quot;7dp&quot; android:paddingRight=&quot;8dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:layout_below=&quot;@+id/dialog_message&quot; android:layout_alignLeft=&quot;@+id/dialog_message&quot;/>"
         errorLine2="                                                                                                                                                                                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4190,18 +4231,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;7dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;SeekBar android:id=&quot;@+id/my_bar&quot; android:paddingLeft=&quot;7dp&quot; android:paddingTop=&quot;7dp&quot; android:paddingRight=&quot;8dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:layout_below=&quot;@+id/dialog_message&quot; android:layout_alignLeft=&quot;@+id/dialog_message&quot;/>"
-        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_seekbar_preference.xml"
-            line="5"
-            column="43"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;8dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingEnd=&quot;8dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;SeekBar android:id=&quot;@+id/my_bar&quot; android:paddingLeft=&quot;7dp&quot; android:paddingTop=&quot;7dp&quot; android:paddingRight=&quot;8dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:layout_below=&quot;@+id/dialog_message&quot; android:layout_alignLeft=&quot;@+id/dialog_message&quot;/>"
         errorLine2="                                                                                             ~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4212,7 +4242,18 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_alignLeft` with `android:layout_alignStart=&quot;@+id/my_bar&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingStart=&quot;7dp&quot;` to better support right-to-left layouts"
+        errorLine1="        &lt;SeekBar android:id=&quot;@+id/my_bar&quot; android:paddingLeft=&quot;7dp&quot; android:paddingTop=&quot;7dp&quot; android:paddingRight=&quot;8dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:layout_below=&quot;@+id/dialog_message&quot; android:layout_alignLeft=&quot;@+id/dialog_message&quot;/>"
+        errorLine2="                                          ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/dialog_seekbar_preference.xml"
+            line="5"
+            column="43"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:layout_alignStart=&quot;@+id/my_bar&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceSmall&quot; android:id=&quot;@+id/actual_value&quot; android:paddingLeft=&quot;7dp&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:maxLines=&quot;1&quot; android:layout_below=&quot;@+id/my_bar&quot; android:layout_alignLeft=&quot;@+id/my_bar&quot;/>"
         errorLine2="                                                                                                                                                                                                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4223,7 +4264,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;7dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingStart=&quot;7dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceSmall&quot; android:id=&quot;@+id/actual_value&quot; android:paddingLeft=&quot;7dp&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:maxLines=&quot;1&quot; android:layout_below=&quot;@+id/my_bar&quot; android:layout_alignLeft=&quot;@+id/my_bar&quot;/>"
         errorLine2="                                                                                                            ~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4245,7 +4286,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;0dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingStart=&quot;0dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;LinearLayout android:orientation=&quot;vertical&quot; android:id=&quot;@+id/dock_item_holder&quot; android:paddingLeft=&quot;0dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
         errorLine2="                                                                                        ~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4256,7 +4297,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;2dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingEnd=&quot;2dp&quot;` to better support right-to-left layouts"
         errorLine1="    &lt;ImageButton android:layout_gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/home_button&quot; android:background=&quot;@null&quot; android:padding=&quot;0dp&quot; android:paddingRight=&quot;2dp&quot; android:visibility=&quot;invisible&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;45dp&quot; android:layout_height=&quot;wrap_content&quot; android:src=&quot;@drawable/home_button_normal&quot;/>"
         errorLine2="                                                                                                                                                                        ~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4289,7 +4330,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;48dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:layout_marginEnd=&quot;48dp&quot;` to better support right-to-left layouts"
         errorLine1="    &lt;org.zeam.DeleteZone android:layout_gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/delete_zone&quot; android:background=&quot;@drawable/delete_zone_selector&quot; android:visibility=&quot;invisible&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:layout_marginRight=&quot;48dp&quot; android:src=&quot;@drawable/trashcan&quot; android:scaleType=&quot;center&quot; launcher:direction=&quot;vertical&quot;/>"
         errorLine2="                                                                                                                                                                                                                                                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4311,29 +4352,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/live_folder_grid.xml"
-            line="4"
-            column="245"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-port/live_folder_grid.xml"
-            line="4"
-            column="245"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
         errorLine2="                                                                                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4344,13 +4363,35 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
         errorLine2="                                                                                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/live_folder_grid.xml"
             line="4"
             column="272"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
+        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
+        errorLine2="                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout-land/live_folder_grid.xml"
+            line="4"
+            column="245"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
+        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
+        errorLine2="                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout-port/live_folder_grid.xml"
+            line="4"
+            column="245"/>
     </issue>
 
     <issue
@@ -4377,7 +4418,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
         errorLine2="                                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4388,7 +4429,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
         errorLine2="                                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4421,24 +4462,24 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/live_folder_list.xml"
-            line="4"
-            column="245"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
         errorLine2="                                                                                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/live_folder_list.xml"
             line="4"
             column="272"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
+        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
+        errorLine2="                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/live_folder_list.xml"
+            line="4"
+            column="245"/>
     </issue>
 
     <issue
@@ -4454,7 +4495,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
         errorLine2="                                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4487,29 +4528,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zeam_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                              ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/user_folder.xml"
-            line="4"
-            column="255"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:paddingLeft` with `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zeam_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                              ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-port/user_folder.xml"
-            line="4"
-            column="255"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zeam_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
         errorLine2="                                                                                                                                                                                                                                                                                         ~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4520,13 +4539,35 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:paddingRight` with `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zeam_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
         errorLine2="                                                                                                                                                                                                                                                                                         ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/user_folder.xml"
             line="4"
             column="282"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
+        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zeam_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
+        errorLine2="                                                                                                                                                                                                                                                              ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout-land/user_folder.xml"
+            line="4"
+            column="255"/>
+    </issue>
+
+    <issue
+        id="RtlHardcoded"
+        message="Consider adding `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
+        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zeam_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
+        errorLine2="                                                                                                                                                                                                                                                              ~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout-port/user_folder.xml"
+            line="4"
+            column="255"/>
     </issue>
 
     <issue
@@ -4553,7 +4594,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
         errorLine2="                                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4564,7 +4605,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginRight` with `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
         errorLine2="                                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
@@ -4597,7 +4638,7 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider replacing `android:layout_marginLeft` with `android:layout_marginStart=&quot;8dp&quot;` to better support right-to-left layouts"
+        message="Consider adding `android:layout_marginStart=&quot;8dp&quot;` to better support right-to-left layouts"
         errorLine1="        &lt;ImageButton android:id=&quot;@+id/search_voice_btn&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginLeft=&quot;8dp&quot; android:src=&quot;@android:drawable/ic_btn_speak_now&quot;/>"
         errorLine2="                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location

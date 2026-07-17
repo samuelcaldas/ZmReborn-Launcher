@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="preferences_entries_actions">
+        <item>Nenhuma</item>
+        <item>Abrir aplicativos</item>
+        <item>Ir para tela padrão</item>
+        <item>Expandir notificações</item>
+        <item>Prévia das telas</item>
+        <item>Alternar tela cheia</item>
+        <item>Abrir discador</item>
+    </array>
+    <array name="preferences_entries_workspace_screen_indicator_types">
+        <item>Nenhum</item>
+        <item>Controle deslizante</item>
+        <item>Pontos</item>
+    </array>
+    <array name="preferences_entries_apps_grid_types">
+        <item>Rolagem vertical</item>
+        <item>Paginação horizontal</item>
+    </array>
+    <array name="preferences_entries_dock_backgrounds">
+        <item>Escuro</item>
+        <item>Escuro com degradê</item>
+        <item>Transparente</item>
+        <item>Preto sólido</item>
+        <item>Cinza sólido</item>
+        <item>Barra cinza</item>
+        <item>Fosco</item>
+    </array>
+    <array name="preferences_entries_dock_item_alignments_resets">
+        <item>Início</item>
+        <item>Centro</item>
+        <item>Fim</item>
+    </array>
+    <array name="preferences_entries_dock_item_widths">
+        <item>Pequeno</item>
+        <item>Médio</item>
+        <item>Grande</item>
+    </array>
+    <array name="preferences_entries_application_languages">
+        <item>Padrão do sistema</item>
+        <item>English</item>
+        <item>Português (Brasil)</item>
+    </array>
+</resources>
+

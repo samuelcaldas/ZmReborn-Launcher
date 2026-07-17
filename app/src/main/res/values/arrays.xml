@@ -11,7 +11,7 @@
         <item>Toggle fullscreen</item>
         <item>Open dialer</item>
     </array>
-    <array name="preferences_entry_values_actions">
+    <array name="preferences_entry_values_actions" translatable="false">
         <item>1</item>
         <item>2</item>
         <item>3</item>
@@ -20,7 +20,12 @@
         <item>6</item>
         <item>7</item>
     </array>
-    <array name="preferences_values_workspace_screen_indicator_types">
+    <array name="preferences_entries_workspace_screen_indicator_types">
+        <item>None</item>
+        <item>Slider</item>
+        <item>Dots</item>
+    </array>
+    <array name="preferences_values_workspace_screen_indicator_types" translatable="false">
         <item>None</item>
         <item>Slider</item>
         <item>Dots</item>
@@ -29,11 +34,11 @@
         <item>Vertical scrolling</item>
         <item>Horizontal paging</item>
     </array>
-    <array name="preferences_entry_values_apps_grid_types">
+    <array name="preferences_entry_values_apps_grid_types" translatable="false">
         <item>1</item>
         <item>2</item>
     </array>
-    <array name="preferences_values_dock_backgrounds">
+    <array name="preferences_entries_dock_backgrounds">
         <item>Dark</item>
         <item>Dark fade</item>
         <item>Transparent</item>
@@ -42,15 +47,44 @@
         <item>Grey bar</item>
         <item>Frost</item>
     </array>
-    <array name="preferences_values_dock_item_alignments_resets">
+    <array name="preferences_values_dock_backgrounds" translatable="false">
+        <item>Dark</item>
+        <item>Dark fade</item>
+        <item>Transparent</item>
+        <item>Black solid</item>
+        <item>Grey solid</item>
+        <item>Grey bar</item>
+        <item>Frost</item>
+    </array>
+    <array name="preferences_entries_dock_item_alignments_resets">
         <item>Start</item>
         <item>Center</item>
         <item>End</item>
     </array>
-    <array name="preferences_values_dock_item_widths">
+    <array name="preferences_values_dock_item_alignments_resets" translatable="false">
+        <item>Start</item>
+        <item>Center</item>
+        <item>End</item>
+    </array>
+    <array name="preferences_entries_dock_item_widths">
         <item>Small</item>
         <item>Medium</item>
         <item>Large</item>
+    </array>
+    <array name="preferences_values_dock_item_widths" translatable="false">
+        <item>Small</item>
+        <item>Medium</item>
+        <item>Large</item>
+    </array>
+    <array name="preferences_entries_application_languages">
+        <item>System default</item>
+        <item>English</item>
+        <item>Português (Brasil)</item>
+    </array>
+    <array name="preferences_values_application_languages" translatable="false">
+        <item></item>
+        <item>en</item>
+        <item>pt-BR</item>
     </array>
     <array name="wallpapers">
     </array>
