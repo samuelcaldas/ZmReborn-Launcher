@@ -9,7 +9,7 @@ public class LauncherApplication extends Application {
     private static final String LOG_TAG = LauncherApplication.class.getSimpleName();
 
     public void onCreate() {
-        Log.i(LOG_TAG, "\n--- " + getString(C0041R.string.application_name).toUpperCase() + " " + getVersionName(getApplicationContext()) + " ---");
+        Log.i(LOG_TAG, "\n--- " + getString(R.string.application_name).toUpperCase() + " " + getVersionName(getApplicationContext()) + " ---");
         super.onCreate();
     }
 

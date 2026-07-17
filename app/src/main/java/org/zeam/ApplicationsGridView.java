@@ -159,7 +159,7 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
             setSelection(0);
         }
         if (animated) {
-            Animation inAnimation = AnimationUtils.loadAnimation(context, C0041R.anim.apps_scale_in);
+            Animation inAnimation = AnimationUtils.loadAnimation(context, R.anim.apps_scale_in);
             inAnimation.setAnimationListener(this.mAnimationListener);
             setAnimation(inAnimation);
         }
@@ -176,7 +176,7 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
             return false;
         }
         if (animated) {
-            setAnimation(AnimationUtils.loadAnimation(getContext(), C0041R.anim.apps_scale_out));
+            setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.apps_scale_out));
         }
         setVisibility(4);
         invalidate();

@@ -40,7 +40,7 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
 
     public Dock(Context context, AttributeSet attrs) {
         super(context, attrs);
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, C0041R.styleable.Dock, 0, 0);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Dock, 0, 0);
         this.mCellHeight = typedArray.getDimensionPixelSize(1, this.mCellHeight);
         this.mCellWidth = typedArray.getDimensionPixelSize(0, this.mCellWidth);
         this.mOrientation = typedArray.getInt(2, this.mOrientation);
@@ -52,8 +52,8 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
 
     /* access modifiers changed from: protected */
     public void onFinishInflate() {
-        this.mItemHolder = (LinearLayout) findViewById(C0041R.C0042id.dock_item_holder);
-        this.mScrollView = findViewById(C0041R.C0042id.dock_scroll_view);
+        this.mItemHolder = (LinearLayout) findViewById(R.id.dock_item_holder);
+        this.mScrollView = findViewById(R.id.dock_scroll_view);
         this.mScrollView.setBackgroundColor(0);
         super.onFinishInflate();
     }
@@ -65,7 +65,7 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
             case 2:
             case 3:
             case 6:
-                this.mScrollView.setBackgroundResource(C0041R.drawable.dock_bg_glow);
+                this.mScrollView.setBackgroundResource(R.drawable.dock_bg_glow);
                 return true;
             default:
                 this.mScrollView.setBackgroundDrawable((Drawable) null);
@@ -159,16 +159,16 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
                 if (itemInfo.container == -1) {
                     itemInfo = new ApplicationItemInfo((ApplicationItemInfo) itemInfo);
                 }
-                view = this.mLauncher.createSmallShortcut(C0041R.layout.small_application, this, (ApplicationItemInfo) itemInfo);
+                view = this.mLauncher.createSmallShortcut(R.layout.small_application, this, (ApplicationItemInfo) itemInfo);
                 break;
             case 2:
-                view = this.mLauncher.createSmallFolder(C0041R.layout.small_application, this, (UserFolderInfo) itemInfo);
+                view = this.mLauncher.createSmallFolder(R.layout.small_application, this, (UserFolderInfo) itemInfo);
                 break;
             case 3:
-                view = this.mLauncher.createSmallLiveFolder(C0041R.layout.small_application, this, (LiveFolderInfo) itemInfo);
+                view = this.mLauncher.createSmallLiveFolder(R.layout.small_application, this, (LiveFolderInfo) itemInfo);
                 break;
             case 6:
-                view = this.mLauncher.createSmallApplicationsGridItem(C0041R.layout.small_application, this, (ApplicationsGridItemInfo) itemInfo);
+                view = this.mLauncher.createSmallApplicationsGridItem(R.layout.small_application, this, (ApplicationsGridItemInfo) itemInfo);
                 break;
         }
         Drawable selectorDrawable = SelectorDrawable.createSelector(getContext(), true);
@@ -414,7 +414,7 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
     /* access modifiers changed from: package-private */
     public void hide(boolean animated) {
         if (animated) {
-            setAnimation(AnimationUtils.loadAnimation(getContext(), C0041R.anim.dock_fade_out));
+            setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.dock_fade_out));
         }
         setVisibility(4);
     }
@@ -422,7 +422,7 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
     /* access modifiers changed from: package-private */
     public void show(boolean animated) {
         if (animated) {
-            setAnimation(AnimationUtils.loadAnimation(getContext(), C0041R.anim.dock_fade_in));
+            setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.dock_fade_in));
         }
         setVisibility(0);
     }

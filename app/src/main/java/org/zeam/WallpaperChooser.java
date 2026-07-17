@@ -37,13 +37,13 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
         super.onCreate(icicle);
         requestWindowFeature(1);
         findWallpapers();
-        setContentView(C0041R.layout.wallpaper_chooser);
-        this.mGallery = (Gallery) findViewById(C0041R.C0042id.gallery);
+        setContentView(R.layout.wallpaper_chooser);
+        this.mGallery = (Gallery) findViewById(R.id.gallery);
         this.mGallery.setAdapter(new ImageAdapter(this));
         this.mGallery.setOnItemSelectedListener(this);
         this.mGallery.setCallbackDuringFling(false);
-        findViewById(C0041R.C0042id.set).setOnClickListener(this);
-        this.mImageView = (ImageView) findViewById(C0041R.C0042id.wallpaper);
+        findViewById(R.id.set).setOnClickListener(this);
+        this.mImageView = (ImageView) findViewById(R.id.wallpaper);
     }
 
     private void findWallpapers() {
@@ -51,8 +51,8 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
         this.mImages = new ArrayList<>(24);
         Resources resources = getResources();
         String packageName = getApplication().getPackageName();
-        addWallpapers(resources, packageName, C0041R.array.wallpapers);
-        addWallpapers(resources, packageName, C0041R.array.extra_wallpapers);
+        addWallpapers(resources, packageName, R.array.wallpapers);
+        addWallpapers(resources, packageName, R.array.extra_wallpapers);
     }
 
     private void addWallpapers(Resources resources, String packageName, int list) {
@@ -126,7 +126,7 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
         public View getView(int position, View convertView, ViewGroup parent) {
             ImageView image;
             if (convertView == null) {
-                image = (ImageView) this.mLayoutInflater.inflate(C0041R.layout.wallpaper_item, parent, false);
+                image = (ImageView) this.mLayoutInflater.inflate(R.layout.wallpaper_item, parent, false);
             } else {
                 image = (ImageView) convertView;
             }

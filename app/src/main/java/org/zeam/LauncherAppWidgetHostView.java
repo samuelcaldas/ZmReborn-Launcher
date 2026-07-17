@@ -20,7 +20,7 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
 
     /* access modifiers changed from: protected */
     public View getErrorView() {
-        return this.mInflater.inflate(C0041R.layout.appwidget_error, this, false);
+        return this.mInflater.inflate(R.layout.appwidget_error, this, false);
     }
 
     public boolean onInterceptTouchEvent(MotionEvent motionEvent) {

@@ -23,7 +23,7 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
     private Runnable mAutoHide = new Runnable() {
         public void run() {
             if (ScreenIndicator.this.mAnimation == null) {
-                ScreenIndicator.this.mAnimation = AnimationUtils.loadAnimation(ScreenIndicator.this.getContext(), C0041R.anim.screen_indicator_fade_out);
+                ScreenIndicator.this.mAnimation = AnimationUtils.loadAnimation(ScreenIndicator.this.getContext(), R.anim.screen_indicator_fade_out);
                 ScreenIndicator.this.mAnimation.setAnimationListener(ScreenIndicator.this);
             } else {
                 try {

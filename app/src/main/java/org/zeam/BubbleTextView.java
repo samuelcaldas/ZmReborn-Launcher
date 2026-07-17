@@ -44,7 +44,7 @@ public class BubbleTextView extends TextView {
         this.mBackground = SelectorDrawable.createSelector(context, true);
         this.mBackground.setCallback(this);
         setBackgroundDrawable((Drawable) null);
-        int color = resources.getColor(C0041R.color.bubble_dark_background);
+        int color = resources.getColor(R.color.bubble_dark_background);
         this.mPaint = new Paint(1);
         this.mPaint.setColor(color);
         float scale = resources.getDisplayMetrics().density;

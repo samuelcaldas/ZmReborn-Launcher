@@ -14,7 +14,7 @@ public class UserFolder extends Folder implements DropTarget {
     }
 
     static UserFolder fromXml(Context context) {
-        return (UserFolder) LayoutInflater.from(context).inflate(C0041R.layout.user_folder, (ViewGroup) null);
+        return (UserFolder) LayoutInflater.from(context).inflate(R.layout.user_folder, (ViewGroup) null);
     }
 
     public boolean acceptDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {

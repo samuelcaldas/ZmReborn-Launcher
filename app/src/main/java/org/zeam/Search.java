@@ -163,15 +163,15 @@ public class Search extends LinearLayout implements View.OnClickListener, View.O
     /* access modifiers changed from: protected */
     public void onFinishInflate() {
         super.onFinishInflate();
-        this.mSearchText = (TextView) findViewById(C0041R.C0042id.search_src_text);
-        this.mVoiceButton = (ImageButton) findViewById(C0041R.C0042id.search_voice_btn);
+        this.mSearchText = (TextView) findViewById(R.id.search_src_text);
+        this.mVoiceButton = (ImageButton) findViewById(R.id.search_voice_btn);
         this.mSearchText.setOnKeyListener(this);
         this.mSearchText.setOnClickListener(this);
         this.mVoiceButton.setOnClickListener(this);
         setOnClickListener(this);
         this.mSearchText.setOnLongClickListener(this);
         this.mVoiceButton.setOnLongClickListener(this);
-        this.mSearchText.setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(C0041R.drawable.placeholder_google), (Drawable) null, (Drawable) null, (Drawable) null);
+        this.mSearchText.setCompoundDrawablesWithIntrinsicBounds(getContext().getResources().getDrawable(R.drawable.placeholder_google), (Drawable) null, (Drawable) null, (Drawable) null);
         configureVoiceSearchButton();
     }
 

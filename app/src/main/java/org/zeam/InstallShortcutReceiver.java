@@ -46,13 +46,13 @@ public class InstallShortcutReceiver extends BroadcastReceiver {
             }
             if (data.getBooleanExtra("duplicate", true) || !LauncherModel.shortcutExists(context, name, intent)) {
                 Launcher.addShortcut(context, data, cell, true);
-                Toast.makeText(context, context.getString(C0041R.string.shortcut_installed, new Object[]{name}), 0).show();
+                Toast.makeText(context, context.getString(R.string.shortcut_installed, new Object[]{name}), 0).show();
             } else {
-                Toast.makeText(context, context.getString(C0041R.string.shortcut_duplicate, new Object[]{name}), 0).show();
+                Toast.makeText(context, context.getString(R.string.shortcut_duplicate, new Object[]{name}), 0).show();
             }
             return true;
         }
-        Toast.makeText(context, context.getString(C0041R.string.out_of_space), 0).show();
+        Toast.makeText(context, context.getString(R.string.out_of_space), 0).show();
         return false;
     }
 

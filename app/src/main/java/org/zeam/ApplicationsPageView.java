@@ -43,7 +43,7 @@ public class ApplicationsPageView extends LinearLayout {
             linearLayout.setMinimumHeight(rowHeight);
             for (int c = 0; c < columns && index < applicationItemInfos.size(); c++) {
                 ApplicationItemInfo applicationItemInfo = applicationItemInfos.get(index);
-                TextView textView = (TextView) this.mLayoutInflater.inflate(C0041R.layout.application_boxed_page, (ViewGroup) null, false);
+                TextView textView = (TextView) this.mLayoutInflater.inflate(R.layout.application_boxed_page, (ViewGroup) null, false);
                 if (!applicationItemInfo.filtered) {
                     applicationItemInfo.icon = Utilities.createIconThumbnail(applicationItemInfo.icon, context);
                     applicationItemInfo.filtered = true;

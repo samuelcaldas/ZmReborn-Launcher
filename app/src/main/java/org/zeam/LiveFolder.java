@@ -20,7 +20,7 @@ public class LiveFolder extends Folder {
     }
 
     static LiveFolder fromXml(Context context, FolderInfo folderInfo) {
-        return (LiveFolder) LayoutInflater.from(context).inflate(isDisplayModeList(folderInfo) ? C0041R.layout.live_folder_list : C0041R.layout.live_folder_grid, (ViewGroup) null);
+        return (LiveFolder) LayoutInflater.from(context).inflate(isDisplayModeList(folderInfo) ? R.layout.live_folder_list : R.layout.live_folder_grid, (ViewGroup) null);
     }
 
     private static boolean isDisplayModeList(FolderInfo folderInfo) {

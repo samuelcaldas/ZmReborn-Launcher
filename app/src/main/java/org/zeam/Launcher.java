@@ -182,7 +182,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         this.mDisplayMetrics = displayMetrics;
         checkForLocaleChange();
         setWallpaperDimension();
-        setContentView(C0041R.layout.launcher);
+        setContentView(R.layout.launcher);
         setupViews();
         registerIntentReceivers();
         registerContentObservers();
@@ -509,10 +509,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 case 7:
                     processShortcut(data, 6, 1);
                     return;
-                case C0041R.styleable.Favorite_title:
+                case R.styleable.Favorite_title:
                     addLiveFolder(data);
                     return;
-                case C0041R.styleable.Favorite_uri:
+                case R.styleable.Favorite_uri:
                     addAppWidget(data);
                     return;
                 default:
@@ -631,28 +631,28 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     private void setupViews() {
-        this.mDragLayer = (DragLayer) findViewById(C0041R.C0042id.drag_layer);
+        this.mDragLayer = (DragLayer) findViewById(R.id.drag_layer);
         DragLayer dragLayer = this.mDragLayer;
-        this.mWorkspace = (Workspace) dragLayer.findViewById(C0041R.C0042id.workspace);
+        this.mWorkspace = (Workspace) dragLayer.findViewById(R.id.workspace);
         Workspace workspace = this.mWorkspace;
-        ViewStub appsGridStub = (ViewStub) dragLayer.findViewById(C0041R.C0042id.apps_grid_stub);
+        ViewStub appsGridStub = (ViewStub) dragLayer.findViewById(R.id.apps_grid_stub);
         switch (PreferencesUtil.getAppsGridType(this)) {
             case 1:
-                appsGridStub.setLayoutResource(C0041R.layout.apps_grid_view);
+                appsGridStub.setLayoutResource(R.layout.apps_grid_view);
                 break;
             case 2:
-                appsGridStub.setLayoutResource(C0041R.layout.apps_paging_view);
+                appsGridStub.setLayoutResource(R.layout.apps_paging_view);
                 break;
             default:
-                appsGridStub.setLayoutResource(C0041R.layout.apps_paging_view);
+                appsGridStub.setLayoutResource(R.layout.apps_paging_view);
                 break;
         }
         this.mApplicationsView = (ApplicationsView) appsGridStub.inflate();
         ApplicationsView applicationsView = this.mApplicationsView;
-        ViewStub dockbarStub = (ViewStub) dragLayer.findViewById(C0041R.C0042id.dock_stub);
-        dockbarStub.setLayoutResource(C0041R.layout.dockbar);
+        ViewStub dockbarStub = (ViewStub) dragLayer.findViewById(R.id.dock_stub);
+        dockbarStub.setLayoutResource(R.layout.dockbar);
         dockbarStub.inflate();
-        this.mHomeButton = (ImageButton) findViewById(C0041R.C0042id.home_button);
+        this.mHomeButton = (ImageButton) findViewById(R.id.home_button);
         this.mHomeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 if (Launcher.this.isApplicationsGridOpen()) {
@@ -660,7 +660,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 }
             }
         });
-        DeleteZone deleteZone = (DeleteZone) dragLayer.findViewById(C0041R.C0042id.delete_zone);
+        DeleteZone deleteZone = (DeleteZone) dragLayer.findViewById(R.id.delete_zone);
         applicationsView.setDragController(dragLayer);
         applicationsView.setLauncher(this);
         workspace.setOnLongClickListener(this);
@@ -671,12 +671,12 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         dragLayer.setIgnoredDropTarget(applicationsView.getImplementingView());
         dragLayer.setDragScoller(workspace);
         dragLayer.addDragListener(deleteZone);
-        this.mDock = (Dock) dragLayer.findViewById(C0041R.C0042id.dock);
+        this.mDock = (Dock) dragLayer.findViewById(R.id.dock);
         this.mDock.setDragger(dragLayer);
         this.mDock.setLauncher(this);
         dragLayer.addDragListener(this.mDock);
         deleteZone.setHandle(new View(this));
-        this.mScreenIndicator = (ScreenIndicator) findViewById(C0041R.C0042id.workspace_screen_indicator);
+        this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.workspace_screen_indicator);
     }
 
     private void loadPreferences() {
@@ -701,7 +701,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         Dock dock = this.mDock;
         Resources resources = getResources();
         String dockItemWidth = PreferencesUtil.getDockItemWidth(this);
-        String[] dockItemWidths = resources.getStringArray(C0041R.array.preferences_values_dock_item_widths);
+        String[] dockItemWidths = resources.getStringArray(R.array.preferences_values_dock_item_widths);
         for (int i = 0; i < dockItemWidths.length; i++) {
             if (dockItemWidths[i].equals(dockItemWidth)) {
                 switch (i) {
@@ -722,7 +722,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         Dock dock = this.mDock;
         Resources resources = getResources();
         String dockBackgroundType = PreferencesUtil.getDockBackgroundType(this);
-        String[] dockBackgrounds = resources.getStringArray(C0041R.array.preferences_values_dock_backgrounds);
+        String[] dockBackgrounds = resources.getStringArray(R.array.preferences_values_dock_backgrounds);
         dock.setBackgroundColor(1610612736);
         for (int i = 0; i < dockBackgrounds.length; i++) {
             if (dockBackgrounds[i].equals(dockBackgroundType)) {
@@ -731,7 +731,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                         dock.setBackgroundColor(-2013265920);
                         break;
                     case 1:
-                        dock.setBackgroundResource(C0041R.drawable.dock_bg_fade_to_black);
+                        dock.setBackgroundResource(R.drawable.dock_bg_fade_to_black);
                         break;
                     case 2:
                         dock.setBackgroundDrawable((Drawable) null);
@@ -743,13 +743,13 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                         dock.setBackgroundColor(-12303292);
                         break;
                     case 5:
-                        dock.setBackgroundResource(C0041R.drawable.dock_bg_bar_grey);
+                        dock.setBackgroundResource(R.drawable.dock_bg_bar_grey);
                         break;
                     case 6:
                         dock.setBackgroundColor(1358954495);
                         break;
                     default:
-                        dock.setBackgroundResource(C0041R.drawable.dock_bg_bar_grey);
+                        dock.setBackgroundResource(R.drawable.dock_bg_bar_grey);
                         break;
                 }
             }
@@ -841,7 +841,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     /* access modifiers changed from: package-private */
     public View createShortcut(ApplicationItemInfo info) {
-        return createShortcut(C0041R.layout.application, (ViewGroup) this.mWorkspace.getChildAt(this.mWorkspace.getCurrentScreen()), info);
+        return createShortcut(R.layout.application, (ViewGroup) this.mWorkspace.getChildAt(this.mWorkspace.getCurrentScreen()), info);
     }
 
     /* access modifiers changed from: package-private */
@@ -909,7 +909,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     /* access modifiers changed from: package-private */
     public View createApplicationsGridItemView(ApplicationsGridItemInfo applicationsGridItemInfo) {
-        TextView textView = (TextView) this.mInflater.inflate(C0041R.layout.application, (ViewGroup) this.mWorkspace.getChildAt(this.mWorkspace.getCurrentScreen()), false);
+        TextView textView = (TextView) this.mInflater.inflate(R.layout.application, (ViewGroup) this.mWorkspace.getChildAt(this.mWorkspace.getCurrentScreen()), false);
         textView.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, Utilities.createIconThumbnail(applicationsGridItemInfo.icon, this), (Drawable) null, (Drawable) null);
         if (PreferencesUtil.isShowShortcutTitlesEnabled(this)) {
             textView.setText(applicationsGridItemInfo.title);
@@ -939,11 +939,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         final AppWidgetProviderInfo appWidgetInfo = this.mAppWidgetManager.getAppWidgetInfo(appWidgetId);
         final int[] spans = ((CellLayout) this.mWorkspace.getChildAt(cellInfo.screen)).rectToCell(appWidgetInfo.minWidth, appWidgetInfo.minHeight);
         final CellLayout.CellInfo cInfo = cellInfo;
-        View widgetSpanView = View.inflate(this, C0041R.layout.widget_span, (ViewGroup) null);
-        final NumberPicker columnsPicker = (NumberPicker) widgetSpanView.findViewById(C0041R.C0042id.widget_columns_span);
+        View widgetSpanView = View.inflate(this, R.layout.widget_span, (ViewGroup) null);
+        final NumberPicker columnsPicker = (NumberPicker) widgetSpanView.findViewById(R.id.widget_columns_span);
         columnsPicker.setRange(1, this.mWorkspace.getCurrentDesktopColumns());
         columnsPicker.setCurrent(spans[0]);
-        final NumberPicker rowsPicker = (NumberPicker) widgetSpanView.findViewById(C0041R.C0042id.widget_rows_span);
+        final NumberPicker rowsPicker = (NumberPicker) widgetSpanView.findViewById(R.id.widget_rows_span);
         rowsPicker.setRange(1, this.mWorkspace.getCurrentDesktopRows());
         rowsPicker.setCurrent(spans[1]);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
@@ -951,16 +951,16 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         scrollView.addView(widgetSpanView);
         builder.setView(scrollView);
         AlertDialog alertDialog = builder.create();
-        alertDialog.setTitle(getString(C0041R.string.dialog_title_widget_span));
+        alertDialog.setTitle(getString(R.string.dialog_title_widget_span));
         final boolean z = insertAtFirst;
-        alertDialog.setButton(-1, getString(C0041R.string.button_ok), new DialogInterface.OnClickListener() {
+        alertDialog.setButton(-1, getString(R.string.button_ok), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int which) {
                 spans[1] = rowsPicker.getCurrent();
                 spans[0] = columnsPicker.getCurrent();
                 Launcher.this.realAddWidget(appWidgetInfo, cInfo, spans, appWidgetId, z);
             }
         });
-        alertDialog.setButton(-2, getString(C0041R.string.button_cancel), new DialogInterface.OnClickListener() {
+        alertDialog.setButton(-2, getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int which) {
                 dialogInterface.dismiss();
             }
@@ -1144,14 +1144,14 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
-        menu.add(1, 2, 0, C0041R.string.menu_add).setIcon(17301555).setAlphabeticShortcut('A');
-        menu.add(2, 3, 0, C0041R.string.menu_wallpaper).setIcon(17301567).setAlphabeticShortcut('W');
-        menu.add(2, 4, 0, C0041R.string.menu_search).setIcon(17301600).setAlphabeticShortcut('s');
-        menu.add(2, 5, 0, C0041R.string.menu_applications).setIcon(17301591).setAlphabeticShortcut('M');
-        menu.add(2, 6, 0, C0041R.string.menu_preferences).setIcon(17301570).setAlphabeticShortcut('P');
-        menu.add(2, 7, 0, C0041R.string.menu_settings).setIntent(new Intent("android.settings.SETTINGS")).setIcon(17301577).setAlphabeticShortcut('S');
-        menu.add(3, 8, 0, C0041R.string.menu_manage_apps).setIcon(17301570).setAlphabeticShortcut('M');
-        menu.add(3, 9, 0, C0041R.string.menu_uninstall_apps).setIcon(17301564).setAlphabeticShortcut('U');
+        menu.add(1, 2, 0, R.string.menu_add).setIcon(17301555).setAlphabeticShortcut('A');
+        menu.add(2, 3, 0, R.string.menu_wallpaper).setIcon(17301567).setAlphabeticShortcut('W');
+        menu.add(2, 4, 0, R.string.menu_search).setIcon(17301600).setAlphabeticShortcut('s');
+        menu.add(2, 5, 0, R.string.menu_applications).setIcon(17301591).setAlphabeticShortcut('M');
+        menu.add(2, 6, 0, R.string.menu_preferences).setIcon(17301570).setAlphabeticShortcut('P');
+        menu.add(2, 7, 0, R.string.menu_settings).setIntent(new Intent("android.settings.SETTINGS")).setIcon(17301577).setAlphabeticShortcut('S');
+        menu.add(3, 8, 0, R.string.menu_manage_apps).setIcon(17301570).setAlphabeticShortcut('M');
+        menu.add(3, 9, 0, R.string.menu_uninstall_apps).setIcon(17301564).setAlphabeticShortcut('U');
         return LOGD;
     }
 
@@ -1197,10 +1197,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             case 6:
                 startPreferences();
                 return LOGD;
-            case C0041R.styleable.Favorite_title:
+            case R.styleable.Favorite_title:
                 startActivitySafely(new Intent("android.intent.action.MANAGE_PACKAGE_STORAGE"));
                 return LOGD;
-            case C0041R.styleable.Favorite_uri:
+            case R.styleable.Favorite_uri:
                 this.mApplicationsView.setMode(1);
                 return LOGD;
             default:
@@ -1320,15 +1320,15 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             LauncherModel.addItemToDatabase(this, info, -100, this.mWorkspace.getCurrentScreen(), xy[0], xy[1], false);
             View view = this.mInflater.inflate(info.layoutResource, (ViewGroup) null);
             view.setTag(info);
-            ((Search) view.findViewById(C0041R.C0042id.widget_search)).setLauncher(this);
+            ((Search) view.findViewById(R.id.widget_search)).setLauncher(this);
             this.mWorkspace.addInCurrentScreen(view, xy[0], xy[1], spanX, spanY);
         }
     }
 
     /* access modifiers changed from: package-private */
     public void processShortcut(Intent intent, int requestCodeApplication, int requestCodeShortcut) {
-        String applicationName = getResources().getString(C0041R.string.group_applications);
-        String applicationsGridName = getResources().getString(C0041R.string.group_add_apps_grid);
+        String applicationName = getResources().getString(R.string.group_applications);
+        String applicationsGridName = getResources().getString(R.string.group_add_apps_grid);
         String shortcutName = intent.getStringExtra("android.intent.extra.shortcut.NAME");
         if (applicationName != null && applicationName.equals(shortcutName)) {
             Intent mainIntent = new Intent("android.intent.action.MAIN", (Uri) null);
@@ -1345,7 +1345,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     /* access modifiers changed from: package-private */
     public void addLiveFolder(Intent intent) {
-        String folderName = getResources().getString(C0041R.string.group_folder);
+        String folderName = getResources().getString(R.string.group_folder);
         String shortcutName = intent.getStringExtra("android.intent.extra.shortcut.NAME");
         if (folderName == null || !folderName.equals(shortcutName)) {
             startActivityForResult(intent, 4);
@@ -1360,11 +1360,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         cellInfo.screen = this.mWorkspace.getCurrentScreen();
         if ((cellInfo.cellX != -1 && cellInfo.cellY != -1) || findSingleSlot(cellInfo)) {
             UserFolderInfo folderInfo = new UserFolderInfo();
-            folderInfo.title = getText(C0041R.string.folder_name);
+            folderInfo.title = getText(R.string.folder_name);
             LauncherModel.addItemToDatabase(this, folderInfo, -100, this.mWorkspace.getCurrentScreen(), cellInfo.cellX, cellInfo.cellY, false);
             sLauncherModel.addDesktopItem(folderInfo);
             sLauncherModel.addFolder(folderInfo);
-            this.mWorkspace.addInCurrentScreen(FolderIcon.fromXml(C0041R.layout.folder_icon, this, (ViewGroup) this.mWorkspace.getChildAt(this.mWorkspace.getCurrentScreen()), folderInfo), cellInfo.cellX, cellInfo.cellY, 1, 1, insertAtFirst);
+            this.mWorkspace.addInCurrentScreen(FolderIcon.fromXml(R.layout.folder_icon, this, (ViewGroup) this.mWorkspace.getChildAt(this.mWorkspace.getCurrentScreen()), folderInfo), cellInfo.cellX, cellInfo.cellY, 1, 1, insertAtFirst);
         }
     }
 
@@ -1374,7 +1374,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             LiveFolderInfo info = addLiveFolder(this, data, cellInfo, false);
             if (!this.mRestoring) {
                 sLauncherModel.addDesktopItem(info);
-                this.mWorkspace.addInCurrentScreen(LiveFolderIcon.fromXml(C0041R.layout.live_folder_icon, this, (ViewGroup) this.mWorkspace.getChildAt(this.mWorkspace.getCurrentScreen()), info), cellInfo.cellX, cellInfo.cellY, 1, 1, insertAtFirst);
+                this.mWorkspace.addInCurrentScreen(LiveFolderIcon.fromXml(R.layout.live_folder_icon, this, (ViewGroup) this.mWorkspace.getChildAt(this.mWorkspace.getCurrentScreen()), info), cellInfo.cellX, cellInfo.cellY, 1, 1, insertAtFirst);
             } else if (sLauncherModel.isDesktopLoaded()) {
                 sLauncherModel.addDesktopItem(info);
             }
@@ -1397,7 +1397,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             }
         }
         if (icon == null) {
-            icon = context.getResources().getDrawable(C0041R.drawable.ic_launcher_folder);
+            icon = context.getResources().getDrawable(R.drawable.ic_launcher_folder);
         }
         LiveFolderInfo liveFolderInfo = new LiveFolderInfo();
         liveFolderInfo.icon = icon;
@@ -1425,7 +1425,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private boolean findSlot(CellLayout.CellInfo cellInfo, int[] xy, int spanX, int spanY) {
         if (!cellInfo.findCellForSpan(xy, spanX, spanY)) {
             if (!this.mWorkspace.findAllVacantCells(this.mSavedState != null ? this.mSavedState.getBooleanArray(RUNTIME_STATE_PENDING_ADD_OCCUPIED_CELLS) : null).findCellForSpan(xy, spanX, spanY)) {
-                Toast.makeText(this, getString(C0041R.string.out_of_space), 0).show();
+                Toast.makeText(this, getString(R.string.out_of_space), 0).show();
                 return false;
             }
         }
@@ -1449,10 +1449,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     /* access modifiers changed from: private */
     public void startWallpaperChooser() {
-        Intent chooser = Intent.createChooser(new Intent("android.intent.action.SET_WALLPAPER"), getText(C0041R.string.chooser_wallpaper));
+        Intent chooser = Intent.createChooser(new Intent("android.intent.action.SET_WALLPAPER"), getText(R.string.chooser_wallpaper));
         WallpaperInfo wallpaperInfo = ((WallpaperManager) getSystemService("wallpaper")).getWallpaperInfo();
         if (!(wallpaperInfo == null || wallpaperInfo.getSettingsActivity() == null)) {
-            LabeledIntent labeledIntent = new LabeledIntent(getPackageName(), C0041R.string.configure_wallpaper, 0);
+            LabeledIntent labeledIntent = new LabeledIntent(getPackageName(), R.string.configure_wallpaper, 0);
             labeledIntent.setClassName(wallpaperInfo.getPackageName(), wallpaperInfo.getSettingsActivity());
             chooser.putExtra("android.intent.extra.INITIAL_INTENTS", new Intent[]{labeledIntent});
         }
@@ -1661,7 +1661,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             for (int i = 0; i < count; i++) {
                 ((ViewGroup) workspace.getChildAt(i)).removeAllViewsInLayout();
             }
-            ((Dock) this.mDragLayer.findViewById(C0041R.C0042id.dock)).removeAllViewsInLayout();
+            ((Dock) this.mDragLayer.findViewById(R.id.dock)).removeAllViewsInLayout();
             if (this.mBinder != null) {
                 this.mBinder.mTerminate = LOGD;
             }
@@ -1674,7 +1674,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     public void bindItems(DesktopBinder binder, ArrayList<ItemInfo> shortcuts, int start, int count) {
         Workspace workspace = this.mWorkspace;
         boolean desktopLocked = this.mDesktopLocked;
-        Dock dock = (Dock) this.mDragLayer.findViewById(C0041R.C0042id.dock);
+        Dock dock = (Dock) this.mDragLayer.findViewById(R.id.dock);
         ArrayList<ItemInfo> dockItems = new ArrayList<>();
         int end = Math.min(start + 6, count);
         int i = start;
@@ -1691,17 +1691,17 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                             workspace.addInScreen(createShortcut((ApplicationItemInfo) item), item.screen, item.cellX, item.cellY, 1, 1, desktopLocked ? false : LOGD);
                             break;
                         case 2:
-                            workspace.addInScreen(FolderIcon.fromXml(C0041R.layout.folder_icon, this, (ViewGroup) workspace.getChildAt(workspace.getCurrentScreen()), (UserFolderInfo) item), item.screen, item.cellX, item.cellY, 1, 1, desktopLocked ? false : LOGD);
+                            workspace.addInScreen(FolderIcon.fromXml(R.layout.folder_icon, this, (ViewGroup) workspace.getChildAt(workspace.getCurrentScreen()), (UserFolderInfo) item), item.screen, item.cellX, item.cellY, 1, 1, desktopLocked ? false : LOGD);
                             break;
                         case 3:
-                            workspace.addInScreen(LiveFolderIcon.fromXml(C0041R.layout.live_folder_icon, this, (ViewGroup) workspace.getChildAt(workspace.getCurrentScreen()), (LiveFolderInfo) item), item.screen, item.cellX, item.cellY, 1, 1, desktopLocked ? false : LOGD);
+                            workspace.addInScreen(LiveFolderIcon.fromXml(R.layout.live_folder_icon, this, (ViewGroup) workspace.getChildAt(workspace.getCurrentScreen()), (LiveFolderInfo) item), item.screen, item.cellX, item.cellY, 1, 1, desktopLocked ? false : LOGD);
                             break;
                         case 6:
                             workspace.addInScreen(createApplicationsGridItemView((ApplicationsGridItemInfo) item), item.screen, item.cellX, item.cellY, 1, 1, desktopLocked ? false : LOGD);
                             break;
                         case 1001:
-                            View view = this.mInflater.inflate(C0041R.layout.widget_search, (ViewGroup) workspace.getChildAt(workspace.getCurrentScreen()), false);
-                            ((Search) view.findViewById(C0041R.C0042id.widget_search)).setLauncher(this);
+                            View view = this.mInflater.inflate(R.layout.widget_search, (ViewGroup) workspace.getChildAt(workspace.getCurrentScreen()), false);
+                            ((Search) view.findViewById(R.id.widget_search)).setLauncher(this);
                             Widget widget = (Widget) item;
                             view.setTag(widget);
                             workspace.addWidget(view, widget, desktopLocked ? false : LOGD);
@@ -1817,16 +1817,16 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     /* access modifiers changed from: package-private */
     public void startActivitySafely(Intent intent) {
         if (intent == null) {
-            Toast.makeText(this, C0041R.string.activity_not_found, 0).show();
+            Toast.makeText(this, R.string.activity_not_found, 0).show();
             return;
         }
         intent.addFlags(268435456);
         try {
             startActivity(intent);
         } catch (ActivityNotFoundException e) {
-            Toast.makeText(this, C0041R.string.activity_not_found, 0).show();
+            Toast.makeText(this, R.string.activity_not_found, 0).show();
         } catch (SecurityException se) {
-            Toast.makeText(this, C0041R.string.activity_not_found, 0).show();
+            Toast.makeText(this, R.string.activity_not_found, 0).show();
             Log.e(LOG_TAG, "Launcher does not have the permission to launch " + intent + ". Make sure to create a MAIN intent-filter for the corresponding activity " + "or use the exported attribute for this activity.", se);
         }
     }
@@ -1932,7 +1932,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         switch (id) {
             case 3:
                 if (this.mFolderInfo != null) {
-                    EditText input = (EditText) dialog.findViewById(C0041R.C0042id.folder_name);
+                    EditText input = (EditText) dialog.findViewById(R.id.folder_name);
                     CharSequence text = this.mFolderInfo.title;
                     input.setText(text);
                     input.setSelection(0, text.length());
@@ -1968,11 +1968,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     public void pickShortcut(int requestCode, int title) {
         Bundle bundle = new Bundle();
         ArrayList<String> shortcutNames = new ArrayList<>();
-        shortcutNames.add(getString(C0041R.string.group_applications));
-        shortcutNames.add(getString(C0041R.string.group_add_apps_grid));
+        shortcutNames.add(getString(R.string.group_applications));
+        shortcutNames.add(getString(R.string.group_add_apps_grid));
         ArrayList<Intent.ShortcutIconResource> shortcutIcons = new ArrayList<>();
-        shortcutIcons.add(Intent.ShortcutIconResource.fromContext(this, C0041R.drawable.ic_launcher_application));
-        shortcutIcons.add(Intent.ShortcutIconResource.fromContext(this, C0041R.drawable.applications_grid));
+        shortcutIcons.add(Intent.ShortcutIconResource.fromContext(this, R.drawable.ic_launcher_application));
+        shortcutIcons.add(Intent.ShortcutIconResource.fromContext(this, R.drawable.applications_grid));
         bundle.putStringArrayList("android.intent.extra.shortcut.NAME", shortcutNames);
         bundle.putParcelableArrayList("android.intent.extra.shortcut.ICON_RESOURCE", shortcutIcons);
         Intent pickIntent = new Intent("android.intent.action.PICK_ACTIVITY");
@@ -1995,10 +1995,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         /* access modifiers changed from: package-private */
         public Dialog createDialog() {
             Launcher.this.mWaitingForResult = Launcher.LOGD;
-            View layout = View.inflate(Launcher.this, C0041R.layout.rename_folder, (ViewGroup) null);
-            this.mInput = (EditText) layout.findViewById(C0041R.C0042id.folder_name);
+            View layout = View.inflate(Launcher.this, R.layout.rename_folder, (ViewGroup) null);
+            this.mInput = (EditText) layout.findViewById(R.id.folder_name);
             AlertDialog.Builder builder = new AlertDialog.Builder(Launcher.this);
-            builder.setTitle(Launcher.this.getString(C0041R.string.rename_folder_title));
+            builder.setTitle(Launcher.this.getString(R.string.rename_folder_title));
             builder.setCancelable(Launcher.LOGD);
             builder.setIcon(0);
             builder.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -2006,12 +2006,12 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                     RenameFolderDialog.this.cleanup();
                 }
             });
-            builder.setNegativeButton(Launcher.this.getString(C0041R.string.button_cancel), new DialogInterface.OnClickListener() {
+            builder.setNegativeButton(Launcher.this.getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     RenameFolderDialog.this.cleanup();
                 }
             });
-            builder.setPositiveButton(Launcher.this.getString(C0041R.string.button_ok), new DialogInterface.OnClickListener() {
+            builder.setPositiveButton(Launcher.this.getString(R.string.button_ok), new DialogInterface.OnClickListener() {
                 public void onClick(DialogInterface dialog, int which) {
                     RenameFolderDialog.this.changeFolderName();
                 }
@@ -2122,7 +2122,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             Launcher.this.mWaitingForResult = Launcher.LOGD;
             this.mAdapter = new AddDialogAdapter(Launcher.this);
             AlertDialog.Builder builder = new AlertDialog.Builder(Launcher.this);
-            builder.setTitle(Launcher.this.getString(C0041R.string.add));
+            builder.setTitle(Launcher.this.getString(R.string.add));
             builder.setInverseBackgroundForced(Launcher.LOGD);
             builder.setAdapter(this.mAdapter, this);
             AlertDialog dialog = builder.create();
@@ -2156,8 +2156,8 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                     ArrayList<AppWidgetProviderInfo> customInfo = new ArrayList<>();
                     AppWidgetProviderInfo appWidgetProviderInfo = new AppWidgetProviderInfo();
                     appWidgetProviderInfo.provider = new ComponentName(Launcher.this.getPackageName(), "XXX.YYY");
-                    appWidgetProviderInfo.label = Launcher.this.getString(C0041R.string.group_search);
-                    appWidgetProviderInfo.icon = C0041R.drawable.ic_search_widget;
+                    appWidgetProviderInfo.label = Launcher.this.getString(R.string.group_search);
+                    appWidgetProviderInfo.icon = R.drawable.ic_search_widget;
                     customInfo.add(appWidgetProviderInfo);
                     pickIntent.putParcelableArrayListExtra("customInfo", customInfo);
                     ArrayList<Bundle> customExtras = new ArrayList<>();
@@ -2168,19 +2168,19 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                     Launcher.this.startActivityForResult(pickIntent, 9);
                     return;
                 case 1:
-                    Launcher.this.pickShortcut(7, C0041R.string.title_select_shortcut);
+                    Launcher.this.pickShortcut(7, R.string.title_select_shortcut);
                     return;
                 case 2:
                     Bundle bundle2 = new Bundle();
                     ArrayList<String> shortcutNames = new ArrayList<>();
-                    shortcutNames.add(res.getString(C0041R.string.group_folder));
+                    shortcutNames.add(res.getString(R.string.group_folder));
                     bundle2.putStringArrayList("android.intent.extra.shortcut.NAME", shortcutNames);
                     ArrayList<Intent.ShortcutIconResource> shortcutIcons = new ArrayList<>();
-                    shortcutIcons.add(Intent.ShortcutIconResource.fromContext(Launcher.this, C0041R.drawable.ic_launcher_folder));
+                    shortcutIcons.add(Intent.ShortcutIconResource.fromContext(Launcher.this, R.drawable.ic_launcher_folder));
                     bundle2.putParcelableArrayList("android.intent.extra.shortcut.ICON_RESOURCE", shortcutIcons);
                     Intent pickIntent2 = new Intent("android.intent.action.PICK_ACTIVITY");
                     pickIntent2.putExtra("android.intent.extra.INTENT", new Intent("android.intent.action.CREATE_LIVE_FOLDER"));
-                    pickIntent2.putExtra("android.intent.extra.TITLE", Launcher.this.getText(C0041R.string.title_select_live_folder));
+                    pickIntent2.putExtra("android.intent.extra.TITLE", Launcher.this.getText(R.string.title_select_live_folder));
                     pickIntent2.putExtras(bundle2);
                     Launcher.this.startActivityForResult(pickIntent2, 8);
                     return;
@@ -2366,7 +2366,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     /* access modifiers changed from: package-private */
     public View createSmallFolder(int layoutResId, ViewGroup parent, UserFolderInfo info) {
         ImageView imageView = (ImageView) this.mInflater.inflate(layoutResId, parent, false);
-        imageView.setImageDrawable(Utilities.createDockIconThumbnail(getResources().getDrawable(C0041R.drawable.ic_launcher_folder), this));
+        imageView.setImageDrawable(Utilities.createDockIconThumbnail(getResources().getDrawable(R.drawable.ic_launcher_folder), this));
         imageView.setOnClickListener(this);
         imageView.setTag(info);
         return imageView;
@@ -2378,7 +2378,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         Resources resources = getResources();
         Drawable drawable = info.icon;
         if (drawable == null) {
-            drawable = resources.getDrawable(C0041R.drawable.ic_launcher_folder);
+            drawable = resources.getDrawable(R.drawable.ic_launcher_folder);
         }
         info.filtered = LOGD;
         imageView.setImageDrawable(Utilities.createDockIconThumbnail(drawable, this));
@@ -2448,7 +2448,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             this.mApplicationsView.getImplementingView().bringToFront();
             this.mApplicationsView.open(animated && this.mAllowAppsGridAnimations);
             if (animated && this.mAllowAppsGridAnimations) {
-                this.mHomeButton.setAnimation(AnimationUtils.loadAnimation(this, C0041R.anim.home_button_fade_in));
+                this.mHomeButton.setAnimation(AnimationUtils.loadAnimation(this, R.anim.home_button_fade_in));
             }
             this.mHomeButton.setVisibility(0);
             this.mHomeButton.bringToFront();
@@ -2477,7 +2477,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                     this.mScreenIndicator.show();
                 }
                 if (animated && this.mAllowAppsGridAnimations) {
-                    this.mHomeButton.setAnimation(AnimationUtils.loadAnimation(this, C0041R.anim.home_button_fade_out));
+                    this.mHomeButton.setAnimation(AnimationUtils.loadAnimation(this, R.anim.home_button_fade_out));
                 }
                 this.mHomeButton.setVisibility(4);
                 this.mApplicationsGridOpen = false;

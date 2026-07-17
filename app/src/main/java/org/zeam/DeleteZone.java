@@ -60,7 +60,7 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
                 if (DeleteZone.this.shouldUninstall) {
                     Context context = DeleteZone.this.getContext();
                     ((Vibrator) context.getSystemService("vibrator")).vibrate(35);
-                    Toast.makeText(context, C0041R.string.drop_to_uninstall, 500).show();
+                    Toast.makeText(context, R.string.drop_to_uninstall, 500).show();
                 }
             }
         };
@@ -85,11 +85,11 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
                 if (DeleteZone.this.shouldUninstall) {
                     Context context = DeleteZone.this.getContext();
                     ((Vibrator) context.getSystemService("vibrator")).vibrate(35);
-                    Toast.makeText(context, C0041R.string.drop_to_uninstall, 500).show();
+                    Toast.makeText(context, R.string.drop_to_uninstall, 500).show();
                 }
             }
         };
-        TypedArray a = context.obtainStyledAttributes(attrs, C0041R.styleable.DeleteZone, defStyle, 0);
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.DeleteZone, defStyle, 0);
         this.mOrientation = a.getInt(0, 1);
         a.recycle();
     }

@@ -759,14 +759,14 @@ public class LauncherModel {
                     Resources resources = launcher.getPackageManager().getResourcesForApplication(packageName);
                     liveFolderInfo.icon = resources.getDrawable(resources.getIdentifier(resourceName, (String) null, (String) null));
                 } catch (Exception e) {
-                    liveFolderInfo.icon = launcher.getResources().getDrawable(C0041R.drawable.ic_launcher_folder);
+                    liveFolderInfo.icon = launcher.getResources().getDrawable(R.drawable.ic_launcher_folder);
                 }
                 liveFolderInfo.iconResource = new Intent.ShortcutIconResource();
                 liveFolderInfo.iconResource.packageName = packageName;
                 liveFolderInfo.iconResource.resourceName = resourceName;
                 return;
             default:
-                liveFolderInfo.icon = launcher.getResources().getDrawable(C0041R.drawable.ic_launcher_folder);
+                liveFolderInfo.icon = launcher.getResources().getDrawable(R.drawable.ic_launcher_folder);
                 return;
         }
     }

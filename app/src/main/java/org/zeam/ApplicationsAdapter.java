@@ -23,7 +23,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationItemInfo> {
         Context context = getContext();
         ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) getItem(position);
         if (convertView == null) {
-            convertView = this.mLayoutInflater.inflate(C0041R.layout.application_boxed_grid, parent, false);
+            convertView = this.mLayoutInflater.inflate(R.layout.application_boxed_grid, parent, false);
             textView = (TextView) convertView;
             textView.setDrawingCacheQuality(524288);
         } else {

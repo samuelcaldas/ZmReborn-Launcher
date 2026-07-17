@@ -29,11 +29,11 @@ public class Folder extends LinearLayout implements DragSource, AdapterView.OnIt
     public void onFinishInflate() {
         super.onFinishInflate();
         Context context = getContext();
-        this.mTextView = (TextView) findViewById(C0041R.C0042id.folder_name);
-        this.mContent = (AbsListView) findViewById(C0041R.C0042id.folder_content);
+        this.mTextView = (TextView) findViewById(R.id.folder_name);
+        this.mContent = (AbsListView) findViewById(R.id.folder_content);
         this.mContent.setOnItemClickListener(this);
         this.mContent.setOnItemLongClickListener(this);
-        ImageButton renameButton = (ImageButton) findViewById(C0041R.C0042id.folder_button_rename);
+        ImageButton renameButton = (ImageButton) findViewById(R.id.folder_button_rename);
         renameButton.setBackgroundDrawable(SelectorDrawable.createSelector(context, true));
         renameButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -41,7 +41,7 @@ public class Folder extends LinearLayout implements DragSource, AdapterView.OnIt
                 Folder.this.mLauncher.showRenameDialog(Folder.this.mFolderInfo);
             }
         });
-        ImageButton closeButton = (ImageButton) findViewById(C0041R.C0042id.folder_button_close);
+        ImageButton closeButton = (ImageButton) findViewById(R.id.folder_button_close);
         closeButton.setBackgroundDrawable(SelectorDrawable.createSelector(context, true));
         closeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {

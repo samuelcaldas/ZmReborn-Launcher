@@ -44,7 +44,7 @@ public class UninstallShortcutReceiver extends BroadcastReceiver {
                 }
                 if (changed) {
                     contentResolver.notifyChange(LauncherSettings.Favorites.CONTENT_URI, (ContentObserver) null);
-                    Toast.makeText(context, context.getString(C0041R.string.shortcut_uninstalled, new Object[]{name}), 0).show();
+                    Toast.makeText(context, context.getString(R.string.shortcut_uninstalled, new Object[]{name}), 0).show();
                 }
             }
         }

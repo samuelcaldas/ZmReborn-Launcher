@@ -17,7 +17,7 @@ public class Preferences extends PreferenceActivity {
     /* access modifiers changed from: protected */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        addPreferencesFromResource(C0041R.xml.preferences);
+        addPreferencesFromResource(R.xml.preferences);
         Preference.OnPreferenceChangeListener restartChangeListener = new Preference.OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object object) {
                 Launcher.sRestart = true;
@@ -30,16 +30,16 @@ public class Preferences extends PreferenceActivity {
                 return true;
             }
         };
-        findPreference(getString(C0041R.string.preferences_key_general_selector_colour_pressed)).setOnPreferenceChangeListener(restartChangeListener);
-        findPreference(getString(C0041R.string.preferences_key_general_selector_colour_focused)).setOnPreferenceChangeListener(restartChangeListener);
-        final DialogSeekBarPreference defaultScreenPreference = (DialogSeekBarPreference) findPreference(getString(C0041R.string.preferences_key_workspace_default_screen));
-        ((DialogSeekBarPreference) findPreference(getString(C0041R.string.preferences_key_workspace_number_of_screens))).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        findPreference(getString(R.string.preferences_key_general_selector_colour_pressed)).setOnPreferenceChangeListener(restartChangeListener);
+        findPreference(getString(R.string.preferences_key_general_selector_colour_focused)).setOnPreferenceChangeListener(restartChangeListener);
+        final DialogSeekBarPreference defaultScreenPreference = (DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_workspace_default_screen));
+        ((DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_workspace_number_of_screens))).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object value) {
                 int numberOfScreens = ((Integer) value).intValue() + 1;
                 defaultScreenPreference.setMax(numberOfScreens);
                 if (numberOfScreens < PreferencesUtil.getDefaultScreen(Preferences.this)) {
                     SharedPreferences.Editor editor = defaultScreenPreference.getEditor();
-                    editor.putInt(Preferences.this.getString(C0041R.string.preferences_key_workspace_number_of_screens), numberOfScreens);
+                    editor.putInt(Preferences.this.getString(R.string.preferences_key_workspace_number_of_screens), numberOfScreens);
                     editor.commit();
                 }
                 Launcher.sRestart = true;
@@ -48,48 +48,48 @@ public class Preferences extends PreferenceActivity {
         });
         defaultScreenPreference.setMax(PreferencesUtil.getNumberOfScreens(this));
         defaultScreenPreference.setOnPreferenceChangeListener(restartChangeListener);
-        ((DialogSeekBarPreference) findPreference(getString(C0041R.string.preferences_key_workspace_content_grid_rows))).setOnPreferenceChangeListener(restartChangeListener);
-        ((DialogSeekBarPreference) findPreference(getString(C0041R.string.preferences_key_workspace_content_grid_columns))).setOnPreferenceChangeListener(restartChangeListener);
-        findPreference(getString(C0041R.string.preferences_key_workspace_content_grid_auto_fit)).setOnPreferenceChangeListener(restartChangeListener);
-        findPreference(getString(C0041R.string.preferences_key_workspace_show_shortcut_titles)).setOnPreferenceChangeListener(restartLoadersChangeListener);
-        findPreference(getString(C0041R.string.preferences_key_workspace_manage_wallpaper)).setOnPreferenceChangeListener(restartChangeListener);
+        ((DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_workspace_content_grid_rows))).setOnPreferenceChangeListener(restartChangeListener);
+        ((DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_workspace_content_grid_columns))).setOnPreferenceChangeListener(restartChangeListener);
+        findPreference(getString(R.string.preferences_key_workspace_content_grid_auto_fit)).setOnPreferenceChangeListener(restartChangeListener);
+        findPreference(getString(R.string.preferences_key_workspace_show_shortcut_titles)).setOnPreferenceChangeListener(restartLoadersChangeListener);
+        findPreference(getString(R.string.preferences_key_workspace_manage_wallpaper)).setOnPreferenceChangeListener(restartChangeListener);
         loadAppsGridRowsColumns(PreferencesUtil.getAppsGridType(this));
-        findPreference(getString(C0041R.string.preferences_key_apps_grid_type)).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        findPreference(getString(R.string.preferences_key_apps_grid_type)).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object object) {
                 Preferences.this.loadAppsGridRowsColumns(Integer.parseInt(String.valueOf(object)));
                 Launcher.sRestart = true;
                 return true;
             }
         });
-        findPreference(getString(C0041R.string.preferences_key_apps_grid_bg_alpha)).setOnPreferenceChangeListener(restartChangeListener);
-        findPreference(getString(C0041R.string.preferences_key_dock_item_width)).setOnPreferenceChangeListener(restartChangeListener);
-        findPreference(getString(C0041R.string.preferences_key_dock_item_alignment)).setOnPreferenceChangeListener(restartChangeListener);
-        final Preference resetTo = findPreference(getString(C0041R.string.preferences_key_dock_reset_to));
-        findPreference(getString(C0041R.string.preferences_key_dock_reset_home)).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+        findPreference(getString(R.string.preferences_key_apps_grid_bg_alpha)).setOnPreferenceChangeListener(restartChangeListener);
+        findPreference(getString(R.string.preferences_key_dock_item_width)).setOnPreferenceChangeListener(restartChangeListener);
+        findPreference(getString(R.string.preferences_key_dock_item_alignment)).setOnPreferenceChangeListener(restartChangeListener);
+        final Preference resetTo = findPreference(getString(R.string.preferences_key_dock_reset_to));
+        findPreference(getString(R.string.preferences_key_dock_reset_home)).setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object valueObject) {
                 resetTo.setEnabled(((Boolean) valueObject).booleanValue());
                 return true;
             }
         });
         resetTo.setEnabled(PreferencesUtil.getDockResetHome(this));
-        findPreference(getString(C0041R.string.preferences_key_restart)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        findPreference(getString(R.string.preferences_key_restart)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
                 Preferences.restart();
                 return false;
             }
         });
-        findPreference(getString(C0041R.string.preferences_key_reset)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
+        findPreference(getString(R.string.preferences_key_reset)).setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
-                new AlertDialog.Builder(Preferences.this).setMessage(Preferences.this.getString(C0041R.string.preferences_confirm_reset)).setPositiveButton(Preferences.this.getString(C0041R.string.button_yes), new DialogInterface.OnClickListener() {
+                new AlertDialog.Builder(Preferences.this).setMessage(Preferences.this.getString(R.string.preferences_confirm_reset)).setPositiveButton(Preferences.this.getString(R.string.button_yes), new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialogInterface, int i) {
                         Preferences.this.resetAlertRestart();
                     }
-                }).setNegativeButton(Preferences.this.getString(C0041R.string.button_no), (DialogInterface.OnClickListener) null).show();
+                }).setNegativeButton(Preferences.this.getString(R.string.button_no), (DialogInterface.OnClickListener) null).show();
                 return false;
             }
         });
-        Preference applicationPreference = findPreference(getString(C0041R.string.preferences_key_application));
-        applicationPreference.setTitle(String.valueOf(getString(C0041R.string.application_name)) + " " + LauncherApplication.getVersionName(this));
+        Preference applicationPreference = findPreference(getString(R.string.preferences_key_application));
+        applicationPreference.setTitle(String.valueOf(getString(R.string.application_name)) + " " + LauncherApplication.getVersionName(this));
         applicationPreference.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener() {
             public boolean onPreferenceClick(Preference preference) {
                 Preferences.this.startActivity(new Intent("android.intent.action.VIEW", Uri.parse("http://zeam.org/")));
@@ -100,10 +100,10 @@ public class Preferences extends PreferenceActivity {
 
     /* access modifiers changed from: private */
     public void loadAppsGridRowsColumns(int appsGridType) {
-        final DialogSeekBarPreference appsGridContentRowsPortrait = (DialogSeekBarPreference) findPreference(getString(C0041R.string.preferences_key_apps_grid_content_rows_port));
-        final DialogSeekBarPreference appsGridContentColumnsPortrait = (DialogSeekBarPreference) findPreference(getString(C0041R.string.preferences_key_apps_grid_content_columns_port));
-        final DialogSeekBarPreference appsGridContentRowsLandscape = (DialogSeekBarPreference) findPreference(getString(C0041R.string.preferences_key_apps_grid_content_rows_land));
-        final DialogSeekBarPreference appsGridContentColumnsLandscape = (DialogSeekBarPreference) findPreference(getString(C0041R.string.preferences_key_apps_grid_content_columns_land));
+        final DialogSeekBarPreference appsGridContentRowsPortrait = (DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_apps_grid_content_rows_port));
+        final DialogSeekBarPreference appsGridContentColumnsPortrait = (DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_apps_grid_content_columns_port));
+        final DialogSeekBarPreference appsGridContentRowsLandscape = (DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_apps_grid_content_rows_land));
+        final DialogSeekBarPreference appsGridContentColumnsLandscape = (DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_apps_grid_content_columns_land));
         if (appsGridType == 1) {
             appsGridContentRowsPortrait.setEnabled(false);
             appsGridContentRowsLandscape.setEnabled(false);
@@ -120,7 +120,7 @@ public class Preferences extends PreferenceActivity {
             appsGridContentColumnsPortrait.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 public boolean onPreferenceChange(Preference preference, Object value) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Preferences.this).edit();
-                    editor.putInt(Preferences.this.getString(C0041R.string.f14x51b1f069), ((Integer) value).intValue() + appsGridContentColumnsPortrait.getMin());
+                    editor.putInt(Preferences.this.getString(R.string.f14x51b1f069), ((Integer) value).intValue() + appsGridContentColumnsPortrait.getMin());
                     editor.commit();
                     return true;
                 }
@@ -128,7 +128,7 @@ public class Preferences extends PreferenceActivity {
             appsGridContentColumnsLandscape.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 public boolean onPreferenceChange(Preference preference, Object value) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Preferences.this).edit();
-                    editor.putInt(Preferences.this.getString(C0041R.string.f13x51afe9d3), ((Integer) value).intValue() + appsGridContentColumnsLandscape.getMin());
+                    editor.putInt(Preferences.this.getString(R.string.f13x51afe9d3), ((Integer) value).intValue() + appsGridContentColumnsLandscape.getMin());
                     editor.commit();
                     return true;
                 }
@@ -153,7 +153,7 @@ public class Preferences extends PreferenceActivity {
             appsGridContentRowsPortrait.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 public boolean onPreferenceChange(Preference preference, Object value) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Preferences.this).edit();
-                    editor.putInt(Preferences.this.getString(C0041R.string.preferences_key_apps_grid_horizontal_paging_content_rows_port), ((Integer) value).intValue() + appsGridContentRowsPortrait.getMin());
+                    editor.putInt(Preferences.this.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_rows_port), ((Integer) value).intValue() + appsGridContentRowsPortrait.getMin());
                     editor.commit();
                     return true;
                 }
@@ -161,7 +161,7 @@ public class Preferences extends PreferenceActivity {
             appsGridContentColumnsPortrait.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 public boolean onPreferenceChange(Preference preference, Object value) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Preferences.this).edit();
-                    editor.putInt(Preferences.this.getString(C0041R.string.preferences_key_apps_grid_horizontal_paging_content_columns_port), ((Integer) value).intValue() + appsGridContentColumnsPortrait.getMin());
+                    editor.putInt(Preferences.this.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_columns_port), ((Integer) value).intValue() + appsGridContentColumnsPortrait.getMin());
                     editor.commit();
                     return true;
                 }
@@ -169,7 +169,7 @@ public class Preferences extends PreferenceActivity {
             appsGridContentRowsLandscape.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 public boolean onPreferenceChange(Preference preference, Object value) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Preferences.this).edit();
-                    editor.putInt(Preferences.this.getString(C0041R.string.preferences_key_apps_grid_horizontal_paging_content_rows_land), ((Integer) value).intValue() + appsGridContentRowsLandscape.getMin());
+                    editor.putInt(Preferences.this.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_rows_land), ((Integer) value).intValue() + appsGridContentRowsLandscape.getMin());
                     editor.commit();
                     return true;
                 }
@@ -177,7 +177,7 @@ public class Preferences extends PreferenceActivity {
             appsGridContentColumnsLandscape.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
                 public boolean onPreferenceChange(Preference preference, Object value) {
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Preferences.this).edit();
-                    editor.putInt(Preferences.this.getString(C0041R.string.preferences_key_apps_grid_horizontal_paging_content_columns_land), ((Integer) value).intValue() + appsGridContentColumnsLandscape.getMin());
+                    editor.putInt(Preferences.this.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_columns_land), ((Integer) value).intValue() + appsGridContentColumnsLandscape.getMin());
                     editor.commit();
                     return true;
                 }
@@ -192,7 +192,7 @@ public class Preferences extends PreferenceActivity {
     }
 
     static void alertRestart(Context context) {
-        new AlertDialog.Builder(context).setCancelable(false).setMessage(context.getString(C0041R.string.preferences_alert_dialog_restart_message)).setPositiveButton(context.getString(C0041R.string.preferences_alert_dialog_restart_button), new DialogInterface.OnClickListener() {
+        new AlertDialog.Builder(context).setCancelable(false).setMessage(context.getString(R.string.preferences_alert_dialog_restart_message)).setPositiveButton(context.getString(R.string.preferences_alert_dialog_restart_button), new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialogInterface, int i) {
                 Preferences.restart();
             }

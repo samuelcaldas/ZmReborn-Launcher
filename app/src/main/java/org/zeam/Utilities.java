@@ -175,7 +175,7 @@ final class Utilities {
             return null;
         }
         Bitmap iconBitmap = getMutableBitmap(iconDrawable);
-        return iconBitmap != null ? new FastBitmapDrawable(addOverlay(iconBitmap, ((BitmapDrawable) context.getResources().getDrawable(C0041R.drawable.overlay_uninstall)).getBitmap())) : iconDrawable;
+        return iconBitmap != null ? new FastBitmapDrawable(addOverlay(iconBitmap, ((BitmapDrawable) context.getResources().getDrawable(R.drawable.overlay_uninstall)).getBitmap())) : iconDrawable;
     }
 
     static Drawable adjustIconOpacity(Drawable iconDrawable) {

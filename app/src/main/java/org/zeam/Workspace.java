@@ -961,13 +961,13 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
                 if (itemInfo.container == -1) {
                     itemInfo = new ApplicationItemInfo((ApplicationItemInfo) itemInfo);
                 }
-                view = this.mLauncher.createShortcut(C0041R.layout.application, cellLayout, (ApplicationItemInfo) itemInfo);
+                view = this.mLauncher.createShortcut(R.layout.application, cellLayout, (ApplicationItemInfo) itemInfo);
                 break;
             case 2:
-                view = FolderIcon.fromXml(C0041R.layout.folder_icon, this.mLauncher, (ViewGroup) getChildAt(this.mScreenCurrent), (UserFolderInfo) itemInfo);
+                view = FolderIcon.fromXml(R.layout.folder_icon, this.mLauncher, (ViewGroup) getChildAt(this.mScreenCurrent), (UserFolderInfo) itemInfo);
                 break;
             case 3:
-                view = LiveFolderIcon.fromXml(C0041R.layout.live_folder_icon, this.mLauncher, (ViewGroup) getChildAt(this.mScreenCurrent), (LiveFolderInfo) itemInfo);
+                view = LiveFolderIcon.fromXml(R.layout.live_folder_icon, this.mLauncher, (ViewGroup) getChildAt(this.mScreenCurrent), (LiveFolderInfo) itemInfo);
                 break;
             case 6:
                 view = this.mLauncher.createApplicationsGridItemView((ApplicationsGridItemInfo) itemInfo);

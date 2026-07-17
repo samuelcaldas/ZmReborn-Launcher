@@ -49,9 +49,9 @@ public class NumberPickerButton extends ImageButton {
     }
 
     private void cancelLongpress() {
-        if (C0041R.C0042id.increment == getId()) {
+        if (R.id.increment == getId()) {
             this.mNumberPicker.cancelIncrement();
-        } else if (C0041R.C0042id.decrement == getId()) {
+        } else if (R.id.decrement == getId()) {
             this.mNumberPicker.cancelDecrement();
         }
     }

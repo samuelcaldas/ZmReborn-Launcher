@@ -42,13 +42,13 @@ class LiveFolderAdapter extends CursorAdapter {
         View view;
         ViewHolder viewHolder = new ViewHolder();
         if (!this.mIsList) {
-            view = this.mInflater.inflate(C0041R.layout.application_boxed_grid, parent, false);
+            view = this.mInflater.inflate(R.layout.application_boxed_grid, parent, false);
         } else {
-            view = this.mInflater.inflate(C0041R.layout.application_list, parent, false);
-            viewHolder.description = (TextView) view.findViewById(C0041R.C0042id.description);
-            viewHolder.icon = (ImageView) view.findViewById(C0041R.C0042id.icon);
+            view = this.mInflater.inflate(R.layout.application_list, parent, false);
+            viewHolder.description = (TextView) view.findViewById(R.id.description);
+            viewHolder.icon = (ImageView) view.findViewById(R.id.icon);
         }
-        viewHolder.name = (TextView) view.findViewById(C0041R.C0042id.name);
+        viewHolder.name = (TextView) view.findViewById(R.id.name);
         viewHolder.idIndex = cursor.getColumnIndexOrThrow("_id");
         viewHolder.nameIndex = cursor.getColumnIndexOrThrow("name");
         viewHolder.descriptionIndex = cursor.getColumnIndex("description");

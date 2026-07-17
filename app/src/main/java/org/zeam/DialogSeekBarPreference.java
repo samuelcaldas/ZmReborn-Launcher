@@ -25,15 +25,15 @@ public class DialogSeekBarPreference extends DialogPreference implements SeekBar
         this.mSuffix = attrs.getAttributeValue(f2ns, "text");
         this.mMin = attrs.getAttributeIntValue(f2ns, "min", 0);
         this.mMax = attrs.getAttributeIntValue(f2ns, "max", 100);
-        setDialogLayoutResource(C0041R.layout.dialog_seekbar_preference);
+        setDialogLayoutResource(R.layout.dialog_seekbar_preference);
     }
 
     /* access modifiers changed from: protected */
     public void onBindDialogView(View view) {
         super.onBindDialogView(view);
-        ((TextView) view.findViewById(C0041R.C0042id.dialog_message)).setText(getDialogMessage());
-        this.mValueText = (TextView) view.findViewById(C0041R.C0042id.actual_value);
-        this.mSeekBar = (SeekBar) view.findViewById(C0041R.C0042id.my_bar);
+        ((TextView) view.findViewById(R.id.dialog_message)).setText(getDialogMessage());
+        this.mValueText = (TextView) view.findViewById(R.id.actual_value);
+        this.mSeekBar = (SeekBar) view.findViewById(R.id.my_bar);
         this.mSeekBar.setOnSeekBarChangeListener(this);
         this.mSeekBar.setMax(this.mMax - this.mMin);
         this.mSeekBar.setProgress(this.mValue - this.mMin);

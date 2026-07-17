@@ -19,19 +19,19 @@ public class PreferencesUtil {
     }
 
     static int getNumberOfScreens(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.preferences_key_workspace_number_of_screens), Integer.parseInt(context.getString(C0041R.string.preferences_default_workspace_number_of_screens)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_workspace_number_of_screens), Integer.parseInt(context.getString(R.string.preferences_default_workspace_number_of_screens)));
     }
 
     static int getDefaultScreen(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.preferences_key_workspace_default_screen), Integer.parseInt(context.getString(C0041R.string.preferences_default_workspace_default_screen))) - 1;
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_workspace_default_screen), Integer.parseInt(context.getString(R.string.preferences_default_workspace_default_screen))) - 1;
     }
 
     static String getScreenIndicator(Context context) {
-        return getSharedPreferences(context).getString(context.getString(C0041R.string.preferences_key_workspace_screen_indicator_type), context.getString(C0041R.string.preferences_default_workspace_screen_indicator_type));
+        return getSharedPreferences(context).getString(context.getString(R.string.preferences_key_workspace_screen_indicator_type), context.getString(R.string.preferences_default_workspace_screen_indicator_type));
     }
 
     static boolean useSensorOrientation(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(C0041R.string.preferences_key_general_sensor_orientation), Boolean.parseBoolean(context.getString(C0041R.string.preferences_default_general_sensor_orientation)));
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_general_sensor_orientation), Boolean.parseBoolean(context.getString(R.string.preferences_default_general_sensor_orientation)));
     }
 
     static boolean isManageWallpaperEnabled(Context context) {
@@ -43,132 +43,132 @@ public class PreferencesUtil {
         if (displayMetrics.densityDpi < 240 || ((Build.MODEL != null && Build.MODEL.contains("Sensation")) || Build.VERSION.SDK_INT >= 14)) {
             defaultValue = true;
         }
-        boolean enabled = sharedPreferences.getBoolean(context.getString(C0041R.string.preferences_key_workspace_manage_wallpaper), defaultValue);
+        boolean enabled = sharedPreferences.getBoolean(context.getString(R.string.preferences_key_workspace_manage_wallpaper), defaultValue);
         SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(context.getString(C0041R.string.preferences_key_workspace_manage_wallpaper), enabled);
+        editor.putBoolean(context.getString(R.string.preferences_key_workspace_manage_wallpaper), enabled);
         editor.commit();
         return enabled;
     }
 
     static boolean isScrollWallpaperEnabled(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(C0041R.string.preferences_key_workspace_scroll_wallpaper), Boolean.parseBoolean(context.getString(C0041R.string.preferences_default_workspace_scroll_wallpaper)));
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_workspace_scroll_wallpaper), Boolean.parseBoolean(context.getString(R.string.preferences_default_workspace_scroll_wallpaper)));
     }
 
     static boolean isFullscreenEnabled(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(C0041R.string.preferences_key_general_fullscreen), Boolean.parseBoolean(context.getString(C0041R.string.preferences_default_general_fullscreen)));
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_general_fullscreen), Boolean.parseBoolean(context.getString(R.string.preferences_default_general_fullscreen)));
     }
 
     static void setFullscreenEnabled(Context context, boolean fullscreen) {
         SharedPreferences.Editor editor = getSharedPreferences(context).edit();
-        editor.putBoolean(context.getString(C0041R.string.preferences_key_general_fullscreen), Boolean.valueOf(fullscreen).booleanValue());
+        editor.putBoolean(context.getString(R.string.preferences_key_general_fullscreen), Boolean.valueOf(fullscreen).booleanValue());
         editor.commit();
     }
 
     static boolean isShowShortcutTitlesEnabled(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(C0041R.string.preferences_key_workspace_show_shortcut_titles), Boolean.parseBoolean(context.getString(C0041R.string.preferences_default_workspace_show_shortcut_titles)));
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_workspace_show_shortcut_titles), Boolean.parseBoolean(context.getString(R.string.preferences_default_workspace_show_shortcut_titles)));
     }
 
     static int getContentGridRows(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.preferences_key_workspace_content_grid_rows), Integer.parseInt(context.getString(C0041R.string.preferences_default_workspace_content_grid_rows)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_workspace_content_grid_rows), Integer.parseInt(context.getString(R.string.preferences_default_workspace_content_grid_rows)));
     }
 
     static int getContentGridColumns(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.preferences_key_workspace_content_grid_columns), Integer.parseInt(context.getString(C0041R.string.preferences_default_workspace_content_grid_columns)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_workspace_content_grid_columns), Integer.parseInt(context.getString(R.string.preferences_default_workspace_content_grid_columns)));
     }
 
     static boolean isAutoFitContentGridItemsEnabled(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(C0041R.string.preferences_key_workspace_content_grid_auto_fit), Boolean.parseBoolean(context.getString(C0041R.string.preferences_default_workspace_content_grid_auto_fit)));
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_workspace_content_grid_auto_fit), Boolean.parseBoolean(context.getString(R.string.preferences_default_workspace_content_grid_auto_fit)));
     }
 
     static boolean isElasticScrollingEnabled(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(C0041R.string.preferences_key_workspace_elastic_scrolling), Boolean.parseBoolean(context.getString(C0041R.string.preferences_default_workspace_elastic_scrolling)));
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_workspace_elastic_scrolling), Boolean.parseBoolean(context.getString(R.string.preferences_default_workspace_elastic_scrolling)));
     }
 
     static boolean isScreenLoopingEnabled(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(C0041R.string.preferences_key_workspace_screen_looping), Boolean.parseBoolean(context.getString(C0041R.string.preferences_default_workspace_screen_looping)));
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_workspace_screen_looping), Boolean.parseBoolean(context.getString(R.string.preferences_default_workspace_screen_looping)));
     }
 
     static int getSelectorPressedColorHex(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.preferences_key_general_selector_colour_pressed), context.getResources().getColor(C0041R.color.preferences_default_general_selector_colour_pressed));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_general_selector_colour_pressed), context.getResources().getColor(R.color.preferences_default_general_selector_colour_pressed));
     }
 
     static int getSelectorFocusedColorHex(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.preferences_key_general_selector_colour_focused), context.getResources().getColor(C0041R.color.preferences_default_general_selector_colour_focused));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_general_selector_colour_focused), context.getResources().getColor(R.color.preferences_default_general_selector_colour_focused));
     }
 
     static int getActionBindingForHomeButton(Context context) {
-        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(C0041R.string.preferences_key_action_home_button), context.getString(C0041R.string.preferences_default_action_home_button)));
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.preferences_key_action_home_button), context.getString(R.string.preferences_default_action_home_button)));
     }
 
     static int getActionBindingForSwipeUp(Context context) {
-        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(C0041R.string.preferences_key_action_swipe_up), context.getString(C0041R.string.preferences_default_action_swipe_up)));
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.preferences_key_action_swipe_up), context.getString(R.string.preferences_default_action_swipe_up)));
     }
 
     static int getActionBindingForSwipeDown(Context context) {
-        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(C0041R.string.preferences_key_action_swipe_down), context.getString(C0041R.string.preferences_default_action_swipe_down)));
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.preferences_key_action_swipe_down), context.getString(R.string.preferences_default_action_swipe_down)));
     }
 
     static int getActionBindingForDoubleTap(Context context) {
-        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(C0041R.string.preferences_key_action_double_tap), context.getString(C0041R.string.preferences_default_action_double_tap)));
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.preferences_key_action_double_tap), context.getString(R.string.preferences_default_action_double_tap)));
     }
 
     static int getAppsGridType(Context context) {
-        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(C0041R.string.preferences_key_apps_grid_type), context.getString(C0041R.string.preferences_default_apps_grid_type)));
+        return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.preferences_key_apps_grid_type), context.getString(R.string.preferences_default_apps_grid_type)));
     }
 
     static int getAppsGridVerticalScrollingContentColumnsPortrait(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.f14x51b1f069), Integer.parseInt(context.getString(C0041R.string.f12x744d074b)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.f14x51b1f069), Integer.parseInt(context.getString(R.string.f12x744d074b)));
     }
 
     static int getAppsGridVerticalScrollingContentColumnsLandscape(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.f13x51afe9d3), Integer.parseInt(context.getString(C0041R.string.f11x744b00b5)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.f13x51afe9d3), Integer.parseInt(context.getString(R.string.f11x744b00b5)));
     }
 
     static int getAppsGridHorizontalPagingContentRowsPortrait(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.preferences_key_apps_grid_horizontal_paging_content_rows_port), Integer.parseInt(context.getString(C0041R.string.f10xb4e613d8)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_rows_port), Integer.parseInt(context.getString(R.string.f10xb4e613d8)));
     }
 
     static int getAppsGridHorizontalPagingContentColumnsPortrait(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.preferences_key_apps_grid_horizontal_paging_content_columns_port), Integer.parseInt(context.getString(C0041R.string.f8xe2a30d52)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_columns_port), Integer.parseInt(context.getString(R.string.f8xe2a30d52)));
     }
 
     static int getAppsGridHorizontalPagingContentRowsLandscape(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.preferences_key_apps_grid_horizontal_paging_content_rows_land), Integer.parseInt(context.getString(C0041R.string.f9xb4e40d42)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_rows_land), Integer.parseInt(context.getString(R.string.f9xb4e40d42)));
     }
 
     static int getAppsGridHorizontalPagingContentColumnsLandscape(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.preferences_key_apps_grid_horizontal_paging_content_columns_land), Integer.parseInt(context.getString(C0041R.string.f7xe2a106bc)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_horizontal_paging_content_columns_land), Integer.parseInt(context.getString(R.string.f7xe2a106bc)));
     }
 
     static boolean rememberApplicationsPosition(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(C0041R.string.preferences_key_apps_grid_remember_position), Boolean.parseBoolean(context.getString(C0041R.string.preferences_default_apps_grid_remember_position)));
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_apps_grid_remember_position), Boolean.parseBoolean(context.getString(R.string.preferences_default_apps_grid_remember_position)));
     }
 
     static boolean isAnimateAppsGridEnabled(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(C0041R.string.preferences_key_apps_grid_animated), Boolean.parseBoolean(context.getString(C0041R.string.preferences_default_apps_grid_animated)));
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_apps_grid_animated), Boolean.parseBoolean(context.getString(R.string.preferences_default_apps_grid_animated)));
     }
 
     static int getAppsGridBackgroundAlpha(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(C0041R.string.preferences_key_apps_grid_bg_alpha), Integer.parseInt(context.getString(C0041R.string.preferences_default_apps_grid_bg_alpha)));
+        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_bg_alpha), Integer.parseInt(context.getString(R.string.preferences_default_apps_grid_bg_alpha)));
     }
 
     static String getDockBackgroundType(Context context) {
-        return getSharedPreferences(context).getString(context.getString(C0041R.string.preferences_key_dock_background), context.getString(C0041R.string.preferences_default_dock_background));
+        return getSharedPreferences(context).getString(context.getString(R.string.preferences_key_dock_background), context.getString(R.string.preferences_default_dock_background));
     }
 
     static boolean getDockResetHome(Context context) {
-        return getSharedPreferences(context).getBoolean(context.getString(C0041R.string.preferences_key_dock_reset_home), Boolean.parseBoolean(context.getString(C0041R.string.preferences_default_dock_reset_home)));
+        return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_dock_reset_home), Boolean.parseBoolean(context.getString(R.string.preferences_default_dock_reset_home)));
     }
 
     static String getDockResetTo(Context context) {
-        return getSharedPreferences(context).getString(context.getString(C0041R.string.preferences_key_dock_reset_to), context.getString(C0041R.string.preferences_default_dock_reset_to));
+        return getSharedPreferences(context).getString(context.getString(R.string.preferences_key_dock_reset_to), context.getString(R.string.preferences_default_dock_reset_to));
     }
 
     static String getDockItemWidth(Context context) {
-        return getSharedPreferences(context).getString(context.getString(C0041R.string.preferences_key_dock_item_width), context.getString(C0041R.string.preferences_default_dock_item_width));
+        return getSharedPreferences(context).getString(context.getString(R.string.preferences_key_dock_item_width), context.getString(R.string.preferences_default_dock_item_width));
     }
 
     static String getDockItemAlignment(Context context) {
-        return getSharedPreferences(context).getString(context.getString(C0041R.string.preferences_key_dock_item_alignment), context.getString(C0041R.string.preferences_default_dock_item_alignment));
+        return getSharedPreferences(context).getString(context.getString(R.string.preferences_key_dock_item_alignment), context.getString(R.string.preferences_default_dock_item_alignment));
     }
 }

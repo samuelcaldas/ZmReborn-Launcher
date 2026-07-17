@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" android:versionCode="112" android:versionName="3.1.10" package="org.zeam">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" package="org.zeam">
     <uses-sdk android:minSdkVersion="8"/>
     <permission android:label="@string/permlab_install_shortcut" android:name="org.zeam.permission.INSTALL_SHORTCUT" android:protectionLevel="normal" android:permissionGroup="android.permission-group.SYSTEM_TOOLS" android:description="@string/permdesc_install_shortcut"/>
     <permission android:label="@string/permlab_uninstall_shortcut" android:name="org.zeam.permission.UNINSTALL_SHORTCUT" android:protectionLevel="normal" android:permissionGroup="android.permission-group.SYSTEM_TOOLS" android:description="@string/permdesc_uninstall_shortcut"/>
@@ -43,6 +43,6 @@
                 <action android:name="com.android.launcher.action.UNINSTALL_SHORTCUT"/>
             </intent-filter>
         </receiver>
-        <provider android:name="LauncherProvider" android:readPermission="org.zeam.permission.READ_SETTINGS" android:writePermission="org.zeam.permission.WRITE_SETTINGS" android:authorities="org.zeam.provider"/>
+        <provider android:name=".LauncherProvider" android:readPermission="org.zeam.permission.READ_SETTINGS" android:writePermission="org.zeam.permission.WRITE_SETTINGS" android:authorities="org.zeam.provider"/>
     </application>
 </manifest>

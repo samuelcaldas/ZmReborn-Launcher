@@ -21,7 +21,7 @@ public class LiveFolderIcon extends FolderIcon {
         Resources resources = launcher.getResources();
         Drawable drawable = folderInfo.icon;
         if (drawable == null) {
-            drawable = Utilities.createIconThumbnail(resources.getDrawable(C0041R.drawable.ic_launcher_folder), launcher);
+            drawable = Utilities.createIconThumbnail(resources.getDrawable(R.drawable.ic_launcher_folder), launcher);
             folderInfo.filtered = true;
         }
         icon.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, drawable, (Drawable) null, (Drawable) null);

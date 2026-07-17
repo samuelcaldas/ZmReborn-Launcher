@@ -25,7 +25,7 @@ public class DotsIndicator extends ViewGroup {
     private void init() {
         setFocusable(false);
         setWillNotDraw(false);
-        this.mDotDrawableId = C0041R.drawable.pager_dots;
+        this.mDotDrawableId = R.drawable.pager_dots;
     }
 
     /* access modifiers changed from: protected */

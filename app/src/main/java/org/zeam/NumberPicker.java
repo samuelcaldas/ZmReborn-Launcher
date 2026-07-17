@@ -83,19 +83,19 @@ public class NumberPicker extends LinearLayout implements View.OnClickListener, 
         };
         this.mSpeed = 300;
         setOrientation(1);
-        ((LayoutInflater) context.getSystemService("layout_inflater")).inflate(C0041R.layout.number_picker, this, true);
+        ((LayoutInflater) context.getSystemService("layout_inflater")).inflate(R.layout.number_picker, this, true);
         this.mHandler = new Handler();
         InputFilter inputFilter = new NumberPickerInputFilter(this, (NumberPickerInputFilter) null);
         this.mNumberInputFilter = new NumberRangeKeyListener(this, (NumberRangeKeyListener) null);
-        this.mIncrementButton = (NumberPickerButton) findViewById(C0041R.C0042id.increment);
+        this.mIncrementButton = (NumberPickerButton) findViewById(R.id.increment);
         this.mIncrementButton.setOnClickListener(this);
         this.mIncrementButton.setOnLongClickListener(this);
         this.mIncrementButton.setNumberPicker(this);
-        this.mDecrementButton = (NumberPickerButton) findViewById(C0041R.C0042id.decrement);
+        this.mDecrementButton = (NumberPickerButton) findViewById(R.id.decrement);
         this.mDecrementButton.setOnClickListener(this);
         this.mDecrementButton.setOnLongClickListener(this);
         this.mDecrementButton.setNumberPicker(this);
-        this.mText = (EditText) findViewById(C0041R.C0042id.timepicker_input);
+        this.mText = (EditText) findViewById(R.id.timepicker_input);
         this.mText.setOnFocusChangeListener(this);
         this.mText.setFilters(new InputFilter[]{inputFilter});
         this.mText.setRawInputType(2);
@@ -150,9 +150,9 @@ public class NumberPicker extends LinearLayout implements View.OnClickListener, 
         if (!this.mText.hasFocus()) {
             this.mText.requestFocus();
         }
-        if (C0041R.C0042id.increment == v.getId()) {
+        if (R.id.increment == v.getId()) {
             changeCurrent(this.mCurrent + 1);
-        } else if (C0041R.C0042id.decrement == v.getId()) {
+        } else if (R.id.decrement == v.getId()) {
             changeCurrent(this.mCurrent - 1);
         }
     }
@@ -218,10 +218,10 @@ public class NumberPicker extends LinearLayout implements View.OnClickListener, 
 
     public boolean onLongClick(View v) {
         this.mText.clearFocus();
-        if (C0041R.C0042id.increment == v.getId()) {
+        if (R.id.increment == v.getId()) {
             this.mIncrement = true;
             this.mHandler.post(this.mRunnable);
-        } else if (C0041R.C0042id.decrement == v.getId()) {
+        } else if (R.id.decrement == v.getId()) {
             this.mDecrement = true;
             this.mHandler.post(this.mRunnable);
         }

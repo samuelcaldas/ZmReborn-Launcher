@@ -363,7 +363,7 @@ public class LauncherProvider extends ContentProvider {
             PackageManager packageManager = this.mContext.getPackageManager();
             int i = 0;
             try {
-                XmlResourceParser parser = this.mContext.getResources().getXml(C0041R.xml.default_workspace);
+                XmlResourceParser parser = this.mContext.getResources().getXml(R.xml.default_workspace);
                 AttributeSet attrs = Xml.asAttributeSet(parser);
                 XmlUtils.beginDocument(parser, TAG_FAVORITES);
                 int depth = parser.getDepth();
@@ -374,7 +374,7 @@ public class LauncherProvider extends ContentProvider {
                     } else if (type == 2) {
                         boolean added = false;
                         String name = parser.getName();
-                        TypedArray a = this.mContext.obtainStyledAttributes(attrs, C0041R.styleable.Favorite);
+                        TypedArray a = this.mContext.obtainStyledAttributes(attrs, R.styleable.Favorite);
                         values.clear();
                         String container = a.getString(10);
                         if (container == null) {

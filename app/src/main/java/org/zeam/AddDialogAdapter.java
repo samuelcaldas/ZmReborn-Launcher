@@ -35,15 +35,15 @@ public class AddDialogAdapter extends BaseAdapter {
     public AddDialogAdapter(Launcher launcher) {
         Resources res = launcher.getResources();
         this.mLayoutInflater = (LayoutInflater) launcher.getSystemService("layout_inflater");
-        this.mListItems.add(new ListItem(res, C0041R.string.group_add_widgets, C0041R.drawable.ic_launcher_appwidget, 0));
-        this.mListItems.add(new ListItem(res, C0041R.string.group_add_shortcuts, C0041R.drawable.ic_launcher_shortcut, 1));
-        this.mListItems.add(new ListItem(res, C0041R.string.group_add_folders, C0041R.drawable.ic_launcher_folder, 2));
+        this.mListItems.add(new ListItem(res, R.string.group_add_widgets, R.drawable.ic_launcher_appwidget, 0));
+        this.mListItems.add(new ListItem(res, R.string.group_add_shortcuts, R.drawable.ic_launcher_shortcut, 1));
+        this.mListItems.add(new ListItem(res, R.string.group_add_folders, R.drawable.ic_launcher_folder, 2));
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
         ListItem listItem = (ListItem) getItem(position);
         if (convertView == null) {
-            convertView = this.mLayoutInflater.inflate(C0041R.layout.dialog_list_item, parent, false);
+            convertView = this.mLayoutInflater.inflate(R.layout.dialog_list_item, parent, false);
         }
         TextView textView = (TextView) convertView;
         textView.setTag(listItem);

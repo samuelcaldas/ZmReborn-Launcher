@@ -55,7 +55,7 @@ public class CellLayout extends ViewGroup {
         this.mCellXY = new int[2];
         this.mDragRect = new RectF();
         this.mLastDownOnOccupiedCell = false;
-        TypedArray typedArray = context.obtainStyledAttributes(attrs, C0041R.styleable.CellLayout, defStyle, 0);
+        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.CellLayout, defStyle, 0);
         this.mCellWidth = typedArray.getDimensionPixelSize(0, 10);
         this.mCellHeight = typedArray.getDimensionPixelSize(1, 10);
         this.mLongAxisStartPadding = typedArray.getDimensionPixelSize(2, 10);
@@ -518,7 +518,7 @@ public class CellLayout extends ViewGroup {
 
     public int[] rectToCell(int width, int height) {
         Resources resources = getResources();
-        int smallerSize = Math.min(resources.getDimensionPixelSize(C0041R.dimen.cell_width), resources.getDimensionPixelSize(C0041R.dimen.cell_height));
+        int smallerSize = Math.min(resources.getDimensionPixelSize(R.dimen.cell_width), resources.getDimensionPixelSize(R.dimen.cell_height));
         return new int[]{(width + smallerSize) / smallerSize, (height + smallerSize) / smallerSize};
     }
 

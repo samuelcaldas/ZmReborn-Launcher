@@ -35,14 +35,14 @@ public class LauncherDialogAdapter extends BaseAdapter {
     public LauncherDialogAdapter(Launcher launcher) {
         Resources resources = launcher.getResources();
         this.mLayoutInflater = (LayoutInflater) launcher.getSystemService("layout_inflater");
-        this.mListItems.add(new ListItem(resources, C0041R.string.add, C0041R.drawable.ic_launcher_shortcut, 0));
-        this.mListItems.add(new ListItem(resources, C0041R.string.menu_wallpaper, C0041R.drawable.ic_launcher_wallpaper, 1));
-        this.mListItems.add(new ListItem(resources, C0041R.string.menu_preferences, C0041R.drawable.ic_launcher_settings, 2));
+        this.mListItems.add(new ListItem(resources, R.string.add, R.drawable.ic_launcher_shortcut, 0));
+        this.mListItems.add(new ListItem(resources, R.string.menu_wallpaper, R.drawable.ic_launcher_wallpaper, 1));
+        this.mListItems.add(new ListItem(resources, R.string.menu_preferences, R.drawable.ic_launcher_settings, 2));
     }
 
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = this.mLayoutInflater.inflate(C0041R.layout.dialog_list_item, parent, false);
+            convertView = this.mLayoutInflater.inflate(R.layout.dialog_list_item, parent, false);
         }
         TextView textView = (TextView) convertView;
         ListItem listItem = (ListItem) getItem(position);

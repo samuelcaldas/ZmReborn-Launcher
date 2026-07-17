@@ -13,8 +13,8 @@ public class ApplicationsGridItemInfo extends ItemInfo {
     ApplicationsGridItemInfo(Context context) {
         Resources resources = context.getResources();
         this.itemType = 6;
-        this.icon = resources.getDrawable(C0041R.drawable.applications_grid);
-        this.title = resources.getString(C0041R.string.group_applications);
+        this.icon = resources.getDrawable(R.drawable.applications_grid);
+        this.title = resources.getString(R.string.group_applications);
     }
 
     /* access modifiers changed from: package-private */

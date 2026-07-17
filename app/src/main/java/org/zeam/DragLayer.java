@@ -79,8 +79,8 @@ public class DragLayer extends FrameLayout implements DragController {
 
     public DragLayer(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.mTrashPaint.setColorFilter(new PorterDuffColorFilter(context.getResources().getColor(C0041R.color.delete_color_filter), PorterDuff.Mode.SRC_ATOP));
-        int snagColor = context.getResources().getColor(C0041R.color.snag_callout_color);
+        this.mTrashPaint.setColorFilter(new PorterDuffColorFilter(context.getResources().getColor(R.color.delete_color_filter), PorterDuff.Mode.SRC_ATOP));
+        int snagColor = context.getResources().getColor(R.color.snag_callout_color);
         Paint estimatedPaint = new Paint();
         estimatedPaint.setColor(snagColor);
         estimatedPaint.setStrokeWidth(3.0f);
@@ -365,7 +365,7 @@ public class DragLayer extends FrameLayout implements DragController {
 
     private int getDockY() {
         int[] dockLocation = new int[2];
-        findViewById(C0041R.C0042id.dock).getLocationOnScreen(dockLocation);
+        findViewById(R.id.dock).getLocationOnScreen(dockLocation);
         return dockLocation[1];
     }
 

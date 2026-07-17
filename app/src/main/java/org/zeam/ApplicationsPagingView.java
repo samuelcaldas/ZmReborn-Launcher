@@ -42,7 +42,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     public void onFinishInflate() {
         super.onFinishInflate();
         this.mResetMode = true;
-        this.mViewPager = (ViewPager) findViewById(C0041R.C0042id.view_pager);
+        this.mViewPager = (ViewPager) findViewById(R.id.view_pager);
         this.mViewPager.setDrawingCacheEnabled(true);
         setDrawingCacheEnabled(true);
         this.mViewPager.setDrawingCacheQuality(524288);
@@ -51,7 +51,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
                 ApplicationsPagingView.this.indicate();
             }
         });
-        this.mScreenIndicator = (ScreenIndicator) findViewById(C0041R.C0042id.apps_paging_screen_indicator);
+        this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.apps_paging_screen_indicator);
         this.mAnimationListener = new Animation.AnimationListener() {
             public void onAnimationStart(Animation animation) {
             }
@@ -101,7 +101,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
             ArrayList<View> pageViews = new ArrayList<>();
             for (Integer intValue : pageContents.keySet()) {
                 int page = intValue.intValue();
-                ApplicationsPageView applicationsPageView = (ApplicationsPageView) layoutInflater.inflate(C0041R.layout.apps_page_view, (ViewGroup) null);
+                ApplicationsPageView applicationsPageView = (ApplicationsPageView) layoutInflater.inflate(R.layout.apps_page_view, (ViewGroup) null);
                 applicationsPageView.populatePage(uninstalling, sRows, sColumns, pageContents.get(Integer.valueOf(page)), this, this);
                 pageViews.add(applicationsPageView);
             }
@@ -156,7 +156,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         buildPages();
         initIndicator();
         if (animated) {
-            Animation inAnimation = AnimationUtils.loadAnimation(getContext(), C0041R.anim.apps_scale_in);
+            Animation inAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.apps_scale_in);
             inAnimation.setAnimationListener(this.mAnimationListener);
             setAnimation(inAnimation);
         }
@@ -173,7 +173,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
             return false;
         }
         if (animated) {
-            setAnimation(AnimationUtils.loadAnimation(getContext(), C0041R.anim.apps_scale_out));
+            setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.apps_scale_out));
         }
         setVisibility(4);
         return true;

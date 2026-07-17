@@ -29,12 +29,12 @@ public class ColourPickerDialog extends Dialog implements ColourPickerView.OnCol
     }
 
     private void setup(int color) {
-        View layout = ((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(C0041R.layout.dialog_colour_picker, (ViewGroup) null);
+        View layout = ((LayoutInflater) getContext().getSystemService("layout_inflater")).inflate(R.layout.dialog_colour_picker, (ViewGroup) null);
         setContentView(layout);
-        setTitle(C0041R.string.dialog_colour_picker_title);
-        this.mColourPicker = (ColourPickerView) layout.findViewById(C0041R.C0042id.colour_picker_view);
-        this.mOldColour = (ColourPickerPanelView) layout.findViewById(C0041R.C0042id.old_colour_panel);
-        this.mNewColour = (ColourPickerPanelView) layout.findViewById(C0041R.C0042id.new_colour_panel);
+        setTitle(R.string.dialog_colour_picker_title);
+        this.mColourPicker = (ColourPickerView) layout.findViewById(R.id.colour_picker_view);
+        this.mOldColour = (ColourPickerPanelView) layout.findViewById(R.id.old_colour_panel);
+        this.mNewColour = (ColourPickerPanelView) layout.findViewById(R.id.new_colour_panel);
         ((LinearLayout) this.mOldColour.getParent()).setPadding(Math.round(this.mColourPicker.getDrawingOffset()), 0, Math.round(this.mColourPicker.getDrawingOffset()), 0);
         this.mOldColour.setOnClickListener(this);
         this.mNewColour.setOnClickListener(this);
@@ -61,7 +61,7 @@ public class ColourPickerDialog extends Dialog implements ColourPickerView.OnCol
 
     public void onClick(View view) {
         switch (view.getId()) {
-            case C0041R.C0042id.new_colour_panel /*2131099659*/:
+            case R.id.new_colour_panel /*2131099659*/:
                 if (this.mOnColourChangedListener != null) {
                     this.mOnColourChangedListener.onColourChanged(this.mNewColour.getColor());
                     break;
