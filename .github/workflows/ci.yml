@@ -1,0 +1,45 @@
+name: Android CI
+
+on:
+  push:
+    branches: [ dev, main ]
+  pull_request:
+    branches: [ dev, main ]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v4
+
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Grant Execute Permission for Gradlew
+      run: chmod +x gradlew
+
+    - name: Run Lint
+      run: ./gradlew :app:lint --no-daemon
+
+    - name: Run Unit Tests
+      run: ./gradlew :app:testDebugUnitTest --no-daemon
+
+    - name: Build Debug APK
+      run: ./gradlew assembleDebug --no-daemon
+
+    - name: Verify APK Generated
+      run: |
+        if [ ! -f "app/build/outputs/apk/debug/app-debug.apk" ]; then
+          echo "APK not found!"
+          exit 1
+        fi
+        echo "APK successfully built."
