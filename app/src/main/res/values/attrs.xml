@@ -56,4 +56,37 @@
     </attr>
     <attr name="max" format="integer">
     </attr>
+
+    <declare-styleable name="DeleteZone">
+        <attr name="direction" />
+    </declare-styleable>
+
+    <declare-styleable name="CellLayout">
+        <attr name="cellWidth" />
+        <attr name="cellHeight" />
+        <attr name="longAxisStartPadding" />
+        <attr name="longAxisEndPadding" />
+        <attr name="shortAxisStartPadding" />
+        <attr name="shortAxisEndPadding" />
+    </declare-styleable>
+
+    <declare-styleable name="Dock">
+        <attr name="cellWidth" />
+        <attr name="cellHeight" />
+        <attr name="orientation" />
+    </declare-styleable>
+
+    <declare-styleable name="Favorite">
+        <attr name="className" />
+        <attr name="packageName" />
+        <attr name="screen" />
+        <attr name="x" />
+        <attr name="y" />
+        <attr name="spanX" />
+        <attr name="spanY" />
+        <attr name="icon" />
+        <attr name="title" />
+        <attr name="uri" />
+        <attr name="container" />
+    </declare-styleable>
 </resources>
