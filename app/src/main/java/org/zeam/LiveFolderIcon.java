@@ -28,6 +28,7 @@ public class LiveFolderIcon extends FolderIcon {
         if (PreferencesUtil.isShowShortcutTitlesEnabled(launcher)) {
             icon.setText(folderInfo.title);
         }
+        icon.setContentDescription(folderInfo.title);
         icon.setTag(folderInfo);
         icon.setOnClickListener(launcher);
         return icon;

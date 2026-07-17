@@ -61,6 +61,8 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
                     Context context = DeleteZone.this.getContext();
                     ((Vibrator) context.getSystemService("vibrator")).vibrate(35);
                     Toast.makeText(context, R.string.drop_to_uninstall, 500).show();
+                    DeleteZone.this.setColorFilter(context.getResources().getColor(R.color.zeam_ember), android.graphics.PorterDuff.Mode.SRC_ATOP);
+                    DeleteZone.this.setContentDescription(context.getString(R.string.drop_to_uninstall));
                 }
             }
         };
@@ -86,6 +88,8 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
                     Context context = DeleteZone.this.getContext();
                     ((Vibrator) context.getSystemService("vibrator")).vibrate(35);
                     Toast.makeText(context, R.string.drop_to_uninstall, 500).show();
+                    DeleteZone.this.setColorFilter(context.getResources().getColor(R.color.zeam_ember), android.graphics.PorterDuff.Mode.SRC_ATOP);
+                    DeleteZone.this.setContentDescription(context.getString(R.string.drop_to_uninstall));
                 }
             }
         };
@@ -145,6 +149,8 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
     public void onDragExit(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
         this.mTransition.reverseTransition(TRANSITION_DURATION);
         this.mHandler.removeCallbacks(this.mShowUninstaller);
+        clearColorFilter();
+        setContentDescription(getContext().getString(R.string.accessibility_delete_zone));
         if (this.shouldUninstall) {
             this.mUninstallTarget = false;
             this.mHandler.postDelayed(this.mShowUninstaller, 100);
@@ -156,6 +162,10 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
         this.mCustomPadding = 1;
         if (item != null) {
             this.mTrashMode = true;
+            this.shouldUninstall = false;
+            this.mUninstallTarget = false;
+            clearColorFilter();
+            setContentDescription(getContext().getString(R.string.accessibility_delete_zone));
             createAnimations();
             int[] location = this.mLocation;
             getLocationOnScreen(location);
@@ -188,10 +198,14 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
             this.mHandle.startAnimation(this.mHandleInAnimation);
             setVisibility(8);
         }
+        clearColorFilter();
+        setContentDescription(getContext().getString(R.string.accessibility_delete_zone));
         if (this.shouldUninstall && this.mUninstallApplicationItemInfo != null) {
             this.mLauncher.uninstallApplication(this.mUninstallApplicationItemInfo);
             this.mUninstallApplicationItemInfo = null;
         }
+        this.shouldUninstall = false;
+        this.mUninstallTarget = false;
     }
 
     private void createAnimations() {

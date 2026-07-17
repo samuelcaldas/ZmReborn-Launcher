@@ -78,9 +78,9 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
 
     public void setBackgroundAlpha(int alpha) {
         int i = 0;
-        setBackgroundColor(Color.argb(alpha, 0, 0, 0));
+        setBackgroundColor(Color.argb(alpha, 18, 26, 33));
         if (alpha == 255) {
-            i = -16777216;
+            i = -15590879; // #ff121a21 (zeam_slate)
         }
         setCacheColorHint(i);
         invalidate();

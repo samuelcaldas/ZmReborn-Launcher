@@ -43,7 +43,7 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
     private View mIndicator;
     private int mItems = 5;
     private int mType = 1;
-    private int mVisibleTime = 300;
+    private int mVisibleTime = 600;
 
     public ScreenIndicator(Context context) {
         super(context);
@@ -183,7 +183,7 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
 
     public void setAutoHide(boolean autohide) {
         if (autohide) {
-            this.mVisibleTime = 300;
+            this.mVisibleTime = 600;
             setVisibility(4);
             return;
         }

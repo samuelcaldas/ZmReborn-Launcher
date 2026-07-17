@@ -90,6 +90,12 @@
     <string name="button_yes">Yes</string>
     <string name="button_done">Done</string>
     <string name="button_close">Close</string>
+    <string name="accessibility_close_drawer">Close application drawer</string>
+    <string name="accessibility_folder_rename">Rename folder</string>
+    <string name="accessibility_folder_close">Close folder</string>
+    <string name="accessibility_delete_zone">Remove from home screen</string>
+    <string name="accessibility_voice_search">Voice search</string>
+    <string name="workspace_empty_tip">Long press to add shortcuts &amp; widgets</string>
     <string name="button_cancel">Cancel</string>
     <string name="group_applications">Applications</string>
     <string name="group_add_apps_grid">Applications grid</string>

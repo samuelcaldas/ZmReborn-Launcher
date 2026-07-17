@@ -35,6 +35,7 @@ public class Folder extends LinearLayout implements DragSource, AdapterView.OnIt
         this.mContent.setOnItemLongClickListener(this);
         ImageButton renameButton = (ImageButton) findViewById(R.id.folder_button_rename);
         renameButton.setBackgroundDrawable(SelectorDrawable.createSelector(context, true));
+        renameButton.setContentDescription(context.getString(R.string.accessibility_folder_rename));
         renameButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Folder.this.mLauncher.closeFolder(Folder.this);
@@ -43,6 +44,7 @@ public class Folder extends LinearLayout implements DragSource, AdapterView.OnIt
         });
         ImageButton closeButton = (ImageButton) findViewById(R.id.folder_button_close);
         closeButton.setBackgroundDrawable(SelectorDrawable.createSelector(context, true));
+        closeButton.setContentDescription(context.getString(R.string.accessibility_folder_close));
         closeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 Folder.this.mLauncher.closeFolder(Folder.this);

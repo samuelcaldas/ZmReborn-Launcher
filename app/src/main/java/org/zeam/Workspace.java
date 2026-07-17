@@ -318,6 +318,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
             if (!(child instanceof Folder)) {
                 child.setOnLongClickListener(this.mLongClickListener);
             }
+            this.mLauncher.updateWorkspaceEmptyTip();
         }
     }
 
@@ -1190,6 +1191,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
             if (childCount2 > 0) {
                 cellLayout.requestLayout();
                 cellLayout.invalidate();
+                this.mLauncher.updateWorkspaceEmptyTip();
             }
         }
     }

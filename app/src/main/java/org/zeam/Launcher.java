@@ -30,6 +30,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -66,15 +67,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import org.zeam.CellLayout;
 import org.zeam.LauncherSettings;
 
-public final class Launcher extends Activity implements View.OnClickListener, View.OnLongClickListener {
+public final class Launcher extends Activity implements View.OnClickListener, View.OnLongClickListener, DragController.DragListener {
     static final int APPWIDGET_HOST_ID = 1024;
     static final int DEFAULT_SCREEN = 2;
     private static final int DIALOG_ADD = 2;
@@ -543,6 +542,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         dockbarStub.setLayoutResource(R.layout.dockbar);
         dockbarStub.inflate();
         this.mHomeButton = (ImageButton) findViewById(R.id.home_button);
+        this.mHomeButton.setContentDescription(getString(R.string.accessibility_close_drawer));
         this.mHomeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
                 if (Launcher.this.isApplicationsGridOpen()) {
@@ -551,6 +551,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             }
         });
         DeleteZone deleteZone = (DeleteZone) dragLayer.findViewById(R.id.delete_zone);
+        deleteZone.setContentDescription(getString(R.string.accessibility_delete_zone));
         applicationsView.setDragController(dragLayer);
         applicationsView.setLauncher(this);
         workspace.setOnLongClickListener(this);
@@ -565,6 +566,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         this.mDock.setDragger(dragLayer);
         this.mDock.setLauncher(this);
         dragLayer.addDragListener(this.mDock);
+        dragLayer.addDragListener(this);
         deleteZone.setHandle(new View(this));
         this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.workspace_screen_indicator);
     }
@@ -701,6 +703,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         if (PreferencesUtil.isShowShortcutTitlesEnabled(this)) {
             favorite.setText(info.title);
         }
+        favorite.setContentDescription(info.title);
         favorite.setTag(info);
         favorite.setOnClickListener(this);
         return favorite;
@@ -760,6 +763,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         if (PreferencesUtil.isShowShortcutTitlesEnabled(this)) {
             textView.setText(applicationsGridItemInfo.title);
         }
+        textView.setContentDescription(applicationsGridItemInfo.title);
         textView.setTag(applicationsGridItemInfo);
         textView.setOnClickListener(this);
         return textView;
@@ -1306,25 +1310,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     private static void registerReceiverCompat(Context context, BroadcastReceiver receiver, IntentFilter filter) {
-        try {
-            Method method = Context.class.getMethod("registerReceiver", new Class[]{BroadcastReceiver.class, IntentFilter.class, Integer.TYPE});
-            method.invoke(context, new Object[]{receiver, filter, Integer.valueOf(4)});
-        } catch (NoSuchMethodException e) {
+        if (Build.VERSION.SDK_INT < 33) {
             context.registerReceiver(receiver, filter);
-        } catch (IllegalAccessException e2) {
-            throw new IllegalStateException("Cannot access flagged receiver registration", e2);
-        } catch (InvocationTargetException e3) {
-            Throwable cause = e3.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            }
-            if (cause instanceof Error) {
-                throw (Error) cause;
-            }
-            throw new IllegalStateException("Flagged receiver registration failed", cause);
-        } catch (SecurityException e4) {
-            throw new IllegalStateException("Cannot access flagged receiver registration", e4);
+            return;
         }
+        context.registerReceiver(receiver, filter, Context.RECEIVER_NOT_EXPORTED);
     }
 
     private void registerIntentReceivers() {
@@ -1416,6 +1406,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             parent.removeView(folder);
         }
         folder.onClose();
+        updateWorkspaceEmptyTip();
     }
 
     /* access modifiers changed from: private */
@@ -1637,6 +1628,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             this.mApplicationsView.getImplementingView().requestFocus();
         }
         this.mDesktopLocked = false;
+        updateWorkspaceEmptyTip();
     }
 
     /* access modifiers changed from: private */
@@ -1661,6 +1653,8 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         }
         if (!appWidgets.isEmpty()) {
             binder.obtainMessage(2).sendToTarget();
+        } else {
+            updateWorkspaceEmptyTip();
         }
     }
 
@@ -1736,6 +1730,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         }
         openFolder.onOpen();
         closeApplications(false);
+        updateWorkspaceEmptyTip();
     }
 
     /* access modifiers changed from: package-private */
@@ -2213,6 +2208,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     public View createSmallApplicationsGridItem(int layoutResId, ViewGroup parent, ApplicationsGridItemInfo applicationsGridItemInfo) {
         ImageView imageView = (ImageView) this.mInflater.inflate(layoutResId, parent, false);
         imageView.setImageDrawable(Utilities.createDockIconThumbnail(applicationsGridItemInfo.icon, this));
+        imageView.setContentDescription(applicationsGridItemInfo.title);
         imageView.setTag(applicationsGridItemInfo);
         imageView.setOnClickListener(this);
         return imageView;
@@ -2226,6 +2222,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             info.filtered = LOGD;
         }
         imageView.setImageDrawable(Utilities.createDockIconThumbnail(info.icon, this));
+        imageView.setContentDescription(info.title);
         imageView.setOnClickListener(this);
         imageView.setTag(info);
         return imageView;
@@ -2235,6 +2232,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     public View createSmallFolder(int layoutResId, ViewGroup parent, UserFolderInfo info) {
         ImageView imageView = (ImageView) this.mInflater.inflate(layoutResId, parent, false);
         imageView.setImageDrawable(Utilities.createDockIconThumbnail(getResources().getDrawable(R.drawable.ic_launcher_folder), this));
+        imageView.setContentDescription(info.title);
         imageView.setOnClickListener(this);
         imageView.setTag(info);
         return imageView;
@@ -2250,6 +2248,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         }
         info.filtered = LOGD;
         imageView.setImageDrawable(Utilities.createDockIconThumbnail(drawable, this));
+        imageView.setContentDescription(info.title);
         imageView.setOnClickListener(this);
         imageView.setTag(info);
         return imageView;
@@ -2324,6 +2323,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 this.mScreenIndicator.hide();
             }
             this.mApplicationsGridOpen = LOGD;
+            updateWorkspaceEmptyTip();
         }
     }
 
@@ -2349,6 +2349,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 }
                 this.mHomeButton.setVisibility(4);
                 this.mApplicationsGridOpen = false;
+                updateWorkspaceEmptyTip();
             }
         }
     }
@@ -2483,5 +2484,41 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     public ScreenIndicator getScreenIndicator() {
         return this.mScreenIndicator;
+    }
+
+    public void updateWorkspaceEmptyTip() {
+        TextView emptyTip = (TextView) findViewById(R.id.workspace_empty_tip);
+        if (emptyTip == null) {
+            return;
+        }
+        if (isApplicationsGridOpen() || (this.mWorkspace != null && this.mWorkspace.getOpenFolder() != null)) {
+            emptyTip.setVisibility(View.GONE);
+            return;
+        }
+        boolean isEmpty = true;
+        if (this.mWorkspace != null) {
+            int count = this.mWorkspace.getChildCount();
+            for (int i = 0; i < count; i++) {
+                View child = this.mWorkspace.getChildAt(i);
+                if (child instanceof CellLayout) {
+                    if (((CellLayout) child).getChildCount() > 0) {
+                        isEmpty = false;
+                        break;
+                    }
+                }
+            }
+        }
+        emptyTip.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
+    }
+
+    public void onDragStart(View view, DragSource source, Object info, int dragAction) {
+        TextView emptyTip = (TextView) findViewById(R.id.workspace_empty_tip);
+        if (emptyTip != null) {
+            emptyTip.setVisibility(View.GONE);
+        }
+    }
+
+    public void onDragEnd() {
+        updateWorkspaceEmptyTip();
     }
 }
