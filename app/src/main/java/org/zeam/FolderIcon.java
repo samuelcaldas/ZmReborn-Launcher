@@ -33,6 +33,7 @@ public class FolderIcon extends BubbleTextView implements DropTarget {
         if (PreferencesUtil.isShowShortcutTitlesEnabled(launcher)) {
             icon.setText(folderInfo.title);
         }
+        icon.setContentDescription(folderInfo.title);
         icon.setTag(folderInfo);
         icon.setOnClickListener(launcher);
         icon.mInfo = folderInfo;

@@ -2,11 +2,7 @@ package org.zeam;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Build;
 import android.preference.PreferenceManager;
-import android.util.DisplayMetrics;
-import android.view.Display;
-import android.view.WindowManager;
 
 public class PreferencesUtil {
     private static SharedPreferences sSharedPreferences;
@@ -35,18 +31,10 @@ public class PreferencesUtil {
     }
 
     static boolean isManageWallpaperEnabled(Context context) {
-        SharedPreferences sharedPreferences = getSharedPreferences(context);
-        Display defaultDisplay = ((WindowManager) context.getSystemService("window")).getDefaultDisplay();
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        boolean defaultValue = false;
-        defaultDisplay.getMetrics(displayMetrics);
-        if (displayMetrics.densityDpi < 240 || ((Build.MODEL != null && Build.MODEL.contains("Sensation")) || Build.VERSION.SDK_INT >= 14)) {
-            defaultValue = true;
-        }
-        boolean enabled = sharedPreferences.getBoolean(context.getString(R.string.preferences_key_workspace_manage_wallpaper), defaultValue);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putBoolean(context.getString(R.string.preferences_key_workspace_manage_wallpaper), enabled);
-        editor.commit();
+        SharedPreferences preferences = getSharedPreferences(context);
+        String key = context.getString(R.string.preferences_key_workspace_manage_wallpaper);
+        boolean enabled = preferences.getBoolean(key, true);
+        preferences.edit().putBoolean(key, enabled).commit();
         return enabled;
     }
 

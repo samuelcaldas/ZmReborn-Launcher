@@ -41,7 +41,7 @@ public class FastXmlSerializerTest {
 
         String xml = writer.toString();
         assertTrue(xml.contains("special=\"a&quot;b&amp;c&lt;d&gt;e\""));
-        assertTrue(xml.contains("x\"y&amp;z&lt;w&gt;v"));
+        assertTrue(xml.contains("x&quot;y&amp;z&lt;w&gt;v"));
     }
 
     @Test

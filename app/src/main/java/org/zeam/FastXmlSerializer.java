@@ -2,24 +2,14 @@ package org.zeam;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.nio.ByteBuffer;
-import java.nio.CharBuffer;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
-import java.nio.charset.CoderResult;
-import java.nio.charset.IllegalCharsetNameException;
-import java.nio.charset.UnsupportedCharsetException;
 import org.xmlpull.v1.XmlSerializer;
 
 public class FastXmlSerializer implements XmlSerializer {
     private static final int BUFFER_LEN = 8192;
     private static final String[] ESCAPE_TABLE;
-    private ByteBuffer mBytes = ByteBuffer.allocate(BUFFER_LEN);
-    private CharsetEncoder mCharset;
     private boolean mInTag;
-    private OutputStream mOutputStream;
     private int mPos;
     private final char[] mText = new char[BUFFER_LEN];
     private Writer mWriter;
@@ -180,35 +170,13 @@ public class FastXmlSerializer implements XmlSerializer {
         throw new UnsupportedOperationException();
     }
 
-    private void flushBytes() throws IOException {
-        int position = this.mBytes.position();
-        if (position > 0) {
-            this.mBytes.flip();
-            this.mOutputStream.write(this.mBytes.array(), 0, position);
-            this.mBytes.clear();
-        }
-    }
-
     public void flush() throws IOException {
-        if (this.mPos > 0) {
-            if (this.mOutputStream != null) {
-                CharBuffer charBuffer = CharBuffer.wrap(this.mText, 0, this.mPos);
-                CoderResult result = this.mCharset.encode(charBuffer, this.mBytes, true);
-                while (!result.isError()) {
-                    if (result.isOverflow()) {
-                        flushBytes();
-                        result = this.mCharset.encode(charBuffer, this.mBytes, true);
-                    } else {
-                        flushBytes();
-                        this.mOutputStream.flush();
-                    }
-                }
-                throw new IOException(result.toString());
-            }
-            this.mWriter.write(this.mText, 0, this.mPos);
-            this.mWriter.flush();
-            this.mPos = 0;
+        if (this.mPos == 0) {
+            return;
         }
+        this.mWriter.write(this.mText, 0, this.mPos);
+        this.mWriter.flush();
+        this.mPos = 0;
     }
 
     public int getDepth() {
@@ -253,14 +221,7 @@ public class FastXmlSerializer implements XmlSerializer {
         if (os == null) {
             throw new IllegalArgumentException();
         }
-        try {
-            this.mCharset = Charset.forName(encoding).newEncoder();
-            this.mOutputStream = os;
-        } catch (IllegalCharsetNameException e) {
-            throw ((UnsupportedEncodingException) new UnsupportedEncodingException(encoding).initCause(e));
-        } catch (UnsupportedCharsetException e2) {
-            throw ((UnsupportedEncodingException) new UnsupportedEncodingException(encoding).initCause(e2));
-        }
+        this.mWriter = new OutputStreamWriter(os, encoding);
     }
 
     public void setOutput(Writer writer) throws IOException, IllegalArgumentException, IllegalStateException {
