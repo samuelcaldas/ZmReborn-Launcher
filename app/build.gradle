@@ -23,6 +23,9 @@ def missingReleaseSigningValues = releaseSigningValues.findAll { !it.value.isPre
 def hasReleaseSigning = missingReleaseSigningValues.isEmpty()
 
 android {
+    useLibrary "android.test.runner"
+    useLibrary "android.test.base"
+    useLibrary "android.test.mock"
     namespace 'org.zeam'
     compileSdk 35
 
