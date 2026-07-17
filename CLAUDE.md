@@ -1,58 +1,59 @@
 # CLAUDE.md
 
-## Branch Scope
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-- Work only on `dev`.
-- Never read, modify, compare, merge, or use `main` or `master`; those branches contain an outdated, broken reconstruction attempt.
+## Branch and Provenance
 
-## Project Context
-
-- Zeam Launcher 3.1.10 is reconstructed from JADX-decompiled source.
-- Preserve original behavior, source provenance, and traceability.
+- Work locally on `dev`.
+- Do not inspect, modify, compare, merge, or use `main`, `master`, or their history.
+- `original_source` is the immutable raw JADX provenance baseline. Preserve reconstructed behavior, provenance, and traceability against it.
 - Keep the original APK only at `docs/reference/zeam-launcher-3-1-10-en-android.apk`.
 - Do not commit generated APKs or build output.
 
-## Build Configuration
+## Toolchain and Commands
 
-- JDK: 17
-- Gradle Wrapper: 8.7
-- Android Gradle Plugin: 8.5.2
-- `compileSdk` / `targetSdk`: 35
-- `minSdk`: 8
-
-Set `ANDROID_SDK_ROOT`, then run:
+- Require `ANDROID_SDK_ROOT` pointing to the Android SDK.
+- Use JDK 17, Gradle Wrapper 8.7, Android Gradle Plugin 8.5.2, SDK 35, Build Tools 34.0.0, and `minSdk` 8.
 
 ```sh
 ./gradlew assembleDebug --no-daemon
+./gradlew :app:lint --no-daemon
+git diff --check
 ```
 
-Use Docker for development/builds and KVM-backed Android emulators for runtime validation.
+Install and launch the debug build:
 
-## Dependency Policy
+```sh
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+adb shell monkey -p org.zeam -c android.intent.category.LAUNCHER 1
+```
 
-- Keep zero third-party app/runtime dependencies.
-- Use Android SDK and Java APIs only unless the user explicitly approves another dependency.
-- Android Gradle Plugin remains the only build dependency.
+No tracked unit, instrumentation, or UI tests currently exist. When a local unit test exists, run one with:
 
-## Compatibility Rules
+```sh
+./gradlew :app:testDebugUnitTest --tests 'org.zeam.ExampleTest.test_name' --no-daemon
+```
 
-- Avoid direct bytecode references to APIs unavailable at `minSdk 8`.
-- Use small, focused compatibility bridges when old and current Android APIs differ.
-- Use generated `R`; never restore JADX's `C0041R` class or frozen numeric resource IDs.
+## Architecture and Runtime Flow
+
+- `LauncherApplication` owns the shared `LauncherModel`; `Launcher` coordinates activity lifecycle and launcher views.
+- `LauncherModel` asynchronously loads applications and favorites, then persists workspace changes.
+- `LauncherProvider` owns the SQLite favorites/workspace database and its initial seeding.
+- `Workspace` and `CellLayout` render the desktop; `DragLayer` and drag-drop interfaces route item movement.
+- The app drawer uses grid and paging implementations; preferences and receivers trigger model/UI reloads.
+- Widget, dynamic-receiver, and wallpaper compatibility bridges preserve behavior from API 8 through API 35.
+- Manifest `<queries>` package visibility plus launcher, provider, and receiver registrations are runtime-critical.
+
+## Constraints
+
+- Keep zero third-party app/runtime dependencies. Use Android SDK and Java APIs unless explicitly approved otherwise.
+- Use generated `R`; never restore JADX `C0041R` or frozen numeric resource IDs.
+- Avoid direct bytecode references to APIs unavailable at `minSdk` 8; use focused compatibility bridges.
 - Preserve fail-fast behavior and specific exception handling at system boundaries.
 
-## Validation
+## Validation and Documentation
 
-For affected runtime behavior, test both API 10 and API 35. Minimum smoke coverage:
-
-1. Install and launch.
-2. Open the app drawer.
-3. Open Preferences.
-4. Review filtered logcat for fatal exceptions, verifier failures, missing methods, and `UnsupportedOperationException`.
-
-Run `git diff --check` and relevant Gradle tasks after changes.
-
-## Documentation
-
-- Update `docs/CHANGELOG.md` for reconstruction, build, compatibility, or emulator-validation changes.
-- Keep `README.md` build and compatibility instructions current.
+- Run relevant build, lint, and `git diff --check` validation after changes.
+- For runtime changes, smoke-test API 10 and API 35: install/launch, app drawer, Preferences, and filtered logcat for fatal exceptions, verifier failures, missing methods, and `UnsupportedOperationException`.
+- API 8 is preserved by `minSdk` but remains untested because no system image was available.
+- Update `docs/CHANGELOG.md` for reconstruction, build, compatibility, or emulator-validation changes; keep README build and compatibility instructions current.
