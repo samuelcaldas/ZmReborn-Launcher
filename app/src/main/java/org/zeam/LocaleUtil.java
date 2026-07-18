@@ -26,7 +26,6 @@ final class LocaleUtil {
         if (locale == null) {
             return baseContext;
         }
-        Locale.setDefault(locale);
         if (Build.VERSION.SDK_INT >= 17) {
             return Api17.wrap(baseContext, locale);
         }
@@ -67,13 +66,16 @@ final class LocaleUtil {
             return SYSTEM_DEFAULT_LANGUAGE;
         }
         String normalized = language.trim().replace('_', '-');
+        if (normalized.length() == 0) {
+            return SYSTEM_DEFAULT_LANGUAGE;
+        }
         if (ENGLISH_LANGUAGE.equalsIgnoreCase(normalized)) {
             return ENGLISH_LANGUAGE;
         }
         if (BRAZILIAN_PORTUGUESE_LANGUAGE.equalsIgnoreCase(normalized)) {
             return BRAZILIAN_PORTUGUESE_LANGUAGE;
         }
-        return SYSTEM_DEFAULT_LANGUAGE;
+        return ENGLISH_LANGUAGE;
     }
 
     static Locale localeForLanguage(String language) {

@@ -31,7 +31,6 @@ android {
         minSdkVersion 8
         targetSdkVersion 35
         resConfigs "en", "pt-rBR"
-        testInstrumentationRunner "android.test.InstrumentationTestRunner"
         versionCode 112
         versionName "3.1.10"
     }
@@ -77,9 +76,6 @@ android {
 
 dependencies {
     testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation files(
-            "${android.sdkDirectory}/platforms/android-35/optional/android.test.base.jar",
-            "${android.sdkDirectory}/platforms/android-35/optional/android.test.runner.jar")
 }
 
 if (releaseSigningRequired.get() && !hasReleaseSigning) {

@@ -2,6 +2,7 @@ package org.zeam;
 
 import android.app.Activity;
 import android.app.WallpaperManager;
+import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -32,6 +33,11 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
     public WallpaperLoader mLoader;
     /* access modifiers changed from: private */
     public ArrayList<Integer> mThumbs;
+
+    @Override
+    protected void attachBaseContext(Context base) {
+        super.attachBaseContext(LocaleUtil.wrap(base));
+    }
 
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
