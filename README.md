@@ -62,14 +62,14 @@ On modern Android versions, set Zeam as the device's HOME app through the system
 
 ## Languages
 
-Zeam supports System default, English, and Brazilian Portuguese (`pt-BR`). Choose **Preferences → General → Language**; Zeam persists the selection and restarts so launcher resources and cached application labels reload consistently. Unsupported or malformed stored language values fall back safely to System default.
+Zeam supports System default, English, and Brazilian Portuguese (`pt-BR`). Choose **Preferences → General → Language**; Zeam persists the selection and restarts so launcher resources and cached application labels reload consistently. Unsupported or malformed stored language values fall back safely to English.
 
 Language resources are packaged with the base app so in-app switching also works for Android App Bundle installs. Supported languages are currently left-to-right; RTL layout support remains deferred.
 
 ## Verification and compatibility
 
-Build, unit, instrumentation-compilation, and lint validation completed successfully. Runtime checks covered an API 10 Android 2.3.3 emulator for explicit launch, app drawer, Preferences, and the legacy locale path; and an API 35 emulator for actual HOME-role behavior, app drawer, Preferences, and the modern locale path. Launcher and Brazilian Portuguese Preferences instrumentation tests passed on both platforms.
+Validation targets `assembleDebug`, `:app:testDebugUnitTest`, `:app:lint`, and `git diff --check`. No emulator or device was available for this feature pass, so on-device locale rendering remains pending.
 
-`minSdk` 8 remains preserved, but an API 8 system image was unavailable and was not tested. The app has no third-party runtime dependencies. Build validation uses Android Gradle Plugin and JUnit 4, while instrumentation compilation uses Android SDK optional test-framework jars. On API 35, static wallpaper bitmap access falls back to the system wallpaper background when platform access is denied.
+`minSdk` 8 remains preserved. The app has no third-party runtime dependencies; JUnit 4 is test-only. On API 35, static wallpaper bitmap access falls back to the system wallpaper background when platform access is denied.
 
 See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for detailed reconstruction evidence and known risks.

@@ -17,17 +17,17 @@ public class LocaleUtilTest {
     }
 
     @Test
-    public void normalizeLanguageRejectsUnsupportedOrMalformedValues() {
-        assertEquals("", LocaleUtil.normalizeLanguage("fr"));
-        assertEquals("", LocaleUtil.normalizeLanguage("pt"));
-        assertEquals("", LocaleUtil.normalizeLanguage("pt-BR-extra"));
-        assertEquals("", LocaleUtil.normalizeLanguage("not a locale"));
+    public void normalizeLanguageFallsBackToEnglishForUnsupportedValues() {
+        assertEquals("en", LocaleUtil.normalizeLanguage("fr"));
+        assertEquals("en", LocaleUtil.normalizeLanguage("pt"));
+        assertEquals("en", LocaleUtil.normalizeLanguage("pt-BR-extra"));
+        assertEquals("en", LocaleUtil.normalizeLanguage("not a locale"));
     }
 
     @Test
     public void localeForLanguageCreatesSupportedLocales() {
         assertNull(LocaleUtil.localeForLanguage(null));
-        assertNull(LocaleUtil.localeForLanguage("fr"));
+        assertEquals(Locale.ENGLISH, LocaleUtil.localeForLanguage("fr"));
         assertEquals(Locale.ENGLISH, LocaleUtil.localeForLanguage("en"));
         assertEquals(new Locale("pt", "BR"), LocaleUtil.localeForLanguage("pt-BR"));
     }
