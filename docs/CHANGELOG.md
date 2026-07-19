@@ -99,6 +99,17 @@ Refined the homescreen styling, folders, indicator timing, delete feedback, acce
 - **Drag & Delete Feedback**: Integrated dynamic `zeam_ember` highlight color overlay and updated accessibility readouts on `DeleteZone` only when dragging hover arming is reached.
 - **Empty Workspace Tip**: Center-aligned a non-intrusive textual guidance tip ("Long press to add shortcuts & widgets") visible only when the homescreen workspace is completely empty of shortcuts/widgets.
 
+## App-List Drawer Geometry and Accessibility — 2026-07-19
+
+Refined drawer rendering without changing drawer mode meaning, app launch behavior, or app-list folder semantics:
+
+- Swapped paging geometry to measured content bounds instead of window-frame-derived rows and heights, so drawer pages stay bounded on narrow and landscape layouts.
+- Added Android-free page-partition helpers and regression tests for zero items, exact capacity, overflow, and invalid requested dimensions.
+- Kept drawer folder tiles intact while improving application tile labels to 13sp, two-line wrapping, and end-ellipsis treatment for long localized names.
+- Added full accessibility content descriptions for drawer items and made uninstall state instance-scoped so paging and grid adapters no longer share a global uninstall flag.
+- Hardened paging long-press, empty-list handling, and current-page clamping so remembered positions do not wander past available pages.
+- Added instrumentation coverage for drawer inflation and open/close round-trips; connected device/emulator validation was not run in this environment because no SDK installation was available.
+
 ## GitHub Release Automation — 2026-07-18
 
 Added protected signed APK release automation without publishing a new tag or release:
@@ -106,4 +117,3 @@ Added protected signed APK release automation without publishing a new tag or re
 - Added `.github/workflows/release.yml` with semantic-tag validation, changelog/version checks, protected signing, APK certificate and metadata verification, checksums, provenance attestation, and GitHub Release publication gates.
 - Added [`docs/RELEASING.md`](RELEASING.md) covering environment secrets, dry runs, publication, consumer verification, and rollback boundaries.
 - Debug CI artifacts remain separate from signed GitHub Release assets.
-
