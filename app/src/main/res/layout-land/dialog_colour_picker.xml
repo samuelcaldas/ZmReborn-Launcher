@@ -1,10 +1,79 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" android:orientation="horizontal" android:paddingLeft="5dp" android:paddingRight="5dp" android:layout_width="wrap_content" android:layout_height="wrap_content">
-    <org.zeam.ColourPickerView android:id="@+id/colour_picker_view" android:tag="landscape" android:layout_width="wrap_content" android:layout_height="wrap_content"/>
-    <LinearLayout android:orientation="vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginBottom="10dp">
-        <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:gravity="center" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="6dp" android:layout_marginTop="6dp" android:layout_marginRight="6dp" android:layout_marginBottom="5dp" android:text="@string/dialog_colour_picker_press_colour_to_apply"/>
-        <org.zeam.ColourPickerPanelView android:id="@+id/old_colour_panel" android:layout_width="match_parent" android:layout_height="40dp" android:layout_weight="0.5"/>
-        <TextView android:textSize="20sp" android:gravity="center" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="10dp" android:layout_marginBottom="10dp" android:text="↓"/>
-        <org.zeam.ColourPickerPanelView android:id="@+id/new_colour_panel" android:layout_width="match_parent" android:layout_height="40dp" android:layout_weight="0.5"/>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="RtlHardcoded"
+    android:fillViewport="true"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="vertical"
+        android:paddingLeft="12dp"
+        android:paddingTop="8dp"
+        android:paddingRight="12dp"
+        android:paddingBottom="8dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <org.zeam.ColourPickerView
+            android:id="@+id/colour_picker_view"
+            android:contentDescription="@string/dialog_colour_picker_accessibility_picker"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@color/zeam_steel"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:text="@string/dialog_colour_picker_press_colour_to_apply" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+            <TextView
+                android:id="@+id/old_colour_label"
+                android:textColor="@color/zeam_steel"
+                android:text="@string/dialog_colour_picker_old_colour"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+            <TextView
+                android:textSize="20sp"
+                android:textColor="@color/zeam_amber"
+                android:gravity="center"
+                android:text="@string/dialog_colour_picker_arrow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="8dp"
+                android:paddingRight="8dp" />
+            <TextView
+                android:id="@+id/new_colour_label"
+                android:textColor="@color/zeam_amber"
+                android:gravity="right"
+                android:text="@string/dialog_colour_picker_new_colour"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+        </LinearLayout>
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:layout_marginTop="4dp">
+            <org.zeam.ColourPickerPanelView
+                android:id="@+id/old_colour_panel"
+                android:contentDescription="@string/dialog_colour_picker_accessibility_cancel"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1" />
+            <org.zeam.ColourPickerPanelView
+                android:id="@+id/new_colour_panel"
+                android:contentDescription="@string/dialog_colour_picker_accessibility_apply"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginLeft="8dp"
+                android:layout_weight="1" />
+        </LinearLayout>
     </LinearLayout>
-</LinearLayout>
+</ScrollView>

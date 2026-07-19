@@ -75,6 +75,7 @@ public class ColourPickerPreference extends Preference implements Preference.OnP
                     widgetFrameView.removeViews(0, count);
                 }
                 widgetFrameView.addView(iView);
+                iView.setContentDescription(ColourPickerPreference.convertToARGB(getValue()));
                 iView.setBackgroundDrawable(new AlphaPatternDrawable((int) (5.0f * this.mDensity)));
                 iView.setImageBitmap(getPreviewBitmap());
             }
@@ -122,9 +123,9 @@ public class ColourPickerPreference extends Preference implements Preference.OnP
         }
         this.mValue = color;
         setPreviewColor();
-        try {
-            getOnPreferenceChangeListener().onPreferenceChange(this, Integer.valueOf(color));
-        } catch (NullPointerException e) {
+        Preference.OnPreferenceChangeListener listener = getOnPreferenceChangeListener();
+        if (listener != null) {
+            listener.onPreferenceChange(this, Integer.valueOf(color));
         }
     }
 

@@ -1,8 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:gravity="center_vertical" android:paddingRight="?android:attr/scrollbarSize" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="?android:attr/listPreferredItemHeight">
-    <RelativeLayout android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginLeft="15dp" android:layout_marginTop="6dp" android:layout_marginRight="16dp" android:layout_marginBottom="6dp" android:layout_weight="1">
-        <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:id="@+id/dialog_message" android:paddingLeft="7dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxLines="2" android:layout_below="@android:id/title" android:layout_alignLeft="@android:id/title"/>
-        <SeekBar android:id="@+id/my_bar" android:paddingLeft="7dp" android:paddingTop="7dp" android:paddingRight="8dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_below="@+id/dialog_message" android:layout_alignLeft="@+id/dialog_message"/>
-        <TextView android:textAppearance="?android:attr/textAppearanceSmall" android:id="@+id/actual_value" android:paddingLeft="7dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:maxLines="1" android:layout_below="@+id/my_bar" android:layout_alignLeft="@+id/my_bar"/>
-    </RelativeLayout>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:paddingLeft="16dp"
+    android:paddingTop="8dp"
+    android:paddingRight="16dp"
+    android:paddingBottom="8dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <TextView
+        android:id="@+id/dialog_message"
+        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:textColor="@color/zeam_steel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+    <SeekBar
+        android:id="@+id/my_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:paddingTop="8dp"
+        android:paddingBottom="8dp" />
+    <TextView
+        android:id="@+id/actual_value"
+        android:textColor="@color/zeam_amber"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
 </LinearLayout>

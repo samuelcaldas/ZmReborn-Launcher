@@ -38,6 +38,12 @@
     <string name="dialog_text_rows">Linhas</string>
     <string name="dialog_colour_picker_title">Escolher uma cor</string>
     <string name="dialog_colour_picker_press_colour_to_apply">Toque em uma cor para aplicar</string>
+    <string name="dialog_colour_picker_arrow">→</string>
+    <string name="dialog_colour_picker_old_colour">Atual</string>
+    <string name="dialog_colour_picker_new_colour">Nova</string>
+    <string name="dialog_colour_picker_accessibility_picker">Seletor de cor. Use toque ou trackball para escolher uma cor.</string>
+    <string name="dialog_colour_picker_accessibility_cancel">Cor atual. Pressione para cancelar.</string>
+    <string name="dialog_colour_picker_accessibility_apply">Nova cor. Pressione para aplicar.</string>
     <string name="dock_confirm_delete">Remover item selecionado?</string>
     <string name="preferences_confirm_reset">Redefinir todas as preferências?</string>
     <string name="add_folder">Pasta</string>

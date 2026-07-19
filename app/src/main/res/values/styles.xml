@@ -46,4 +46,24 @@
         <item name="android:scaleType">center</item>
         <item name="android:drawablePadding">3dp</item>
     </style>
+    <style name="SettingsPreferenceStyle">
+        <item name="android:layout">@layout/settings_preference</item>
+    </style>
+    <style name="SettingsPreferenceCategoryStyle">
+        <item name="android:layout">@layout/settings_preference_category</item>
+    </style>
+    <style name="SettingsCheckBoxPreferenceStyle">
+        <item name="android:layout">@layout/settings_preference</item>
+        <item name="android:widgetLayout">@layout/settings_checkbox_widget</item>
+    </style>
+    <style name="SettingsTheme" parent="@android:style/Theme.Black">
+        <item name="android:windowBackground">@color/zeam_slate</item>
+        <item name="android:colorBackground">@color/zeam_slate</item>
+        <item name="android:textColorPrimary">@color/zeam_fog</item>
+        <item name="android:textColorSecondary">@color/zeam_steel</item>
+        <item name="android:preferenceStyle">@style/SettingsPreferenceStyle</item>
+        <item name="android:preferenceCategoryStyle">@style/SettingsPreferenceCategoryStyle</item>
+        <item name="android:checkBoxPreferenceStyle">@style/SettingsCheckBoxPreferenceStyle</item>
+        <item name="android:dialogPreferenceStyle">@style/SettingsPreferenceStyle</item>
+    </style>
 </resources>

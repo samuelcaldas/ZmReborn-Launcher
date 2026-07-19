@@ -35,7 +35,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:label="@string/menu_preferences" android:name=".Preferences"/>
+        <activity android:theme="@style/SettingsTheme" android:label="@string/preferences_title_system_settings" android:name=".Preferences"/>
         <receiver android:name=".InstallShortcutReceiver" android:permission="com.android.launcher.permission.INSTALL_SHORTCUT" android:exported="true">
             <intent-filter>
                 <action android:name="com.android.launcher.action.INSTALL_SHORTCUT"/>

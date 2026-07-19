@@ -256,6 +256,9 @@ public class ColourPickerView extends View {
         } else {
             y2 = y - rect.top;
         }
+        if (width <= 0.0f || height <= 0.0f) {
+            return new float[]{this.mSat, this.mVal};
+        }
         result[0] = (BORDER_WIDTH_PX / width) * x2;
         result[1] = BORDER_WIDTH_PX - ((BORDER_WIDTH_PX / height) * y2);
         return result;
@@ -272,6 +275,9 @@ public class ColourPickerView extends View {
         } else {
             y2 = y - rect.top;
         }
+        if (height <= 0.0f) {
+            return this.mHue;
+        }
         return 360.0f - ((y2 * 360.0f) / height);
     }
 
@@ -285,6 +291,9 @@ public class ColourPickerView extends View {
             x2 = width;
         } else {
             x2 = x - ((int) rect.left);
+        }
+        if (width <= 0) {
+            return this.mAlpha;
         }
         return 255 - ((x2 * 255) / width);
     }
@@ -411,7 +420,7 @@ public class ColourPickerView extends View {
         int heightAllowed2 = chooseHeight(heightMode, heightAllowed);
         if (!this.mShowAlphaPanel) {
             height = (int) ((((float) widthAllowed2) - this.PANEL_SPACING) - this.HUE_PANEL_WIDTH);
-            if (height > heightAllowed2 || getTag().equals("landscape")) {
+            if (heightAllowed2 > 0 && height > heightAllowed2) {
                 height = heightAllowed2;
                 width = (int) (((float) height) + this.PANEL_SPACING + this.HUE_PANEL_WIDTH);
             } else {
@@ -419,14 +428,14 @@ public class ColourPickerView extends View {
             }
         } else {
             width = (int) ((((float) heightAllowed2) - this.ALPHA_PANEL_HEIGHT) + this.HUE_PANEL_WIDTH);
-            if (width > widthAllowed2) {
+            if (widthAllowed2 > 0 && width > widthAllowed2) {
                 width = widthAllowed2;
                 height = (int) ((((float) widthAllowed2) - this.HUE_PANEL_WIDTH) + this.ALPHA_PANEL_HEIGHT);
             } else {
                 height = heightAllowed2;
             }
         }
-        setMeasuredDimension(width, height);
+        setMeasuredDimension(Math.max(1, width), Math.max(1, height));
     }
 
     private int chooseWidth(int mode, int size) {
@@ -472,6 +481,7 @@ public class ColourPickerView extends View {
         if (this.mShowAlphaPanel) {
             panelSide -= this.PANEL_SPACING + this.ALPHA_PANEL_HEIGHT;
         }
+        panelSide = Math.max(1.0f, panelSide);
         float left = dRect.left + BORDER_WIDTH_PX;
         float top = dRect.top + BORDER_WIDTH_PX;
         this.mSatValRect = new RectF(left, top, left + panelSide, top + panelSide);

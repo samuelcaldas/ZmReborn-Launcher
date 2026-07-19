@@ -113,6 +113,12 @@
     <string name="dialog_text_rows">Rows</string>
     <string name="dialog_colour_picker_title">Pick a colour</string>
     <string name="dialog_colour_picker_press_colour_to_apply">Press on colour to apply</string>
+    <string name="dialog_colour_picker_arrow">→</string>
+    <string name="dialog_colour_picker_old_colour">Current</string>
+    <string name="dialog_colour_picker_new_colour">New</string>
+    <string name="dialog_colour_picker_accessibility_picker">Colour picker. Use touch or trackball to choose a colour.</string>
+    <string name="dialog_colour_picker_accessibility_cancel">Current colour. Press to cancel.</string>
+    <string name="dialog_colour_picker_accessibility_apply">New colour. Press to apply.</string>
     <string name="dock_confirm_delete">Are you sure you want to remove the selected item?</string>
     <string name="preferences_confirm_reset">Are you sure you want to reset all preferences?</string>
     <string name="add_folder">Folder</string>
