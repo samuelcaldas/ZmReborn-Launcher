@@ -4,8 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Branch and Provenance
 
-- Work locally on `dev`.
-- Do not inspect, modify, compare, merge, or use `main`, `master`, or their history.
+- Work locally on `main`.
 - `original_source` is the immutable raw JADX provenance baseline. Preserve reconstructed behavior, provenance, and traceability against it.
 - Keep the original APK only at `docs/reference/zeam-launcher-3-1-10-en-android.apk`.
 - Do not commit generated APKs or build output.
