@@ -108,7 +108,8 @@ Added separate app-list folder organization while preserving existing homescreen
 - App-list folders support create, rename, delete, and membership selection from drawer-native dialogs; deleting a folder returns its applications to the loose list.
 - Folder panels use bounded, scrollable layouts and safe measured geometry so narrow, short, portrait, and landscape screens do not clip headers, controls, or icons.
 - Drawer preferences remain the source of requested rows and columns; runtime sizing clamps invalid or oversized values and rebuilds after orientation or drawer-mode changes.
-- Added unit and instrumentation coverage for projection, persistence, geometry, folder navigation, orientation changes, and settings regression paths.
+- Added unit and instrumentation coverage for projection, persistence, geometry, folder navigation, orientation changes, and settings regression paths; instrumentation sources compile successfully.
+- Connected instrumentation and API 10/API 35 manual smoke were not run in this environment because no Android device or emulator was attached.
 
 ## GitHub Release Automation — 2026-07-18
 
