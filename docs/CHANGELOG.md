@@ -99,29 +99,16 @@ Refined the homescreen styling, folders, indicator timing, delete feedback, acce
 - **Drag & Delete Feedback**: Integrated dynamic `zeam_ember` highlight color overlay and updated accessibility readouts on `DeleteZone` only when dragging hover arming is reached.
 - **Empty Workspace Tip**: Center-aligned a non-intrusive textual guidance tip ("Long press to add shortcuts & widgets") visible only when the homescreen workspace is completely empty of shortcuts/widgets.
 
-## Folder Ledger and Safe Drawer Layout — 2026-07-19
+## App-List Drawer Geometry and Accessibility — 2026-07-19
 
-Added separate app-list folder organization while preserving existing homescreen folder persistence:
+Refined drawer rendering without changing drawer mode meaning, app launch behavior, or app-list folder semantics:
 
-- App-list folders store launcher component names in dedicated tables; workspace `favorites` rows remain unchanged.
-- Both vertical scrolling and horizontal paging drawers render folder tiles, with folder contents resolved from current installed applications.
-- App-list folders support create, rename, delete, and membership selection from drawer-native dialogs; deleting a folder returns its applications to the loose list.
-- Folder panels use bounded, scrollable layouts and safe measured geometry so narrow, short, portrait, and landscape screens do not clip headers, controls, or icons.
-- Drawer preferences remain the source of requested rows and columns; runtime sizing clamps invalid or oversized values and rebuilds after orientation or drawer-mode changes.
-- Added unit and instrumentation coverage for projection, persistence, geometry, folder navigation, orientation changes, and settings regression paths; instrumentation sources compile successfully.
-- Connected instrumentation and API 10/API 35 manual smoke were not run in this environment because no Android device or emulator was attached.
-
-## Settings Control Deck — 2026-07-19
-
-Refined Preferences without changing stored keys or launcher behavior:
-
-- Applied classic Zeam slate, fog, steel, and amber styling to the legacy `PreferenceActivity` while keeping native preference controls and nested-screen navigation.
-- Made preference rows wrap titles and summaries, retain framework title/summary/widget IDs, preserve checkbox widgets, and maintain positive touch bounds on constrained screens.
-- Added selected-value summaries for list, seek-bar, and colour preferences so current state remains visible without opening each control.
-- Hardened seek-bar range clamping and fixed default-screen persistence when reducing workspace screen count.
-- Reworked seek and colour-picker dialogs into vertically scrollable layouts that remain usable in portrait, landscape, narrow widths, and larger text settings; preserved existing colour apply/cancel behavior.
-- Added JVM resource-contract tests and Preferences instrumentation coverage for all 36 controls, row bounds, and seek-value clamping.
-- Unit tests, lint, debug APK assembly, and instrumentation compilation pass in `zeam-emu`; connected instrumentation and API 10/API 35 settings smoke were unavailable because no device or emulator was attached.
+- Swapped paging geometry to measured content bounds instead of window-frame-derived rows and heights, so drawer pages stay bounded on narrow and landscape layouts.
+- Added Android-free page-partition helpers and regression tests for zero items, exact capacity, overflow, and invalid requested dimensions.
+- Kept drawer folder tiles intact while improving application tile labels to 13sp, two-line wrapping, and end-ellipsis treatment for long localized names.
+- Added full accessibility content descriptions for drawer items and made uninstall state instance-scoped so paging and grid adapters no longer share a global uninstall flag.
+- Hardened paging long-press, empty-list handling, and current-page clamping so remembered positions do not wander past available pages.
+- Added instrumentation coverage for drawer inflation and open/close round-trips; connected device/emulator validation was not run in this environment because no SDK installation was available.
 
 ## GitHub Release Automation — 2026-07-18
 
@@ -130,4 +117,3 @@ Added protected signed APK release automation without publishing a new tag or re
 - Added `.github/workflows/release.yml` with semantic-tag validation, changelog/version checks, protected signing, APK certificate and metadata verification, checksums, provenance attestation, and GitHub Release publication gates.
 - Added [`docs/RELEASING.md`](RELEASING.md) covering environment secrets, dry runs, publication, consumer verification, and rollback boundaries.
 - Debug CI artifacts remain separate from signed GitHub Release assets.
-

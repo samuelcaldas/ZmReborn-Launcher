@@ -90,30 +90,28 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     }
 
     private void buildPages() {
-        boolean uninstalling = true;
-        ArrayList<ApplicationItemInfo> applicationItemInfos = this.mApplicationItemInfos;
-        if (applicationItemInfos != null) {
-            LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-            DrawerLayoutMetrics metrics = calculatePageMetrics();
-            int effectiveRows = metrics.getRows();
-            int effectiveColumns = metrics.getColumns();
-            LinkedHashMap<Integer, List<ApplicationItemInfo>> pageContents = loadPageContents(
-                    effectiveRows, effectiveColumns, applicationItemInfos);
-            if (this.mMode != 1) {
-                uninstalling = false;
-            }
-            ArrayList<View> pageViews = new ArrayList<>();
-            for (Integer intValue : pageContents.keySet()) {
-                int page = intValue.intValue();
-                ApplicationsPageView applicationsPageView = (ApplicationsPageView) layoutInflater.inflate(R.layout.apps_page_view, (ViewGroup) null);
-                applicationsPageView.populatePage(uninstalling, effectiveRows, effectiveColumns,
-                        pageContents.get(Integer.valueOf(page)), this, this);
-                pageViews.add(applicationsPageView);
-            }
-            this.mViewPager.clearPagingViews();
-            this.mViewPager.setPagingViews(pageViews);
-            System.gc();
+        if (this.mViewPager == null) {
+            return;
         }
+        ArrayList<ApplicationItemInfo> applicationItemInfos = this.mApplicationItemInfos;
+        DrawerLayoutMetrics metrics = calculatePageMetrics();
+        LinkedHashMap<Integer, List<ApplicationItemInfo>> pageContents = loadPageContents(
+                metrics.getRows(), metrics.getColumns(), applicationItemInfos);
+        boolean uninstalling = this.mMode == 1;
+        LayoutInflater layoutInflater = LayoutInflater.from(getContext());
+        ArrayList<View> pageViews = new ArrayList<>();
+        for (Integer intValue : pageContents.keySet()) {
+            int page = intValue.intValue();
+            ApplicationsPageView applicationsPageView = (ApplicationsPageView) layoutInflater.inflate(
+                    R.layout.apps_page_view, (ViewGroup) null);
+            applicationsPageView.populatePage(uninstalling, metrics.getRows(), metrics.getColumns(),
+                    pageContents.get(Integer.valueOf(page)), this, this);
+            pageViews.add(applicationsPageView);
+        }
+        this.mViewPager.clearPagingViews();
+        this.mViewPager.setPagingViews(pageViews);
+        clampCurrentPageIndex();
+        System.gc();
     }
 
     private DrawerLayoutMetrics calculatePageMetrics() {
@@ -123,23 +121,23 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
             width = getResources().getDisplayMetrics().widthPixels;
             height = getResources().getDisplayMetrics().heightPixels;
         }
-        return DrawerLayoutMetrics.calculate(width, height, sRows, sColumns, 6, 0, 48, 48);
+        return DrawerLayoutMetrics.calculate(width, height, sRows, sColumns,
+                getPaddingLeft() + getPaddingRight(), getPaddingTop() + getPaddingBottom(), 48, 48);
     }
 
-    private static LinkedHashMap<Integer, List<ApplicationItemInfo>> loadPageContents(int rows, int columns, ArrayList<ApplicationItemInfo> applicationItemInfos) {
+    private static LinkedHashMap<Integer, List<ApplicationItemInfo>> loadPageContents(int rows, int columns,
+            ArrayList<ApplicationItemInfo> applicationItemInfos) {
         LinkedHashMap<Integer, List<ApplicationItemInfo>> pageContents = new LinkedHashMap<>();
-        int itemsPerPage = Math.max(1, rows * columns);
-        int pageCount = (applicationItemInfos.size() + itemsPerPage - 1) / itemsPerPage;
-        for (int p = 0; p < pageCount; p++) {
-            int start = itemsPerPage * p;
-            int end = start + itemsPerPage;
-            int applicationCount = applicationItemInfos.size();
-            if (end >= applicationCount) {
-                end = applicationCount;
-            }
+        if (applicationItemInfos == null || applicationItemInfos.size() == 0) {
+            return pageContents;
+        }
+        int pageCount = ApplicationsPagePartition.calculatePageCount(applicationItemInfos.size(), rows, columns);
+        for (int page = 0; page < pageCount; page++) {
+            int start = ApplicationsPagePartition.calculatePageStart(page, rows, columns);
+            int end = ApplicationsPagePartition.calculatePageEnd(page, applicationItemInfos.size(), rows, columns);
             List<ApplicationItemInfo> pageList = applicationItemInfos.subList(start, end);
             if (pageList.size() > 0) {
-                pageContents.put(Integer.valueOf(p + 1), pageList);
+                pageContents.put(Integer.valueOf(page + 1), pageList);
             }
         }
         return pageContents;
@@ -151,10 +149,17 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
 
     private void initIndicator() {
         if (this.mScreenIndicator != null) {
-            this.mScreenIndicator.setItems(this.mViewPager.getPageCount());
+            int pageCount = this.mViewPager.getPageCount();
+            this.mScreenIndicator.setItems(pageCount);
             this.mScreenIndicator.setType(1);
             this.mScreenIndicator.setAutoHide(false);
+            if (pageCount <= 0) {
+                this.mScreenIndicator.fullIndicate(0);
+                this.mViewPager.resetScroll();
+                return;
+            }
             if (PreferencesUtil.rememberApplicationsPosition(getContext())) {
+                clampCurrentPageIndex();
                 this.mScreenIndicator.fullIndicate(this.mViewPager.getCurrentPageIndex());
                 return;
             }
@@ -227,7 +232,8 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
             this.mLauncher.showAppListFolderActions((AppListFolderInfo) applicationItemInfo);
             return true;
         }
-        this.mDragController.startDrag(view, this, applicationItemInfo, 1);
+        ApplicationItemInfo copiedItem = new ApplicationItemInfo(applicationItemInfo);
+        this.mDragController.startDrag(view, this, copiedItem, 1);
         this.mLauncher.closeAllApplications();
         return true;
     }
@@ -259,6 +265,21 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
 
     /* access modifiers changed from: private */
     public void indicate() {
-        this.mScreenIndicator.indicate(((float) this.mViewPager.getScrollX()) / ((float) (this.mViewPager.getPageCount() * getWidth())));
+        int pageCount = this.mViewPager.getPageCount();
+        if (pageCount > 0 && getWidth() > 0) {
+            this.mScreenIndicator.indicate(((float) this.mViewPager.getScrollX()) / ((float) (pageCount * getWidth())));
+        }
+    }
+
+    private void clampCurrentPageIndex() {
+        int pageCount = this.mViewPager.getPageCount();
+        if (pageCount <= 0) {
+            this.mViewPager.resetScroll();
+            return;
+        }
+        int currentIndex = this.mViewPager.getCurrentPageIndex();
+        if (currentIndex >= pageCount) {
+            this.mViewPager.resetScroll();
+        }
     }
 }

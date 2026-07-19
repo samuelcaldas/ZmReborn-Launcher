@@ -10,7 +10,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 public class ApplicationsAdapter extends ArrayAdapter<ApplicationItemInfo> {
-    private static boolean sUninstalling = false;
+    private boolean mUninstalling;
     private final LayoutInflater mLayoutInflater;
 
     public ApplicationsAdapter(Context context, ArrayList<ApplicationItemInfo> applicationItemInfos) {
@@ -31,11 +31,11 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationItemInfo> {
         }
         if (applicationItemInfo instanceof AppListFolderInfo) {
             textView.setTextColor(-1);
+            textView.setBackgroundDrawable(SelectorDrawable.createSelector(context, true));
             textView.setCompoundDrawablesWithIntrinsicBounds((Drawable) null,
                     context.getResources().getDrawable(R.drawable.ic_launcher_folder),
                     (Drawable) null, (Drawable) null);
-            textView.setContentDescription(applicationItemInfo.title);
-        } else if (!sUninstalling) {
+        } else if (!this.mUninstalling) {
             textView.setTextColor(-1);
             textView.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, applicationItemInfo.icon, (Drawable) null, (Drawable) null);
         } else if (Utilities.canUninstallApplication(context, applicationItemInfo)) {
@@ -46,11 +46,12 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationItemInfo> {
             textView.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, Utilities.adjustIconOpacity(applicationItemInfo.icon), (Drawable) null, (Drawable) null);
         }
         textView.setText(applicationItemInfo.title);
+        textView.setContentDescription(applicationItemInfo.title);
         return convertView;
     }
 
     /* access modifiers changed from: package-private */
     public void setUninstalling(boolean uninstalling) {
-        sUninstalling = uninstalling;
+        this.mUninstalling = uninstalling;
     }
 }
