@@ -58,6 +58,10 @@
     <string name="menu_settings">Configurações</string>
     <string name="menu_manage_apps">Gerenciar</string>
     <string name="menu_uninstall_apps">Desinstalar</string>
+    <string name="menu_new_app_list_folder">Nova pasta de aplicativos</string>
+    <string name="app_list_folder_empty">Nenhum aplicativo instalado nesta pasta.</string>
+    <string name="app_list_folder_rename">Renomear pasta</string>
+    <string name="app_list_folder_delete">Excluir pasta</string>
     <string name="search_hint">Pesquisa Google</string>
     <string name="gadget_error_text">Problema ao carregar widget</string>
     <string name="preferences_alert_dialog_restart_message">É necessário reiniciar para aplicar as alterações</string>

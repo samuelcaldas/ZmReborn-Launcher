@@ -56,6 +56,8 @@ import android.view.ViewStub;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ScrollView;
@@ -70,6 +72,7 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.Set;
 import org.zeam.CellLayout;
 import org.zeam.LauncherSettings;
 
@@ -93,6 +96,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private static final int MENU_SEARCH = 4;
     private static final int MENU_SETTINGS = 7;
     private static final int MENU_UNINSTALL_APPS = 9;
+    private static final int MENU_NEW_APP_LIST_FOLDER = 10;
     private static final int MENU_WALLPAPER = 3;
     private static final String PREFERENCES = "launcher.preferences";
     private static final boolean PROFILE_ROTATE = false;
@@ -134,6 +138,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     public LauncherAppWidgetHost mAppWidgetHost;
     private AppWidgetManager mAppWidgetManager;
     private boolean mApplicationsGridOpen = false;
+    private AlertDialog mAppListFolderDialog;
     private final BroadcastReceiver mApplicationsReceiver = new ApplicationsIntentReceiver(this, (ApplicationsIntentReceiver) null);
     /* access modifiers changed from: private */
     public ApplicationsView mApplicationsView;
@@ -424,6 +429,8 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             Preferences.alertRestart(this);
         }
         loadPreferences();
+        boolean landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+        this.mRotation = landscape ? 1 : 0;
         int rotation = this.mRotation;
         if (this.mApplicationsView instanceof ApplicationsGridView) {
             if (rotation == 0) {
@@ -1007,6 +1014,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         menu.add(2, 7, 0, R.string.menu_settings).setIntent(new Intent("android.settings.SETTINGS")).setIcon(17301577).setAlphabeticShortcut('S');
         menu.add(3, 8, 0, R.string.menu_manage_apps).setIcon(17301570).setAlphabeticShortcut('M');
         menu.add(3, 9, 0, R.string.menu_uninstall_apps).setIcon(17301564).setAlphabeticShortcut('U');
+        menu.add(3, MENU_NEW_APP_LIST_FOLDER, 1, R.string.menu_new_app_list_folder).setIcon(R.drawable.ic_menu_edit);
         return LOGD;
     }
 
@@ -1058,12 +1066,163 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             case 9:
                 this.mApplicationsView.setMode(1);
                 return LOGD;
+            case MENU_NEW_APP_LIST_FOLDER:
+                showNewAppListFolderDialog();
+                return LOGD;
             default:
                 if (PreferencesUtil.isFullscreenEnabled(this) && !isFullscreen()) {
                     setFullscreen(LOGD, false);
                 }
                 return super.onOptionsItemSelected(item);
         }
+    }
+
+    /* access modifiers changed from: package-private */
+    public void openAppListFolder(final AppListFolderInfo folderInfo) {
+        if (this.mAppListFolderDialog != null) {
+            this.mAppListFolderDialog.dismiss();
+        }
+        GridView gridView = new GridView(this);
+        boolean landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
+        int requestedColumns = landscape ? 5 : 4;
+        gridView.setNumColumns(requestedColumns);
+        gridView.setVerticalSpacing(7);
+        gridView.setPadding(4, 4, 4, 4);
+        gridView.setBackgroundColor(getResources().getColor(R.color.zeam_slate));
+        gridView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
+            public void onItemClick(android.widget.AdapterView parent, View view, int position, long id) {
+                ApplicationItemInfo application = (ApplicationItemInfo) parent.getItemAtPosition(position);
+                startActivitySafely(application.intent);
+            }
+        });
+        gridView.setAdapter(new ApplicationsAdapter(this, folderInfo.getContents()));
+        TextView emptyView = new TextView(this);
+        emptyView.setText(R.string.app_list_folder_empty);
+        emptyView.setTextColor(getResources().getColor(R.color.zeam_fog));
+        emptyView.setGravity(17);
+        FrameLayout content = new FrameLayout(this);
+        content.addView(gridView, new FrameLayout.LayoutParams(-1, -1));
+        content.addView(emptyView, new FrameLayout.LayoutParams(-1, -1));
+        gridView.setEmptyView(emptyView);
+        this.mAppListFolderDialog = new AlertDialog.Builder(this).setTitle(folderInfo.title)
+                .setView(content).setNegativeButton(R.string.button_close, null).create();
+        this.mAppListFolderDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            public void onDismiss(DialogInterface dialog) {
+                Launcher.this.mAppListFolderDialog = null;
+            }
+        });
+        this.mAppListFolderDialog.show();
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        int margin = Math.max(1, (int) (12.0f * displayMetrics.density));
+        FolderLayoutMetrics metrics = FolderLayoutMetrics.calculate(displayMetrics.widthPixels,
+                displayMetrics.heightPixels, margin, displayMetrics.widthPixels - margin * 2,
+                (int) (displayMetrics.heightPixels * 0.72f), (int) (58.0f * displayMetrics.density),
+                requestedColumns, folderInfo.getContents().size(), (int) (48.0f * displayMetrics.density));
+        if (this.mAppListFolderDialog.getWindow() != null) {
+            this.mAppListFolderDialog.getWindow().setLayout(metrics.getPanelWidth(), metrics.getPanelHeight());
+        }
+    }
+
+    /* access modifiers changed from: package-private */
+    public void showNewAppListFolderDialog() {
+        final EditText titleInput = new EditText(this);
+        titleInput.setSingleLine(true);
+        titleInput.setHint(R.string.folder_name);
+        new AlertDialog.Builder(this).setTitle(R.string.menu_new_app_list_folder).setView(titleInput)
+                .setNegativeButton(R.string.button_cancel, null)
+                .setPositiveButton(R.string.button_done, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        String title = titleInput.getText().toString().trim();
+                        if (title.length() == 0) {
+                            Toast.makeText(Launcher.this, R.string.folder_name, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+                        Launcher.this.showAppListFolderSelection(title);
+                    }
+                }).show();
+    }
+
+    void showAppListFolderActions(final AppListFolderInfo folderInfo) {
+        final String[] actions = {getString(R.string.app_list_folder_rename),
+                getString(R.string.app_list_folder_delete)};
+        new AlertDialog.Builder(this).setTitle(folderInfo.title).setItems(actions,
+                new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        if (which == 0) {
+                            showAppListFolderRenameDialog(folderInfo);
+                            return;
+                        }
+                        confirmDeleteAppListFolder(folderInfo);
+                    }
+                }).show();
+    }
+
+    private void showAppListFolderRenameDialog(final AppListFolderInfo folderInfo) {
+        final EditText titleInput = new EditText(this);
+        titleInput.setSingleLine(true);
+        titleInput.setText(folderInfo.title);
+        new AlertDialog.Builder(this).setTitle(R.string.rename_folder_title).setView(titleInput)
+                .setNegativeButton(R.string.button_cancel, null)
+                .setPositiveButton(R.string.button_done, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        String title = titleInput.getText().toString().trim();
+                        if (title.length() == 0) {
+                            return;
+                        }
+                        new AppListFolderStore(getContentResolver()).renameFolder(
+                                folderInfo.getFolderId(), title);
+                        sLauncherModel.loadApplications(false, mApplicationsView);
+                    }
+                }).show();
+    }
+
+    private void confirmDeleteAppListFolder(final AppListFolderInfo folderInfo) {
+        new AlertDialog.Builder(this).setTitle(folderInfo.title)
+                .setMessage(R.string.app_list_folder_delete)
+                .setNegativeButton(R.string.button_cancel, null)
+                .setPositiveButton(R.string.button_yes, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        new AppListFolderStore(getContentResolver()).deleteFolder(
+                                folderInfo.getFolderId());
+                        sLauncherModel.loadApplications(false, mApplicationsView);
+                    }
+                }).show();
+    }
+
+    private void showAppListFolderSelection(final String title) {
+        ArrayList<ApplicationItemInfo> allApplications = LauncherModel.getAllApplications();
+        Set<String> assignedComponents = new AppListFolderStore(getContentResolver()).loadAssignedComponents();
+        final ArrayList<ApplicationItemInfo> applications = new ArrayList<>();
+        for (ApplicationItemInfo application : allApplications) {
+            if (!assignedComponents.contains(AppListFolderProjection.componentNameOf(application))) {
+                applications.add(application);
+            }
+        }
+        final boolean[] checked = new boolean[applications.size()];
+        String[] labels = new String[applications.size()];
+        for (int index = 0; index < applications.size(); index++) {
+            labels[index] = applications.get(index).title.toString();
+        }
+        new AlertDialog.Builder(this).setTitle(title).setMultiChoiceItems(labels, checked,
+                new DialogInterface.OnMultiChoiceClickListener() {
+                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                        checked[which] = isChecked;
+                    }
+                }).setNegativeButton(R.string.button_cancel, null)
+                .setPositiveButton(R.string.button_done, new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int which) {
+                        AppListFolderStore store = new AppListFolderStore(getContentResolver());
+                        long folderId = store.createFolder(title, 0);
+                        ArrayList<String> components = new ArrayList<>();
+                        for (int index = 0; index < applications.size(); index++) {
+                            if (checked[index]) {
+                                components.add(AppListFolderProjection.componentNameOf(applications.get(index)));
+                            }
+                        }
+                        store.replaceContents(folderId, components);
+                        sLauncherModel.loadApplications(false, mApplicationsView);
+                    }
+                }).show();
     }
 
     /* access modifiers changed from: package-private */

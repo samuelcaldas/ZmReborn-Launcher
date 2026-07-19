@@ -29,7 +29,13 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationItemInfo> {
         } else {
             textView = (TextView) convertView;
         }
-        if (!sUninstalling) {
+        if (applicationItemInfo instanceof AppListFolderInfo) {
+            textView.setTextColor(-1);
+            textView.setCompoundDrawablesWithIntrinsicBounds((Drawable) null,
+                    context.getResources().getDrawable(R.drawable.ic_launcher_folder),
+                    (Drawable) null, (Drawable) null);
+            textView.setContentDescription(applicationItemInfo.title);
+        } else if (!sUninstalling) {
             textView.setTextColor(-1);
             textView.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, applicationItemInfo.icon, (Drawable) null, (Drawable) null);
         } else if (Utilities.canUninstallApplication(context, applicationItemInfo)) {

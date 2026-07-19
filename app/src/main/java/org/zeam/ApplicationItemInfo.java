@@ -18,6 +18,7 @@ class ApplicationItemInfo extends ItemInfo {
     public static final Collator sCollator = Collator.getInstance();
     boolean customIcon;
     boolean filtered;
+    String componentName;
     Drawable icon;
     Bitmap iconBitmap;
     Intent.ShortcutIconResource iconResource;
@@ -41,6 +42,7 @@ class ApplicationItemInfo extends ItemInfo {
         this.icon = info.icon;
         this.filtered = info.filtered;
         this.customIcon = info.customIcon;
+        this.componentName = info.componentName;
     }
 
     /* access modifiers changed from: package-private */
@@ -49,6 +51,7 @@ class ApplicationItemInfo extends ItemInfo {
 
     /* access modifiers changed from: package-private */
     public final void setActivity(ComponentName className, int launchFlags) {
+        this.componentName = className.flattenToString();
         this.intent = new Intent("android.intent.action.MAIN");
         this.intent.addCategory("android.intent.category.LAUNCHER");
         this.intent.setComponent(className);

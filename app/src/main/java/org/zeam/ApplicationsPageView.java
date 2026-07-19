@@ -24,55 +24,73 @@ public class ApplicationsPageView extends LinearLayout {
 
     /* access modifiers changed from: package-private */
     public void populatePage(boolean uninstalling, int rows, int columns, List<ApplicationItemInfo> applicationItemInfos, View.OnLongClickListener onLongClickListener, View.OnClickListener onClickListener) {
-        Drawable iconDrawable;
         Context context = getContext();
         this.mLayoutInflater = LayoutInflater.from(context);
-        Rect rect = new Rect();
-        getWindowVisibleDisplayFrame(rect);
-        int height = rect.height();
-        int rowHeight = (int) (((double) (height / rows)) * 0.83d);
-        int widthMinusPadding = (rect.width() - getPaddingRight()) - getPaddingLeft();
-        int paddingLeft = getPaddingLeft();
-        setPadding(paddingLeft, (int) (((double) (height - (rowHeight * rows))) / 3.2d), getPaddingRight(), getPaddingBottom());
+        removeAllViews();
+        int measuredWidth = getMeasuredWidth();
+        int measuredHeight = getMeasuredHeight();
+        if (measuredWidth <= 0 || measuredHeight <= 0) {
+            measuredWidth = context.getResources().getDisplayMetrics().widthPixels;
+            measuredHeight = context.getResources().getDisplayMetrics().heightPixels;
+        }
+        DrawerLayoutMetrics metrics = DrawerLayoutMetrics.calculate(measuredWidth, measuredHeight,
+                rows, columns, getPaddingLeft() + getPaddingRight(),
+                getPaddingTop() + getPaddingBottom(), 48, 48);
         int index = 0;
-        for (int r = 0; r < rows; r++) {
-            LinearLayout linearLayout = new LinearLayout(context);
-            linearLayout.setLayoutParams(new LinearLayout.LayoutParams(-1, -1));
-            linearLayout.setOrientation(0);
-            linearLayout.setMinimumWidth(widthMinusPadding);
-            linearLayout.setMinimumHeight(rowHeight);
-            for (int c = 0; c < columns && index < applicationItemInfos.size(); c++) {
+        for (int row = 0; row < metrics.getRows(); row++) {
+            LinearLayout rowLayout = new LinearLayout(context);
+            rowLayout.setOrientation(0);
+            rowLayout.setMinimumWidth(metrics.getAvailableWidth());
+            rowLayout.setMinimumHeight(metrics.getCellHeight());
+            addView(rowLayout, new LinearLayout.LayoutParams(-1, metrics.getCellHeight()));
+            for (int column = 0; column < metrics.getColumns() && index < applicationItemInfos.size(); column++) {
                 ApplicationItemInfo applicationItemInfo = applicationItemInfos.get(index);
-                TextView textView = (TextView) this.mLayoutInflater.inflate(R.layout.application_boxed_page, (ViewGroup) null, false);
-                if (!applicationItemInfo.filtered) {
-                    applicationItemInfo.icon = Utilities.createIconThumbnail(applicationItemInfo.icon, context);
-                    applicationItemInfo.filtered = true;
-                }
-                if (uninstalling) {
-                    if (Utilities.canUninstallApplication(context, applicationItemInfo)) {
-                        textView.setTextColor(-1);
-                        iconDrawable = Utilities.overlayUninstallIcon(context, applicationItemInfo.icon);
-                    } else {
-                        textView.setTextColor(-7829368);
-                        iconDrawable = Utilities.adjustIconOpacity(applicationItemInfo.icon);
-                    }
-                    textView.setBackgroundResource(17170445);
-                } else {
-                    textView.setTextColor(-1);
-                    iconDrawable = applicationItemInfo.icon;
-                    textView.setBackgroundDrawable(SelectorDrawable.createSelector(context, true));
-                }
-                textView.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, iconDrawable, (Drawable) null, (Drawable) null);
-                textView.setOnLongClickListener(onLongClickListener);
-                textView.setWidth(widthMinusPadding / columns);
-                textView.setOnClickListener(onClickListener);
-                textView.setText(applicationItemInfo.title);
-                textView.setTag(applicationItemInfo);
-                textView.setDrawingCacheQuality(524288);
-                linearLayout.addView(textView);
+                TextView textView = createApplicationTile(uninstalling, applicationItemInfo,
+                        onLongClickListener, onClickListener);
+                rowLayout.addView(textView, new LinearLayout.LayoutParams(metrics.getCellWidth(),
+                        metrics.getCellHeight()));
                 index++;
             }
-            addView(linearLayout, new LinearLayout.LayoutParams(-1, -1));
         }
+    }
+
+    private TextView createApplicationTile(boolean uninstalling, ApplicationItemInfo applicationItemInfo,
+            View.OnLongClickListener onLongClickListener, View.OnClickListener onClickListener) {
+        Context context = getContext();
+        Drawable iconDrawable = null;
+        TextView textView = (TextView) this.mLayoutInflater.inflate(R.layout.application_boxed_page,
+                (ViewGroup) null, false);
+        if (applicationItemInfo instanceof AppListFolderInfo) {
+            textView.setTextColor(-1);
+            iconDrawable = context.getResources().getDrawable(R.drawable.ic_launcher_folder);
+            textView.setBackgroundDrawable(SelectorDrawable.createSelector(context, true));
+        } else if (!applicationItemInfo.filtered) {
+            applicationItemInfo.icon = Utilities.createIconThumbnail(applicationItemInfo.icon, context);
+            applicationItemInfo.filtered = true;
+        }
+        if (applicationItemInfo instanceof AppListFolderInfo) {
+            // Folder tile keeps its ledger icon and remains outside uninstall mode.
+        } else if (uninstalling) {
+            if (Utilities.canUninstallApplication(context, applicationItemInfo)) {
+                textView.setTextColor(-1);
+                iconDrawable = Utilities.overlayUninstallIcon(context, applicationItemInfo.icon);
+            } else {
+                textView.setTextColor(-7829368);
+                iconDrawable = Utilities.adjustIconOpacity(applicationItemInfo.icon);
+            }
+            textView.setBackgroundResource(17170445);
+        } else {
+            textView.setTextColor(-1);
+            iconDrawable = applicationItemInfo.icon;
+            textView.setBackgroundDrawable(SelectorDrawable.createSelector(context, true));
+        }
+        textView.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, iconDrawable,
+                (Drawable) null, (Drawable) null);
+        textView.setOnLongClickListener(onLongClickListener);
+        textView.setOnClickListener(onClickListener);
+        textView.setText(applicationItemInfo.title);
+        textView.setTag(applicationItemInfo);
+        textView.setDrawingCacheQuality(524288);
+        return textView;
     }
 }

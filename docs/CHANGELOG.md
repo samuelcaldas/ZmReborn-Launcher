@@ -99,6 +99,17 @@ Refined the homescreen styling, folders, indicator timing, delete feedback, acce
 - **Drag & Delete Feedback**: Integrated dynamic `zeam_ember` highlight color overlay and updated accessibility readouts on `DeleteZone` only when dragging hover arming is reached.
 - **Empty Workspace Tip**: Center-aligned a non-intrusive textual guidance tip ("Long press to add shortcuts & widgets") visible only when the homescreen workspace is completely empty of shortcuts/widgets.
 
+## Folder Ledger and Safe Drawer Layout — 2026-07-19
+
+Added separate app-list folder organization while preserving existing homescreen folder persistence:
+
+- App-list folders store launcher component names in dedicated tables; workspace `favorites` rows remain unchanged.
+- Both vertical scrolling and horizontal paging drawers render folder tiles, with folder contents resolved from current installed applications.
+- App-list folders support create, rename, delete, and membership selection from drawer-native dialogs; deleting a folder returns its applications to the loose list.
+- Folder panels use bounded, scrollable layouts and safe measured geometry so narrow, short, portrait, and landscape screens do not clip headers, controls, or icons.
+- Drawer preferences remain the source of requested rows and columns; runtime sizing clamps invalid or oversized values and rebuilds after orientation or drawer-mode changes.
+- Added unit and instrumentation coverage for projection, persistence, geometry, folder navigation, orientation changes, and settings regression paths.
+
 ## GitHub Release Automation — 2026-07-18
 
 Added protected signed APK release automation without publishing a new tag or release:

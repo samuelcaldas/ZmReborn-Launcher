@@ -40,7 +40,7 @@ public class LauncherProvider extends ContentProvider {
     static final String AUTHORITY = "org.zeam.provider";
     static final Uri CONTENT_APPWIDGET_RESET_URI = Uri.parse("content://org.zeam.provider/appWidgetReset");
     private static final String DATABASE_NAME = "launcher.db";
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     static final String EXTRA_BIND_SOURCES = "org.zeam.provider.bindsources";
     static final String EXTRA_BIND_TARGETS = "org.zeam.provider.bindtargets";
     private static final boolean LOGD = true;
@@ -49,6 +49,8 @@ public class LauncherProvider extends ContentProvider {
     static final String PARAMETER_NOTIFY = "notify";
     static final String TABLE_FAVORITES = "favorites";
     static final String TABLE_GESTURES = "gestures";
+    static final String TABLE_APP_LIST_FOLDERS = "appListFolders";
+    static final String TABLE_APP_LIST_FOLDER_ITEMS = "appListFolderItems";
     private SQLiteOpenHelper mOpenHelper;
 
     public boolean onCreate() {
@@ -141,7 +143,7 @@ public class LauncherProvider extends ContentProvider {
         private final Context mContext;
 
         DatabaseHelper(Context context) {
-            super(context, LauncherProvider.DATABASE_NAME, (SQLiteDatabase.CursorFactory) null, 5);
+            super(context, LauncherProvider.DATABASE_NAME, (SQLiteDatabase.CursorFactory) null, LauncherProvider.DATABASE_VERSION);
             this.mContext = context;
             this.mAppWidgetHost = new AppWidgetHost(context, 1024);
         }
@@ -154,6 +156,7 @@ public class LauncherProvider extends ContentProvider {
             Log.d(LauncherProvider.LOG_TAG, "creating new launcher database");
             db.execSQL("CREATE TABLE favorites (_id INTEGER PRIMARY KEY,title TEXT,intent TEXT,container INTEGER,screen INTEGER,cellX INTEGER,cellY INTEGER,spanX INTEGER,spanY INTEGER,itemType INTEGER,appWidgetId INTEGER NOT NULL DEFAULT -1,isShortcut INTEGER,iconType INTEGER,iconPackage TEXT,iconResource TEXT,icon BLOB,uri TEXT,action INTEGER,displayMode INTEGER);");
             db.execSQL("CREATE TABLE gestures (_id INTEGER PRIMARY KEY,title TEXT,intent TEXT,itemType INTEGER,iconType INTEGER,iconPackage TEXT,iconResource TEXT,icon BLOB);");
+            createAppListFolderTables(db);
             if (this.mAppWidgetHost != null) {
                 this.mAppWidgetHost.deleteHost();
                 sendAppWidgetResetNotify();
@@ -290,12 +293,33 @@ public class LauncherProvider extends ContentProvider {
                     db.endTransaction();
                 }
             }
-            if (version != 5) {
+            if (version < 6) {
+                db.beginTransaction();
+                try {
+                    createAppListFolderTables(db);
+                    db.setTransactionSuccessful();
+                    version = 6;
+                } catch (SQLException ex3) {
+                    Log.e(LauncherProvider.LOG_TAG, ex3.getMessage(), ex3);
+                } finally {
+                    db.endTransaction();
+                }
+            }
+            if (version != 6) {
                 Log.w(LauncherProvider.LOG_TAG, "unable to upgrade database, recreating..");
                 db.execSQL("DROP TABLE IF EXISTS favorites");
                 db.execSQL("DROP TABLE IF EXISTS gestures");
+                db.execSQL("DROP TABLE IF EXISTS appListFolderItems");
+                db.execSQL("DROP TABLE IF EXISTS appListFolders");
                 onCreate(db);
             }
+        }
+
+        private void createAppListFolderTables(SQLiteDatabase db) {
+            db.execSQL("CREATE TABLE IF NOT EXISTS appListFolders (_id INTEGER PRIMARY KEY,title TEXT NOT NULL,position INTEGER NOT NULL);");
+            db.execSQL("CREATE TABLE IF NOT EXISTS appListFolderItems (_id INTEGER PRIMARY KEY,folderId INTEGER NOT NULL,componentName TEXT NOT NULL UNIQUE,position INTEGER NOT NULL);");
+            db.execSQL("CREATE INDEX IF NOT EXISTS appListFolderItems_folderId_index ON appListFolderItems(folderId);");
+            db.execSQL("CREATE INDEX IF NOT EXISTS appListFolderItems_componentName_index ON appListFolderItems(componentName);");
         }
 
         private void convertWidgets(SQLiteDatabase db) {
