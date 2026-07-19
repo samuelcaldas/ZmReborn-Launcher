@@ -110,6 +110,14 @@ Refined drawer rendering without changing drawer mode meaning, app launch behavi
 - Hardened paging long-press, empty-list handling, and current-page clamping so remembered positions do not wander past available pages.
 - Added instrumentation coverage for drawer inflation and open/close round-trips; connected device/emulator validation was not run in this environment because no SDK installation was available.
 
+## UI Capture Tracking — 2026-07-19
+
+Added revision-linked capture tracking under `docs/captures/`:
+
+- Documented naming, device metadata, surface checklist, and screenshot commands.
+- Recorded current revision `68d3786` and required homescreen, drawer, folder, and settings captures.
+- No runtime PNGs were fabricated: capture remains pending because no Android device/emulator is attached and `/opt/android-sdk` is unavailable in the current environment.
+
 ## GitHub Release Automation — 2026-07-18
 
 Added protected signed APK release automation without publishing a new tag or release:
