@@ -94,7 +94,11 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         ArrayList<ApplicationItemInfo> applicationItemInfos = this.mApplicationItemInfos;
         if (applicationItemInfos != null) {
             LayoutInflater layoutInflater = LayoutInflater.from(getContext());
-            LinkedHashMap<Integer, List<ApplicationItemInfo>> pageContents = loadPageContents(sRows, sColumns, applicationItemInfos);
+            DrawerLayoutMetrics metrics = calculatePageMetrics();
+            int effectiveRows = metrics.getRows();
+            int effectiveColumns = metrics.getColumns();
+            LinkedHashMap<Integer, List<ApplicationItemInfo>> pageContents = loadPageContents(
+                    effectiveRows, effectiveColumns, applicationItemInfos);
             if (this.mMode != 1) {
                 uninstalling = false;
             }
@@ -102,7 +106,8 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
             for (Integer intValue : pageContents.keySet()) {
                 int page = intValue.intValue();
                 ApplicationsPageView applicationsPageView = (ApplicationsPageView) layoutInflater.inflate(R.layout.apps_page_view, (ViewGroup) null);
-                applicationsPageView.populatePage(uninstalling, sRows, sColumns, pageContents.get(Integer.valueOf(page)), this, this);
+                applicationsPageView.populatePage(uninstalling, effectiveRows, effectiveColumns,
+                        pageContents.get(Integer.valueOf(page)), this, this);
                 pageViews.add(applicationsPageView);
             }
             this.mViewPager.clearPagingViews();
@@ -111,14 +116,20 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         }
     }
 
+    private DrawerLayoutMetrics calculatePageMetrics() {
+        int width = getWidth();
+        int height = getHeight();
+        if (width <= 0 || height <= 0) {
+            width = getResources().getDisplayMetrics().widthPixels;
+            height = getResources().getDisplayMetrics().heightPixels;
+        }
+        return DrawerLayoutMetrics.calculate(width, height, sRows, sColumns, 6, 0, 48, 48);
+    }
+
     private static LinkedHashMap<Integer, List<ApplicationItemInfo>> loadPageContents(int rows, int columns, ArrayList<ApplicationItemInfo> applicationItemInfos) {
         LinkedHashMap<Integer, List<ApplicationItemInfo>> pageContents = new LinkedHashMap<>();
-        int itemsPerPage = rows * columns;
-        double pageCountDouble = ((double) (applicationItemInfos.size() + 1)) / ((double) itemsPerPage);
-        if (pageCountDouble != ((double) Math.round(pageCountDouble))) {
-            pageCountDouble = Math.floor(pageCountDouble) + 1.0d;
-        }
-        int pageCount = (int) pageCountDouble;
+        int itemsPerPage = Math.max(1, rows * columns);
+        int pageCount = (applicationItemInfos.size() + itemsPerPage - 1) / itemsPerPage;
         for (int p = 0; p < pageCount; p++) {
             int start = itemsPerPage * p;
             int end = start + itemsPerPage;
@@ -211,13 +222,24 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         if (this.mMode != 0 || !view.isInTouchMode()) {
             return false;
         }
-        this.mDragController.startDrag(view, this, (ApplicationItemInfo) view.getTag(), 1);
+        ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) view.getTag();
+        if (applicationItemInfo instanceof AppListFolderInfo) {
+            this.mLauncher.showAppListFolderActions((AppListFolderInfo) applicationItemInfo);
+            return true;
+        }
+        this.mDragController.startDrag(view, this, applicationItemInfo, 1);
         this.mLauncher.closeAllApplications();
         return true;
     }
 
     public void onClick(View view) {
         ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) view.getTag();
+        if (applicationItemInfo instanceof AppListFolderInfo) {
+            if (this.mMode == 0) {
+                this.mLauncher.openAppListFolder((AppListFolderInfo) applicationItemInfo);
+            }
+            return;
+        }
         switch (this.mMode) {
             case 0:
                 this.mResetMode = true;

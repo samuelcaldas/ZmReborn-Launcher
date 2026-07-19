@@ -32,6 +32,7 @@ public class LauncherModel {
     private static AsyncTask<Object, ArrayList<ApplicationItemInfo>, ArrayList<ApplicationItemInfo>> mLoadApplicationsAsyncTask;
     /* access modifiers changed from: private */
     public static ArrayList<ApplicationItemInfo> sCachedApplicationItemInfos;
+    private static ArrayList<ApplicationItemInfo> sAllApplicationItemInfos;
     /* access modifiers changed from: private */
     public static final AtomicInteger sWorkspaceLoaderCount = new AtomicInteger(1);
     /* access modifiers changed from: private */
@@ -53,6 +54,13 @@ public class LauncherModel {
             this.mDesktopItemsLoader.stop();
             this.mDesktopItemsLoaded = false;
         }
+    }
+
+    static ArrayList<ApplicationItemInfo> getAllApplications() {
+        if (sAllApplicationItemInfos == null) {
+            return new ArrayList<>();
+        }
+        return new ArrayList<>(sAllApplicationItemInfos);
     }
 
     /* access modifiers changed from: package-private */
@@ -109,8 +117,13 @@ public class LauncherModel {
                         }
                     }
                     Collections.sort(applicationItemInfos, new ApplicationItemInfo.TitleComparator());
+                    LauncherModel.sAllApplicationItemInfos = new ArrayList<>(applicationItemInfos);
+                    ArrayList<AppListFolderRecord> folders = new AppListFolderStore(
+                            launcher.getContentResolver()).loadFolders();
+                    ArrayList<ApplicationItemInfo> projectedItems = AppListFolderProjection.project(
+                            folders, applicationItemInfos);
                     Process.setThreadPriority(0);
-                    return applicationItemInfos;
+                    return projectedItems;
                 }
 
                 /* access modifiers changed from: protected */
@@ -133,6 +146,9 @@ public class LauncherModel {
 
     /* access modifiers changed from: package-private */
     public synchronized void removePackage(ApplicationsView applicationsView, String packageName) {
+        if (applicationsView != null && applicationsView.getLauncher() != null) {
+            new AppListFolderStore(applicationsView.getLauncher().getContentResolver()).removePackage(packageName);
+        }
         loadApplications(false, applicationsView);
     }
 

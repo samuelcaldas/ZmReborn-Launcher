@@ -54,6 +54,9 @@ Run unit tests or a single test:
 ## Validation and Documentation
 
 - Run relevant build, lint, and `git diff --check` validation after changes.
+- Every new feature must add or update automated unit tests covering its expected behavior.
+- Every fixed defect must add or update an automated regression test covering the failure path.
+- Runtime-facing changes also require relevant instrumentation tests and API 10/API 35 manual smoke coverage.
 - For runtime changes, smoke-test API 10 and API 35: install/launch, app drawer, Preferences, and filtered logcat for fatal exceptions, verifier failures, missing methods, and `UnsupportedOperationException`.
 - API 8 is preserved by `minSdk` but remains untested because no system image was available.
 - Update `docs/CHANGELOG.md` for reconstruction, build, compatibility, or emulator-validation changes; keep README build and compatibility instructions current.

@@ -116,6 +116,12 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
 
     public void onItemClick(AdapterView parent, View v, int position, long id) {
         ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) parent.getItemAtPosition(position);
+        if (applicationItemInfo instanceof AppListFolderInfo) {
+            if (this.mMode == 0) {
+                this.mLauncher.openAppListFolder((AppListFolderInfo) applicationItemInfo);
+            }
+            return;
+        }
         switch (this.mMode) {
             case 0:
                 this.mResetMode = true;
@@ -137,7 +143,12 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
         if (this.mMode != 0 || !view.isInTouchMode()) {
             return false;
         }
-        this.mDragController.startDrag(view, this, new ApplicationItemInfo((ApplicationItemInfo) parent.getItemAtPosition(position)), 1);
+        ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) parent.getItemAtPosition(position);
+        if (applicationItemInfo instanceof AppListFolderInfo) {
+            this.mLauncher.showAppListFolderActions((AppListFolderInfo) applicationItemInfo);
+            return true;
+        }
+        this.mDragController.startDrag(view, this, new ApplicationItemInfo(applicationItemInfo), 1);
         this.mLauncher.closeAllApplications();
         return true;
     }

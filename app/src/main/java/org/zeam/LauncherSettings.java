@@ -22,6 +22,24 @@ class LauncherSettings {
     LauncherSettings() {
     }
 
+    static final class AppListFolders {
+        static final String COMPONENT_NAME = "componentName";
+        static final String CONTENT_URI_STRING = "content://org.zeam.provider/appListFolders?notify=true";
+        static final Uri CONTENT_URI = Uri.parse(CONTENT_URI_STRING);
+        static final String FOLDER_ID = "folderId";
+        static final String ITEMS_TABLE = "appListFolderItems";
+        static final Uri ITEMS_CONTENT_URI = Uri.parse("content://org.zeam.provider/appListFolderItems?notify=true");
+        static final String POSITION = "position";
+        static final String TABLE = "appListFolders";
+
+        private AppListFolders() {
+        }
+
+        static Uri getContentUri(long id) {
+            return Uri.parse(CONTENT_URI_STRING.replace("?notify=true", "/" + id + "?notify=true"));
+        }
+    }
+
     static final class Favorites implements BaseLauncherColumns {
         static final String APPWIDGET_ID = "appWidgetId";
         static final String CELLX = "cellX";
