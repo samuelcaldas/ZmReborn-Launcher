@@ -111,6 +111,18 @@ Added separate app-list folder organization while preserving existing homescreen
 - Added unit and instrumentation coverage for projection, persistence, geometry, folder navigation, orientation changes, and settings regression paths; instrumentation sources compile successfully.
 - Connected instrumentation and API 10/API 35 manual smoke were not run in this environment because no Android device or emulator was attached.
 
+## Settings Control Deck — 2026-07-19
+
+Refined Preferences without changing stored keys or launcher behavior:
+
+- Applied classic Zeam slate, fog, steel, and amber styling to the legacy `PreferenceActivity` while keeping native preference controls and nested-screen navigation.
+- Made preference rows wrap titles and summaries, retain framework title/summary/widget IDs, preserve checkbox widgets, and maintain positive touch bounds on constrained screens.
+- Added selected-value summaries for list, seek-bar, and colour preferences so current state remains visible without opening each control.
+- Hardened seek-bar range clamping and fixed default-screen persistence when reducing workspace screen count.
+- Reworked seek and colour-picker dialogs into vertically scrollable layouts that remain usable in portrait, landscape, narrow widths, and larger text settings; preserved existing colour apply/cancel behavior.
+- Added JVM resource-contract tests and Preferences instrumentation coverage for all 36 controls, row bounds, and seek-value clamping.
+- Unit tests, lint, debug APK assembly, and instrumentation compilation pass in `zeam-emu`; connected instrumentation and API 10/API 35 settings smoke were unavailable because no device or emulator was attached.
+
 ## GitHub Release Automation — 2026-07-18
 
 Added protected signed APK release automation without publishing a new tag or release:

@@ -35,7 +35,8 @@ public class DialogSeekBarPreference extends DialogPreference implements SeekBar
         this.mValueText = (TextView) view.findViewById(R.id.actual_value);
         this.mSeekBar = (SeekBar) view.findViewById(R.id.my_bar);
         this.mSeekBar.setOnSeekBarChangeListener(this);
-        this.mSeekBar.setMax(this.mMax - this.mMin);
+        this.mSeekBar.setMax(Math.max(0, this.mMax - this.mMin));
+        this.mValue = clampStoredValue(this.mValue);
         this.mSeekBar.setProgress(this.mValue - this.mMin);
         String t = String.valueOf(this.mValue);
         TextView textView = this.mValueText;
@@ -67,31 +68,58 @@ public class DialogSeekBarPreference extends DialogPreference implements SeekBar
     }
 
     public void setValue(int value) {
-        int value2 = value + this.mMin;
-        if (value2 > this.mMax) {
-            value2 = this.mMax;
-        } else if (value2 < 0) {
-            value2 = 0;
-        }
-        this.mValue = value2;
-        persistInt(value2);
+        setStoredValue(value + this.mMin);
     }
 
     public void setMax(int max) {
-        this.mMax = max;
+        this.mMax = Math.max(this.mMin, max);
         if (this.mValue > this.mMax) {
-            setValue(this.mMax);
+            setStoredValue(this.mMax);
         }
     }
 
     public void setMin(int min) {
         if (min < this.mMax) {
             this.mMin = min;
+            if (this.mValue < this.mMin) {
+                setStoredValue(this.mMin);
+            }
         }
     }
 
     public int getMin() {
         return this.mMin;
+    }
+
+    public int getMax() {
+        return this.mMax;
+    }
+
+    public int getValue() {
+        return clampStoredValue(this.mValue);
+    }
+
+    public String getDisplayValue() {
+        String value = String.valueOf(getValue());
+        if (this.mSuffix != null) {
+            return value.concat(this.mSuffix);
+        }
+        return value;
+    }
+
+    private void setStoredValue(int value) {
+        this.mValue = clampStoredValue(value);
+        persistInt(this.mValue);
+    }
+
+    private int clampStoredValue(int value) {
+        if (value < this.mMin) {
+            return this.mMin;
+        }
+        if (value > this.mMax) {
+            return this.mMax;
+        }
+        return value;
     }
 
     public void onProgressChanged(SeekBar seek, int value, boolean fromTouch) {

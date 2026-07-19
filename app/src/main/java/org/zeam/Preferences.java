@@ -14,6 +14,8 @@ import android.preference.PreferenceManager;
 import java.io.File;
 
 public class Preferences extends PreferenceActivity {
+    private SettingsSummaryBinder mSummaryBinder;
+
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(LocaleUtil.wrap(base));
@@ -43,9 +45,10 @@ public class Preferences extends PreferenceActivity {
             public boolean onPreferenceChange(Preference preference, Object value) {
                 int numberOfScreens = ((Integer) value).intValue() + 1;
                 defaultScreenPreference.setMax(numberOfScreens);
-                if (numberOfScreens < PreferencesUtil.getDefaultScreen(Preferences.this)) {
+                int defaultScreen = PreferencesUtil.getDefaultScreen(Preferences.this) + 1;
+                if (defaultScreen > numberOfScreens) {
                     SharedPreferences.Editor editor = defaultScreenPreference.getEditor();
-                    editor.putInt(Preferences.this.getString(R.string.preferences_key_workspace_number_of_screens), numberOfScreens);
+                    editor.putInt(Preferences.this.getString(R.string.preferences_key_workspace_default_screen), numberOfScreens);
                     editor.commit();
                 }
                 Launcher.sRestart = true;
@@ -105,6 +108,16 @@ public class Preferences extends PreferenceActivity {
                 return true;
             }
         });
+        mSummaryBinder = SettingsSummaryBinder.attach(getPreferenceScreen(), PreferenceManager.getDefaultSharedPreferences(this));
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (mSummaryBinder != null) {
+            mSummaryBinder.detach();
+            mSummaryBinder = null;
+        }
+        super.onDestroy();
     }
 
     private void bindLanguagePreference() {
