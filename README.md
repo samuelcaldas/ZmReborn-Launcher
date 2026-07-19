@@ -51,6 +51,10 @@ export ANDROID_SDK_ROOT=/path/to/android-sdk
 
 The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
+## Releases
+
+Debug CI artifacts are not release builds. Signed APK publication uses the protected GitHub Actions workflow described in [`docs/RELEASING.md`](docs/RELEASING.md). It validates semantic tags, app version metadata, changelog notes, signing certificate identity, APK metadata, and checksums before publishing a GitHub Release.
+
 ## Install and launch
 
 ```sh

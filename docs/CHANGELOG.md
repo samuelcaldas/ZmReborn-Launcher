@@ -99,3 +99,11 @@ Refined the homescreen styling, folders, indicator timing, delete feedback, acce
 - **Drag & Delete Feedback**: Integrated dynamic `zeam_ember` highlight color overlay and updated accessibility readouts on `DeleteZone` only when dragging hover arming is reached.
 - **Empty Workspace Tip**: Center-aligned a non-intrusive textual guidance tip ("Long press to add shortcuts & widgets") visible only when the homescreen workspace is completely empty of shortcuts/widgets.
 
+## GitHub Release Automation — 2026-07-18
+
+Added protected signed APK release automation without publishing a new tag or release:
+
+- Added `.github/workflows/release.yml` with semantic-tag validation, changelog/version checks, protected signing, APK certificate and metadata verification, checksums, provenance attestation, and GitHub Release publication gates.
+- Added [`docs/RELEASING.md`](RELEASING.md) covering environment secrets, dry runs, publication, consumer verification, and rollback boundaries.
+- Debug CI artifacts remain separate from signed GitHub Release assets.
+

@@ -1,0 +1,382 @@
+name: Signed GitHub Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Candidate release tag, for example v3.1.10'
+        required: true
+        type: string
+      publish:
+        description: 'Publish GitHub Release after all verification gates pass'
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event_name == 'push' && github.ref_name || inputs.tag }}
+  cancel-in-progress: false
+
+env:
+  BUILD_TOOLS_VERSION: '34.0.0'
+
+jobs:
+  validate:
+    name: Validate release metadata
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+    outputs:
+      tag: ${{ steps.metadata.outputs.tag }}
+      version_name: ${{ steps.metadata.outputs.version_name }}
+      version_code: ${{ steps.metadata.outputs.version_code }}
+      source_sha: ${{ steps.metadata.outputs.source_sha }}
+      publish: ${{ steps.metadata.outputs.publish }}
+    steps:
+      # actions/checkout v4.2.2
+      - name: Checkout source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Validate tag, version, and changelog
+        id: metadata
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          REF_NAME: ${{ github.ref_name }}
+          INPUT_TAG: ${{ inputs.tag }}
+          INPUT_PUBLISH: ${{ inputs.publish }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+
+          candidate_tag="${INPUT_TAG:-}"
+          publish="${INPUT_PUBLISH:-false}"
+          if [[ "$EVENT_NAME" == "push" ]]; then
+            candidate_tag="$REF_NAME"
+            publish=true
+          fi
+
+          if [[ ! "$candidate_tag" =~ ^v(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)$ ]]; then
+            echo "Release tag must match vMAJOR.MINOR.PATCH without leading zeroes or suffixes." >&2
+            exit 1
+          fi
+          if [[ "$publish" != true && "$publish" != false ]]; then
+            echo "publish input must be true or false." >&2
+            exit 1
+          fi
+
+          source_sha="$(git rev-parse HEAD)"
+          if [[ "$EVENT_NAME" == "push" || "$publish" == true ]]; then
+            git fetch --force --no-tags origin \
+              "refs/tags/${candidate_tag}:refs/tags/${candidate_tag}"
+            tag_sha="$(git rev-parse "${candidate_tag}^{commit}")"
+            if [[ "$tag_sha" != "$source_sha" ]]; then
+              echo "Release tag does not point at checked-out source commit." >&2
+              echo "tag=${tag_sha} source=${source_sha}" >&2
+              exit 1
+            fi
+          fi
+
+          mapfile -t version_name_lines < <(
+            grep -E '^[[:space:]]*versionName[[:space:]]+"[^"]+"' app/build.gradle
+          )
+          mapfile -t version_code_lines < <(
+            grep -E '^[[:space:]]*versionCode[[:space:]]+[0-9]+' app/build.gradle
+          )
+          if [[ "${#version_name_lines[@]}" -ne 1 || "${#version_code_lines[@]}" -ne 1 ]]; then
+            echo "Expected exactly one literal versionName and versionCode declaration." >&2
+            exit 1
+          fi
+
+          version_name="$(sed -E 's/.*versionName[[:space:]]+"([^"]+)".*/\1/' <<< "${version_name_lines[0]}")"
+          version_code="$(sed -E 's/.*versionCode[[:space:]]+([0-9]+).*/\1/' <<< "${version_code_lines[0]}")"
+          if [[ -z "$version_name" || ! "$version_code" =~ ^[1-9][0-9]*$ ]]; then
+            echo "versionName must be non-empty and versionCode must be positive." >&2
+            exit 1
+          fi
+          if [[ "${candidate_tag#v}" != "$version_name" ]]; then
+            echo "Release tag version does not match app/build.gradle versionName." >&2
+            exit 1
+          fi
+
+          changelog_heading="## [${version_name}]"
+          changelog_heading_count="$(grep -Fxc "$changelog_heading" docs/CHANGELOG.md || true)"
+          if [[ "$changelog_heading_count" -ne 1 ]]; then
+            echo "Expected exactly one changelog heading: ${changelog_heading}" >&2
+            exit 1
+          fi
+          awk -v heading="$changelog_heading" '
+            $0 == heading { found = 1; next }
+            found && $0 ~ /^## / { exit }
+            found { print }
+          ' docs/CHANGELOG.md | sed '/^[[:space:]]*$/d' > release-notes.md
+          if [[ ! -s release-notes.md ]]; then
+            echo "Changelog release section must contain non-empty notes." >&2
+            exit 1
+          fi
+
+          {
+            printf 'tag=%s\n' "$candidate_tag"
+            printf 'version_name=%s\n' "$version_name"
+            printf 'version_code=%s\n' "$version_code"
+            printf 'source_sha=%s\n' "$source_sha"
+            printf 'publish=%s\n' "$publish"
+          } >> "$GITHUB_OUTPUT"
+
+      # actions/upload-artifact v4.6.2
+      - name: Upload release notes
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: release-notes-${{ steps.metadata.outputs.tag }}
+          path: release-notes.md
+          if-no-files-found: error
+          retention-days: 7
+
+  sign-and-verify:
+    name: Build and verify signed APK
+    needs: validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: github-release
+    permissions:
+      contents: read
+    env:
+      RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
+      RELEASE_KEYSTORE_PASSWORD: ${{ secrets.RELEASE_KEYSTORE_PASSWORD }}
+      RELEASE_KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+      RELEASE_KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+      RELEASE_CERT_SHA256: ${{ vars.RELEASE_CERT_SHA256 }}
+      EXPECTED_TAG: ${{ needs.validate.outputs.tag }}
+      EXPECTED_VERSION_NAME: ${{ needs.validate.outputs.version_name }}
+      EXPECTED_VERSION_CODE: ${{ needs.validate.outputs.version_code }}
+    steps:
+      # actions/checkout v4.2.2
+      - name: Checkout validated source
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683
+        with:
+          ref: ${{ needs.validate.outputs.source_sha }}
+          fetch-depth: 0
+          persist-credentials: false
+
+      # actions/setup-java v4.7.1
+      - name: Set up JDK 17
+        uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00
+        with:
+          java-version: '17'
+          distribution: temurin
+
+      - name: Decode release keystore
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          umask 077
+          for required_value in \
+            RELEASE_KEYSTORE_BASE64 \
+            RELEASE_KEYSTORE_PASSWORD \
+            RELEASE_KEY_ALIAS \
+            RELEASE_KEY_PASSWORD \
+            RELEASE_CERT_SHA256; do
+            if [[ -z "${!required_value}" ]]; then
+              echo "Missing required release environment value: ${required_value}" >&2
+              exit 1
+            fi
+          done
+          if [[ ! "$RELEASE_CERT_SHA256" =~ ^[[:xdigit:]:[:space:]]+$ ]]; then
+            echo "RELEASE_CERT_SHA256 must contain only hexadecimal digits, colons, and whitespace." >&2
+            exit 1
+          fi
+
+          keystore_path="$RUNNER_TEMP/zeam-release-${GITHUB_RUN_ID}.jks"
+          printf 'RELEASE_KEYSTORE_PATH=%s\n' "$keystore_path" >> "$GITHUB_ENV"
+          if ! printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$keystore_path"; then
+            echo "RELEASE_KEYSTORE_BASE64 is not valid base64." >&2
+            exit 1
+          fi
+          if [[ ! -s "$keystore_path" ]]; then
+            echo "Decoded release keystore is empty." >&2
+            exit 1
+          fi
+          chmod 600 "$keystore_path"
+
+      - name: Build signed release APK
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          chmod +x gradlew
+          ./gradlew :app:lint :app:testDebugUnitTest :app:assembleRelease \
+            --no-daemon -PreleaseSigningRequired=true
+
+      - name: Verify signed APK metadata
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          sdk_root="${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}"
+          build_tools="$sdk_root/build-tools/$BUILD_TOOLS_VERSION"
+          if [[ -z "$sdk_root" || ! -x "$build_tools/apksigner" || ! -x "$build_tools/aapt" ]]; then
+            echo "Android Build Tools ${BUILD_TOOLS_VERSION} not available." >&2
+            exit 1
+          fi
+
+          source_apk="app/build/outputs/apk/release/app-release.apk"
+          if [[ ! -f "$source_apk" ]]; then
+            echo "Expected signed APK not found: ${source_apk}" >&2
+            exit 1
+          fi
+
+          mkdir -p release
+          artifact_name="zeam-launcher-${EXPECTED_TAG}.apk"
+          cp "$source_apk" "release/$artifact_name"
+          artifact_path="release/$artifact_name"
+
+          "$build_tools/apksigner" verify --verbose --print-certs "$artifact_path" \
+            > "$RUNNER_TEMP/apksigner.txt"
+          if ! grep -Fq 'Verified using v1 scheme (JAR signing): true' "$RUNNER_TEMP/apksigner.txt"; then
+            echo "Release APK is not v1/JAR signed; minSdk compatibility requires v1 signing." >&2
+            exit 1
+          fi
+          if ! grep -Fq 'Verified using v2 scheme (APK Signature Scheme v2): true' "$RUNNER_TEMP/apksigner.txt"; then
+            echo "Release APK is not v2 signed; modern Android requires v2 signing." >&2
+            exit 1
+          fi
+          actual_certificate="$(awk -F': ' '/Signer #1 certificate SHA-256 digest:/ { gsub(/:/, "", $2); print toupper($2); exit }' "$RUNNER_TEMP/apksigner.txt" | tr -d '[:space:]')"
+          expected_certificate="$(printf '%s' "$RELEASE_CERT_SHA256" | tr -d '[:space:]:\r\n' | tr '[:lower:]' '[:upper:]')"
+          if [[ ! "$expected_certificate" =~ ^[[:xdigit:]]{64}$ || "$actual_certificate" != "$expected_certificate" ]]; then
+            echo "Release APK certificate fingerprint does not match RELEASE_CERT_SHA256." >&2
+            exit 1
+          fi
+
+          "$build_tools/aapt" dump badging "$artifact_path" > "$RUNNER_TEMP/badging.txt"
+          version_name_pattern="${EXPECTED_VERSION_NAME//./\\.}"
+          if ! grep -Eq "package: name='org\\.zeam' versionCode='${EXPECTED_VERSION_CODE}' versionName='${version_name_pattern}'" "$RUNNER_TEMP/badging.txt"; then
+            echo "Release APK package or version metadata does not match validated source." >&2
+            exit 1
+          fi
+
+          (
+            cd release
+            sha256sum "$artifact_name" > SHA256SUMS
+            sha256sum --check SHA256SUMS
+          )
+
+      # actions/upload-artifact v4.6.2
+      - name: Upload verified release candidate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: release-candidate-${{ needs.validate.outputs.tag }}
+          path: release
+          if-no-files-found: error
+          retention-days: 7
+
+      - name: Remove release keystore
+        if: always()
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          if [[ -n "${RELEASE_KEYSTORE_PATH:-}" ]]; then
+            rm -f -- "$RELEASE_KEYSTORE_PATH"
+          fi
+
+  publish:
+    name: Publish GitHub Release
+    needs: [validate, sign-and-verify]
+    if: needs.validate.outputs.publish == 'true' && needs.validate.result == 'success' && needs.sign-and-verify.result == 'success'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: github-release
+    permissions:
+      contents: write
+      attestations: write
+      id-token: write
+    env:
+      RELEASE_TAG: ${{ needs.validate.outputs.tag }}
+      SOURCE_SHA: ${{ needs.validate.outputs.source_sha }}
+      VERSION_NAME: ${{ needs.validate.outputs.version_name }}
+    steps:
+      # actions/download-artifact v4.3.0
+      - name: Download verified release candidate
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: release-candidate-${{ needs.validate.outputs.tag }}
+          path: release
+
+      # actions/download-artifact v4.3.0
+      - name: Download release notes
+        uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093
+        with:
+          name: release-notes-${{ needs.validate.outputs.tag }}
+          path: release-notes
+
+      - name: Recheck candidate and tag integrity
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          artifact_name="zeam-launcher-${RELEASE_TAG}.apk"
+          (
+            cd release
+            sha256sum --check SHA256SUMS
+          )
+          repository_url="https://github.com/${GITHUB_REPOSITORY}.git"
+          remote_sha="$(git ls-remote "$repository_url" "refs/tags/${RELEASE_TAG}^{}" | awk 'NR == 1 { print $1; exit }')"
+          if [[ -z "$remote_sha" ]]; then
+            remote_sha="$(git ls-remote "$repository_url" "refs/tags/${RELEASE_TAG}" | awk 'NR == 1 { print $1; exit }')"
+          fi
+          if [[ "$remote_sha" != "$SOURCE_SHA" ]]; then
+            echo "Remote release tag moved or does not point at validated source commit." >&2
+            exit 1
+          fi
+          release_url="https://api.github.com/repos/${GITHUB_REPOSITORY}/releases/tags/${RELEASE_TAG}"
+          status="$(curl --silent --show-error --output /dev/null --write-out '%{http_code}' \
+            --header 'Accept: application/vnd.github+json' "$release_url")"
+          case "$status" in
+            404) ;;
+            200) echo "GitHub Release already exists for ${RELEASE_TAG}." >&2; exit 1 ;;
+            *) echo "Unexpected GitHub Release API status: ${status}." >&2; exit 1 ;;
+          esac
+          test -f "release/$artifact_name"
+          test -s release-notes/release-notes.md
+
+      # actions/attest-build-provenance v2.2.3
+      - name: Attest APK provenance
+        uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2
+        with:
+          subject-path: release/zeam-launcher-${{ needs.validate.outputs.tag }}.apk
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          artifact_name="zeam-launcher-${RELEASE_TAG}.apk"
+          gh release create "$RELEASE_TAG" \
+            --verify-tag \
+            --title "Zeam Launcher ${VERSION_NAME}" \
+            --notes-file release-notes/release-notes.md \
+            "release/${artifact_name}" \
+            release/SHA256SUMS
+
+      - name: Recheck published tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -Eeuo pipefail
+          repository_url="https://github.com/${GITHUB_REPOSITORY}.git"
+          remote_sha="$(git ls-remote "$repository_url" "refs/tags/${RELEASE_TAG}^{}" | awk 'NR == 1 { print $1; exit }')"
+          if [[ -z "$remote_sha" ]]; then
+            remote_sha="$(git ls-remote "$repository_url" "refs/tags/${RELEASE_TAG}" | awk 'NR == 1 { print $1; exit }')"
+          fi
+          if [[ "$remote_sha" != "$SOURCE_SHA" ]]; then
+            echo "Release tag moved during publication; deleting newly created release." >&2
+            gh release delete "$RELEASE_TAG" --yes
+            exit 1
+          fi
