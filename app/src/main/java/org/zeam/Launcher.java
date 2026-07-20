@@ -159,6 +159,8 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private boolean mFullScreenPreviews = LOGD;
     private boolean mFullscreen;
     private ImageButton mHomeButton;
+    private int mHomeButtonBaseBottomMargin;
+    private int mHomeButtonBaseRightMargin;
     private LayoutInflater mInflater;
     private boolean mIsNewIntent;
     private boolean mLocaleChanged;
@@ -222,6 +224,36 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             setFullscreen(LOGD);
         } else {
             setFullscreen(false);
+        }
+    }
+
+    private void applySystemBarInsets() {
+        if (this.mDragLayer == null || this.mApplicationsView == null) {
+            return;
+        }
+        Rect visibleFrame = new Rect();
+        this.mDragLayer.getWindowVisibleDisplayFrame(visibleFrame);
+        int displayWidth = this.mDragLayer.getRootView().getWidth();
+        int displayHeight = this.mDragLayer.getRootView().getHeight();
+        if (displayWidth <= 0 || displayHeight <= 0
+                || visibleFrame.right <= visibleFrame.left
+                || visibleFrame.bottom <= visibleFrame.top) {
+            return;
+        }
+        int leftInset = Math.max(0, visibleFrame.left);
+        int topInset = Math.max(0, visibleFrame.top);
+        int rightInset = Math.max(0, displayWidth - visibleFrame.right);
+        int bottomInset = Math.max(0, displayHeight - visibleFrame.bottom);
+        this.mApplicationsView.setSystemBarInsets(leftInset, topInset, rightInset, bottomInset);
+        if (this.mHomeButton != null) {
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) this.mHomeButton.getLayoutParams();
+            boolean landscape = getResources().getConfiguration().orientation
+                    == Configuration.ORIENTATION_LANDSCAPE;
+            layoutParams.bottomMargin = this.mHomeButtonBaseBottomMargin
+                    + (landscape ? 0 : bottomInset);
+            layoutParams.rightMargin = this.mHomeButtonBaseRightMargin
+                    + (landscape ? rightInset : 0);
+            this.mHomeButton.setLayoutParams(layoutParams);
         }
     }
 
@@ -449,6 +481,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             }
         }
         this.mApplicationsView.setBackgroundAlpha(PreferencesUtil.getAppsGridBackgroundAlpha(this));
+        applySystemBarInsets();
         this.mWorkspace.setWallpaper(false);
         if (this.mRestoring) {
             startLoaders();
@@ -554,6 +587,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         dockbarStub.setLayoutResource(R.layout.dockbar);
         dockbarStub.inflate();
         this.mHomeButton = (ImageButton) findViewById(R.id.home_button);
+        FrameLayout.LayoutParams homeButtonLayoutParams =
+                (FrameLayout.LayoutParams) this.mHomeButton.getLayoutParams();
+        this.mHomeButtonBaseBottomMargin = homeButtonLayoutParams.bottomMargin;
+        this.mHomeButtonBaseRightMargin = homeButtonLayoutParams.rightMargin;
         this.mHomeButton.setContentDescription(getString(R.string.accessibility_close_drawer));
         this.mHomeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -581,6 +618,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         dragLayer.addDragListener(this);
         deleteZone.setHandle(new View(this));
         this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.workspace_screen_indicator);
+        applySystemBarInsets();
     }
 
     private void loadPreferences() {
@@ -2466,6 +2504,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         super.onWindowFocusChanged(hasFocus);
         if (hasFocus) {
             setRequestedFullscreen();
+            this.mDragLayer.post(new Runnable() {
+                public void run() {
+                    Launcher.this.applySystemBarInsets();
+                }
+            });
         }
     }
 

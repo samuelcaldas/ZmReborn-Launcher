@@ -21,13 +21,17 @@ public class ApplicationsDrawerE2ETest extends ActivityInstrumentationTestCase2<
         assertNotNull("Implementing view must exist", launcher.mApplicationsView.getImplementingView());
     }
 
-    public void testDrawerOpenCloseRoundTrip() {
-        Launcher launcher = getActivity();
+    public void testDrawerOpenCloseRoundTrip() throws Throwable {
+        final Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
-        ApplicationsView applicationsView = launcher.mApplicationsView;
-        applicationsView.open(false);
-        assertTrue("Drawer must be open", launcher.isApplicationsGridOpen());
-        applicationsView.close(false);
-        assertFalse("Drawer must be closed", launcher.isApplicationsGridOpen());
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                ApplicationsView applicationsView = launcher.mApplicationsView;
+                applicationsView.open(false);
+                assertTrue("Drawer must be open", launcher.isApplicationsGridOpen());
+                applicationsView.close(false);
+                assertFalse("Drawer must be closed", launcher.isApplicationsGridOpen());
+            }
+        });
     }
 }

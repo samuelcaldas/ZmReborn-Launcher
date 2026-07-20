@@ -25,6 +25,10 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     private boolean mResetMode;
     private ScreenIndicator mScreenIndicator;
     private ViewPager mViewPager;
+    private int mBasePaddingBottom;
+    private int mBasePaddingLeft;
+    private int mBasePaddingRight;
+    private int mBasePaddingTop;
 
     public ApplicationsPagingView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -41,6 +45,10 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     /* access modifiers changed from: protected */
     public void onFinishInflate() {
         super.onFinishInflate();
+        this.mBasePaddingLeft = getPaddingLeft();
+        this.mBasePaddingTop = getPaddingTop();
+        this.mBasePaddingRight = getPaddingRight();
+        this.mBasePaddingBottom = getPaddingBottom();
         this.mResetMode = true;
         this.mViewPager = (ViewPager) findViewById(R.id.view_pager);
         this.mViewPager.setDrawingCacheEnabled(true);
@@ -76,6 +84,14 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
 
     public void setNumRows(int rows) {
         sRows = rows;
+    }
+
+    public void setSystemBarInsets(int left, int top, int right, int bottom) {
+        setPadding(this.mBasePaddingLeft + Math.max(0, left),
+                this.mBasePaddingTop + Math.max(0, top),
+                this.mBasePaddingRight + Math.max(0, right),
+                this.mBasePaddingBottom + Math.max(0, bottom));
+        requestLayout();
     }
 
     public void setBackgroundAlpha(int alpha) {
