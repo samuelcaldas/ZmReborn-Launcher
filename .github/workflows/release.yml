@@ -325,6 +325,8 @@ jobs:
           path: release-notes
 
       - name: Recheck candidate and tag integrity
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -Eeuo pipefail
@@ -333,7 +335,7 @@ jobs:
             cd release
             sha256sum --check SHA256SUMS
           )
-          repository_url="https://github.com/${GITHUB_REPOSITORY}.git"
+          repository_url="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           remote_sha="$(git ls-remote "$repository_url" "refs/tags/${RELEASE_TAG}^{}" | awk 'NR == 1 { print $1; exit }')"
           if [[ -z "$remote_sha" ]]; then
             remote_sha="$(git ls-remote "$repository_url" "refs/tags/${RELEASE_TAG}" | awk 'NR == 1 { print $1; exit }')"
@@ -381,10 +383,11 @@ jobs:
       - name: Recheck published tag
         env:
           GH_TOKEN: ${{ github.token }}
+          GITHUB_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           set -Eeuo pipefail
-          repository_url="https://github.com/${GITHUB_REPOSITORY}.git"
+          repository_url="https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
           remote_sha="$(git ls-remote "$repository_url" "refs/tags/${RELEASE_TAG}^{}" | awk 'NR == 1 { print $1; exit }')"
           if [[ -z "$remote_sha" ]]; then
             remote_sha="$(git ls-remote "$repository_url" "refs/tags/${RELEASE_TAG}" | awk 'NR == 1 { print $1; exit }')"
