@@ -4,7 +4,7 @@ Zeam publishes signed APKs only through `.github/workflows/release.yml`. Normal 
 
 ## Current alpha fallback
 
-The current private repository plan does not provide protected environments or repository rulesets. The first alpha therefore uses repository-level `gh` secrets and the `RELEASE_CERT_SHA256` repository variable. Workflow signing and certificate checks remain fail-closed, but required reviewers, deployment approvals, and immutable `v*` tags are unavailable. Upgrade the repository plan before production publication.
+The current private repository plan does not provide protected environments, repository rulesets, or GitHub provenance attestation for user-owned private repositories. The first alpha therefore uses repository-level `gh` secrets and the `RELEASE_CERT_SHA256` repository variable, and skips the unavailable provenance-attestation step. Signed APK, certificate, metadata, checksum, tag, and release checks remain fail-closed, but required reviewers, deployment approvals, and immutable `v*` tags are unavailable. Production publication requires an eligible public repository or GitHub plan setup.
 
 ## Repository configuration
 
@@ -72,7 +72,7 @@ Use **Actions → Signed GitHub Release → Run workflow** with:
 - `tag`: candidate tag matching source `versionName`, such as `v3.1.11-alpha`.
 - `publish`: `false`.
 
-Dry runs validate metadata, wait for protected-environment approval, build a signed release APK, verify package/version metadata, verify v1/JAR signing, compare the certificate fingerprint, and generate `SHA256SUMS`. They upload short-retention release-candidate artifacts but do not create a tag, provenance attestation, or GitHub Release.
+Dry runs validate metadata, wait for protected-environment approval where available, build a signed release APK, verify package/version metadata, verify v1/JAR signing, compare the certificate fingerprint, and generate `SHA256SUMS`. They upload short-retention release-candidate artifacts but do not create a tag, provenance attestation, or GitHub Release. Private alpha dry runs have no provenance attestation; public publication performs it.
 
 A dry run can use a tag that does not exist yet. This supports checking a prepared commit before creating its release tag.
 
@@ -90,9 +90,9 @@ Publication produces:
 - `zeam-launcher-vX.Y.Z.apk`
 - `SHA256SUMS`
 - Changelog-derived release notes
-- GitHub artifact provenance attestation for APK
+- GitHub artifact provenance attestation for APK on eligible public repositories
 
-APK is built with `-PreleaseSigningRequired=true`, so missing signing inputs fail before release output. Verification requires both v1/JAR signing for legacy `minSdk` support and v2 signing for modern Android. Keystore is decoded only under the runner temporary directory with mode `0600` and removed in an always-run cleanup step.
+Private alpha publication omits GitHub provenance attestation; its signed APK, certificate, metadata, checksum, tag, and release checks still run. APK is built with `-PreleaseSigningRequired=true`, so missing signing inputs fail before release output. Verification requires both v1/JAR signing for legacy `minSdk` support and v2 signing for modern Android. Keystore is decoded only under the runner temporary directory with mode `0600` and removed in an always-run cleanup step.
 
 ## Consumer verification
 
@@ -103,16 +103,18 @@ sha256sum --check SHA256SUMS
 $ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner verify --verbose --print-certs zeam-launcher-vX.Y.Z.apk
 ```
 
-Confirm certificate digest matches published `RELEASE_CERT_SHA256`. Inspect GitHub's **Attestations** view or verify with GitHub CLI where supported:
+Confirm certificate digest matches published `RELEASE_CERT_SHA256`. For eligible public repositories, inspect GitHub's **Attestations** view or verify with GitHub CLI where supported:
 
 ```sh
 gh attestation verify zeam-launcher-vX.Y.Z.apk \
   --repo samuel-caldas/Zeam-Launcher
 ```
 
+Private alpha releases intentionally have no provenance attestation and omit this command.
+
 ## Failure and rollback boundaries
 
-- Metadata, signing, test, lint, APK, certificate, checksum, or attestation failure creates no GitHub Release.
+- Metadata, signing, test, lint, APK, certificate, checksum, or tag/release integrity failure creates no GitHub Release. On eligible public repositories, provenance-attestation failure also prevents release creation; private alpha fallback skips that unavailable step.
 - Existing releases are never overwritten or mutated by this workflow.
 - A published release cannot be rolled back by rebuilding the same version. Prepare a higher `versionCode`, matching `versionName`, changelog section, and new semantic tag.
 - Do not place keystores, passwords, unsigned APKs, Gradle logs, or generated build directories in the repository or release assets.

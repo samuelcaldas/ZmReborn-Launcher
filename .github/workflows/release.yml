@@ -358,6 +358,7 @@ jobs:
 
       # actions/attest-build-provenance v2.2.3
       - name: Attest APK provenance
+        if: github.event.repository.visibility == 'public'
         uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2
         with:
           subject-path: release/zeam-launcher-${{ needs.validate.outputs.tag }}.apk
