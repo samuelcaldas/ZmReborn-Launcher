@@ -125,3 +125,22 @@ Added protected signed APK release automation without publishing a new tag or re
 - Added `.github/workflows/release.yml` with semantic-tag validation, changelog/version checks, protected signing, APK certificate and metadata verification, checksums, provenance attestation, and GitHub Release publication gates.
 - Added [`docs/RELEASING.md`](RELEASING.md) covering environment secrets, dry runs, publication, consumer verification, and rollback boundaries.
 - Debug CI artifacts remain separate from signed GitHub Release assets.
+
+## Signed Alpha Candidate Validation — 2026-07-19
+
+Validated current source as a signed alpha candidate in the `zeam-emu` container:
+
+- `:app:lint`, `:app:testDebugUnitTest`, and `:app:assembleRelease` passed after correcting two release-blocking lint defects.
+- APK metadata is `org.zeam`, `versionCode 113`, and `versionName 3.1.11-alpha`.
+- APK signature verification passed v1/JAR and v2 APK Signature Scheme checks.
+- APK SHA-256: `9472f2f29611a489ac119745b77fb9748250f8935825c9b4314d371e446857bb`.
+- Alpha uses a new signing identity and must be installed as a clean alpha; it is not an upgrade-compatible build for the historical APK.
+- Initial GitHub dry run `29707324433` stopped at the old changelog release-heading gate; no tag or GitHub Release was created.
+
+## [3.1.11-alpha]
+
+First alpha candidate from current launcher source:
+
+- Signed release APK uses `versionCode 113` and `versionName 3.1.11-alpha`.
+- Release validation covers lint, JVM tests, APK metadata, v1/v2 signatures, certificate identity, checksum, and provenance gates.
+- Alpha is signed with a new key and is not upgrade-compatible with the historical APK.

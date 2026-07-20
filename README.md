@@ -1,4 +1,4 @@
-# Zeam Launcher 3.1.10
+# Zeam Launcher 3.1.11-alpha
 
 Reconstructed Android project for Zeam Launcher 3.1.10. The reconstruction is based on raw JADX source in `origin/original_source`; the original APK is archived at [`docs/reference/zeam-launcher-3-1-10-en-android.apk`](docs/reference/zeam-launcher-3-1-10-en-android.apk).
 

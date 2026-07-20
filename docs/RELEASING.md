@@ -2,6 +2,10 @@
 
 Zeam publishes signed APKs only through `.github/workflows/release.yml`. Normal CI continues to build debug APKs and upload them as workflow artifacts; debug artifacts are not release assets.
 
+## Current alpha fallback
+
+The current private repository plan does not provide protected environments or repository rulesets. The first alpha therefore uses repository-level `gh` secrets and the `RELEASE_CERT_SHA256` repository variable. Workflow signing and certificate checks remain fail-closed, but required reviewers, deployment approvals, and immutable `v*` tags are unavailable. Upgrade the repository plan before production publication.
+
 ## Repository configuration
 
 Configure GitHub Releases before using release tags:
@@ -16,6 +20,17 @@ Configure GitHub Releases before using release tags:
    - `RELEASE_KEY_ALIAS`
    - `RELEASE_KEY_PASSWORD`
 6. Add the `github-release` environment variable `RELEASE_CERT_SHA256` with the signing certificate SHA-256 fingerprint as 64 uppercase hexadecimal characters without colons.
+
+For the current alpha fallback, set repository-level values with GitHub CLI instead:
+
+```sh
+gh secret set RELEASE_KEYSTORE_BASE64 --repo OWNER/REPOSITORY < <(base64 -w 0 release.jks)
+gh secret set RELEASE_KEYSTORE_PASSWORD --repo OWNER/REPOSITORY
+gh secret set RELEASE_KEY_ALIAS --repo OWNER/REPOSITORY
+gh secret set RELEASE_KEY_PASSWORD --repo OWNER/REPOSITORY
+gh variable set RELEASE_CERT_SHA256 --repo OWNER/REPOSITORY --body NORMALIZED_CERTIFICATE_SHA256
+```
+
 7. Prepare the keystore secret from the binary keystore file:
 
    ```sh
@@ -41,20 +56,20 @@ Before creating a release candidate:
 2. Create a matching changelog section in `docs/CHANGELOG.md`:
 
    ```markdown
-   ## [3.1.11]
+   ## [3.1.11-alpha]
 
-   Explain changes included in 3.1.11.
+   Explain changes included in 3.1.11-alpha.
    ```
 
-3. Create tag `v3.1.11` at the exact commit containing both changes.
+3. Create tag `v3.1.11-alpha` at the exact commit containing both changes.
 
-Workflow rejects malformed tags, leading-zero components, version mismatches, missing release headings, empty notes, moved tags, and non-positive version codes. Existing historical headings such as `## Status` are not release sections.
+Workflow accepts canonical `vMAJOR.MINOR.PATCH` tags with optional dot-separated prerelease identifiers, then rejects leading-zero components, version mismatches, missing release headings, empty notes, moved tags, and non-positive version codes. Existing historical headings such as `## Status` are not release sections.
 
 ## Candidate dry runs
 
 Use **Actions → Signed GitHub Release → Run workflow** with:
 
-- `tag`: candidate tag matching source `versionName`.
+- `tag`: candidate tag matching source `versionName`, such as `v3.1.11-alpha`.
 - `publish`: `false`.
 
 Dry runs validate metadata, wait for protected-environment approval, build a signed release APK, verify package/version metadata, verify v1/JAR signing, compare the certificate fingerprint, and generate `SHA256SUMS`. They upload short-retention release-candidate artifacts but do not create a tag, provenance attestation, or GitHub Release.
@@ -65,10 +80,10 @@ A dry run can use a tag that does not exist yet. This supports checking a prepar
 
 Publishing occurs only when all gates pass:
 
-- Push a matching `vMAJOR.MINOR.PATCH` tag; or
+- Push a matching `vMAJOR.MINOR.PATCH` or `vMAJOR.MINOR.PATCH-prerelease` tag; or
 - Run workflow dispatch with `publish: true` and an existing tag pointing exactly at selected source commit.
 
-Tag pushes are publishing events. Protected environment approval is required before signing secrets and publication permissions become available. Workflow validates the remote tag again immediately before publication and refuses to modify an existing GitHub Release.
+Tags with prerelease identifiers publish as GitHub prereleases. Tag pushes are publishing events. Protected environment approval is required before signing secrets and publication permissions become available. Workflow validates the remote tag again immediately before publication and refuses to modify an existing GitHub Release.
 
 Publication produces:
 

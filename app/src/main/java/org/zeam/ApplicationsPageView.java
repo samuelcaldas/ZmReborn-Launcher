@@ -1,6 +1,7 @@
 package org.zeam;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -87,7 +88,7 @@ public class ApplicationsPageView extends LinearLayout {
     private TextView createApplicationView(int itemIndex, int cellWidth, int rowHeight) {
         ApplicationItemInfo applicationItemInfo = this.mApplicationItemInfos.get(itemIndex);
         TextView textView = (TextView) this.mLayoutInflater.inflate(
-                R.layout.application_boxed_page, null, false);
+                R.layout.application_boxed_page, this, false);
         Drawable iconDrawable = resolveIcon(applicationItemInfo);
         if (applicationItemInfo instanceof AppListFolderInfo) {
             textView.setTextColor(-1);
@@ -95,10 +96,10 @@ public class ApplicationsPageView extends LinearLayout {
         } else if (this.mUninstalling) {
             if (Utilities.canUninstallApplication(getContext(), applicationItemInfo)) {
                 textView.setTextColor(-1);
-                textView.setBackgroundResource(17170445);
+                textView.setBackgroundColor(Color.TRANSPARENT);
             } else {
                 textView.setTextColor(-7829368);
-                textView.setBackgroundResource(17170445);
+                textView.setBackgroundColor(Color.TRANSPARENT);
             }
         } else {
             textView.setTextColor(-1);
