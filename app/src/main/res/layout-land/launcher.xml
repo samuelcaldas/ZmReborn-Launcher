@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.zeam.DragLayer xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" android:id="@+id/drag_layer" android:layout_width="match_parent" android:layout_height="match_parent">
-    <org.zeam.Workspace android:id="@+id/workspace" android:layout_width="match_parent" android:layout_height="match_parent" launcher:defaultScreen="2">
+<org.zmreborn.DragLayer xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res-auto" android:id="@+id/drag_layer" android:layout_width="match_parent" android:layout_height="match_parent">
+    <org.zmreborn.Workspace android:id="@+id/workspace" android:layout_width="match_parent" android:layout_height="match_parent" launcher:defaultScreen="2">
         <include android:id="@+id/cell1" layout="@layout/workspace_screen"/>
         <include android:id="@+id/cell2" layout="@layout/workspace_screen"/>
         <include android:id="@+id/cell3" layout="@layout/workspace_screen"/>
@@ -8,11 +8,18 @@
         <include android:id="@+id/cell5" layout="@layout/workspace_screen"/>
         <include android:id="@+id/cell6" layout="@layout/workspace_screen"/>
         <include android:id="@+id/cell7" layout="@layout/workspace_screen"/>
-    </org.zeam.Workspace>
+    </org.zmreborn.Workspace>
     <ViewStub android:id="@+id/apps_grid_stub" android:inflatedId="@+id/apps_grid" android:layout_width="match_parent" android:layout_height="match_parent"/>
-    <ImageButton android:layout_gravity="right|center_vertical|center_horizontal|center" android:id="@+id/home_button" android:background="@null" android:padding="0dp" android:paddingRight="2dp" android:visibility="invisible" android:saveEnabled="false" android:layout_width="45dp" android:layout_height="wrap_content" android:src="@drawable/home_button_normal"/>
-    <ViewStub android:layout_gravity="right" android:id="@+id/dock_stub" android:inflatedId="@+id/dock" android:layout_width="57dp" android:layout_height="match_parent"/>
-    <org.zeam.DeleteZone android:layout_gravity="right|center_vertical|center_horizontal|center" android:id="@+id/delete_zone" android:background="@drawable/delete_zone_selector" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="48dp" android:src="@drawable/trashcan" android:scaleType="center" launcher:direction="vertical"/>
-    <org.zeam.ScreenIndicator android:id="@+id/workspace_screen_indicator" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-    <TextView android:id="@+id/workspace_empty_tip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:text="@string/workspace_empty_tip" android:textColor="@color/zeam_steel" android:textSize="16sp" android:visibility="gone" android:gravity="center" android:padding="24dp" android:clickable="false" android:focusable="false" android:longClickable="false"/>
-</org.zeam.DragLayer>
+    <ImageButton android:layout_gravity="right|center_vertical" android:id="@+id/home_button" android:background="@null" android:padding="0dp" android:visibility="invisible" android:saveEnabled="false" android:layout_width="@dimen/minimum_touch_target" android:layout_height="wrap_content" android:src="@drawable/home_button_normal"/>
+    <ViewStub android:layout_gravity="right" android:id="@+id/dock_stub" android:inflatedId="@+id/dock" android:layout_width="@dimen/navigation_strip_size" android:layout_height="match_parent"/>
+    <org.zmreborn.DeleteZone android:layout_gravity="right|center_vertical" android:id="@+id/delete_zone" android:background="@drawable/delete_zone_selector" android:visibility="invisible" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_marginRight="@dimen/minimum_touch_target" android:layout_marginEnd="@dimen/minimum_touch_target" android:src="@drawable/trashcan" android:scaleType="center" launcher:direction="vertical"/>
+    <org.zmreborn.ScreenIndicator android:id="@+id/workspace_screen_indicator" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content"/>
+    <TextView android:id="@+id/workspace_empty_tip" android:layout_width="wrap_content" android:layout_height="wrap_content" android:layout_gravity="center" android:text="@string/workspace_empty_tip" android:textColor="@color/zm_reborn_steel" android:textSize="16sp" android:visibility="gone" android:gravity="center" android:padding="24dp" android:clickable="false" android:focusable="false" android:longClickable="false"/>
+    <FrameLayout android:id="@+id/apps_state_overlay" android:layout_width="match_parent" android:layout_height="match_parent" android:background="@color/zm_reborn_slate" android:visibility="gone" android:clickable="true" android:focusable="true">
+        <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_gravity="center" android:gravity="center" android:orientation="vertical" android:padding="@dimen/space_24">
+            <TextView android:id="@+id/apps_state_message" android:layout_width="wrap_content" android:layout_height="wrap_content" android:gravity="center" android:textColor="@color/zm_reborn_fog" android:textSize="16sp" android:padding="@dimen/space_8"/>
+            <Button android:id="@+id/apps_state_retry" android:layout_width="wrap_content" android:layout_height="@dimen/minimum_touch_target" android:text="@string/try_again" android:visibility="gone"/>
+            <Button android:id="@+id/apps_state_close" android:layout_width="wrap_content" android:layout_height="@dimen/minimum_touch_target" android:text="@string/button_close" android:visibility="gone"/>
+        </LinearLayout>
+    </FrameLayout>
+</org.zmreborn.DragLayer>

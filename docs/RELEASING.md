@@ -1,6 +1,6 @@
-# Signed GitHub Releases
+# Signed ZM Reborn GitHub Releases
 
-Zeam publishes signed APKs only through `.github/workflows/release.yml`. Normal CI continues to build debug APKs and upload them as workflow artifacts; debug artifacts are not release assets.
+ZM Reborn publishes signed APKs only through `.github/workflows/release.yml`. Normal CI continues to build debug APKs and upload them as workflow artifacts; debug artifacts are not release assets.
 
 ## Current alpha fallback
 
@@ -87,7 +87,7 @@ Tags with prerelease identifiers publish as GitHub prereleases. Tag pushes are p
 
 Publication produces:
 
-- `zeam-launcher-vX.Y.Z.apk`
+- `zm-reborn-vX.Y.Z.apk`
 - `SHA256SUMS`
 - Changelog-derived release notes
 - GitHub artifact provenance attestation for APK on eligible public repositories
@@ -100,14 +100,14 @@ Download APK and checksum from GitHub Release, then run:
 
 ```sh
 sha256sum --check SHA256SUMS
-$ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner verify --verbose --print-certs zeam-launcher-vX.Y.Z.apk
+$ANDROID_SDK_ROOT/build-tools/34.0.0/apksigner verify --verbose --print-certs zm-reborn-vX.Y.Z.apk
 ```
 
 Confirm certificate digest matches published `RELEASE_CERT_SHA256`. For eligible public repositories, inspect GitHub's **Attestations** view or verify with GitHub CLI where supported:
 
 ```sh
-gh attestation verify zeam-launcher-vX.Y.Z.apk \
-  --repo samuel-caldas/Zeam-Launcher
+gh attestation verify zm-reborn-vX.Y.Z.apk \
+  --repo '<owner>/<repository>'
 ```
 
 Private alpha releases intentionally have no provenance attestation and omit this command.

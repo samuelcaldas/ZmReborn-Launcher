@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam">
-    <permission android:label="@string/permlab_install_shortcut" android:name="org.zeam.permission.INSTALL_SHORTCUT" android:protectionLevel="normal" android:description="@string/permdesc_install_shortcut"/>
-    <permission android:label="@string/permlab_uninstall_shortcut" android:name="org.zeam.permission.UNINSTALL_SHORTCUT" android:protectionLevel="normal" android:description="@string/permdesc_uninstall_shortcut"/>
-    <permission android:label="@string/permlab_read_settings" android:name="org.zeam.permission.READ_SETTINGS" android:protectionLevel="normal" android:description="@string/permdesc_read_settings"/>
-    <permission android:label="@string/permlab_write_settings" android:name="org.zeam.permission.WRITE_SETTINGS" android:protectionLevel="normal" android:description="@string/permdesc_write_settings"/>
-    <uses-permission android:name="org.zeam.permission.WRITE_SETTINGS"/>
-    <uses-permission android:name="org.zeam.permission.READ_SETTINGS"/>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
+    <permission android:label="@string/permlab_install_shortcut" android:name="${applicationId}.permission.INSTALL_SHORTCUT" android:protectionLevel="normal" android:description="@string/permdesc_install_shortcut"/>
+    <permission android:label="@string/permlab_uninstall_shortcut" android:name="${applicationId}.permission.UNINSTALL_SHORTCUT" android:protectionLevel="normal" android:description="@string/permdesc_uninstall_shortcut"/>
+    <permission android:label="@string/permlab_read_settings" android:name="${applicationId}.permission.READ_SETTINGS" android:protectionLevel="normal" android:description="@string/permdesc_read_settings"/>
+    <permission android:label="@string/permlab_write_settings" android:name="${applicationId}.permission.WRITE_SETTINGS" android:protectionLevel="normal" android:description="@string/permdesc_write_settings"/>
+    <uses-permission android:name="${applicationId}.permission.WRITE_SETTINGS" tools:ignore="SystemPermissionTypo"/>
+    <uses-permission android:name="${applicationId}.permission.READ_SETTINGS"/>
     <uses-permission android:name="android.permission.CALL_PHONE"/>
     <uses-permission android:name="android.permission.CALL_PRIVILEGED"/>
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
@@ -24,9 +24,9 @@
             <category android:name="android.intent.category.LAUNCHER"/>
         </intent>
     </queries>
-    <application android:label="@string/application_name" android:icon="@drawable/ic_launcher" android:name=".LauncherApplication" android:process="org.zeam.core" android:hardwareAccelerated="true">
+    <application android:label="@string/application_name" android:icon="@drawable/ic_launcher" android:name=".LauncherApplication" android:process="${applicationId}.core" android:hardwareAccelerated="true">
         <meta-data android:name="android.app.default_searchable" android:value="*"/>
-        <activity android:theme="@android:style/Theme.Wallpaper.NoTitleBar" android:name=".Launcher" android:clearTaskOnLaunch="true" android:stateNotNeeded="true" android:launchMode="singleTask" android:screenOrientation="nosensor" android:windowSoftInputMode="adjustPan" android:exported="true">
+        <activity android:theme="@style/LauncherTheme" android:name=".Launcher" android:clearTaskOnLaunch="true" android:stateNotNeeded="true" android:launchMode="singleTask" android:screenOrientation="nosensor" android:windowSoftInputMode="adjustPan" android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.HOME"/>
@@ -46,6 +46,6 @@
                 <action android:name="com.android.launcher.action.UNINSTALL_SHORTCUT"/>
             </intent-filter>
         </receiver>
-        <provider android:name=".LauncherProvider" android:readPermission="org.zeam.permission.READ_SETTINGS" android:writePermission="org.zeam.permission.WRITE_SETTINGS" android:authorities="org.zeam.provider"/>
+        <provider android:name=".LauncherProvider" android:readPermission="${applicationId}.permission.READ_SETTINGS" android:writePermission="${applicationId}.permission.WRITE_SETTINGS" android:authorities="${applicationId}.provider"/>
     </application>
 </manifest>

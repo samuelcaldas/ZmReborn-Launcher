@@ -13,14 +13,14 @@
         android:paddingBottom="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <org.zeam.ColourPickerView
+        <org.zmreborn.ColourPickerView
             android:id="@+id/colour_picker_view"
             android:contentDescription="@string/dialog_colour_picker_accessibility_picker"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <TextView
             android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textColor="@color/zeam_steel"
+            android:textColor="@color/zm_reborn_steel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
@@ -33,14 +33,14 @@
             android:layout_height="wrap_content">
             <TextView
                 android:id="@+id/old_colour_label"
-                android:textColor="@color/zeam_steel"
+                android:textColor="@color/zm_reborn_steel"
                 android:text="@string/dialog_colour_picker_old_colour"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
             <TextView
                 android:textSize="20sp"
-                android:textColor="@color/zeam_amber"
+                android:textColor="@color/zm_reborn_amber"
                 android:gravity="center"
                 android:text="@string/dialog_colour_picker_arrow"
                 android:layout_width="wrap_content"
@@ -49,7 +49,7 @@
                 android:paddingRight="8dp" />
             <TextView
                 android:id="@+id/new_colour_label"
-                android:textColor="@color/zeam_amber"
+                android:textColor="@color/zm_reborn_amber"
                 android:gravity="right"
                 android:text="@string/dialog_colour_picker_new_colour"
                 android:layout_width="0dp"
@@ -61,13 +61,13 @@
             android:layout_width="match_parent"
             android:layout_height="48dp"
             android:layout_marginTop="4dp">
-            <org.zeam.ColourPickerPanelView
+            <org.zmreborn.ColourPickerPanelView
                 android:id="@+id/old_colour_panel"
                 android:contentDescription="@string/dialog_colour_picker_accessibility_cancel"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1" />
-            <org.zeam.ColourPickerPanelView
+            <org.zmreborn.ColourPickerPanelView
                 android:id="@+id/new_colour_panel"
                 android:contentDescription="@string/dialog_colour_picker_accessibility_apply"
                 android:layout_width="0dp"

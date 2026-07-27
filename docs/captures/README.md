@@ -1,4 +1,4 @@
-# Zeam UI captures
+# ZM Reborn UI captures
 
 This directory stores device captures used to track launcher UI progress.
 
@@ -40,7 +40,7 @@ For each capture, verify no visible icon, label, action, folder control, indicat
 After installing a debug APK on a connected device:
 
 ```sh
-adb shell monkey -p org.zeam -c android.intent.category.LAUNCHER 1
+adb shell monkey -p org.zmreborn -c android.intent.category.LAUNCHER 1
 adb exec-out screencap -p > docs/captures/<date>-api<level>-<orientation>-<surface>.png
 ```
 

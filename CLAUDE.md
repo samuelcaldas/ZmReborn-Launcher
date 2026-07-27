@@ -11,11 +11,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Toolchain and Commands
 
-- Require `ANDROID_SDK_ROOT` pointing to the Android SDK.
 - Use JDK 17, Gradle Wrapper 8.7, Android Gradle Plugin 8.5.2, SDK 35, Build Tools 34.0.0, and `minSdk` 8.
+- Always build local debug APKs with `./tools/build_apk.sh`; never invoke `assembleDebug` directly.
+- The wrapper owns Docker context `docker-dev`, resolves image `zeam-docker-dev:android35` to its inspected local image ID, forbids pulls, mounts the Gradle cache, provides the Android SDK, and returns concise build output.
 
 ```sh
-./gradlew assembleDebug --no-daemon
+./tools/build_apk.sh
 ./gradlew :app:lint --no-daemon
 git diff --check
 ```
@@ -24,14 +25,14 @@ Install and launch the debug build:
 
 ```sh
 adb install -r app/build/outputs/apk/debug/app-debug.apk
-adb shell monkey -p org.zeam -c android.intent.category.LAUNCHER 1
+adb shell monkey -p org.zmreborn -c android.intent.category.LAUNCHER 1
 ```
 
 Run unit tests or a single test:
 
 ```sh
 ./gradlew :app:testDebugUnitTest --no-daemon
-./gradlew :app:testDebugUnitTest --tests 'org.zeam.FastXmlSerializerTest' --no-daemon
+./gradlew :app:testDebugUnitTest --tests 'org.zmreborn.FastXmlSerializerTest' --no-daemon
 ```
 
 ## Architecture and Runtime Flow

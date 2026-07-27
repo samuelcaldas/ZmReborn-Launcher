@@ -1,2 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<org.zeam.LiveFolderIcon xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" style="@style/WorkspaceIcon.Portrait"/>
+<org.zmreborn.LiveFolderIcon xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res-auto" style="@style/WorkspaceIcon.Portrait"/>

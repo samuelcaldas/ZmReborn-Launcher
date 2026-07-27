@@ -10,7 +10,7 @@
     <TextView
         android:id="@+id/dialog_message"
         android:textAppearance="?android:attr/textAppearanceSmall"
-        android:textColor="@color/zeam_steel"
+        android:textColor="@color/zm_reborn_steel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
     <SeekBar
@@ -22,7 +22,7 @@
         android:paddingBottom="8dp" />
     <TextView
         android:id="@+id/actual_value"
-        android:textColor="@color/zeam_amber"
+        android:textColor="@color/zm_reborn_amber"
         android:textStyle="bold"
         android:gravity="center"
         android:layout_width="match_parent"

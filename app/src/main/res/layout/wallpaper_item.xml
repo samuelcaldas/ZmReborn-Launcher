@@ -1,2 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ImageView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" android:background="?android:attr/galleryItemBackground" android:focusable="true" android:layout_width="wrap_content" android:layout_height="wrap_content" android:scaleType="fitXY"/>
+<ImageView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:background="@drawable/settings_preference_selector"
+    android:focusable="true"
+    android:clickable="true"
+    android:padding="@dimen/space_4"
+    android:minWidth="@dimen/minimum_touch_target"
+    android:minHeight="@dimen/minimum_touch_target"
+    android:scaleType="centerInside"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content" />

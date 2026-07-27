@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <style name="WorkspaceIcon">
-        <item name="android:textSize">12sp</item>
-        <item name="android:textColor">@color/zeam_fog</item>
-        <item name="android:ellipsize">marquee</item>
-        <item name="android:gravity">center_horizontal</item>
+        <item name="android:textSize">14sp</item>
+        <item name="android:textColor">@color/zm_reborn_fog</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:gravity">center</item>
         <item name="android:paddingLeft">5dp</item>
         <item name="android:paddingRight">5dp</item>
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">match_parent</item>
-        <item name="android:singleLine">true</item>
-        <item name="android:shadowColor">#ff000000</item>
-        <item name="android:shadowRadius">2</item>
+        <item name="android:maxLines">2</item>
     </style>
     <style name="WorkspaceIcon.Portrait">
         <item name="android:paddingTop">4dp</item>
@@ -37,6 +35,7 @@
         <item name="android:windowBackground">@null</item>
         <item name="android:windowNoTitle">true</item>
     </style>
+    <style name="LauncherTheme" parent="@android:style/Theme.Wallpaper.NoTitleBar" />
     <style name="DockBarIcon">
         <item name="android:gravity">center_horizontal</item>
         <item name="android:paddingLeft">0dp</item>
@@ -57,10 +56,11 @@
         <item name="android:widgetLayout">@layout/settings_checkbox_widget</item>
     </style>
     <style name="SettingsTheme" parent="@android:style/Theme.Black">
-        <item name="android:windowBackground">@color/zeam_slate</item>
-        <item name="android:colorBackground">@color/zeam_slate</item>
-        <item name="android:textColorPrimary">@color/zeam_fog</item>
-        <item name="android:textColorSecondary">@color/zeam_steel</item>
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/zm_reborn_slate</item>
+        <item name="android:colorBackground">@color/zm_reborn_slate</item>
+        <item name="android:textColorPrimary">@color/zm_reborn_fog</item>
+        <item name="android:textColorSecondary">@color/zm_reborn_steel</item>
         <item name="android:preferenceStyle">@style/SettingsPreferenceStyle</item>
         <item name="android:preferenceCategoryStyle">@style/SettingsPreferenceCategoryStyle</item>
         <item name="android:checkBoxPreferenceStyle">@style/SettingsCheckBoxPreferenceStyle</item>

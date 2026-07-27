@@ -26,11 +26,11 @@ android {
     useLibrary "android.test.runner"
     useLibrary "android.test.base"
     useLibrary "android.test.mock"
-    namespace 'org.zeam'
+    namespace 'org.zmreborn'
     compileSdk 35
 
     defaultConfig {
-        applicationId "org.zeam"
+        applicationId "org.zmreborn"
         minSdkVersion 8
         targetSdkVersion 35
         resConfigs "en", "pt-rBR"
@@ -42,6 +42,10 @@ android {
         language {
             enableSplit = false
         }
+    }
+
+    buildFeatures {
+        buildConfig true
     }
 
     signingConfigs {

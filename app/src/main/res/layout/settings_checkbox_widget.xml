@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <CheckBox xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/checkbox"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:minWidth="48dp"
-    android:minHeight="48dp"
+    android:layout_width="@dimen/minimum_touch_target"
+    android:layout_height="@dimen/minimum_touch_target"
+    android:minWidth="@dimen/minimum_touch_target"
+    android:minHeight="@dimen/minimum_touch_target"
     android:clickable="false"
     android:focusable="false" />

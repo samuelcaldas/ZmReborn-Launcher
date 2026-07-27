@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Candidate release tag, for example v3.1.10'
+        description: 'Candidate release tag, for example v3.1.11-alpha'
         required: true
         type: string
       publish:
@@ -24,6 +24,7 @@ concurrency:
   cancel-in-progress: false
 
 env:
+  APP_ID: 'org.zmreborn'
   BUILD_TOOLS_VERSION: '34.0.0'
 
 jobs:
@@ -175,6 +176,9 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
+      - name: Verify Brand Identity
+        run: python3 tools/verify_brand_identity.py
+
       # actions/setup-java v4.7.1
       - name: Set up JDK 17
         uses: actions/setup-java@c5195efecf7bdfc987ee8bae7a71cb8b11521c00
@@ -203,7 +207,7 @@ jobs:
             exit 1
           fi
 
-          keystore_path="$RUNNER_TEMP/zeam-release-${GITHUB_RUN_ID}.jks"
+          keystore_path="$RUNNER_TEMP/zm-reborn-release-${GITHUB_RUN_ID}.jks"
           printf 'RELEASE_KEYSTORE_PATH=%s\n' "$keystore_path" >> "$GITHUB_ENV"
           if ! printf '%s' "$RELEASE_KEYSTORE_BASE64" | base64 --decode > "$keystore_path"; then
             echo "RELEASE_KEYSTORE_BASE64 is not valid base64." >&2
@@ -241,7 +245,7 @@ jobs:
           fi
 
           mkdir -p release
-          artifact_name="zeam-launcher-${EXPECTED_TAG}.apk"
+          artifact_name="zm-reborn-${EXPECTED_TAG}.apk"
           cp "$source_apk" "release/$artifact_name"
           artifact_path="release/$artifact_name"
 
@@ -264,7 +268,8 @@ jobs:
 
           "$build_tools/aapt" dump badging "$artifact_path" > "$RUNNER_TEMP/badging.txt"
           version_name_pattern="${EXPECTED_VERSION_NAME//./\\.}"
-          if ! grep -Eq "package: name='org\\.zeam' versionCode='${EXPECTED_VERSION_CODE}' versionName='${version_name_pattern}'" "$RUNNER_TEMP/badging.txt"; then
+          package_name_pattern="${APP_ID//./\\.}"
+          if ! grep -Eq "package: name='${package_name_pattern}' versionCode='${EXPECTED_VERSION_CODE}' versionName='${version_name_pattern}'" "$RUNNER_TEMP/badging.txt"; then
             echo "Release APK package or version metadata does not match validated source." >&2
             exit 1
           fi
@@ -337,7 +342,7 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          artifact_name="zeam-launcher-${RELEASE_TAG}.apk"
+          artifact_name="zm-reborn-${RELEASE_TAG}.apk"
           (
             cd release
             sha256sum --check SHA256SUMS
@@ -368,7 +373,7 @@ jobs:
         if: github.event.repository.visibility == 'public'
         uses: actions/attest-build-provenance@c074443f1aee8d4aeeae555aebba3282517141b2
         with:
-          subject-path: release/zeam-launcher-${{ needs.validate.outputs.tag }}.apk
+          subject-path: release/zm-reborn-${{ needs.validate.outputs.tag }}.apk
 
       - name: Create GitHub Release
         env:
@@ -376,7 +381,7 @@ jobs:
         shell: bash
         run: |
           set -Eeuo pipefail
-          artifact_name="zeam-launcher-${RELEASE_TAG}.apk"
+          artifact_name="zm-reborn-${RELEASE_TAG}.apk"
           release_options=()
           if [[ "$PRERELEASE" == true ]]; then
             release_options+=(--prerelease)
@@ -384,7 +389,7 @@ jobs:
           gh release create "$RELEASE_TAG" \
             --verify-tag \
             "${release_options[@]}" \
-            --title "Zeam Launcher ${VERSION_NAME}" \
+            --title "ZM Reborn ${VERSION_NAME}" \
             --notes-file release-notes/release-notes.md \
             "release/${artifact_name}" \
             release/SHA256SUMS

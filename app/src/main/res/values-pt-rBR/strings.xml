@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="application_name">Zeam Launcher</string>
+    <string name="application_name">ZM Reborn</string>
     <string name="preferences_application_version_format">%1$s %2$s</string>
     <string name="application_copyright">Copyright © 2011 Michael Bentz</string>
     <string name="toast_activity_info_not_found">Não foi possível encontrar ActivityInfo para %1$s</string>
@@ -19,14 +19,25 @@
     <string name="button_yes">Sim</string>
     <string name="button_done">Concluído</string>
     <string name="button_close">Fechar</string>
+    <string name="accessibility_open_drawer">Abrir aplicativos</string>
     <string name="accessibility_close_drawer">Fechar gaveta de aplicativos</string>
     <string name="accessibility_folder_rename">Renomear pasta</string>
     <string name="accessibility_folder_close">Fechar pasta</string>
     <string name="accessibility_delete_zone">Remover da tela inicial</string>
+    <string name="accessibility_delete_item">Excluir item</string>
+    <string name="accessibility_remove_application">Remover o aplicativo %1$s</string>
+    <string name="accessibility_page_indicator">Página %1$d de %2$d</string>
+    <string name="accessibility_folder_with_items">Pasta %1$s com %2$d itens</string>
+    <string name="accessibility_app_installed">%1$s, instalado</string>
+    <string name="accessibility_app_updated">%1$s, atualizado</string>
     <string name="accessibility_voice_search">Pesquisa por voz</string>
     <string name="workspace_empty_tip">Mantenha pressionado para adicionar atalhos &amp; widgets</string>
     <string name="button_cancel">Cancelar</string>
     <string name="group_applications">Aplicativos</string>
+    <string name="apps_loading">Carregando aplicativos…</string>
+    <string name="apps_empty">Nenhum aplicativo disponível</string>
+    <string name="apps_load_error">Não foi possível carregar os aplicativos</string>
+    <string name="try_again">Tentar novamente</string>
     <string name="group_add_apps_grid">Grade de aplicativos</string>
     <string name="group_search">Pesquisar</string>
     <string name="group_folder">Nova pasta</string>
@@ -51,6 +62,8 @@
     <string name="add_photo_frame">Moldura de foto</string>
     <string name="add_search">Pesquisar</string>
     <string name="out_of_space">Não há mais espaço nesta tela.</string>
+    <string name="move_canceled">Movimentação cancelada</string>
+    <string name="could_not_move_item">Não foi possível mover o item</string>
     <string name="shortcut_installed">Atalho \"%1$s\" criado.</string>
     <string name="shortcut_uninstalled">Atalho \"%1$s\" removido.</string>
     <string name="shortcut_duplicate">Atalho \"%1$s\" já existe.</string>
@@ -69,6 +82,8 @@
     <string name="app_list_folder_rename">Renomear pasta</string>
     <string name="app_list_folder_delete">Excluir pasta</string>
     <string name="search_hint">Pesquisa Google</string>
+    <string name="search_unavailable">Pesquisa indisponível. Verifique sua conexão e tente novamente.</string>
+    <string name="voice_search_unavailable">Pesquisa por voz indisponível. Instale ou ative um aplicativo de pesquisa por voz e tente novamente.</string>
     <string name="gadget_error_text">Problema ao carregar widget</string>
     <string name="preferences_alert_dialog_restart_message">É necessário reiniciar para aplicar as alterações</string>
     <string name="preferences_alert_dialog_restart_button">Reiniciar agora</string>

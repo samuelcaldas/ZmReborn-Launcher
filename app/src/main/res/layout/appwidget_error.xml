@@ -1,2 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android" android:textAppearance="?android:attr/textAppearanceMediumInverse" android:textColor="@color/appwidget_error_color" android:gravity="center" android:background="@drawable/bg_appwidget_error" android:paddingLeft="20dp" android:paddingTop="10dp" android:paddingRight="20dp" android:paddingBottom="10dp" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/gadget_error_text"/>
+<TextView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:text="@string/gadget_error_text"
+    android:textColor="@color/zm_reborn_ember"
+    android:textSize="16sp"
+    android:gravity="center"
+    android:background="@color/zm_reborn_slate"
+    android:minWidth="@dimen/minimum_touch_target"
+    android:minHeight="@dimen/minimum_touch_target"
+    android:paddingLeft="@dimen/space_16"
+    android:paddingTop="@dimen/space_8"
+    android:paddingRight="@dimen/space_16"
+    android:paddingBottom="@dimen/space_8"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" />

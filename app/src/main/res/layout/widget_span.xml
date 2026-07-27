@@ -1,11 +1,57 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" android:orientation="vertical" android:id="@+id/layout_root" android:layout_width="match_parent" android:layout_height="match_parent">
-    <LinearLayout android:layout_gravity="center" android:orientation="horizontal" android:padding="0dp" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_weight="1">
-        <TextView android:gravity="center_horizontal" android:id="@+id/text_columns_span" android:layout_width="100dp" android:layout_height="match_parent" android:text="@string/dialog_text_columns" android:layout_weight="1"/>
-        <TextView android:gravity="center_horizontal" android:id="@+id/text_rows_span" android:layout_width="100dp" android:layout_height="match_parent" android:text="@string/dialog_text_rows" android:layout_weight="1"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/layout_root"
+    android:orientation="vertical"
+    android:background="@color/zm_reborn_slate"
+    android:paddingLeft="@dimen/space_16"
+    android:paddingTop="@dimen/space_12"
+    android:paddingRight="@dimen/space_16"
+    android:paddingBottom="@dimen/space_12"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <TextView
+            android:id="@+id/text_columns_span"
+            android:text="@string/dialog_text_columns"
+            android:textColor="@color/zm_reborn_fog"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:minHeight="@dimen/minimum_touch_target"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+        <TextView
+            android:id="@+id/text_rows_span"
+            android:text="@string/dialog_text_rows"
+            android:textColor="@color/zm_reborn_fog"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:minHeight="@dimen/minimum_touch_target"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
     </LinearLayout>
-    <LinearLayout android:layout_gravity="center" android:orientation="horizontal" android:paddingLeft="0dp" android:paddingTop="0dp" android:paddingRight="0dp" android:paddingBottom="5dp" android:layout_width="wrap_content" android:layout_height="match_parent" android:layout_weight="1">
-        <org.zeam.NumberPicker android:id="@+id/widget_columns_span" android:layout_width="100dp" android:layout_height="match_parent"/>
-        <org.zeam.NumberPicker android:id="@+id/widget_rows_span" android:layout_width="100dp" android:layout_height="match_parent"/>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_8">
+        <org.zmreborn.NumberPicker
+            android:id="@+id/widget_columns_span"
+            android:background="@color/zm_reborn_slate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minWidth="@dimen/minimum_touch_target"
+            android:layout_weight="1" />
+        <org.zmreborn.NumberPicker
+            android:id="@+id/widget_rows_span"
+            android:background="@color/zm_reborn_slate"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:minWidth="@dimen/minimum_touch_target"
+            android:layout_weight="1" />
     </LinearLayout>
 </LinearLayout>

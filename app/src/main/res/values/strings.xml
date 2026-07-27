@@ -75,7 +75,7 @@
     <string name="preferences_default_dock_item_width" translatable="false">Medium</string>
     <string name="preferences_default_dock_reset_home" translatable="false">true</string>
     <string name="preferences_default_application_language" translatable="false"></string>
-    <string name="application_name">Zeam Launcher</string>
+    <string name="application_name">ZM Reborn</string>
     <string name="preferences_application_version_format">%1$s %2$s</string>
     <string name="application_copyright">Copyright © 2011 Michael Bentz</string>
     <string name="toast_activity_info_not_found">Unable to find ActivityInfo for %1$s</string>
@@ -94,14 +94,25 @@
     <string name="button_yes">Yes</string>
     <string name="button_done">Done</string>
     <string name="button_close">Close</string>
+    <string name="accessibility_open_drawer">Open apps</string>
     <string name="accessibility_close_drawer">Close application drawer</string>
     <string name="accessibility_folder_rename">Rename folder</string>
     <string name="accessibility_folder_close">Close folder</string>
     <string name="accessibility_delete_zone">Remove from home screen</string>
+    <string name="accessibility_delete_item">Delete item</string>
+    <string name="accessibility_remove_application">Remove application %1$s</string>
+    <string name="accessibility_page_indicator">Page %1$d of %2$d</string>
+    <string name="accessibility_folder_with_items">Folder %1$s with %2$d items</string>
+    <string name="accessibility_app_installed">%1$s, installed</string>
+    <string name="accessibility_app_updated">%1$s, updated</string>
     <string name="accessibility_voice_search">Voice search</string>
     <string name="workspace_empty_tip">Long press to add shortcuts &amp; widgets</string>
     <string name="button_cancel">Cancel</string>
     <string name="group_applications">Applications</string>
+    <string name="apps_loading">Loading apps…</string>
+    <string name="apps_empty">No apps available</string>
+    <string name="apps_load_error">Apps could not load</string>
+    <string name="try_again">Try again</string>
     <string name="group_add_apps_grid">Applications grid</string>
     <string name="group_search">Search</string>
     <string name="group_folder">New folder</string>
@@ -126,6 +137,8 @@
     <string name="add_photo_frame">Picture frame</string>
     <string name="add_search">Search</string>
     <string name="out_of_space">No more room on this screen.</string>
+    <string name="move_canceled">Move canceled</string>
+    <string name="could_not_move_item">Could not move item</string>
     <string name="shortcut_installed">Shortcut \"%1$s\" created.</string>
     <string name="shortcut_uninstalled">Shortcut \"%1$s\" was removed.</string>
     <string name="shortcut_duplicate">Shortcut \"%1$s\" already exists.</string>
@@ -144,6 +157,8 @@
     <string name="app_list_folder_rename">Rename folder</string>
     <string name="app_list_folder_delete">Delete folder</string>
     <string name="search_hint">Google Search</string>
+    <string name="search_unavailable">Search unavailable. Check your connection and try again.</string>
+    <string name="voice_search_unavailable">Voice search unavailable. Install or enable a voice search app and try again.</string>
     <string name="gadget_error_text">Problem loading widget</string>
     <string name="preferences_alert_dialog_restart_message">Restarting is required for your changes to take effect</string>
     <string name="preferences_alert_dialog_restart_button">Restart now</string>

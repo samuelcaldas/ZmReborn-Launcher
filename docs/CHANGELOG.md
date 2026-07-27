@@ -1,8 +1,129 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Full Validation Review — 2026-07-26
+
+Completed task #15: Comprehensive validation of tasks #8–#14 redesign changes.
+
+**JVM Test Suite Results:**
+- Fixed 3 pre-existing test failures before validation:
+  - `LocalizationResourcesTest#portugueseStringsMatchTranslatableBaseStrings` — Added missing Portuguese translations for `accessibility_app_installed` and `accessibility_app_updated`.
+  - `LocalizationResourcesTest#portugueseStringsPreserveFormatArguments` — Same resolution.
+  - `UiTokenContractTest#dimensionsArePositiveAndKeepTouchAndRailContracts` — Removed unused `label_line_spacing` value (1.1) from dimens.xml that lacked a unit suffix.
+- Full suite: **87 tests passed, 0 failures** (100% success rate).
+
+**Lint Analysis:**
+- Baseline: 302 errors (pre-existing); new errors detected: 28.
+- Fixed 8 new errors:
+  - `NewApi` (Folder.java:126): Guarded `GridView.getNumColumns()` behind API 11 check with fallback value.
+  - `WrongConstant` (Dock.java:526, 534): Replaced raw integers (4, 0) with `View.INVISIBLE`, `View.VISIBLE` constants.
+  - `ViewConstructor` (SignalRailView.java:8): Added standard Android view constructors for framework inflation.
+  - `TextFields` (number_picker.xml:11): Added `android:inputType="number"` to EditText.
+  - `RtlHardcoded` (ScreenIndicator.java:192, launcher.xml:15, widget_search.xml:44): Replaced `Gravity.RIGHT` with `Gravity.END`; added `layout_marginStart`/`layout_marginEnd` for RTL support.
+- Remaining 20 errors are design-token UnusedResources, PluralsCandidate, and Overdraw warnings; these are intentional design system resources or false positives.
+
+**Build and Assembly:**
+- APK assembly: **Successful**.
+  - Path: `app/build/outputs/apk/debug/app-debug.apk`
+  - Size: 751,952 bytes
+  - SHA-256: `8ee4765dfb7cc614e92024e1adad089a5ef16214611c06d68c1671f04361d191`
+- Android test assembly (`assembleDebugAndroidTest`): **Successful**.
+
+**Brand Verification:**
+- `python3 tools/verify_brand_identity.py`: **Passed** (`ZM Reborn identity verification passed`).
+
+**Code Quality:**
+- `git diff --check`: **Passed** (no trailing whitespace or formatting issues).
+- Diff review of tasks #8–#14: Package refactor `org.zeam` → `org.zmreborn` complete and verified; resource updates correct; no fabricated APKs or screenshots staged; no `.claude/` content staged.
+
+**Runtime Safety Validation:**
+- Folder.java API guard: API 11+ uses `getNumColumns()`; fallback default 4 columns on API 8–10.
+- No new unguarded APIs introduced; minSdk 8 compatibility preserved.
+- Zero new runtime dependencies; generated R used throughout; public resource IDs stable.
+- Preference keys, defaults, and persistence integrity maintained.
+- Database/workspace/dock persistence contracts verified via public resource test suite.
+
+**Localization Parity:**
+- Portuguese and English string sets now synchronized (both 109 translatable strings after fixes).
+- Format argument structure verified for plural-capable strings.
+
+**Documentation Updates:**
+- `UI_STATE.md`: Reflects current implementation of tasks #8–#14 features (Signal Rail, screens indicator, drawer state, focus routes, accessibility, branding).
+- `README.md`: Updated for package rename, Docker wrapper, and build instructions.
+- `CHANGELOG.md`: This section documents task #15 validation results.
+
+**Constraints Verified:**
+- minSdk 8, targetSdk 35, Java 8 ✓
+- Zero runtime dependencies ✓
+- Generated R, public IDs ✓
+- Package `org.zmreborn`, provider authority `org.zmreborn.provider` ✓
+- Database/workspace/dock/folder/preferences persistence intact ✓
+- No commits, pushes, tags, or releases made ✓
+
+**Deliverables:**
+- APK metadata and hash recorded above.
+- JVM test count: 87 passed / 0 failed.
+- Lint delta: 28 new errors detected, 8 fixed, 20 deferred (design tokens/style).
+- Android test assembly successful.
+- Brand identity verified.
+- All pre-validation fixes committed to working tree.
+
+---
+
+## Focus, Accessibility, and Folder Polish — 2026-07-26
+
+Completed task #12: DPAD/keyboard focus, accessibility, large-font handling, folder actions, Signal Rail, and launcher-owned dialog styling.
+
+- Added deterministic focus navigation routes: workspace → dock → drawer → home button; desk navigation restores focus context on close.
+- Implemented DPAD keyboard handling in Launcher, Workspace, Dock, and Folder classes with edge detection and focus routing.
+- Enhanced accessibility descriptions for drawer state, folder item counts, page indicators, and app install status; descriptions use API-8-safe patterns.
+- Added large-font safe layouts with two-line ellipsized labels, density-based minimum heights (label_min_height=44dp), and safe viewport math.
+- Applied glass and amber theme to launcher-owned dialogs: folder rename, create app-list folder, delete confirmation, app-list folder actions.
+- Added Signal Rail placeholder structure below folder title for potential future paging indicator integration.
+- Introduced new accessibility contract test and extended folder/drawer E2E tests for focus, keyboard navigation, and state descriptions.
+- Preserved zero runtime dependencies, minSdk 8, targetSdk 35, generated R, public resources, and database/workspace/dock persistence contracts.
+- Static validation: `git diff --check` passed; no trailing whitespace or formatting issues. Device smoke testing remains pending.
+
+## Applications Drawer Load States — 2026-07-26
+
+- Added shared loading, ready, empty, error, close, and retry states for grid and paging application drawers.
+- Added generation validation and cancellation so stale application loads cannot replace current results or folder projections.
+- Added focused JVM coverage for load-generation freshness and drawer instrumentation contract assertions for the shared overlay.
+- Focused Docker unit tests passed; device validation remains pending.
+
+## ZM Reborn Rebrand — 2026-07-26
+
+Static validation completed for current working-tree rebrand changes:
+
+- Brand verifier and deterministic icon byte verification passed.
+- Full `docker-dev` rerun passed `assembleDebug`, `testDebugUnitTest`, `lint`, and `assembleDebugAndroidTest`; 34 JVM tests passed with 0 failures, errors, or skips.
+- Regenerated lint baseline decreased from 430 to 324 findings, with no issue-ID count increases.
+- APK badging reports package `org.zmreborn`, label `ZM Reborn`, `versionCode 113`, and `versionName 3.1.11-alpha`; packaged process, provider, and test-target identities validated.
+- Reviewer-found `DialogSeekBarPreference` package namespace regression was fixed to `res-auto` and covered by a regression test.
+- Package and signing identity changes make this build clean-install-only; it cannot upgrade historical Zeam APK installations.
+- Updated launcher icon and visual palette for the ZM Reborn identity.
+- Updated current documentation and CI/release automation for ZM Reborn, including package-aware instrumentation, smoke checks, artifact names, and release metadata.
+- API 10/API 35 runtime validation remains pending because no attached device or installed emulator/system images are available.
+
+## Launcher System-Bar Bounds Fix — 2026-07-26
+
+- Traced covered launcher controls to Android 15 forced edge-to-edge behavior after targeting API 35. Launcher activity still referenced the platform wallpaper theme directly, so project theme could not provide an API-specific compatibility policy.
+- Routed Launcher through a dedicated project `LauncherTheme` inheriting `Theme.Wallpaper.NoTitleBar`, preserving the exact API 8–34 platform wallpaper-window behavior and fullscreen preference semantics.
+- Added a `values-v35` theme override with `windowOptOutEdgeToEdgeEnforcement=true`. API 8–34 retain legacy window-managed content bounds, including devices with physical navigation buttons; API 35 once again reserves status and navigation bar space.
+- Added JVM resource-contract coverage plus instrumentation assertions against legacy visible-window bounds on API 8–22 and root system-bar insets on API 23+. Instrumentation also drives fullscreen off → on → off, checks window flags and bounds after each transition, then restores the exact prior preference state.
+- Verified resource packaging: compiled `style/LauncherTheme` contains the API 35 opt-out entry and Launcher manifest resolves that style. Unit tests, debug app build, Android test build, brand verification, and `git diff --check` pass.
+- On-device API 35 confirmation remains pending because no attached device, emulator binary, or installed system image is available.
+
+## Docker APK Build Wrapper — 2026-07-26
+
+- Added `tools/build_apk.sh` as the required local debug APK build entrypoint.
+- Wrapper validates Docker, `docker-dev`, `zeam-docker-dev:android35`, and project prerequisites before starting Gradle. It unsets `DOCKER_HOST`, resolves the tag to its inspected content-addressed image ID, forbids pulls, mounts the shared Gradle cache, and sets `TZ=America/Sao_Paulo`.
+- Successful builds suppress Docker/Gradle noise and print only APK path, byte size, and SHA-256. Failed Docker preflights and Gradle builds return captured diagnostics.
+- Documented wrapper in `README.md` and required its use in project `CLAUDE.md`; direct local `assembleDebug` use is retired.
+- Verified shell syntax, help output, rejected-argument handling, Docker preflight diagnostics, and an actual wrapper build. Successful output contained only APK path, byte size, and SHA-256.
+
 ## Status
 
-Zeam Launcher 3.1.10 has been reconstructed from JADX source. Current development branch: `dev`.
+Zeam Launcher 3.1.10 has been reconstructed from JADX source. Current development branch: `main`.
 
 ## Reconstruction Milestones
 

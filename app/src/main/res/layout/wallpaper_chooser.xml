@@ -1,6 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res/org.zeam" android:orientation="vertical" android:layout_width="match_parent" android:layout_height="match_parent">
-    <ImageView android:id="@+id/wallpaper" android:layout_width="match_parent" android:layout_height="0dp" android:scaleType="fitCenter" android:layout_weight="1"/>
-    <Gallery android:id="@+id/gallery" android:layout_width="match_parent" android:layout_height="wrap_content"/>
-    <Button android:layout_gravity="center_horizontal" android:id="@+id/set" android:layout_width="wrap_content" android:layout_height="wrap_content" android:text="@string/wallpaper_instructions"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:background="@color/zm_reborn_slate"
+    android:paddingLeft="@dimen/space_12"
+    android:paddingTop="@dimen/space_12"
+    android:paddingRight="@dimen/space_12"
+    android:paddingBottom="@dimen/space_12"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <ImageView
+        android:id="@+id/wallpaper"
+        android:contentDescription="@string/wallpaper_instructions"
+        android:background="@color/zm_reborn_slate"
+        android:scaleType="centerInside"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+    <Gallery
+        android:id="@+id/gallery"
+        android:background="@color/zm_reborn_slate"
+        android:spacing="8dp"
+        android:unselectedAlpha="1.0"
+        android:minHeight="@dimen/minimum_touch_target"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_8" />
+    <Button
+        android:id="@+id/set"
+        android:text="@string/wallpaper_instructions"
+        android:textColor="@color/zm_reborn_fog"
+        android:background="@drawable/settings_preference_selector"
+        android:gravity="center"
+        android:minWidth="@dimen/minimum_touch_target"
+        android:minHeight="@dimen/minimum_touch_target"
+        android:paddingLeft="@dimen/space_16"
+        android:paddingRight="@dimen/space_16"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/space_8" />
 </LinearLayout>

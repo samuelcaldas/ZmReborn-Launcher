@@ -26,6 +26,9 @@ jobs:
     - name: Grant Execute Permission for Gradlew
       run: chmod +x gradlew
 
+    - name: Verify Brand Identity
+      run: python3 tools/verify_brand_identity.py
+
     - name: Run Lint
       run: ./gradlew :app:lint --no-daemon
 
@@ -63,6 +66,8 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     timeout-minutes: 30
+    env:
+      APP_ID: org.zmreborn
 
     steps:
     - name: Checkout Code
@@ -109,12 +114,12 @@ jobs:
           echo "Installing androidTest APK..."
           adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
 
-          echo "Running Instrumentation Test (LauncherE2ETest)..."
-          adb shell am instrument -w -r -e class org.zeam.LauncherE2ETest org.zeam.test/android.test.InstrumentationTestRunner
+          echo "Running Instrumentation Tests (full suite)..."
+          adb shell am instrument -w -r "${APP_ID}.test/android.test.InstrumentationTestRunner"
 
           echo "Running adb E2E smoke verification..."
-          adb shell am force-stop org.zeam
-          adb shell am start -W -n org.zeam/.Launcher
+          adb shell am force-stop "${APP_ID}"
+          adb shell am start -W -n "${APP_ID}/.Launcher"
           sleep 3
 
           echo "Verifying focused window is Launcher..."
@@ -125,7 +130,7 @@ jobs:
           adb shell uiautomator dump /sdcard/window_dump.xml
           adb pull /sdcard/window_dump.xml .
 
-          if grep -q "org.zeam:id/workspace" window_dump.xml; then
+          if grep -q "${APP_ID}:id/workspace" window_dump.xml; then
             echo "SUCCESS: workspace found in UI hierarchy!"
           else
             echo "FAILURE: workspace not found in UI hierarchy!"
