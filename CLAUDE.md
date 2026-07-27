@@ -11,7 +11,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Toolchain and Commands
 
-- Use JDK 17, Gradle Wrapper 8.7, Android Gradle Plugin 8.5.2, SDK 35, Build Tools 34.0.0, and `minSdk` 8.
+- Use JDK 17, Gradle Wrapper 8.7, Android Gradle Plugin 8.5.2, SDK 35, Build Tools 34.0.0, and `minSdk` 24.
 - Always build local debug APKs with `./tools/build_apk.sh`; never invoke `assembleDebug` directly.
 - The wrapper owns Docker context `docker-dev`, resolves image `zeam-docker-dev:android35` to its inspected local image ID, forbids pulls, mounts the Gradle cache, provides the Android SDK, and returns concise build output.
 
@@ -42,14 +42,14 @@ Run unit tests or a single test:
 - `LauncherProvider` owns the SQLite favorites/workspace database and its initial seeding.
 - `Workspace` and `CellLayout` render the desktop; `DragLayer` and drag-drop interfaces route item movement.
 - The app drawer uses grid and paging implementations; preferences and receivers trigger model/UI reloads.
-- Widget, dynamic-receiver, and wallpaper compatibility bridges preserve behavior from API 8 through API 35.
+- Widget, dynamic-receiver, and wallpaper compatibility bridges preserve behavior from API 24 through API 35.
 - Manifest `<queries>` package visibility plus launcher, provider, and receiver registrations are runtime-critical.
 
 ## Constraints
 
 - Keep zero third-party app/runtime dependencies. Use Android SDK and Java APIs unless explicitly approved otherwise.
 - Use generated `R`; never restore JADX `C0041R` or frozen numeric resource IDs.
-- Avoid direct bytecode references to APIs unavailable at `minSdk` 8; use focused compatibility bridges.
+- Avoid direct bytecode references to APIs unavailable at `minSdk` 24; use focused compatibility bridges.
 - Preserve fail-fast behavior and specific exception handling at system boundaries.
 
 ## Validation and Documentation
@@ -57,7 +57,6 @@ Run unit tests or a single test:
 - Run relevant build, lint, and `git diff --check` validation after changes.
 - Every new feature must add or update automated unit tests covering its expected behavior.
 - Every fixed defect must add or update an automated regression test covering the failure path.
-- Runtime-facing changes also require relevant instrumentation tests and API 10/API 35 manual smoke coverage.
-- For runtime changes, smoke-test API 10 and API 35: install/launch, app drawer, Preferences, and filtered logcat for fatal exceptions, verifier failures, missing methods, and `UnsupportedOperationException`.
-- API 8 is preserved by `minSdk` but remains untested because no system image was available.
+- Runtime-facing changes also require relevant instrumentation tests and API 24/API 35 manual smoke coverage.
+- For runtime changes, smoke-test API 24 and API 35: install/launch, app drawer, Preferences, and filtered logcat for fatal exceptions, verifier failures, missing methods, and `UnsupportedOperationException`.
 - Update `docs/CHANGELOG.md` for reconstruction, build, compatibility, or emulator-validation changes; keep README build and compatibility instructions current.

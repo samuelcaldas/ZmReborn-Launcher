@@ -1,6 +1,5 @@
 package org.zmreborn;
 
-import android.annotation.TargetApi;
 import android.appwidget.AppWidgetHost;
 import android.appwidget.AppWidgetManager;
 import android.content.ComponentName;
@@ -22,15 +21,12 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.Xml;
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import org.xmlpull.v1.XmlPullParserException;
@@ -485,33 +481,9 @@ public class LauncherProvider extends ContentProvider {
             return addAppWidget(db, contentValues, componentName, typedArray.getInt(5, 0), typedArray.getInt(6, 0));
         }
 
-        private boolean bindAppWidgetId(AppWidgetManager appWidgetManager, int appWidgetId, ComponentName componentName) {
-            if (Build.VERSION.SDK_INT >= 16) {
-                return AppWidgetManagerApi16.bindAppWidgetIdIfAllowed(appWidgetManager, appWidgetId, componentName);
-            }
-            return bindAppWidgetIdLegacy(appWidgetManager, appWidgetId, componentName);
-        }
-
-        private boolean bindAppWidgetIdLegacy(AppWidgetManager appWidgetManager, int appWidgetId, ComponentName componentName) {
-            try {
-                Method method = AppWidgetManager.class.getMethod("bindAppWidgetId", Integer.TYPE, ComponentName.class);
-                method.invoke(appWidgetManager, Integer.valueOf(appWidgetId), componentName);
-                return true;
-            } catch (NoSuchMethodException e) {
-                Log.e(LauncherProvider.LOG_TAG, "Legacy app widget binding method is unavailable", e);
-            } catch (IllegalAccessException e2) {
-                Log.e(LauncherProvider.LOG_TAG, "Legacy app widget binding method is inaccessible", e2);
-            } catch (InvocationTargetException e3) {
-                Log.e(LauncherProvider.LOG_TAG, "Legacy app widget binding failed", e3);
-            }
-            return false;
-        }
-
-        @TargetApi(16)
-        private static class AppWidgetManagerApi16 {
-            private static boolean bindAppWidgetIdIfAllowed(AppWidgetManager appWidgetManager, int appWidgetId, ComponentName componentName) {
-                return appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, componentName);
-            }
+        private boolean bindAppWidgetId(AppWidgetManager appWidgetManager, int appWidgetId,
+                ComponentName componentName) {
+            return appWidgetManager.bindAppWidgetIdIfAllowed(appWidgetId, componentName);
         }
 
         private boolean addAppWidget(SQLiteDatabase db, ContentValues contentValues, ComponentName componentName, int spanX, int spanY) {

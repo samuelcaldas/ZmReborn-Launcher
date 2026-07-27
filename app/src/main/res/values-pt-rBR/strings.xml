@@ -13,6 +13,7 @@
     <string name="configure_wallpaper">Configurar</string>
     <string name="drop_to_uninstall">Solte para desinstalar</string>
     <string name="rename_folder_label">Nome da pasta:</string>
+    <string name="number_picker_value_hint">Valor</string>
     <string name="rename_folder_title">Renomear pasta</string>
     <string name="button_no">Não</string>
     <string name="button_ok">OK</string>

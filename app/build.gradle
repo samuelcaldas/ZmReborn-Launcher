@@ -31,7 +31,7 @@ android {
 
     defaultConfig {
         applicationId "org.zmreborn"
-        minSdkVersion 8
+        minSdkVersion 24
         targetSdkVersion 35
         resConfigs "en", "pt-rBR"
         versionCode 113

@@ -1,12 +1,10 @@
 package org.zmreborn;
 
 import android.annotation.SuppressLint;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.LocaleList;
 import android.preference.PreferenceManager;
 import java.util.Locale;
@@ -26,10 +24,9 @@ final class LocaleUtil {
         if (locale == null) {
             return baseContext;
         }
-        if (Build.VERSION.SDK_INT >= 17) {
-            return Api17.wrap(baseContext, locale);
-        }
-        return wrapLegacy(baseContext, locale);
+        Configuration configuration = new Configuration(baseContext.getResources().getConfiguration());
+        configuration.setLocale(locale);
+        return baseContext.createConfigurationContext(configuration);
     }
 
     static String getSelectedLanguage(Context context) {
@@ -98,66 +95,40 @@ final class LocaleUtil {
         Locale systemLocale = getPrimaryLocale(systemConfiguration);
         Locale selectedLocale = localeForLanguage(getSelectedLanguage(context));
         Locale effectiveLocale = selectedLocale == null ? systemLocale : selectedLocale;
-        return systemLocaleKey(systemConfiguration) + '|' + localeKey(effectiveLocale);
+        return localeListKey(systemConfiguration) + '|' + localeKey(effectiveLocale);
     }
 
     private static Locale getPrimaryLocale(Configuration configuration) {
-        if (Build.VERSION.SDK_INT >= 24) {
-            return Api24.getPrimaryLocale(configuration);
+        LocaleList locales = configuration.getLocales();
+        if (locales.isEmpty()) {
+            return null;
         }
-        return configuration.locale;
+        return locales.get(0);
     }
 
-    private static String systemLocaleKey(Configuration configuration) {
-        if (Build.VERSION.SDK_INT >= 24) {
-            return Api24.localeListKey(configuration);
+    private static String localeListKey(Configuration configuration) {
+        LocaleList locales = configuration.getLocales();
+        StringBuilder key = new StringBuilder();
+        for (int index = 0; index < locales.size(); index++) {
+            appendLocaleKey(key, locales.get(index));
         }
-        return localeKey(configuration.locale);
+        return key.toString();
+    }
+
+    private static void appendLocaleKey(StringBuilder key, Locale locale) {
+        if (key.length() > 0) {
+            key.append(',');
+        }
+        key.append(localeKey(locale));
     }
 
     private static String localeKey(Locale locale) {
         return locale == null ? "" : locale.toString();
     }
 
-    private static Context wrapLegacy(Context context, Locale locale) {
-        Resources resources = context.getResources();
-        Configuration configuration = new Configuration(resources.getConfiguration());
-        configuration.locale = locale;
-        resources.updateConfiguration(configuration, resources.getDisplayMetrics());
-        return context;
-    }
-
     private static void requireContext(Context context) {
         if (context == null) {
             throw new IllegalArgumentException("Context must not be null");
-        }
-    }
-
-    @TargetApi(17)
-    private static class Api17 {
-        private static Context wrap(Context context, Locale locale) {
-            Configuration configuration = new Configuration(context.getResources().getConfiguration());
-            configuration.setLocale(locale);
-            return context.createConfigurationContext(configuration);
-        }
-    }
-
-    @TargetApi(24)
-    private static class Api24 {
-        private static Locale getPrimaryLocale(Configuration configuration) {
-            return configuration.getLocales().get(0);
-        }
-
-        private static String localeListKey(Configuration configuration) {
-            LocaleList locales = configuration.getLocales();
-            StringBuilder key = new StringBuilder();
-            for (int index = 0; index < locales.size(); index++) {
-                if (index > 0) {
-                    key.append(',');
-                }
-                key.append(localeKey(locales.get(index)));
-            }
-            return key.toString();
         }
     }
 }

@@ -88,6 +88,7 @@
     <string name="configure_wallpaper">Configure</string>
     <string name="drop_to_uninstall">Drop to uninstall</string>
     <string name="rename_folder_label">Folder name:</string>
+    <string name="number_picker_value_hint">Value</string>
     <string name="rename_folder_title">Rename folder</string>
     <string name="button_no">No</string>
     <string name="button_ok">OK</string>

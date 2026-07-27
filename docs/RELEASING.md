@@ -92,7 +92,7 @@ Publication produces:
 - Changelog-derived release notes
 - GitHub artifact provenance attestation for APK on eligible public repositories
 
-Private alpha publication omits GitHub provenance attestation; its signed APK, certificate, metadata, checksum, tag, and release checks still run. APK is built with `-PreleaseSigningRequired=true`, so missing signing inputs fail before release output. Verification requires both v1/JAR signing for legacy `minSdk` support and v2 signing for modern Android. Keystore is decoded only under the runner temporary directory with mode `0600` and removed in an always-run cleanup step.
+Private alpha publication omits GitHub provenance attestation; its signed APK, certificate, metadata, checksum, tag, and release checks still run. APK is built with `-PreleaseSigningRequired=true`, so missing signing inputs fail before release output. Release policy verifies both v1/JAR and v2 signatures. Keystore is decoded only under the runner temporary directory with mode `0600` and removed in an always-run cleanup step.
 
 ## Consumer verification
 
