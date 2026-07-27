@@ -92,18 +92,39 @@ uv run --with pillow .claude/skills/run-image-gen/driver.py \
   --out /tmp/enhanced.png
 ```
 
-### Recreate or edit an existing asset
+### Recreate or edit an existing asset (image edit endpoint)
 
-Reference an existing file (passed as description context; direct image edits
-via `/v1/images/edits` require a multipart upload not yet in the driver — use
-a descriptive prompt that references the existing asset instead):
+Pass `--ref` to use `/v1/images/edits` with the original as reference.
+Use `--upscale-ref` when the source is small (e.g. 72 px hdpi icon) —
+it upscales to 1024×1024 before uploading so the model has enough detail:
 
 ```bash
 uv run --with pillow .claude/skills/run-image-gen/driver.py \
-  --prompt "Recreate this launcher icon but replace the background with Glass (#D9121A21): bold amber Z on translucent slate, same rounded-corner shape" \
+  --prompt "Recreate as modern flat Material You icon: amber (#F2B64A) folder on dark slate (#121A21) background, no gradients no gloss" \
   --model gpt-image-2 \
-  --out docs/branding/ic_launcher_glass.png
+  --ref app/src/main/res/drawable-hdpi/ic_launcher_folder.png \
+  --upscale-ref \
+  --out docs/branding/ic_launcher_folder_new.png
 ```
+
+### Save to drawable-* density dirs (not mipmap)
+
+Use `--dir-prefix drawable` and `--density mdpi,hdpi` for UI icons that live
+in `drawable-mdpi/` and `drawable-hdpi/` (not mipmap buckets):
+
+```bash
+uv run --with pillow .claude/skills/run-image-gen/driver.py \
+  --prompt "Modern flat Android icon: amber (#F2B64A) 2x2 rounded square grid on dark slate (#121A21)" \
+  --model gpt-image-2 \
+  --ref app/src/main/res/drawable-hdpi/applications_grid.png \
+  --upscale-ref \
+  --out-dir app/src/main/res \
+  --dir-prefix drawable \
+  --density mdpi,hdpi \
+  --asset-name applications_grid.png
+```
+
+Output: `app/src/main/res/drawable-{mdpi,hdpi}/applications_grid.png`
 
 ## Run: codex exec (alternative)
 
@@ -127,8 +148,11 @@ Use the driver script for deterministic, fast generation.
 --model TEXT        gpt-image-2 (default, opaque) | gpt-image-1.5 (transparent).
 --size WxH          API generation size. Default: 1024x1024.
 --transparent       Switch to gpt-image-1.5 and request transparent background.
+--ref PATH          Reference image for /v1/images/edits (multipart upload).
+--upscale-ref       Upscale --ref to 1024x1024 before uploading (for tiny originals).
 --out PATH          Single output file. Skips density resize.
---out-dir DIR       Android res root. Writes mipmap-*/ASSET_NAME.
+--out-dir DIR       Android res root. Writes {prefix}-*/ASSET_NAME.
+--dir-prefix TEXT   Directory prefix: mipmap (default) or drawable.
 --density LIST      Comma-separated density names or "all" (default with --out-dir).
 --asset-name NAME   Filename inside density dirs. Default: ic_launcher.png.
 --quality VALUE     low|medium|high|auto (gpt-image-2 only). Default: high.
@@ -138,13 +162,15 @@ Use the driver script for deterministic, fast generation.
 
 ## Android density size table
 
-| Density   | px  | Path                              |
-|-----------|-----|-----------------------------------|
-| mdpi      | 48  | `app/src/main/res/mipmap-mdpi/`   |
-| hdpi      | 72  | `app/src/main/res/mipmap-hdpi/`   |
-| xhdpi     | 96  | `app/src/main/res/mipmap-xhdpi/`  |
-| xxhdpi    | 144 | `app/src/main/res/mipmap-xxhdpi/` |
-| xxxhdpi   | 192 | `app/src/main/res/mipmap-xxxhdpi/`|
+| Density   | px  | mipmap path                       | drawable path                      |
+|-----------|-----|-----------------------------------|------------------------------------|
+| mdpi      | 48  | `mipmap-mdpi/`                    | `drawable-mdpi/`                   |
+| hdpi      | 72  | `mipmap-hdpi/`                    | `drawable-hdpi/`                   |
+| xhdpi     | 96  | `mipmap-xhdpi/`                   | `drawable-xhdpi/`                  |
+| xxhdpi    | 144 | `mipmap-xxhdpi/`                  | `drawable-xxhdpi/`                 |
+| xxxhdpi   | 192 | `mipmap-xxxhdpi/`                 | `drawable-xxxhdpi/`                |
+
+UI icons (dock, toolbar, context menu) use `drawable-*`. Launcher app icon uses `mipmap-*`.
 
 ## Gotchas
 
