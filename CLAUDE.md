@@ -28,6 +28,8 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell monkey -p org.zmreborn -c android.intent.category.LAUNCHER 1
 ```
 
+For Docker emulator runtime testing, follow [`README.md#docker-emulator-testing`](README.md#docker-emulator-testing). The API 35 image is built from `tools/Dockerfile.emulator`, uses `--device /dev/kvm`, and exposes ADB on port 5555.
+
 Run unit tests or a single test:
 
 ```sh

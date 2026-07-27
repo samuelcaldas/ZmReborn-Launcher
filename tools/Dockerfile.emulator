@@ -1,0 +1,49 @@
+FROM zeam-docker-dev:android35
+
+ENV ANDROID_SDK_ROOT=/opt/android-sdk
+ENV ANDROID_AVD_HOME=/root/.android/avd
+ENV AVD_NAME=zeam_avd
+ENV API_LEVEL=35
+ENV SYSTEM_IMAGE=system-images;android-35;google_apis;x86_64
+ENV EMULATOR_DEVICE=pixel_3a
+
+# Runtime deps for emulator
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libpulse0 \
+        libglib2.0-0 \
+        libstdc++6 \
+        libx11-6 \
+        libxcb1 \
+        libxext6 \
+        libxi6 \
+        libxrender1 \
+        libxcomposite1 \
+        libxcursor1 \
+        libxdamage1 \
+        libxfixes3 \
+        libxrandr2 \
+        libxtst6 \
+        libnss3 \
+        libcups2 \
+        libxss1 \
+        libasound2 \
+        libatk1.0-0 \
+        libpangocairo-1.0-0 \
+        libgtk-3-0 \
+        socat \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install emulator + system image (requires internet at build time)
+RUN yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" \
+        "emulator" \
+        "${SYSTEM_IMAGE}"
+
+# Accept all licenses
+RUN yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" --licenses
+
+EXPOSE 5555
+
+COPY tools/emulator-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
+
+ENTRYPOINT ["/entrypoint.sh"]

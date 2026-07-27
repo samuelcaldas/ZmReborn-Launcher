@@ -1,5 +1,14 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Docker Emulator Runtime — 2026-07-27
+
+- Added `tools/Dockerfile.emulator` extending `zeam-docker-dev:android35` with Android Emulator and API 35 Google APIs x86_64 system image.
+- Added `tools/emulator-entrypoint.sh` to create and start a headless AVD with KVM acceleration, SwiftShader GPU, 1080×1920 display, and ADB port 5555.
+- Added README instructions for building, running, connecting to, installing APK on, capturing screenshots from, and stopping Docker emulator.
+- RC2 runtime screenshot sweep remains in progress; visual findings will be recorded in `docs/captures/` after emulator boot.
+
+---
+
 ## Full Validation Review — 2026-07-26
 
 Completed task #15: Comprehensive validation of tasks #8–#14 redesign changes.

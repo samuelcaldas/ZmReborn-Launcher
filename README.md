@@ -31,7 +31,9 @@ Current layout:
 ├── gradlew
 ├── CLAUDE.md
 ├── tools/
-│   └── build_apk.sh
+│   ├── build_apk.sh
+│   ├── Dockerfile.emulator
+│   └── emulator-entrypoint.sh
 └── docs/
     ├── README.md
     ├── CHANGELOG.md
@@ -86,5 +88,57 @@ Language resources are packaged with the base app so in-app switching also works
 Validation uses `./tools/build_apk.sh` for the debug APK, plus `:app:testDebugUnitTest`, `:app:lint`, and `git diff --check`. Runtime-facing changes require emulator smoke coverage on API 24 and API 35.
 
 `minSdk` 24 supports Android 7.0 and newer. The app has no third-party runtime dependencies; JUnit 4 is test-only. On API 35, static wallpaper bitmap access falls back to the system wallpaper background when platform access is denied.
+
+## Docker emulator testing
+
+The emulator image `zeam-docker-emulator:android35` runs an API 35 AVD with KVM acceleration. Build it once from the repo root (requires internet; downloads ~1 GB):
+
+```sh
+docker --context docker-dev build \
+    -f tools/Dockerfile.emulator \
+    -t zeam-docker-emulator:android35 \
+    .
+```
+
+Prerequisites: Docker context `docker-dev`, KVM device (`/dev/kvm`), and the base image `zeam-docker-dev:android35`. The emulator container requires `--device /dev/kvm` and exposes ADB on port 5555.
+
+Start the emulator:
+
+```sh
+docker --context docker-dev run -d --rm \
+    --name zeam-runtime \
+    --device /dev/kvm \
+    -p 5555:5555 \
+    zeam-docker-emulator:android35
+```
+
+Wait for full boot (typically 60–120 s), then connect ADB:
+
+```sh
+adb connect localhost:5555
+adb wait-for-device
+# Confirm device shows as `emulator-5554` or `localhost:5555`
+adb devices
+```
+
+Install the debug APK and set ZM Reborn as the default launcher, then use standard ADB screenshot capture:
+
+```sh
+adb install -r app/build/outputs/apk/debug/app-debug.apk
+# Set ZM Reborn as default launcher via system picker shown on first HOME press
+adb shell monkey -p org.zmreborn -c android.intent.category.LAUNCHER 1
+
+# Capture a screenshot
+adb shell screencap -p /data/local/tmp/screen.png
+adb pull /data/local/tmp/screen.png docs/captures/screen.png
+```
+
+Stop the container when done:
+
+```sh
+docker --context docker-dev stop zeam-runtime
+```
+
+The entrypoint (`tools/emulator-entrypoint.sh`) creates the AVD on first run if absent, applies a headless config (2048 MB RAM, SwiftShader GPU, 1080×1920 px, 420 dpi), and starts the emulator with `-no-window -no-audio -no-boot-anim -no-snapshot`.
 
 See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for detailed reconstruction evidence and known risks.
