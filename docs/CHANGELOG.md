@@ -1,5 +1,35 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## [3.1.11-alpha-rc3]
+
+### Bug Fixes
+
+- Fixed `NullPointerException` crash on API 35 in Applications grid and Action bindings
+  preference screens caused by numeric `<array>` entry values being resolved as integer
+  resource types by `TypedArray.getTextArray()`, returning null `CharSequence` elements.
+  Converted affected arrays to `<string-array>` to guarantee string interpretation.
+- Fixed Preferences inaccessible from options menu on tall displays: menu panel row 1
+  now shows Add | Preferences | Wallpaper instead of Add | Wallpaper | Search.
+- Fixed misleading icon on Add action in long-press context dialog: was showing orange
+  shortcut arrow (`ic_launcher_shortcut`); now shows standard plus icon (`ic_menu_add`).
+- Fixed `getResources().getColor()` deprecation warnings in `Launcher.java`,
+  `Preferences.java`, `ColourPickerPreference.java`, and `SettingsPreference.java`;
+  replaced with `Context.getColor()` throughout.
+- Fixed "Scroll reset to.." label in Dock preferences: removed spurious trailing ellipsis.
+
+### CI
+
+- Fixed e2e emulator job using `api-level: 23` when `minSdk` is 24; install now succeeds.
+- Regenerated lint baseline after fixing 20 code-level issues (RTL hardcoded attributes,
+  `ObsoleteSdkInt`, `LabelFor`, redundant margin attributes across 10 layout files).
+
+### Testing
+
+- Added Docker emulator runtime (`tools/Dockerfile.emulator`, `tools/emulator-entrypoint.sh`)
+  with API 35 Google APIs x86_64 AVD, KVM acceleration, SwiftShader GPU.
+- Added emulator APK test skill and driver (`driver.sh`) for headless screenshot sweeps
+  and crash verification across all launcher surfaces.
+
 ## Docker Emulator Runtime — 2026-07-27
 
 - Added `tools/Dockerfile.emulator` extending `zeam-docker-dev:android35` with Android Emulator and API 35 Google APIs x86_64 system image.
