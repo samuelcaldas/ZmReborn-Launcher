@@ -11,7 +11,7 @@
         <item>Toggle fullscreen</item>
         <item>Open dialer</item>
     </array>
-    <array name="preferences_entry_values_actions" translatable="false">
+    <string-array name="preferences_entry_values_actions" translatable="false">
         <item>1</item>
         <item>2</item>
         <item>3</item>
@@ -19,7 +19,7 @@
         <item>5</item>
         <item>6</item>
         <item>7</item>
-    </array>
+    </string-array>
     <array name="preferences_entries_workspace_screen_indicator_types">
         <item>None</item>
         <item>Slider</item>
@@ -34,10 +34,10 @@
         <item>Vertical scrolling</item>
         <item>Horizontal paging</item>
     </array>
-    <array name="preferences_entry_values_apps_grid_types" translatable="false">
+    <string-array name="preferences_entry_values_apps_grid_types" translatable="false">
         <item>1</item>
         <item>2</item>
-    </array>
+    </string-array>
     <array name="preferences_entries_dock_backgrounds">
         <item>Dark</item>
         <item>Dark fade</item>
@@ -81,11 +81,11 @@
         <item>English</item>
         <item>Português (Brasil)</item>
     </array>
-    <array name="preferences_values_application_languages" translatable="false">
+    <string-array name="preferences_values_application_languages" translatable="false">
         <item></item>
         <item>en</item>
         <item>pt-BR</item>
-    </array>
+    </string-array>
     <array name="wallpapers">
     </array>
 </resources>

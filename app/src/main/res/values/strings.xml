@@ -208,7 +208,7 @@
     <string name="preferences_title_apps_grid_bg_alpha">Transparency</string>
     <string name="preferences_title_dock_background">Background</string>
     <string name="preferences_title_dock_reset_home">Scroll reset</string>
-    <string name="preferences_title_dock_reset_to">Scroll reset to..</string>
+    <string name="preferences_title_dock_reset_to">Scroll reset to</string>
     <string name="preferences_title_dock_item_alignment">Item alignment</string>
     <string name="preferences_title_dock_item_width">Item spacing</string>
     <string name="preferences_title_reset">Reset to default</string>

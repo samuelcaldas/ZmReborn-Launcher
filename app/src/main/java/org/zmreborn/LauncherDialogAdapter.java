@@ -35,7 +35,7 @@ public class LauncherDialogAdapter extends BaseAdapter {
     public LauncherDialogAdapter(Launcher launcher) {
         Resources resources = launcher.getResources();
         this.mLayoutInflater = (LayoutInflater) launcher.getSystemService("layout_inflater");
-        this.mListItems.add(new ListItem(resources, R.string.add, R.drawable.ic_launcher_shortcut, 0));
+        this.mListItems.add(new ListItem(resources, R.string.add, android.R.drawable.ic_menu_add, 0));
         this.mListItems.add(new ListItem(resources, R.string.menu_wallpaper, R.drawable.ic_launcher_wallpaper, 1));
         this.mListItems.add(new ListItem(resources, R.string.menu_preferences, R.drawable.ic_launcher_settings, 2));
     }

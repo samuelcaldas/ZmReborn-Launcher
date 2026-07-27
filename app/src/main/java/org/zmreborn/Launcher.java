@@ -784,33 +784,33 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         Resources resources = getResources();
         String dockBackgroundType = PreferencesUtil.getDockBackgroundType(this);
         String[] dockBackgrounds = resources.getStringArray(R.array.preferences_values_dock_backgrounds);
-        dock.setBackgroundColor(resources.getColor(R.color.zm_reborn_glass));
+        dock.setBackgroundColor(getColor(R.color.zm_reborn_glass));
         for (int i = 0; i < dockBackgrounds.length; i++) {
             if (dockBackgrounds[i].equals(dockBackgroundType)) {
                 switch (i) {
                     case 0:
-                        dock.setBackgroundColor(resources.getColor(R.color.zm_reborn_glass));
+                        dock.setBackgroundColor(getColor(R.color.zm_reborn_glass));
                         break;
                     case 1:
-                        dock.setBackgroundColor(resources.getColor(R.color.zm_reborn_glass));
+                        dock.setBackgroundColor(getColor(R.color.zm_reborn_glass));
                         break;
                     case 2:
                         dock.setBackgroundDrawable((Drawable) null);
                         break;
                     case 3:
-                        dock.setBackgroundColor(resources.getColor(R.color.zm_reborn_slate));
+                        dock.setBackgroundColor(getColor(R.color.zm_reborn_slate));
                         break;
                     case 4:
-                        dock.setBackgroundColor(resources.getColor(R.color.zm_reborn_steel));
+                        dock.setBackgroundColor(getColor(R.color.zm_reborn_steel));
                         break;
                     case 5:
                         dock.setBackgroundResource(R.drawable.dock_bg_bar_grey);
                         break;
                     case 6:
-                        dock.setBackgroundColor(resources.getColor(R.color.zm_reborn_glass));
+                        dock.setBackgroundColor(getColor(R.color.zm_reborn_glass));
                         break;
                     default:
-                        dock.setBackgroundColor(resources.getColor(R.color.zm_reborn_glass));
+                        dock.setBackgroundColor(getColor(R.color.zm_reborn_glass));
                         break;
                 }
             }
@@ -1164,10 +1164,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         menu.add(1, 2, 0, R.string.menu_add).setIcon(17301555).setAlphabeticShortcut('A');
+        menu.add(2, 6, 0, R.string.menu_preferences).setIcon(17301570).setAlphabeticShortcut('P');
         menu.add(2, 3, 0, R.string.menu_wallpaper).setIcon(17301567).setAlphabeticShortcut('W');
         menu.add(2, 4, 0, R.string.menu_search).setIcon(17301600).setAlphabeticShortcut('s');
         menu.add(2, 5, 0, R.string.menu_applications).setIcon(17301591).setAlphabeticShortcut('M');
-        menu.add(2, 6, 0, R.string.menu_preferences).setIcon(17301570).setAlphabeticShortcut('P');
         menu.add(2, 7, 0, R.string.menu_settings).setIntent(new Intent("android.settings.SETTINGS")).setIcon(17301577).setAlphabeticShortcut('S');
         menu.add(3, 8, 0, R.string.menu_manage_apps).setIcon(17301570).setAlphabeticShortcut('M');
         menu.add(3, 9, 0, R.string.menu_uninstall_apps).setIcon(17301564).setAlphabeticShortcut('U');
@@ -1245,7 +1245,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         gridView.setNumColumns(requestedColumns);
         gridView.setVerticalSpacing(7);
         gridView.setPadding(4, 4, 4, 4);
-        gridView.setBackgroundColor(getResources().getColor(R.color.zm_reborn_slate));
+        gridView.setBackgroundColor(getColor(R.color.zm_reborn_slate));
         gridView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             public void onItemClick(android.widget.AdapterView parent, View view, int position, long id) {
                 ApplicationItemInfo application = (ApplicationItemInfo) parent.getItemAtPosition(position);
@@ -1255,18 +1255,18 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         gridView.setAdapter(new ApplicationsAdapter(this, folderInfo.getContents()));
         TextView emptyView = new TextView(this);
         emptyView.setText(R.string.app_list_folder_empty);
-        emptyView.setTextColor(getResources().getColor(R.color.zm_reborn_fog));
+        emptyView.setTextColor(getColor(R.color.zm_reborn_fog));
         emptyView.setGravity(17);
         FrameLayout content = new FrameLayout(this);
         content.addView(gridView, new FrameLayout.LayoutParams(-1, -1));
         content.addView(emptyView, new FrameLayout.LayoutParams(-1, -1));
         gridView.setEmptyView(emptyView);
-        content.setBackgroundColor(getResources().getColor(R.color.zm_reborn_glass));
+        content.setBackgroundColor(getColor(R.color.zm_reborn_glass));
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(content).setNegativeButton(R.string.button_close, null);
         TextView titleView = new TextView(this);
         titleView.setText(folderInfo.title);
-        titleView.setTextColor(getResources().getColor(R.color.zm_reborn_amber));
+        titleView.setTextColor(getColor(R.color.zm_reborn_amber));
         titleView.setTextSize(18);
         titleView.setPadding(12, 12, 12, 12);
         builder.setCustomTitle(titleView);
@@ -1293,9 +1293,9 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         final EditText titleInput = new EditText(this);
         titleInput.setSingleLine(true);
         titleInput.setHint(R.string.folder_name);
-        titleInput.setBackgroundColor(getResources().getColor(R.color.zm_reborn_glass));
-        titleInput.setTextColor(getResources().getColor(R.color.zm_reborn_fog));
-        titleInput.setHintTextColor(getResources().getColor(R.color.zm_reborn_steel));
+        titleInput.setBackgroundColor(getColor(R.color.zm_reborn_glass));
+        titleInput.setTextColor(getColor(R.color.zm_reborn_fog));
+        titleInput.setHintTextColor(getColor(R.color.zm_reborn_steel));
         AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(R.string.menu_new_app_list_folder)
                 .setView(titleInput)
                 .setNegativeButton(R.string.button_cancel, null)
@@ -1332,8 +1332,8 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         final EditText titleInput = new EditText(this);
         titleInput.setSingleLine(true);
         titleInput.setText(folderInfo.title);
-        titleInput.setBackgroundColor(getResources().getColor(R.color.zm_reborn_glass));
-        titleInput.setTextColor(getResources().getColor(R.color.zm_reborn_fog));
+        titleInput.setBackgroundColor(getColor(R.color.zm_reborn_glass));
+        titleInput.setTextColor(getColor(R.color.zm_reborn_fog));
         new AlertDialog.Builder(this).setTitle(R.string.rename_folder_title).setView(titleInput)
                 .setNegativeButton(R.string.button_cancel, null)
                 .setPositiveButton(R.string.button_done, new DialogInterface.OnClickListener() {
@@ -1353,7 +1353,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(folderInfo.title);
         TextView messageView = new TextView(this);
         messageView.setText(R.string.app_list_folder_delete);
-        messageView.setTextColor(getResources().getColor(R.color.zm_reborn_ember));
+        messageView.setTextColor(getColor(R.color.zm_reborn_ember));
         messageView.setPadding(12, 12, 12, 12);
         builder.setView(messageView)
                 .setNegativeButton(R.string.button_cancel, null)
@@ -2217,13 +2217,13 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         public Dialog createDialog() {
             Launcher.this.mWaitingForResult = Launcher.LOGD;
             View layout = View.inflate(Launcher.this, R.layout.rename_folder, (ViewGroup) null);
-            layout.setBackgroundColor(Launcher.this.getResources().getColor(R.color.zm_reborn_glass));
+            layout.setBackgroundColor(Launcher.this.getColor(R.color.zm_reborn_glass));
             this.mInput = (EditText) layout.findViewById(R.id.folder_name);
-            this.mInput.setBackgroundColor(Launcher.this.getResources().getColor(R.color.zm_reborn_slate));
-            this.mInput.setTextColor(Launcher.this.getResources().getColor(R.color.zm_reborn_fog));
+            this.mInput.setBackgroundColor(Launcher.this.getColor(R.color.zm_reborn_slate));
+            this.mInput.setTextColor(Launcher.this.getColor(R.color.zm_reborn_fog));
             TextView label = (TextView) layout.findViewById(R.id.label);
             if (label != null) {
-                label.setTextColor(Launcher.this.getResources().getColor(R.color.zm_reborn_amber));
+                label.setTextColor(Launcher.this.getColor(R.color.zm_reborn_amber));
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(Launcher.this);
             builder.setTitle(Launcher.this.getString(R.string.rename_folder_title));
