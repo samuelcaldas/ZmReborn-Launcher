@@ -2,7 +2,7 @@
 <resources>
     <string name="application_name">ZM Reborn</string>
     <string name="preferences_application_version_format">%1$s %2$s</string>
-    <string name="application_copyright">Copyright © 2011 Michael Bentz</string>
+    <string name="application_copyright">Copyright © 2026 Samuel Caldas</string>
     <string name="toast_activity_info_not_found">Não foi possível encontrar ActivityInfo para %1$s</string>
     <string name="folder_name">Pasta</string>
     <string name="chooser_wallpaper">Selecionar papel de parede de</string>
