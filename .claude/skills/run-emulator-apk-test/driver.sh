@@ -114,16 +114,22 @@ cmd_screenshot_all() {
     shot "09-prefs-workspace-scrolled"
     back; sleep 2
 
-    # Applications grid — CRASHES on RC2 (NullPointerException in ListPreference)
-    echo "⚠ Skipping Applications grid (crashes on RC2 — NPE in ListPreference.findIndexOfValue)"
+    # Applications grid sub-screen (bounds [0,336][1080,504], center y=420)
+    launch_prefs
+    tap 540 420; sleep 2
+    shot "10-prefs-apps-grid"
+    back; sleep 1
 
-    # Action bindings — CRASHES on RC2 (same NPE)
-    echo "⚠ Skipping Action bindings (crashes on RC2 — same NPE)"
+    # Action bindings sub-screen (bounds [0,504][1080,672], center y=588)
+    launch_prefs
+    tap 540 588; sleep 2
+    shot "11-prefs-action-bindings"
+    back; sleep 1
 
     # Dock sub-screen (bounds [0,672][1080,840], center y=756)
     launch_prefs
     tap 540 756; sleep 2
-    shot "10-prefs-dock"
+    shot "12-prefs-dock"
     back; sleep 1; back; sleep 1
 
     echo "Done. Screenshots in ${OUT_DIR}/"
