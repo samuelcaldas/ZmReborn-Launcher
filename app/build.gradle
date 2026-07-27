@@ -55,8 +55,7 @@ android {
                 storePassword releaseKeystorePassword.get()
                 keyAlias releaseKeyAlias.get()
                 keyPassword releaseKeyPassword.get()
-                v1SigningEnabled true
-                v2SigningEnabled true
+
             }
         }
     }

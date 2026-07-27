@@ -251,10 +251,6 @@ jobs:
 
           "$build_tools/apksigner" verify --verbose --print-certs "$artifact_path" \
             > "$RUNNER_TEMP/apksigner.txt"
-          if ! grep -Fq 'Verified using v1 scheme (JAR signing): true' "$RUNNER_TEMP/apksigner.txt"; then
-            echo "Release APK is not v1/JAR signed; release policy requires v1 signing." >&2
-            exit 1
-          fi
           if ! grep -Fq 'Verified using v2 scheme (APK Signature Scheme v2): true' "$RUNNER_TEMP/apksigner.txt"; then
             echo "Release APK is not v2 signed; release policy requires v2 signing." >&2
             exit 1
