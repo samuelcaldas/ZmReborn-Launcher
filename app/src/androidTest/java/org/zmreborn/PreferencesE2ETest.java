@@ -6,7 +6,9 @@ import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.test.ActivityInstrumentationTestCase2;
 import android.test.TouchUtils;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.TextView;
 
 public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Preferences> {
     public PreferencesE2ETest() {
@@ -87,6 +89,19 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
             assertTrue("Settings row must have positive width", row.getWidth() > 0);
             assertTrue("Settings row must have positive height", row.getHeight() > 0);
         }
+    }
+
+    public void testPreferenceRowsUseSemanticTextSizes() {
+        Preferences preferences = getActivity();
+        LayoutInflater inflater = LayoutInflater.from(preferences);
+        View row = inflater.inflate(R.layout.settings_preference, null);
+        TextView title = (TextView) row.findViewById(android.R.id.title);
+        TextView summary = (TextView) row.findViewById(android.R.id.summary);
+        TextView category = (TextView) inflater.inflate(R.layout.settings_preference_category, null);
+
+        assertEquals(preferences.getResources().getDimension(R.dimen.text_size_title), title.getTextSize(), 0.1f);
+        assertEquals(preferences.getResources().getDimension(R.dimen.text_size_label), summary.getTextSize(), 0.1f);
+        assertEquals(preferences.getResources().getDimension(R.dimen.text_size_category), category.getTextSize(), 0.1f);
     }
 
     public void testLargeFontSafetyInPreferenceRows() {

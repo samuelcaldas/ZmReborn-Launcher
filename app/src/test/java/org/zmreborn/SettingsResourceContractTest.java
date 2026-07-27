@@ -140,6 +140,8 @@ public class SettingsResourceContractTest {
         assertTrue(row.contains("@dimen/settings_row_height"));
         assertTrue(row.contains("@color/zm_reborn_fog"));
         assertTrue(row.contains("@color/zm_reborn_steel"));
+        assertTrue(row.contains("@style/TextAppearance.ZmReborn.Title"));
+        assertTrue(row.contains("@style/TextAppearance.ZmReborn.Label"));
         assertTrue(row.contains("android:clickable=\"false\""));
         assertTrue(row.contains("android:focusable=\"false\""));
         String checkbox = read("main/res/layout/settings_checkbox_widget.xml");
@@ -150,6 +152,7 @@ public class SettingsResourceContractTest {
         String category = read("main/res/layout/settings_preference_category.xml");
         assertTrue(category.contains("@color/zm_reborn_amber"));
         assertTrue(category.contains("@dimen/settings_row_height"));
+        assertTrue(category.contains("@style/TextAppearance.ZmReborn.Category"));
         String selector = read("main/res/drawable/settings_preference_selector.xml");
         assertTrue(selector.contains("android:state_selected=\"true\""));
         assertTrue(selector.contains("android:state_focused=\"true\""));

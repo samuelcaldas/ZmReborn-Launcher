@@ -12,7 +12,7 @@
         android:id="@+id/timepicker_input"
         android:hint="@string/number_picker_value_hint"
         android:inputType="number"
-        android:textSize="30sp"
+        android:textAppearance="@style/TextAppearance.ZmReborn.Display"
         android:textColor="@color/zm_reborn_fog"
         android:gravity="center"
         android:background="@drawable/settings_preference_selector"

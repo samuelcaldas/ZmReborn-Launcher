@@ -27,9 +27,8 @@
             android:inputType="none"
             android:minWidth="@dimen/minimum_touch_target"
             android:minHeight="@dimen/minimum_touch_target"
-            android:textAppearance="?android:attr/textAppearanceMediumInverse"
+            android:textAppearance="@style/TextAppearance.ZmReborn.Body"
             android:textColor="@color/zm_reborn_fog"
-            android:textSize="14sp"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1" />
