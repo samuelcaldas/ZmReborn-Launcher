@@ -21,7 +21,7 @@ public class SettingsPreference extends Preference {
         }
         TextView title = (TextView) view.findViewById(android.R.id.title);
         if (title != null) {
-            title.setTextColor(getContext().getResources().getColor(R.color.zm_reborn_ember));
+            title.setTextColor(getContext().getColor(R.color.zm_reborn_ember));
         }
     }
 

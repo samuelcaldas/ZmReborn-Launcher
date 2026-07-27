@@ -39,7 +39,7 @@ public class ColourPickerPreference extends Preference implements Preference.OnP
         setOnPreferenceClickListener(this);
         if (attrs != null) {
             String defaultValue = attrs.getAttributeValue(androidns, "defaultValue");
-            if (defaultValue.startsWith("#")) {
+            if (defaultValue != null && defaultValue.startsWith("#")) {
                 try {
                     this.mDefaultValue = convertToColorInt(defaultValue);
                 } catch (NumberFormatException e) {
@@ -49,7 +49,7 @@ public class ColourPickerPreference extends Preference implements Preference.OnP
             } else {
                 int resourceId = attrs.getAttributeResourceValue(androidns, "defaultValue", 0);
                 if (resourceId != 0) {
-                    this.mDefaultValue = context.getResources().getInteger(resourceId);
+                    this.mDefaultValue = context.getColor(resourceId);
                 }
             }
             this.mAlphaSliderEnabled = attrs.getAttributeBooleanValue((String) null, "alphaSlider", false);

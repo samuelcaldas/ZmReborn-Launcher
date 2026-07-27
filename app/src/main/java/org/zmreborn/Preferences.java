@@ -23,7 +23,7 @@ public class Preferences extends PreferenceActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-        getListView().setBackgroundColor(getResources().getColor(R.color.zm_reborn_slate));
+        getListView().setBackgroundColor(getColor(R.color.zm_reborn_slate));
         getListView().setDivider(null);
         getListView().setDividerHeight(0);
         bindLanguagePreference();
