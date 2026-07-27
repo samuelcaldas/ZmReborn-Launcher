@@ -95,7 +95,7 @@ jobs:
     - name: Run E2E Emulator Tests
       uses: reactivecircus/android-emulator-runner@v2
       with:
-        api-level: 23
+        api-level: 24
         target: default
         arch: x86
         profile: Nexus 6

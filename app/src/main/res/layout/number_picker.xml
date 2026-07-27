@@ -10,6 +10,7 @@
         android:layout_height="wrap_content" />
     <EditText
         android:id="@+id/timepicker_input"
+        android:hint="@string/number_picker_value_hint"
         android:inputType="number"
         android:textSize="30sp"
         android:textColor="@color/zm_reborn_fog"

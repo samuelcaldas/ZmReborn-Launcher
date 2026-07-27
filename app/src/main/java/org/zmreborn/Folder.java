@@ -116,10 +116,7 @@ public class Folder extends LinearLayout implements DragSource, AdapterView.OnIt
     }
 
     private int getGridViewColumns(GridView gridView) {
-        if (android.os.Build.VERSION.SDK_INT >= 11) {
-            return gridView.getNumColumns();
-        }
-        return 4;
+        return gridView.getNumColumns();
     }
 
     /* access modifiers changed from: package-private */

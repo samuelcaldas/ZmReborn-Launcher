@@ -8,30 +8,8 @@
         errorLine2="                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Workspace.java"
-            line="1293"
+            line="1299"
             column="64"/>
-    </issue>
-
-    <issue
-        id="MissingSuperCall"
-        message="Overriding method should call `super.onFinishInflate`"
-        errorLine1="    public void onFinishInflate() {"
-        errorLine2="                ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/ApplicationsGridView.java"
-            line="112"
-            column="17"/>
-    </issue>
-
-    <issue
-        id="MissingSuperCall"
-        message="Overriding method should call `super.draw`"
-        errorLine1="        public void draw(Canvas canvas) {"
-        errorLine2="                    ~~~~">
-        <location
-            file="src/main/java/org/zmreborn/ScreenIndicator.java"
-            line="206"
-            column="21"/>
     </issue>
 
     <issue
@@ -41,7 +19,7 @@
         errorLine2="                            ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/ApplicationsGridView.java"
-            line="103"
+            line="123"
             column="29"/>
     </issue>
 
@@ -129,7 +107,7 @@
         errorLine2="                                                            ~">
         <location
             file="src/main/java/org/zmreborn/Dock.java"
-            line="44"
+            line="46"
             column="61"/>
     </issue>
 
@@ -140,7 +118,7 @@
         errorLine2="                                              ~">
         <location
             file="src/main/java/org/zmreborn/Dock.java"
-            line="46"
+            line="48"
             column="47"/>
     </issue>
 
@@ -151,7 +129,7 @@
         errorLine2="                                                     ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1009"
+            line="1166"
             column="54"/>
     </issue>
 
@@ -162,7 +140,7 @@
         errorLine2="                                                           ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1010"
+            line="1167"
             column="60"/>
     </issue>
 
@@ -173,7 +151,7 @@
         errorLine2="                                                        ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1011"
+            line="1168"
             column="57"/>
     </issue>
 
@@ -184,7 +162,7 @@
         errorLine2="                                                              ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1012"
+            line="1169"
             column="63"/>
     </issue>
 
@@ -195,7 +173,7 @@
         errorLine2="                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1013"
+            line="1170"
             column="62"/>
     </issue>
 
@@ -206,7 +184,7 @@
         errorLine2="                                                                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1014"
+            line="1171"
             column="110"/>
     </issue>
 
@@ -217,7 +195,7 @@
         errorLine2="                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1015"
+            line="1172"
             column="62"/>
     </issue>
 
@@ -228,7 +206,7 @@
         errorLine2="                                                                ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1016"
+            line="1173"
             column="65"/>
     </issue>
 
@@ -239,7 +217,7 @@
         errorLine2="                                                       ~~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="407"
+            line="403"
             column="56"/>
     </issue>
 
@@ -250,7 +228,7 @@
         errorLine2="                                                         ~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="413"
+            line="409"
             column="58"/>
     </issue>
 
@@ -261,7 +239,7 @@
         errorLine2="                                                        ~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="414"
+            line="410"
             column="57"/>
     </issue>
 
@@ -272,7 +250,7 @@
         errorLine2="                                                        ~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="415"
+            line="411"
             column="57"/>
     </issue>
 
@@ -283,7 +261,7 @@
         errorLine2="                                                                                 ~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="442"
+            line="438"
             column="82"/>
     </issue>
 
@@ -294,7 +272,7 @@
         errorLine2="                                                      ~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="472"
+            line="468"
             column="55"/>
     </issue>
 
@@ -305,7 +283,7 @@
         errorLine2="                                                                                    ~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="485"
+            line="481"
             column="85"/>
     </issue>
 
@@ -316,7 +294,7 @@
         errorLine2="                                                                                                             ~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="485"
+            line="481"
             column="110"/>
     </issue>
 
@@ -327,7 +305,7 @@
         errorLine2="                                            ~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="540"
+            line="512"
             column="45"/>
     </issue>
 
@@ -338,7 +316,7 @@
         errorLine2="                                             ~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="541"
+            line="513"
             column="46"/>
     </issue>
 
@@ -349,7 +327,7 @@
         errorLine2="                                  ~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="544"
+            line="516"
             column="35"/>
     </issue>
 
@@ -389,12 +367,12 @@
     <issue
         id="ScrollViewSize"
         message="This LinearLayout should use `android:layout_height=&quot;wrap_content&quot;`"
-        errorLine1="        &lt;LinearLayout android:orientation=&quot;vertical&quot; android:id=&quot;@+id/dock_item_holder&quot; android:paddingLeft=&quot;0dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
-        errorLine2="                                                                                                                                                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        &lt;LinearLayout android:orientation=&quot;vertical&quot; android:id=&quot;@+id/dock_item_holder&quot; android:paddingStart=&quot;0dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
+        errorLine2="                                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/dockbar.xml"
             line="4"
-            column="179"/>
+            column="180"/>
     </issue>
 
     <issue
@@ -415,7 +393,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Preferences.java"
-            line="151"
+            line="154"
             column="28"/>
     </issue>
 
@@ -426,7 +404,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Preferences.java"
-            line="159"
+            line="162"
             column="28"/>
     </issue>
 
@@ -437,7 +415,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Preferences.java"
-            line="184"
+            line="187"
             column="28"/>
     </issue>
 
@@ -448,7 +426,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Preferences.java"
-            line="192"
+            line="195"
             column="28"/>
     </issue>
 
@@ -459,7 +437,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Preferences.java"
-            line="200"
+            line="203"
             column="28"/>
     </issue>
 
@@ -470,7 +448,7 @@
         errorLine2="                           ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Preferences.java"
-            line="208"
+            line="211"
             column="28"/>
     </issue>
 
@@ -587,8 +565,8 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;application_boxed_grid&quot; in layout-port has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:textSize=&quot;13sp&quot; android:textColor=&quot;@color/bright_text_dark_focused&quot; android:ellipsize=&quot;end&quot; android:gravity=&quot;top|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/name&quot; android:paddingLeft=&quot;2dp&quot; android:paddingTop=&quot;5dp&quot; android:paddingRight=&quot;2dp&quot; android:paddingBottom=&quot;5dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;88dp&quot; android:maxLines=&quot;2&quot; android:singleLine=&quot;false&quot; android:drawablePadding=&quot;0dp&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:textSize=&quot;@dimen/small_label_text_size&quot; android:textColor=&quot;@color/bright_text_dark_focused&quot; android:ellipsize=&quot;end&quot; android:gravity=&quot;top|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/name&quot; android:paddingLeft=&quot;2dp&quot; android:paddingTop=&quot;5dp&quot; android:paddingRight=&quot;2dp&quot; android:paddingBottom=&quot;5dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:minHeight=&quot;@dimen/label_min_height&quot; android:maxLines=&quot;2&quot; android:singleLine=&quot;false&quot; android:drawablePadding=&quot;0dp&quot;/>"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/application_boxed_grid.xml"
             line="2"
@@ -609,8 +587,8 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;application_boxed_page&quot; in layout-port has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:textSize=&quot;13sp&quot; android:textColor=&quot;@color/bright_text_dark_focused&quot; android:ellipsize=&quot;end&quot; android:gravity=&quot;top|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/name&quot; android:paddingLeft=&quot;2dp&quot; android:paddingTop=&quot;5dp&quot; android:paddingRight=&quot;2dp&quot; android:paddingBottom=&quot;5dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:maxLines=&quot;2&quot; android:singleLine=&quot;false&quot; android:drawablePadding=&quot;0dp&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:textSize=&quot;@dimen/small_label_text_size&quot; android:textColor=&quot;@color/bright_text_dark_focused&quot; android:ellipsize=&quot;end&quot; android:gravity=&quot;top|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/name&quot; android:paddingLeft=&quot;2dp&quot; android:paddingTop=&quot;5dp&quot; android:paddingRight=&quot;2dp&quot; android:paddingBottom=&quot;5dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:minHeight=&quot;@dimen/label_min_height&quot; android:maxLines=&quot;2&quot; android:singleLine=&quot;false&quot; android:drawablePadding=&quot;0dp&quot;/>"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/application_boxed_page.xml"
             line="2"
@@ -620,8 +598,8 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;apps_grid_view&quot; in layout-land has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingRight=&quot;40dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/all_apps_view&quot; android:nextFocusDown=&quot;@+id/all_apps_view&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;1dp&quot; android:numColumns=&quot;5&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingEnd=&quot;40dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/all_apps_view&quot; android:nextFocusDown=&quot;@+id/all_apps_view&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;1dp&quot; android:numColumns=&quot;5&quot;/>"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/apps_grid_view.xml"
             line="2"
@@ -631,8 +609,8 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;apps_grid_view&quot; in layout-port has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingTop=&quot;9dp&quot; android:paddingBottom=&quot;30dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/all_apps_view&quot; android:nextFocusDown=&quot;@+id/all_apps&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;5dp&quot; android:numColumns=&quot;4&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingTop=&quot;9dp&quot; android:paddingBottom=&quot;30dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/home_button&quot; android:nextFocusDown=&quot;@+id/dock&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;5dp&quot; android:numColumns=&quot;4&quot;/>"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/apps_grid_view.xml"
             line="2"
@@ -642,8 +620,8 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;apps_page_view&quot; in layout-land has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingLeft=&quot;3dp&quot; android:paddingRight=&quot;30dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingStart=&quot;3dp&quot; android:paddingEnd=&quot;30dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/apps_page_view.xml"
             line="2"
@@ -675,7 +653,7 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;apps_paging_view&quot; in layout-port has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.ApplicationsPagingView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:visibility=&quot;invisible&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:paddingBottom=&quot;40dp&quot;>"
+        errorLine1="&lt;org.zmreborn.ApplicationsPagingView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:visibility=&quot;invisible&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:paddingBottom=&quot;40dp&quot; android:nextFocusLeft=&quot;@+id/view_pager&quot; android:nextFocusRight=&quot;@+id/view_pager&quot; android:nextFocusUp=&quot;@+id/view_pager&quot; android:nextFocusDown=&quot;@+id/view_pager&quot;>"
         errorLine2=" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/apps_paging_view.xml"
@@ -736,7 +714,7 @@
     <issue
         id="MissingDefaultResource"
         message="The drawable &quot;dock_bg_bar_grey&quot; in drawable-land has no declaration in the base `drawable` folder or in a `drawable-`*density*`dpi` folder; this can lead to crashes when the drawable is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:shape=&quot;rectangle&quot;>"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2=" ~~~~~">
         <location
             file="src/main/res/drawable-land/dock_bg_bar_grey.xml"
@@ -747,7 +725,7 @@
     <issue
         id="MissingDefaultResource"
         message="The drawable &quot;dock_bg_bar_grey&quot; in drawable-port has no declaration in the base `drawable` folder or in a `drawable-`*density*`dpi` folder; this can lead to crashes when the drawable is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:shape=&quot;rectangle&quot;>"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2=" ~~~~~">
         <location
             file="src/main/res/drawable-port/dock_bg_bar_grey.xml"
@@ -758,7 +736,7 @@
     <issue
         id="MissingDefaultResource"
         message="The drawable &quot;dock_bg_fade_to_black&quot; in drawable-land has no declaration in the base `drawable` folder or in a `drawable-`*density*`dpi` folder; this can lead to crashes when the drawable is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:shape=&quot;rectangle&quot;>"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2=" ~~~~~">
         <location
             file="src/main/res/drawable-land/dock_bg_fade_to_black.xml"
@@ -769,7 +747,7 @@
     <issue
         id="MissingDefaultResource"
         message="The drawable &quot;dock_bg_fade_to_black&quot; in drawable-port has no declaration in the base `drawable` folder or in a `drawable-`*density*`dpi` folder; this can lead to crashes when the drawable is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:shape=&quot;rectangle&quot;>"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2=" ~~~~~">
         <location
             file="src/main/res/drawable-port/dock_bg_fade_to_black.xml"
@@ -780,7 +758,7 @@
     <issue
         id="MissingDefaultResource"
         message="The drawable &quot;dock_bg_glow&quot; in drawable-land has no declaration in the base `drawable` folder or in a `drawable-`*density*`dpi` folder; this can lead to crashes when the drawable is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:shape=&quot;rectangle&quot;>"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2=" ~~~~~">
         <location
             file="src/main/res/drawable-land/dock_bg_glow.xml"
@@ -791,7 +769,7 @@
     <issue
         id="MissingDefaultResource"
         message="The drawable &quot;dock_bg_glow&quot; in drawable-port has no declaration in the base `drawable` folder or in a `drawable-`*density*`dpi` folder; this can lead to crashes when the drawable is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:shape=&quot;rectangle&quot;>"
+        errorLine1="&lt;shape xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2=" ~~~~~">
         <location
             file="src/main/res/drawable-port/dock_bg_glow.xml"
@@ -802,7 +780,7 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;dockbar&quot; in layout-land has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.Dock xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:layout_gravity=&quot;top|right|center_vertical|center_horizontal|center&quot; android:padding=&quot;0dp&quot; android:paddingTop=&quot;2dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;match_parent&quot; launcher:cellWidth=&quot;54dp&quot; launcher:cellHeight=&quot;58dp&quot; launcher:orientation=&quot;horizontal&quot;>"
+        errorLine1="&lt;org.zmreborn.Dock xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:layout_gravity=&quot;top|right&quot; android:padding=&quot;0dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;match_parent&quot; launcher:cellWidth=&quot;@dimen/dock_cell_width_landscape&quot; launcher:cellHeight=&quot;@dimen/dock_cell_height_landscape&quot; launcher:orientation=&quot;vertical&quot;>"
         errorLine2=" ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/dockbar.xml"
@@ -813,7 +791,7 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;dockbar&quot; in layout-port has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.Dock xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:layout_gravity=&quot;bottom&quot; android:padding=&quot;0dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; launcher:cellWidth=&quot;53dp&quot; launcher:cellHeight=&quot;56dp&quot; launcher:orientation=&quot;vertical&quot;>"
+        errorLine1="&lt;org.zmreborn.Dock xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:layout_gravity=&quot;bottom&quot; android:padding=&quot;0dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; launcher:cellWidth=&quot;@dimen/dock_cell_width_portrait&quot; launcher:cellHeight=&quot;@dimen/dock_cell_height_portrait&quot; launcher:orientation=&quot;horizontal&quot;>"
         errorLine2=" ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/dockbar.xml"
@@ -934,8 +912,8 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;workspace_screen&quot; in layout-land has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.CellLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; launcher:cellWidth=&quot;106dp&quot; launcher:cellHeight=&quot;73dp&quot; launcher:longAxisStartPadding=&quot;0dp&quot; launcher:longAxisEndPadding=&quot;55dp&quot; launcher:shortAxisStartPadding=&quot;0dp&quot; launcher:shortAxisEndPadding=&quot;0dp&quot; launcher:shortAxisCells=&quot;4&quot; launcher:longAxisCells=&quot;4&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;org.zmreborn.CellLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; launcher:cellWidth=&quot;106dp&quot; launcher:cellHeight=&quot;73dp&quot; launcher:longAxisStartPadding=&quot;0dp&quot; launcher:longAxisEndPadding=&quot;@dimen/navigation_strip_size&quot; launcher:shortAxisStartPadding=&quot;0dp&quot; launcher:shortAxisEndPadding=&quot;0dp&quot; launcher:shortAxisCells=&quot;4&quot; launcher:longAxisCells=&quot;4&quot;/>"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/workspace_screen.xml"
             line="2"
@@ -945,8 +923,8 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;workspace_screen&quot; in layout-port has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.CellLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; launcher:cellWidth=&quot;80dp&quot; launcher:cellHeight=&quot;100dp&quot; launcher:longAxisStartPadding=&quot;0dp&quot; launcher:longAxisEndPadding=&quot;55dp&quot; launcher:shortAxisStartPadding=&quot;0dp&quot; launcher:shortAxisEndPadding=&quot;0dp&quot; launcher:shortAxisCells=&quot;4&quot; launcher:longAxisCells=&quot;4&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;org.zmreborn.CellLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; launcher:cellWidth=&quot;80dp&quot; launcher:cellHeight=&quot;100dp&quot; launcher:longAxisStartPadding=&quot;0dp&quot; launcher:longAxisEndPadding=&quot;@dimen/navigation_strip_size&quot; launcher:shortAxisStartPadding=&quot;0dp&quot; launcher:shortAxisEndPadding=&quot;0dp&quot; launcher:shortAxisCells=&quot;4&quot; launcher:longAxisCells=&quot;4&quot;/>"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/workspace_screen.xml"
             line="2"
@@ -960,7 +938,7 @@
         errorLine2="               ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Preferences.java"
-            line="238"
+            line="241"
             column="16"/>
     </issue>
 
@@ -1026,7 +1004,7 @@
         errorLine2="                                                                                                           ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1238"
+            line="1415"
             column="108"/>
     </issue>
 
@@ -1037,7 +1015,7 @@
         errorLine2="                                                                       ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1442"
+            line="1619"
             column="72"/>
     </issue>
 
@@ -1048,7 +1026,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1846"
+            line="2023"
             column="63"/>
     </issue>
 
@@ -1059,7 +1037,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1853"
+            line="2030"
             column="63"/>
     </issue>
 
@@ -1070,7 +1048,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1855"
+            line="2032"
             column="63"/>
     </issue>
 
@@ -1083,17 +1061,6 @@
             file="src/main/java/org/zmreborn/UninstallShortcutReceiver.java"
             line="47"
             column="115"/>
-    </issue>
-
-    <issue
-        id="UnusedAttribute"
-        message="Attribute `hardwareAccelerated` is only used in API level 11 and higher (current min is 8)"
-        errorLine1="    &lt;application android:label=&quot;@string/application_name&quot; android:icon=&quot;@drawable/ic_launcher&quot; android:name=&quot;.LauncherApplication&quot; android:process=&quot;${applicationId}.core&quot; android:hardwareAccelerated=&quot;true&quot;>"
-        errorLine2="                                                                                                                                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="27"
-            column="172"/>
     </issue>
 
     <issue
@@ -1136,7 +1103,7 @@
         errorLine2="                      ~">
         <location
             file="src/main/java/org/zmreborn/ApplicationsGridView.java"
-            line="177"
+            line="205"
             column="23"/>
     </issue>
 
@@ -1147,7 +1114,7 @@
         errorLine2="                      ~">
         <location
             file="src/main/java/org/zmreborn/ApplicationsGridView.java"
-            line="192"
+            line="220"
             column="23"/>
     </issue>
 
@@ -1158,7 +1125,7 @@
         errorLine2="                                               ~~~~~~">
         <location
             file="src/main/java/org/zmreborn/ApplicationsPagingView.java"
-            line="48"
+            line="58"
             column="48"/>
     </issue>
 
@@ -1169,7 +1136,7 @@
         errorLine2="                      ~">
         <location
             file="src/main/java/org/zmreborn/ApplicationsPagingView.java"
-            line="179"
+            line="248"
             column="23"/>
     </issue>
 
@@ -1180,7 +1147,7 @@
         errorLine2="                      ~">
         <location
             file="src/main/java/org/zmreborn/ApplicationsPagingView.java"
-            line="194"
+            line="263"
             column="23"/>
     </issue>
 
@@ -1308,23 +1275,23 @@
     <issue
         id="WrongConstant"
         message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="        setVisibility(4);"
-        errorLine2="                      ~">
+        errorLine1="        this.mSelectedView.setVisibility(0);"
+        errorLine2="                                         ~">
         <location
             file="src/main/java/org/zmreborn/Dock.java"
-            line="419"
-            column="23"/>
+            line="489"
+            column="42"/>
     </issue>
 
     <issue
         id="WrongConstant"
         message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="        setVisibility(0);"
-        errorLine2="                      ~">
+        errorLine1="        this.mSelectedView.setVisibility(0);"
+        errorLine2="                                         ~">
         <location
             file="src/main/java/org/zmreborn/Dock.java"
-            line="427"
-            column="23"/>
+            line="506"
+            column="42"/>
     </issue>
 
     <issue
@@ -1356,7 +1323,7 @@
         errorLine2="                                                                      ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/DragLayer.java"
-            line="90"
+            line="92"
             column="71"/>
     </issue>
 
@@ -1367,7 +1334,7 @@
         errorLine2="                                                                                          ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/DragLayer.java"
-            line="95"
+            line="97"
             column="91"/>
     </issue>
 
@@ -1378,7 +1345,7 @@
         errorLine2="                               ~">
         <location
             file="src/main/java/org/zmreborn/DragLayer.java"
-            line="154"
+            line="158"
             column="32"/>
     </issue>
 
@@ -1389,7 +1356,7 @@
         errorLine2="                                               ~">
         <location
             file="src/main/java/org/zmreborn/DragLayer.java"
-            line="226"
+            line="253"
             column="48"/>
     </issue>
 
@@ -1400,7 +1367,7 @@
         errorLine2="                                         ~">
         <location
             file="src/main/java/org/zmreborn/DragLayer.java"
-            line="402"
+            line="454"
             column="42"/>
     </issue>
 
@@ -1455,7 +1422,7 @@
         errorLine2="                                    ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="214"
+            line="224"
             column="37"/>
     </issue>
 
@@ -1466,7 +1433,7 @@
         errorLine2="                                    ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="216"
+            line="226"
             column="37"/>
     </issue>
 
@@ -1477,7 +1444,7 @@
         errorLine2="                                                                                ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="367"
+            line="487"
             column="81"/>
     </issue>
 
@@ -1488,7 +1455,7 @@
         errorLine2="                                                                        ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="460"
+            line="580"
             column="73"/>
     </issue>
 
@@ -1499,7 +1466,7 @@
         errorLine2="                                                   ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="484"
+            line="604"
             column="52"/>
     </issue>
 
@@ -1510,7 +1477,7 @@
         errorLine2="                                                           ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="916"
+            line="1073"
             column="60"/>
     </issue>
 
@@ -1521,7 +1488,7 @@
         errorLine2="                                                                                                           ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1238"
+            line="1415"
             column="108"/>
     </issue>
 
@@ -1532,7 +1499,7 @@
         errorLine2="                                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1267"
+            line="1444"
             column="78"/>
     </issue>
 
@@ -1543,7 +1510,7 @@
         errorLine2="                                          ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1281"
+            line="1458"
             column="43"/>
     </issue>
 
@@ -1554,7 +1521,7 @@
         errorLine2="                                                                       ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1442"
+            line="1619"
             column="72"/>
     </issue>
 
@@ -1565,7 +1532,7 @@
         errorLine2="                                              ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1451"
+            line="1628"
             column="47"/>
     </issue>
 
@@ -1576,7 +1543,7 @@
         errorLine2="                                                                           ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1467"
+            line="1644"
             column="76"/>
     </issue>
 
@@ -1587,7 +1554,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1846"
+            line="2023"
             column="63"/>
     </issue>
 
@@ -1598,7 +1565,7 @@
         errorLine2="                        ~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1849"
+            line="2026"
             column="25"/>
     </issue>
 
@@ -1609,7 +1576,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1853"
+            line="2030"
             column="63"/>
     </issue>
 
@@ -1620,7 +1587,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1855"
+            line="2032"
             column="63"/>
     </issue>
 
@@ -1631,7 +1598,7 @@
         errorLine2="                                           ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2484"
+            line="2686"
             column="44"/>
     </issue>
 
@@ -1642,7 +1609,7 @@
         errorLine2="                                               ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2514"
+            line="2718"
             column="48"/>
     </issue>
 
@@ -1653,7 +1620,7 @@
         errorLine2="                                                                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2523"
+            line="2730"
             column="111"/>
     </issue>
 
@@ -1686,7 +1653,7 @@
         errorLine2="                            ~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="379"
+            line="375"
             column="29"/>
     </issue>
 
@@ -1697,7 +1664,7 @@
         errorLine2="                                ~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="446"
+            line="442"
             column="33"/>
     </issue>
 
@@ -1708,7 +1675,7 @@
         errorLine2="                                ~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/LauncherProvider.java"
-            line="550"
+            line="522"
             column="33"/>
     </issue>
 
@@ -1780,100 +1747,12 @@
 
     <issue
         id="WrongConstant"
-        message="Must be one of: MeasureSpec.UNSPECIFIED, MeasureSpec.EXACTLY, MeasureSpec.AT_MOST"
-        errorLine1="        super.onMeasure(widthMeasureSpec, View.MeasureSpec.makeMeasureSpec(realHeight, 1073741824));"
-        errorLine2="                                                                                       ~~~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/ScreenIndicator.java"
-            line="110"
-            column="88"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="        setVisibility(0);"
-        errorLine2="                      ~">
-        <location
-            file="src/main/java/org/zmreborn/ScreenIndicator.java"
-            line="135"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="        setVisibility(0);"
-        errorLine2="                      ~">
-        <location
-            file="src/main/java/org/zmreborn/ScreenIndicator.java"
-            line="155"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="            setVisibility(4);"
-        errorLine2="                          ~">
-        <location
-            file="src/main/java/org/zmreborn/ScreenIndicator.java"
-            line="187"
-            column="27"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="        setVisibility(0);"
-        errorLine2="                      ~">
-        <location
-            file="src/main/java/org/zmreborn/ScreenIndicator.java"
-            line="191"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="        setVisibility(4);"
-        errorLine2="                      ~">
-        <location
-            file="src/main/java/org/zmreborn/ScreenIndicator.java"
-            line="222"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="        setVisibility(4);"
-        errorLine2="                      ~">
-        <location
-            file="src/main/java/org/zmreborn/ScreenIndicator.java"
-            line="232"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="            setVisibility(0);"
-        errorLine2="                          ~">
-        <location
-            file="src/main/java/org/zmreborn/ScreenIndicator.java"
-            line="237"
-            column="27"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
         message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
         errorLine1="        imageButton.setVisibility(i);"
         errorLine2="                                  ~">
         <location
             file="src/main/java/org/zmreborn/Search.java"
-            line="195"
+            line="198"
             column="35"/>
     </issue>
 
@@ -1913,12 +1792,12 @@
     <issue
         id="WrongConstant"
         message="Must be one of: Context.POWER_SERVICE, Context.WINDOW_SERVICE, Context.LAYOUT_INFLATER_SERVICE, Context.ACCOUNT_SERVICE, Context.ACTIVITY_SERVICE, Context.ALARM_SERVICE, Context.NOTIFICATION_SERVICE, Context.ACCESSIBILITY_SERVICE, Context.CAPTIONING_SERVICE, Context.KEYGUARD_SERVICE, Context.LOCATION_SERVICE, Context.HEALTHCONNECT_SERVICE, Context.SEARCH_SERVICE, Context.SENSOR_SERVICE, Context.STORAGE_SERVICE, Context.STORAGE_STATS_SERVICE, Context.WALLPAPER_SERVICE, Context.VIBRATOR_MANAGER_SERVICE, Context.VIBRATOR_SERVICE, Context.CONNECTIVITY_SERVICE, Context.IPSEC_SERVICE, Context.VPN_MANAGEMENT_SERVICE, Context.NETWORK_STATS_SERVICE, Context.WIFI_SERVICE, Context.WIFI_AWARE_SERVICE, Context.WIFI_P2P_SERVICE, Context.WIFI_RTT_RANGING_SERVICE, Context.NSD_SERVICE, Context.AUDIO_SERVICE, Context.FINGERPRINT_SERVICE, Context.BIOMETRIC_SERVICE, Context.MEDIA_ROUTER_SERVICE, Context.TELEPHONY_SERVICE, Context.TELEPHONY_SUBSCRIPTION_SERVICE, Context.CARRIER_CONFIG_SERVICE, Context.EUICC_SERVICE, Context.TELECOM_SERVICE, Context.CLIPBOARD_SERVICE, Context.INPUT_METHOD_SERVICE, Context.TEXT_SERVICES_MANAGER_SERVICE, Context.TEXT_CLASSIFICATION_SERVICE, Context.APPWIDGET_SERVICE, Context.DROPBOX_SERVICE, Context.DEVICE_POLICY_SERVICE, Context.UI_MODE_SERVICE, Context.DOWNLOAD_SERVICE, Context.NFC_SERVICE, Context.BLUETOOTH_SERVICE, Context.USB_SERVICE, Context.LAUNCHER_APPS_SERVICE, Context.INPUT_SERVICE, Context.DISPLAY_SERVICE, Context.USER_SERVICE, Context.RESTRICTIONS_SERVICE, Context.APP_OPS_SERVICE, Context.ROLE_SERVICE, Context.CAMERA_SERVICE, Context.PRINT_SERVICE, Context.CONSUMER_IR_SERVICE, Context.TV_INTERACTIVE_APP_SERVICE, Context.TV_INPUT_SERVICE, Context.USAGE_STATS_SERVICE, Context.MEDIA_SESSION_SERVICE, Context.MEDIA_COMMUNICATION_SERVICE, Context.BATTERY_SERVICE, Context.JOB_SCHEDULER_SERVICE, Context.PERSISTENT_DATA_BLOCK_SERVICE, Context.MEDIA_PROJECTION_SERVICE, Context.MIDI_SERVICE, Context.HARDWARE_PROPERTIES_SERVICE, Context.SHORTCUT_SERVICE, Context.SYSTEM_HEALTH_SERVICE, Context.COMPANION_DEVICE_SERVICE, Context.VIRTUAL_DEVICE_SERVICE, Context.CROSS_PROFILE_APPS_SERVICE, Context.LOCALE_SERVICE, Context.MEDIA_METRICS_SERVICE, Context.DISPLAY_HASH_SERVICE, Context.CREDENTIAL_SERVICE, Context.DEVICE_LOCK_SERVICE, Context.GRAMMATICAL_INFLECTION_SERVICE, Context.SECURITY_STATE_SERVICE, Context.CONTACT_KEYS_SERVICE"
-        errorLine1="                ((WallpaperManager) getSystemService(&quot;wallpaper&quot;)).setResource(this.mImages.get(position).intValue());"
-        errorLine2="                                                     ~~~~~~~~~~~">
+        errorLine1="        WallpaperManager wallpaperManager = (WallpaperManager) getSystemService(&quot;wallpaper&quot;);"
+        errorLine2="                                                                                ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/WallpaperChooser.java"
-            line="101"
-            column="54"/>
+            line="114"
+            column="81"/>
     </issue>
 
     <issue
@@ -2005,7 +1884,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1478"
+            line="1655"
             column="13"/>
     </issue>
 
@@ -2034,23 +1913,23 @@
     <issue
         id="Deprecated"
         message="`android:editable` is deprecated: Use an `&lt;EditText>` to make it editable"
-        errorLine1="        &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceMediumInverse&quot; android:textColor=&quot;@android:color/primary_text_light&quot; android:id=&quot;@+id/search_src_text&quot; android:background=&quot;@drawable/textfield_searchwidget&quot; android:focusable=&quot;true&quot; android:layout_width=&quot;0dp&quot; android:layout_height=&quot;wrap_content&quot; android:editable=&quot;false&quot; android:layout_weight=&quot;1&quot; android:inputType=&quot;none&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="            android:editable=&quot;false&quot;"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/widget_search.xml"
-            line="4"
-            column="317"/>
+            line="25"
+            column="13"/>
     </issue>
 
     <issue
         id="DiscouragedApi"
         message="Should not restrict activity to fixed orientation. This may not be suitable for different form factors, causing the app to be letterboxed."
-        errorLine1="        &lt;activity android:theme=&quot;@android:style/Theme.Wallpaper.NoTitleBar&quot; android:name=&quot;.Launcher&quot; android:clearTaskOnLaunch=&quot;true&quot; android:stateNotNeeded=&quot;true&quot; android:launchMode=&quot;singleTask&quot; android:screenOrientation=&quot;nosensor&quot; android:windowSoftInputMode=&quot;adjustPan&quot; android:exported=&quot;true&quot;>"
-        errorLine2="                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="        &lt;activity android:theme=&quot;@style/LauncherTheme&quot; android:name=&quot;.Launcher&quot; android:clearTaskOnLaunch=&quot;true&quot; android:stateNotNeeded=&quot;true&quot; android:launchMode=&quot;singleTask&quot; android:screenOrientation=&quot;nosensor&quot; android:windowSoftInputMode=&quot;adjustPan&quot; android:exported=&quot;true&quot;>"
+        errorLine2="                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
             line="29"
-            column="197"/>
+            column="176"/>
     </issue>
 
     <issue
@@ -2060,7 +1939,7 @@
         errorLine2="                                                           ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="861"
+            line="1018"
             column="60"/>
     </issue>
 
@@ -2071,7 +1950,7 @@
         errorLine2="                                                       ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1408"
+            line="1585"
             column="56"/>
     </issue>
 
@@ -2082,7 +1961,7 @@
         errorLine2="                                                                          ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/LauncherModel.java"
-            line="521"
+            line="588"
             column="75"/>
     </issue>
 
@@ -2093,7 +1972,7 @@
         errorLine2="                                                                                                             ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/LauncherModel.java"
-            line="686"
+            line="753"
             column="110"/>
     </issue>
 
@@ -2115,7 +1994,7 @@
         errorLine2="                                ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/WallpaperChooser.java"
-            line="67"
+            line="69"
             column="33"/>
     </issue>
 
@@ -2126,8 +2005,19 @@
         errorLine2="                                                    ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/WallpaperChooser.java"
-            line="68"
+            line="70"
             column="53"/>
+    </issue>
+
+    <issue
+        id="PluralsCandidate"
+        message="Formatting %d followed by words (&quot;items&quot;): This should probably be a plural rather than a string"
+        errorLine1="    &lt;string name=&quot;accessibility_folder_with_items&quot;>Folder %1$s with %2$d items&lt;/string>"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="106"
+            column="5"/>
     </issue>
 
     <issue
@@ -2159,11 +2049,11 @@
         errorLine2="                                                                  ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="374"
+            line="494"
             column="67"/>
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1354"
+            line="1531"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -2175,11 +2065,11 @@
         errorLine2="                                                                  ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="374"
+            line="494"
             column="67"/>
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1365"
+            line="1542"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -2191,11 +2081,11 @@
         errorLine2="                                                                  ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="374"
+            line="494"
             column="67"/>
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1354"
+            line="1531"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -2207,11 +2097,11 @@
         errorLine2="                                                                  ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="374"
+            line="494"
             column="67"/>
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1365"
+            line="1542"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -2239,43 +2129,21 @@
     </issue>
 
     <issue
-        id="DrawAllocation"
-        message="Avoid object allocations during draw/layout operations (preallocate and reuse instead)"
-        errorLine1="                LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(-1, -2);"
-        errorLine2="                                                   ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/ScreenIndicator.java"
-            line="117"
-            column="52"/>
-    </issue>
-
-    <issue
-        id="DrawAllocation"
-        message="Avoid object allocations during draw/layout operations (preallocate and reuse instead)"
-        errorLine1="                LinearLayout.LayoutParams params2 = new LinearLayout.LayoutParams(-1, -2);"
-        errorLine2="                                                    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/ScreenIndicator.java"
-            line="124"
-            column="53"/>
-    </issue>
-
-    <issue
         id="Recycle"
         message="This `TypedArray` should be recycled after use with `#recycle()`"
         errorLine1="        TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Dock, 0, 0);"
         errorLine2="                                        ~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Dock.java"
-            line="43"
+            line="45"
             column="41"/>
     </issue>
 
     <issue
         id="ObsoleteLayoutParam"
-        message="Invalid layout param in a `LinearLayout`: `layout_alignLeft`"
-        errorLine1="        &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceSmall&quot; android:textColor=&quot;?android:attr/textColorSecondary&quot; android:ellipsize=&quot;end&quot; android:id=&quot;@+id/description&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:singleLine=&quot;true&quot; android:layout_below=&quot;@+id/name&quot; android:layout_alignLeft=&quot;@+id/name&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Invalid layout param in a `LinearLayout`: `layout_alignStart`"
+        errorLine1="        &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceSmall&quot; android:textColor=&quot;?android:attr/textColorSecondary&quot; android:ellipsize=&quot;end&quot; android:id=&quot;@+id/description&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:singleLine=&quot;true&quot; android:layout_below=&quot;@+id/name&quot; android:layout_alignStart=&quot;@+id/name&quot;/>"
+        errorLine2="                                                                                                                                                                                                                                                                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/application_list.xml"
             line="6"
@@ -2285,54 +2153,12 @@
     <issue
         id="ObsoleteLayoutParam"
         message="Invalid layout param in a `LinearLayout`: `layout_below`"
-        errorLine1="        &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceSmall&quot; android:textColor=&quot;?android:attr/textColorSecondary&quot; android:ellipsize=&quot;end&quot; android:id=&quot;@+id/description&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:singleLine=&quot;true&quot; android:layout_below=&quot;@+id/name&quot; android:layout_alignLeft=&quot;@+id/name&quot;/>"
+        errorLine1="        &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceSmall&quot; android:textColor=&quot;?android:attr/textColorSecondary&quot; android:ellipsize=&quot;end&quot; android:id=&quot;@+id/description&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:singleLine=&quot;true&quot; android:layout_below=&quot;@+id/name&quot; android:layout_alignStart=&quot;@+id/name&quot;/>"
         errorLine2="                                                                                                                                                                                                                                                                                           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/application_list.xml"
             line="6"
             column="284"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-hdpi`.">
-        <location
-            file="src/main/res/values-hdpi-v4"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-land-hdpi`.">
-        <location
-            file="src/main/res/values-land-hdpi-v4"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-land-mdpi`.">
-        <location
-            file="src/main/res/values-land-mdpi-v4"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-mdpi`.">
-        <location
-            file="src/main/res/values-mdpi-v4"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-port-hdpi`.">
-        <location
-            file="src/main/res/values-port-hdpi-v4"/>
-    </issue>
-
-    <issue
-        id="ObsoleteSdkInt"
-        message="This folder configuration (`v4`) is unnecessary; `minSdkVersion` is 8. Merge all the resources in this folder into `values-port-mdpi`.">
-        <location
-            file="src/main/res/values-port-mdpi-v4"/>
     </issue>
 
     <issue
@@ -2342,19 +2168,19 @@
         errorLine2="                    ^">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2572"
+            line="2779"
             column="21"/>
     </issue>
 
     <issue
         id="StaticFieldLeak"
         message="This `AsyncTask` class should be static or leaks might occur (anonymous android.os.AsyncTask)"
-        errorLine1="            mLoadApplicationsAsyncTask = new AsyncTask&lt;Object, ArrayList&lt;ApplicationItemInfo>, ArrayList&lt;ApplicationItemInfo>>() {"
-        errorLine2="                                         ^">
+        errorLine1="        mLoadApplicationsAsyncTask = new AsyncTask&lt;Object, ArrayList&lt;ApplicationItemInfo>, ArrayList&lt;ApplicationItemInfo>>() {"
+        errorLine2="                                     ^">
         <location
             file="src/main/java/org/zmreborn/LauncherModel.java"
-            line="82"
-            column="42"/>
+            line="94"
+            column="38"/>
     </issue>
 
     <issue
@@ -2364,7 +2190,7 @@
         errorLine2="          ~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/WallpaperChooser.java"
-            line="155"
+            line="180"
             column="11"/>
     </issue>
 
@@ -2391,42 +2217,9 @@
     </issue>
 
     <issue
-        id="NestedWeights"
-        message="Nested weights are bad for performance"
-        errorLine1="        &lt;TextView android:gravity=&quot;center_horizontal&quot; android:id=&quot;@+id/text_columns_span&quot; android:layout_width=&quot;100dp&quot; android:layout_height=&quot;match_parent&quot; android:text=&quot;@string/dialog_text_columns&quot; android:layout_weight=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/widget_span.xml"
-            line="4"
-            column="200"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/zm_reborn_slate` with a theme that also paints a background (inferred theme is `@android_style/Theme_Wallpaper_NoTitleBar`)"
-        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingRight=&quot;40dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/all_apps_view&quot; android:nextFocusDown=&quot;@+id/all_apps_view&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;1dp&quot; android:numColumns=&quot;5&quot;/>"
-        errorLine2="                                                                                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/apps_grid_view.xml"
-            line="2"
-            column="152"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/zm_reborn_slate` with a theme that also paints a background (inferred theme is `@android_style/Theme_Wallpaper_NoTitleBar`)"
-        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingTop=&quot;9dp&quot; android:paddingBottom=&quot;30dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/all_apps_view&quot; android:nextFocusDown=&quot;@+id/all_apps&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;5dp&quot; android:numColumns=&quot;4&quot;/>"
-        errorLine2="                                                                                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-port/apps_grid_view.xml"
-            line="2"
-            column="152"/>
-    </issue>
-
-    <issue
         id="Overdraw"
         message="Possible overdraw: Root element paints background `#00000000` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingLeft=&quot;3dp&quot; android:paddingRight=&quot;30dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
+        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingStart=&quot;3dp&quot; android:paddingEnd=&quot;30dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
         errorLine2="                                                                                                                                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/apps_page_view.xml"
@@ -2447,35 +2240,323 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/zm_reborn_slate` with a theme that also paints a background (inferred theme is `@android_style/Theme_Wallpaper_NoTitleBar`)"
-        errorLine1="&lt;org.zmreborn.ApplicationsPagingView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; xmlns:tools=&quot;http://schemas.android.com/tools&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:visibility=&quot;invisible&quot; android:scrollbars=&quot;none&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:paddingRight=&quot;40dp&quot; tools:ignore=&quot;RtlSymmetry,RtlHardcoded&quot;>"
-        errorLine2="                                                                                                                                                                                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/apps_paging_view.xml"
-            line="2"
-            column="201"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@color/zm_reborn_slate` with a theme that also paints a background (inferred theme is `@android_style/Theme_Wallpaper_NoTitleBar`)"
-        errorLine1="&lt;org.zmreborn.ApplicationsPagingView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:visibility=&quot;invisible&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:paddingBottom=&quot;40dp&quot;>"
-        errorLine2="                                                                                                                                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-port/apps_paging_view.xml"
-            line="2"
-            column="154"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `@drawable/bg_appwidget_error` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:textAppearance=&quot;?android:attr/textAppearanceMediumInverse&quot; android:textColor=&quot;@color/appwidget_error_color&quot; android:gravity=&quot;center&quot; android:background=&quot;@drawable/bg_appwidget_error&quot; android:paddingLeft=&quot;20dp&quot; android:paddingTop=&quot;10dp&quot; android:paddingRight=&quot;20dp&quot; android:paddingBottom=&quot;10dp&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:text=&quot;@string/gadget_error_text&quot;/>"
-        errorLine2="                                                                                                                                                                                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="Possible overdraw: Root element paints background `@color/zm_reborn_slate` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/zm_reborn_slate&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/appwidget_error.xml"
-            line="2"
-            column="211"/>
+            line="7"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="Overdraw"
+        message="Possible overdraw: Root element paints background `@color/zm_reborn_slate` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
+        errorLine1="    android:background=&quot;@color/zm_reborn_slate&quot;"
+        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/layout/wallpaper_chooser.xml"
+            line="4"
+            column="5"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.drawer_cell_min_width` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;drawer_cell_min_width&quot;>48dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="14"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.drawer_cell_min_height` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;drawer_cell_min_height&quot;>64dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="15"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.folder_action_size` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;folder_action_size&quot;>48dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="20"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.panel_corner_radius` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;panel_corner_radius&quot;>8dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="22"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.selector_corner_radius` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;selector_corner_radius&quot;>6dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="23"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.drawer_horizontal_padding` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;drawer_horizontal_padding&quot;>12dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="27"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.drawer_vertical_padding` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;drawer_vertical_padding&quot;>8dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="28"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.folder_spacing` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;folder_spacing&quot;>8dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="29"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.dimen.dialog_spacing` appears to be unused"
+        errorLine1="    &lt;dimen name=&quot;dialog_spacing&quot;>16dp&lt;/dimen>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/dimens.xml"
+            line="30"
+            column="12"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.integer.duration_fast` appears to be unused"
+        errorLine1="    &lt;integer name=&quot;duration_fast&quot;>120&lt;/integer>"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/integers.xml"
+            line="3"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.integer.duration_short` appears to be unused"
+        errorLine1="    &lt;integer name=&quot;duration_short&quot;>180&lt;/integer>"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/integers.xml"
+            line="4"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.integer.duration_medium` appears to be unused"
+        errorLine1="    &lt;integer name=&quot;duration_medium&quot;>240&lt;/integer>"
+        errorLine2="             ~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/integers.xml"
+            line="5"
+            column="14"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.accessibility_delete_item` appears to be unused"
+        errorLine1="    &lt;string name=&quot;accessibility_delete_item&quot;>Delete item&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="103"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.accessibility_remove_application` appears to be unused"
+        errorLine1="    &lt;string name=&quot;accessibility_remove_application&quot;>Remove application %1$s&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="104"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.accessibility_app_installed` appears to be unused"
+        errorLine1="    &lt;string name=&quot;accessibility_app_installed&quot;>%1$s, installed&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="107"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.accessibility_app_updated` appears to be unused"
+        errorLine1="    &lt;string name=&quot;accessibility_app_updated&quot;>%1$s, updated&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="108"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="UnusedResources"
+        message="The resource `R.string.search_unavailable` appears to be unused"
+        errorLine1="    &lt;string name=&quot;search_unavailable&quot;>Search unavailable. Check your connection and try again.&lt;/string>"
+        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
+        <location
+            file="src/main/res/values/strings.xml"
+            line="161"
+            column="13"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-hdpi/ic_launcher_add_folder.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-mdpi/ic_launcher_add_folder.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-hdpi/ic_launcher_application.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-mdpi/ic_launcher_application.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-hdpi/ic_launcher_appwidget.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-mdpi/ic_launcher_appwidget.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-hdpi/ic_launcher_folder.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-mdpi/ic_launcher_folder.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-hdpi/ic_launcher_folder_open.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-mdpi/ic_launcher_folder_open.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-hdpi/ic_launcher_settings.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-mdpi/ic_launcher_settings.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-hdpi/ic_launcher_shortcut.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-mdpi/ic_launcher_shortcut.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-hdpi/ic_launcher_wallpaper.png"/>
+    </issue>
+
+    <issue
+        id="IconLauncherShape"
+        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
+        <location
+            file="src/main/res/drawable-mdpi/ic_launcher_wallpaper.png"/>
     </issue>
 
     <issue
@@ -2644,11 +2725,11 @@
     <issue
         id="Autofill"
         message="Missing `autofillHints` attribute"
-        errorLine1="    &lt;EditText android:textSize=&quot;30sp&quot; android:textColor=&quot;@android:color/primary_text_light&quot; android:gravity=&quot;center&quot; android:id=&quot;@+id/timepicker_input&quot; android:background=&quot;@drawable/timepicker_input&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:singleLine=&quot;true&quot; style=&quot;?android:attr/textAppearanceLargeInverse&quot;/>"
+        errorLine1="    &lt;EditText"
         errorLine2="     ~~~~~~~~">
         <location
             file="src/main/res/layout/number_picker.xml"
-            line="4"
+            line="11"
             column="6"/>
     </issue>
 
@@ -2681,7 +2762,7 @@
         errorLine2="                   ~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/DragLayer.java"
-            line="255"
+            line="289"
             column="20"/>
     </issue>
 
@@ -2714,7 +2795,7 @@
         errorLine2="                   ~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Workspace.java"
-            line="695"
+            line="701"
             column="20"/>
     </issue>
 
@@ -2732,7 +2813,7 @@
     <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageButton android:layout_gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/home_button&quot; android:background=&quot;@null&quot; android:padding=&quot;0dp&quot; android:paddingRight=&quot;2dp&quot; android:visibility=&quot;invisible&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;45dp&quot; android:layout_height=&quot;wrap_content&quot; android:src=&quot;@drawable/home_button_normal&quot;/>"
+        errorLine1="    &lt;ImageButton android:layout_gravity=&quot;right|center_vertical&quot; android:id=&quot;@+id/home_button&quot; android:background=&quot;@null&quot; android:padding=&quot;0dp&quot; android:visibility=&quot;invisible&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;@dimen/minimum_touch_target&quot; android:layout_height=&quot;wrap_content&quot; android:src=&quot;@drawable/home_button_normal&quot;/>"
         errorLine2="     ~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/launcher.xml"
@@ -2743,7 +2824,7 @@
     <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageButton android:layout_gravity=&quot;bottom|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/home_button&quot; android:background=&quot;@null&quot; android:padding=&quot;0dp&quot; android:visibility=&quot;invisible&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;45dp&quot; android:src=&quot;@drawable/home_button_normal&quot;/>"
+        errorLine1="    &lt;ImageButton android:layout_gravity=&quot;bottom|center_horizontal&quot; android:id=&quot;@+id/home_button&quot; android:background=&quot;@null&quot; android:padding=&quot;0dp&quot; android:visibility=&quot;invisible&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;@dimen/minimum_touch_target&quot; android:src=&quot;@drawable/home_button_normal&quot;/>"
         errorLine2="     ~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/launcher.xml"
@@ -2875,7 +2956,7 @@
     <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton android:id=&quot;@+id/folder_button_rename&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;8dp&quot; android:paddingRight=&quot;8dp&quot; android:minWidth=&quot;48dp&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;match_parent&quot; android:src=&quot;@drawable/ic_menu_edit&quot;/>"
+        errorLine1="            &lt;ImageButton android:id=&quot;@+id/folder_button_rename&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;8dp&quot; android:paddingRight=&quot;8dp&quot; android:minWidth=&quot;@dimen/minimum_touch_target&quot; android:minHeight=&quot;@dimen/minimum_touch_target&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:src=&quot;@drawable/ic_menu_edit&quot;/>"
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/user_folder.xml"
@@ -2897,7 +2978,7 @@
     <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
-        errorLine1="            &lt;ImageButton android:id=&quot;@+id/folder_button_close&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;8dp&quot; android:paddingRight=&quot;8dp&quot; android:minWidth=&quot;48dp&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;match_parent&quot; android:src=&quot;@drawable/ic_menu_close_clear_cancel&quot;/>"
+        errorLine1="            &lt;ImageButton android:id=&quot;@+id/folder_button_close&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;8dp&quot; android:paddingRight=&quot;8dp&quot; android:minWidth=&quot;@dimen/minimum_touch_target&quot; android:minHeight=&quot;@dimen/minimum_touch_target&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:src=&quot;@drawable/ic_menu_close_clear_cancel&quot;/>"
         errorLine2="             ~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/user_folder.xml"
@@ -2912,7 +2993,7 @@
         errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout-land/user_folder.xml"
-            line="10"
+            line="11"
             column="6"/>
     </issue>
 
@@ -2923,25 +3004,14 @@
         errorLine2="     ~~~~~~~~~">
         <location
             file="src/main/res/layout-port/user_folder.xml"
-            line="10"
+            line="11"
             column="6"/>
     </issue>
 
     <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
-        errorLine1="    &lt;ImageView android:id=&quot;@+id/wallpaper&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;0dp&quot; android:scaleType=&quot;fitCenter&quot; android:layout_weight=&quot;1&quot;/>"
-        errorLine2="     ~~~~~~~~~">
-        <location
-            file="src/main/res/layout/wallpaper_chooser.xml"
-            line="3"
-            column="6"/>
-    </issue>
-
-    <issue
-        id="ContentDescription"
-        message="Missing `contentDescription` attribute on image"
-        errorLine1="&lt;ImageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;?android:attr/galleryItemBackground&quot; android:focusable=&quot;true&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:scaleType=&quot;fitXY&quot;/>"
+        errorLine1="&lt;ImageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot;"
         errorLine2=" ~~~~~~~~~">
         <location
             file="src/main/res/layout/wallpaper_item.xml"
@@ -2952,41 +3022,19 @@
     <issue
         id="ContentDescription"
         message="Missing `contentDescription` attribute on image"
-        errorLine1="        &lt;ImageButton android:id=&quot;@+id/search_voice_btn&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginLeft=&quot;8dp&quot; android:src=&quot;@android:drawable/ic_btn_speak_now&quot;/>"
+        errorLine1="        &lt;ImageButton"
         errorLine2="         ~~~~~~~~~~~">
         <location
             file="src/main/res/layout/widget_search.xml"
-            line="5"
+            line="37"
             column="10"/>
     </issue>
 
     <issue
-        id="LabelFor"
-        message="Missing accessibility label: where minSdk &lt; 17, you should provide an `android:hint`"
-        errorLine1="    &lt;EditText android:textSize=&quot;30sp&quot; android:textColor=&quot;@android:color/primary_text_light&quot; android:gravity=&quot;center&quot; android:id=&quot;@+id/timepicker_input&quot; android:background=&quot;@drawable/timepicker_input&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:singleLine=&quot;true&quot; style=&quot;?android:attr/textAppearanceLargeInverse&quot;/>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/number_picker.xml"
-            line="4"
-            column="5"/>
-    </issue>
-
-    <issue
-        id="LabelFor"
-        message="Missing accessibility label: where minSdk &lt; 17, you should provide an `android:hint`"
-        errorLine1="    &lt;EditText android:textAppearance=&quot;?android:attr/textAppearanceMedium&quot; android:gravity=&quot;fill_horizontal&quot; android:id=&quot;@+id/folder_name&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:scrollHorizontally=&quot;true&quot; android:maxLength=&quot;30&quot; android:capitalize=&quot;none&quot; android:autoText=&quot;false&quot;/>"
-        errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/rename_folder.xml"
-            line="4"
-            column="5"/>
-    </issue>
-
-    <issue
         id="RtlSymmetry"
-        message="When you define `paddingLeft` you should probably also define `paddingRight` for right-to-left symmetry"
-        errorLine1="&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:orientation=&quot;horizontal&quot; android:paddingLeft=&quot;10dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;?android:attr/listPreferredItemHeight&quot;>"
-        errorLine2="                                                                                                          ~~~~~~~~~~~~~~~~~~~">
+        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
+        errorLine1="&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:orientation=&quot;horizontal&quot; android:paddingStart=&quot;10dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;?android:attr/listPreferredItemHeight&quot;>"
+        errorLine2="                                                                                                          ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/application_list.xml"
             line="2"
@@ -2995,9 +3043,9 @@
 
     <issue
         id="RtlSymmetry"
-        message="When you define `paddingRight` you should probably also define `paddingLeft` for right-to-left symmetry"
-        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingRight=&quot;40dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/all_apps_view&quot; android:nextFocusDown=&quot;@+id/all_apps_view&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;1dp&quot; android:numColumns=&quot;5&quot;/>"
-        errorLine2="                                                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~~~">
+        message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
+        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingEnd=&quot;40dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/all_apps_view&quot; android:nextFocusDown=&quot;@+id/all_apps_view&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;1dp&quot; android:numColumns=&quot;5&quot;/>"
+        errorLine2="                                                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/apps_grid_view.xml"
             line="2"
@@ -3006,9 +3054,9 @@
 
     <issue
         id="RtlSymmetry"
-        message="When you define `paddingLeft` you should probably also define `paddingRight` for right-to-left symmetry"
-        errorLine1="        &lt;LinearLayout android:orientation=&quot;vertical&quot; android:id=&quot;@+id/dock_item_holder&quot; android:paddingLeft=&quot;0dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
-        errorLine2="                                                                                        ~~~~~~~~~~~~~~~~~~~">
+        message="When you define `paddingStart` you should probably also define `paddingEnd` for right-to-left symmetry"
+        errorLine1="        &lt;LinearLayout android:orientation=&quot;vertical&quot; android:id=&quot;@+id/dock_item_holder&quot; android:paddingStart=&quot;0dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
+        errorLine2="                                                                                        ~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/dockbar.xml"
             line="4"
@@ -3016,98 +3064,10 @@
     </issue>
 
     <issue
-        id="RtlSymmetry"
-        message="When you define `paddingRight` you should probably also define `paddingLeft` for right-to-left symmetry"
-        errorLine1="    &lt;ImageButton android:layout_gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/home_button&quot; android:background=&quot;@null&quot; android:padding=&quot;0dp&quot; android:paddingRight=&quot;2dp&quot; android:visibility=&quot;invisible&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;45dp&quot; android:layout_height=&quot;wrap_content&quot; android:src=&quot;@drawable/home_button_normal&quot;/>"
-        errorLine2="                                                                                                                                                                        ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/launcher.xml"
-            line="13"
-            column="169"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingStart=&quot;10dp&quot;` to better support right-to-left layouts"
-        errorLine1="&lt;LinearLayout xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:orientation=&quot;horizontal&quot; android:paddingLeft=&quot;10dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;?android:attr/listPreferredItemHeight&quot;>"
-        errorLine2="                                                                                                          ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/application_list.xml"
-            line="2"
-            column="107"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:layout_alignStart=&quot;@+id/name&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceSmall&quot; android:textColor=&quot;?android:attr/textColorSecondary&quot; android:ellipsize=&quot;end&quot; android:id=&quot;@+id/description&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:singleLine=&quot;true&quot; android:layout_below=&quot;@+id/name&quot; android:layout_alignLeft=&quot;@+id/name&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                                                                                            ~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/application_list.xml"
-            line="6"
-            column="317"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingEnd=&quot;40dp&quot;` to better support right-to-left layouts"
-        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingRight=&quot;40dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/all_apps_view&quot; android:nextFocusDown=&quot;@+id/all_apps_view&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;1dp&quot; android:numColumns=&quot;5&quot;/>"
-        errorLine2="                                                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/apps_grid_view.xml"
-            line="2"
-            column="196"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingEnd=&quot;30dp&quot;` to better support right-to-left layouts"
-        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingLeft=&quot;3dp&quot; android:paddingRight=&quot;30dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/apps_page_view.xml"
-            line="2"
-            column="240"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingStart=&quot;3dp&quot;` to better support right-to-left layouts"
-        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingLeft=&quot;3dp&quot; android:paddingRight=&quot;30dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
-        errorLine2="                                                                                                                                                                                                                     ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/apps_page_view.xml"
-            line="2"
-            column="214"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingEnd=&quot;15dp&quot;` to better support right-to-left layouts"
-        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:textAppearance=&quot;?android:attr/textAppearanceLargeInverse&quot; android:gravity=&quot;center_vertical&quot; android:paddingLeft=&quot;7dp&quot; android:paddingRight=&quot;15dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:minHeight=&quot;?android:attr/listPreferredItemHeight&quot; android:drawablePadding=&quot;14dp&quot;/>"
-        errorLine2="                                                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_list_item.xml"
-            line="2"
-            column="196"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingStart=&quot;7dp&quot;` to better support right-to-left layouts"
-        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; android:textAppearance=&quot;?android:attr/textAppearanceLargeInverse&quot; android:gravity=&quot;center_vertical&quot; android:paddingLeft=&quot;7dp&quot; android:paddingRight=&quot;15dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:minHeight=&quot;?android:attr/listPreferredItemHeight&quot; android:drawablePadding=&quot;14dp&quot;/>"
-        errorLine2="                                                                                                                                                                         ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/dialog_list_item.xml"
-            line="2"
-            column="170"/>
-    </issue>
-
-    <issue
         id="RtlHardcoded"
         message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="&lt;org.zmreborn.Dock xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:layout_gravity=&quot;top|right|center_vertical|center_horizontal|center&quot; android:padding=&quot;0dp&quot; android:paddingTop=&quot;2dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;match_parent&quot; launcher:cellWidth=&quot;54dp&quot; launcher:cellHeight=&quot;58dp&quot; launcher:orientation=&quot;horizontal&quot;>"
-        errorLine2="                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;org.zmreborn.Dock xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:layout_gravity=&quot;top|right&quot; android:padding=&quot;0dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;match_parent&quot; launcher:cellWidth=&quot;@dimen/dock_cell_width_landscape&quot; launcher:cellHeight=&quot;@dimen/dock_cell_height_landscape&quot; launcher:orientation=&quot;vertical&quot;>"
+        errorLine2="                                                                                                                                                               ~~~~~~~~~">
         <location
             file="src/main/res/layout-land/dockbar.xml"
             line="2"
@@ -3116,31 +3076,9 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider adding `android:paddingStart=&quot;0dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;LinearLayout android:orientation=&quot;vertical&quot; android:id=&quot;@+id/dock_item_holder&quot; android:paddingLeft=&quot;0dp&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
-        errorLine2="                                                                                        ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/dockbar.xml"
-            line="4"
-            column="89"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingEnd=&quot;2dp&quot;` to better support right-to-left layouts"
-        errorLine1="    &lt;ImageButton android:layout_gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/home_button&quot; android:background=&quot;@null&quot; android:padding=&quot;0dp&quot; android:paddingRight=&quot;2dp&quot; android:visibility=&quot;invisible&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;45dp&quot; android:layout_height=&quot;wrap_content&quot; android:src=&quot;@drawable/home_button_normal&quot;/>"
-        errorLine2="                                                                                                                                                                        ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/launcher.xml"
-            line="13"
-            column="169"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
         message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="    &lt;ImageButton android:layout_gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/home_button&quot; android:background=&quot;@null&quot; android:padding=&quot;0dp&quot; android:paddingRight=&quot;2dp&quot; android:visibility=&quot;invisible&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;45dp&quot; android:layout_height=&quot;wrap_content&quot; android:src=&quot;@drawable/home_button_normal&quot;/>"
-        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="    &lt;ImageButton android:layout_gravity=&quot;right|center_vertical&quot; android:id=&quot;@+id/home_button&quot; android:background=&quot;@null&quot; android:padding=&quot;0dp&quot; android:visibility=&quot;invisible&quot; android:saveEnabled=&quot;false&quot; android:layout_width=&quot;@dimen/minimum_touch_target&quot; android:layout_height=&quot;wrap_content&quot; android:src=&quot;@drawable/home_button_normal&quot;/>"
+        errorLine2="                                         ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/launcher.xml"
             line="13"
@@ -3150,7 +3088,7 @@
     <issue
         id="RtlHardcoded"
         message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="    &lt;ViewStub android:layout_gravity=&quot;right&quot; android:id=&quot;@+id/dock_stub&quot; android:inflatedId=&quot;@+id/dock&quot; android:layout_width=&quot;57dp&quot; android:layout_height=&quot;match_parent&quot;/>"
+        errorLine1="    &lt;ViewStub android:layout_gravity=&quot;right&quot; android:id=&quot;@+id/dock_stub&quot; android:inflatedId=&quot;@+id/dock&quot; android:layout_width=&quot;@dimen/navigation_strip_size&quot; android:layout_height=&quot;match_parent&quot;/>"
         errorLine2="                                      ~~~~~">
         <location
             file="src/main/res/layout-land/launcher.xml"
@@ -3160,20 +3098,9 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider adding `android:layout_marginEnd=&quot;48dp&quot;` to better support right-to-left layouts"
-        errorLine1="    &lt;org.zmreborn.DeleteZone android:layout_gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/delete_zone&quot; android:background=&quot;@drawable/delete_zone_selector&quot; android:visibility=&quot;invisible&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:layout_marginRight=&quot;48dp&quot; android:src=&quot;@drawable/trashcan&quot; android:scaleType=&quot;center&quot; launcher:direction=&quot;vertical&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/launcher.xml"
-            line="15"
-            column="288"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
         message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="    &lt;org.zmreborn.DeleteZone android:layout_gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/delete_zone&quot; android:background=&quot;@drawable/delete_zone_selector&quot; android:visibility=&quot;invisible&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:layout_marginRight=&quot;48dp&quot; android:src=&quot;@drawable/trashcan&quot; android:scaleType=&quot;center&quot; launcher:direction=&quot;vertical&quot;/>"
-        errorLine2="                                                     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="    &lt;org.zmreborn.DeleteZone android:layout_gravity=&quot;right|center_vertical&quot; android:id=&quot;@+id/delete_zone&quot; android:background=&quot;@drawable/delete_zone_selector&quot; android:visibility=&quot;invisible&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:layout_marginEnd=&quot;@dimen/minimum_touch_target&quot; android:src=&quot;@drawable/trashcan&quot; android:scaleType=&quot;center&quot; launcher:direction=&quot;vertical&quot;/>"
+        errorLine2="                                                     ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/launcher.xml"
             line="15"
@@ -3182,52 +3109,8 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider adding `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/live_folder_grid.xml"
-            line="4"
-            column="272"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-port/live_folder_grid.xml"
-            line="4"
-            column="272"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/live_folder_grid.xml"
-            line="4"
-            column="245"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-port/live_folder_grid.xml"
-            line="4"
-            column="245"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
         message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
+        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingStart=&quot;14dp&quot; android:paddingEnd=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
         errorLine2="                                                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/live_folder_grid.xml"
@@ -3238,7 +3121,7 @@
     <issue
         id="RtlHardcoded"
         message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
+        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingStart=&quot;14dp&quot; android:paddingEnd=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
         errorLine2="                                                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/live_folder_grid.xml"
@@ -3248,30 +3131,8 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider adding `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
-        errorLine2="                                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/live_folder_grid.xml"
-            line="5"
-            column="194"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
-        errorLine2="                                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-port/live_folder_grid.xml"
-            line="5"
-            column="194"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
         message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
+        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginEnd=&quot;4dp&quot;>"
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/live_folder_grid.xml"
@@ -3282,7 +3143,7 @@
     <issue
         id="RtlHardcoded"
         message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
+        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginEnd=&quot;4dp&quot;>"
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/live_folder_grid.xml"
@@ -3292,30 +3153,8 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider adding `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/live_folder_list.xml"
-            line="4"
-            column="272"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                    ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/live_folder_list.xml"
-            line="4"
-            column="245"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
         message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
+        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;#c0c0c0&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingStart=&quot;14dp&quot; android:paddingEnd=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
         errorLine2="                                                                                                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/live_folder_list.xml"
@@ -3325,19 +3164,8 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider adding `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
-        errorLine2="                                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/live_folder_list.xml"
-            line="5"
-            column="194"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
         message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
+        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginEnd=&quot;4dp&quot;>"
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout/live_folder_list.xml"
@@ -3348,7 +3176,7 @@
     <issue
         id="RtlHardcoded"
         message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="    &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceMedium&quot; android:gravity=&quot;left&quot; android:id=&quot;@+id/label&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:text=&quot;@string/rename_folder_label&quot;/>"
+        errorLine1="    &lt;TextView android:textAppearance=&quot;?android:attr/textAppearanceMedium&quot; android:gravity=&quot;left&quot; android:id=&quot;@+id/label&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;wrap_content&quot; android:text=&quot;@string/rename_folder_label&quot; android:labelFor=&quot;@id/folder_name&quot;/>"
         errorLine2="                                                                                           ~~~~">
         <location
             file="src/main/res/layout/rename_folder.xml"
@@ -3358,52 +3186,8 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider adding `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zm_reborn_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                                                              ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/user_folder.xml"
-            line="4"
-            column="287"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingEnd=&quot;80dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zm_reborn_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                                                              ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-port/user_folder.xml"
-            line="4"
-            column="287"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zm_reborn_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/user_folder.xml"
-            line="4"
-            column="260"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:paddingStart=&quot;14dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zm_reborn_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
-        errorLine2="                                                                                                                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-port/user_folder.xml"
-            line="4"
-            column="260"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
         message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zm_reborn_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
+        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zm_reborn_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingStart=&quot;14dp&quot; android:paddingEnd=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
         errorLine2="                                                                                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/user_folder.xml"
@@ -3414,7 +3198,7 @@
     <issue
         id="RtlHardcoded"
         message="Use &quot;`start`&quot; instead of &quot;`left`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zm_reborn_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingLeft=&quot;14dp&quot; android:paddingRight=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:lines=&quot;1&quot;/>"
+        errorLine1="        &lt;TextView android:textSize=&quot;17sp&quot; android:textStyle=&quot;bold&quot; android:textColor=&quot;@color/zm_reborn_steel&quot; android:layout_gravity=&quot;left|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/folder_name&quot; android:background=&quot;@android:color/transparent&quot; android:paddingStart=&quot;14dp&quot; android:paddingEnd=&quot;80dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:minHeight=&quot;@dimen/label_min_height&quot; android:maxLines=&quot;2&quot; android:ellipsize=&quot;end&quot;/>"
         errorLine2="                                                                                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/user_folder.xml"
@@ -3424,30 +3208,8 @@
 
     <issue
         id="RtlHardcoded"
-        message="Consider adding `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
-        errorLine2="                                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/user_folder.xml"
-            line="5"
-            column="194"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:layout_marginEnd=&quot;4dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
-        errorLine2="                                                                                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-port/user_folder.xml"
-            line="5"
-            column="194"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
         message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
+        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginEnd=&quot;4dp&quot;>"
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/user_folder.xml"
@@ -3458,23 +3220,12 @@
     <issue
         id="RtlHardcoded"
         message="Use &quot;`end`&quot; instead of &quot;`right`&quot; to ensure correct behavior in right-to-left locales"
-        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginRight=&quot;4dp&quot;>"
+        errorLine1="        &lt;LinearLayout android:gravity=&quot;right|center_vertical|center_horizontal|center&quot; android:orientation=&quot;horizontal&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginEnd=&quot;4dp&quot; android:minHeight=&quot;@dimen/minimum_touch_target&quot;>"
         errorLine2="                                       ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/user_folder.xml"
             line="5"
             column="40"/>
-    </issue>
-
-    <issue
-        id="RtlHardcoded"
-        message="Consider adding `android:layout_marginStart=&quot;8dp&quot;` to better support right-to-left layouts"
-        errorLine1="        &lt;ImageButton android:id=&quot;@+id/search_voice_btn&quot; android:layout_width=&quot;wrap_content&quot; android:layout_height=&quot;match_parent&quot; android:layout_marginLeft=&quot;8dp&quot; android:src=&quot;@android:drawable/ic_btn_speak_now&quot;/>"
-        errorLine2="                                                                                                                                 ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout/widget_search.xml"
-            line="5"
-            column="130"/>
     </issue>
 
 </issues>
