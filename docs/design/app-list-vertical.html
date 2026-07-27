@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZM Reborn — Vertical App List (Continuous Scroll)</title>
+<style>
+  :root {
+    --slate:  #121A21;
+    --glass:  rgba(18,26,33,0.88);
+    --fog:    #EAF0F3;
+    --steel:  #B8C2C8;
+    --amber:  #F2B64A;
+    --ember:  #D95C4F;
+    --drawer-radius: 16px;
+    --tile-radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0d1117;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    gap: 24px;
+    padding: 32px 16px;
+  }
+
+  h1 {
+    color: var(--fog);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .phone {
+    width: 360px;
+    height: 780px;
+    background: var(--slate);
+    border-radius: 36px;
+    border: 2px solid rgba(255,255,255,0.08);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  }
+
+  .wallpaper {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 25% 40%, rgba(242,182,74,0.06) 0%, transparent 50%),
+      radial-gradient(circle at 75% 65%, rgba(217,92,79,0.04) 0%, transparent 40%),
+      linear-gradient(160deg, #0f161c 0%, #121A21 60%, #0a1018 100%);
+  }
+
+  .wallpaper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 40px),
+      repeating-linear-gradient(-45deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 60px);
+  }
+
+  .workspace {
+    position: absolute;
+    top: 60px;
+    left: 0; right: 0;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    opacity: 0.5;
+  }
+  .ws-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    margin: 0 auto;
+  }
+
+  .statusbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    color: var(--fog);
+    font-size: 11px;
+    font-weight: 600;
+    z-index: 10;
+    opacity: 0.8;
+  }
+
+  .dockbar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 72px;
+    background: rgba(18,26,33,0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    z-index: 5;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .dock-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+  }
+  .home-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    background: var(--amber);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .home-btn:active { transform: scale(0.92); }
+  .home-btn svg { width: 22px; height: 22px; fill: var(--slate); }
+
+  /* Drawer */
+  .drawer {
+    position: absolute;
+    bottom: 72px;
+    left: 0; right: 0;
+    height: 610px;
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border-radius: var(--drawer-radius) var(--drawer-radius) 0 0;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-bottom: none;
+    display: flex;
+    flex-direction: column;
+    z-index: 3;
+    transform: translateY(0);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .drawer.hidden { transform: translateY(100%); }
+
+  .drawer-handle {
+    width: 36px;
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    margin: 12px auto 4px;
+    flex-shrink: 0;
+  }
+
+  /* Scroll area + signal rail container */
+  .scroll-wrapper {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Vertical Signal Rail */
+  .signal-rail-v {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: rgba(184,194,200,0.15);
+    border-radius: 1.5px;
+    z-index: 2;
+  }
+  .signal-rail-segment {
+    position: absolute;
+    right: 0;
+    width: 3px;
+    background: var(--amber);
+    border-radius: 1.5px;
+    transition: top 0.2s ease;
+    min-height: 24px;
+  }
+
+  /* App list scroll area */
+  .app-list {
+    height: 100%;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    padding: 4px 16px 8px 16px;
+    /* Hide native scrollbar */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .app-list::-webkit-scrollbar { display: none; }
+
+  /* Section header */
+  .section-header {
+    color: var(--steel);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    padding: 12px 0 6px;
+    border-bottom: 1px solid rgba(184,194,200,0.12);
+    margin-bottom: 4px;
+    position: sticky;
+    top: 0;
+    background: rgba(18,26,33,0.92);
+    z-index: 1;
+  }
+
+  /* Grid row of apps */
+  .app-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 4px;
+    margin-bottom: 4px;
+  }
+
+  .app-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 8px 2px 6px;
+    border-radius: var(--tile-radius);
+    cursor: pointer;
+    transition: background 0.12s;
+    gap: 5px;
+  }
+  .app-tile:hover { background: rgba(242,182,74,0.12); }
+  .app-tile:active { background: rgba(242,182,74,0.22); }
+
+  .app-icon {
+    width: 46px;
+    height: 46px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .app-label {
+    font-size: 10px;
+    color: var(--fog);
+    text-align: center;
+    line-height: 1.3;
+    max-height: 2.6em;
+    overflow: hidden;
+    word-break: break-word;
+  }
+
+  /* Drawer bottom controls */
+  .drawer-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 8px 20px 14px;
+    flex-shrink: 0;
+    border-top: 1px solid rgba(255,255,255,0.05);
+  }
+
+  .scroll-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: rgba(255,255,255,0.08);
+    border-radius: 18px;
+    color: var(--fog);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+  }
+  .scroll-btn:hover { background: rgba(242,182,74,0.2); color: var(--amber); }
+
+  .close-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: rgba(255,255,255,0.08);
+    border-radius: 18px;
+    color: var(--steel);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s, color 0.12s;
+  }
+  .close-btn:hover { background: rgba(217,92,79,0.2); color: var(--ember); }
+
+  .scroll-label {
+    flex: 1;
+    text-align: center;
+    font-size: 11px;
+    color: var(--steel);
+  }
+
+  /* Toast */
+  .toast {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(18,26,33,0.95);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--fog);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 20;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .legend {
+    background: rgba(18,26,33,0.8);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 16px 20px;
+    max-width: 360px;
+    width: 100%;
+  }
+  .legend h2 {
+    color: var(--amber);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .legend ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .legend li {
+    color: var(--steel);
+    font-size: 12px;
+    line-height: 1.4;
+    display: flex;
+    gap: 8px;
+  }
+  .legend li::before { content: '—'; color: var(--amber); flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<h1>Vertical App List · ZM Reborn</h1>
+
+<div class="phone" id="phone">
+  <div class="wallpaper"></div>
+
+  <div class="statusbar">
+    <span>9:41</span>
+    <span>●●● ▲ 100%</span>
+  </div>
+
+  <div class="workspace">
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+  </div>
+
+  <div class="drawer hidden" id="drawer">
+    <div class="drawer-handle"></div>
+
+    <div class="scroll-wrapper">
+      <div class="signal-rail-v">
+        <div class="signal-rail-segment" id="railSegment"></div>
+      </div>
+      <div class="app-list" id="appList">
+        <!-- Injected by JS -->
+      </div>
+    </div>
+
+    <div class="drawer-controls">
+      <button class="scroll-btn" onclick="scrollBy(-200)" title="Scroll up">↑</button>
+      <div class="scroll-label" id="scrollLabel">A – Z</div>
+      <button class="scroll-btn" onclick="scrollBy(200)" title="Scroll down">↓</button>
+      <button class="close-btn" onclick="closeDrawer()" title="Close">✕</button>
+    </div>
+  </div>
+
+  <div class="dockbar">
+    <div class="dock-icon"></div>
+    <div class="dock-icon"></div>
+    <button class="home-btn" onclick="toggleDrawer()" id="homeBtn" title="Open apps">
+      <svg viewBox="0 0 24 24"><path d="M4 8h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 14h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/></svg>
+    </button>
+    <div class="dock-icon"></div>
+    <div class="dock-icon"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<div class="legend">
+  <h2>Vertical Continuous Scroll</h2>
+  <ul>
+    <li>Tap grid button to open/close drawer</li>
+    <li>↑↓ buttons scroll the app list vertically</li>
+    <li>Amber Signal Rail on right edge = scroll position</li>
+    <li>Alphabetical sticky section headers (A, B, C…)</li>
+    <li>4-column grid, continuous — no pages, no swipe</li>
+  </ul>
+</div>
+
+<script>
+const APPS = [
+  {name:'Calendar',    color:'#F2B64A', glyph:'📅'},
+  {name:'Camera',      color:'#5C8AF2', glyph:'📷'},
+  {name:'Chrome',      color:'#EAF0F3', glyph:'🌐'},
+  {name:'Clock',       color:'#D95C4F', glyph:'⏰'},
+  {name:'Contacts',    color:'#4AF2B6', glyph:'👤'},
+  {name:'Drive',       color:'#F2B64A', glyph:'💾'},
+  {name:'Files',       color:'#B8C2C8', glyph:'📁'},
+  {name:'Gallery',     color:'#F264B4', glyph:'🖼'},
+  {name:'Gmail',       color:'#D95C4F', glyph:'✉️'},
+  {name:'Maps',        color:'#4AF2B6', glyph:'🗺'},
+  {name:'Messages',    color:'#5C8AF2', glyph:'💬'},
+  {name:'Music',       color:'#F2B64A', glyph:'🎵'},
+  {name:'Phone',       color:'#4AF264', glyph:'📞'},
+  {name:'Photos',      color:'#F264B4', glyph:'📸'},
+  {name:'Play Store',  color:'#4AF264', glyph:'▶'},
+  {name:'Settings',    color:'#B8C2C8', glyph:'⚙'},
+  {name:'Slack',       color:'#F264B4', glyph:'#'},
+  {name:'Spotify',     color:'#4AF264', glyph:'♪'},
+  {name:'Twitter',     color:'#5C8AF2', glyph:'✦'},
+  {name:'WhatsApp',    color:'#4AF264', glyph:'💬'},
+  {name:'YouTube',     color:'#D95C4F', glyph:'▶'},
+  {name:'Zoom',        color:'#5C8AF2', glyph:'Z'},
+];
+
+function buildList() {
+  const list = document.getElementById('appList');
+  const sorted = [...APPS].sort((a, b) => a.name.localeCompare(b.name));
+
+  let currentLetter = null;
+  let currentRow = null;
+  let colIndex = 0;
+
+  sorted.forEach(app => {
+    const letter = app.name[0].toUpperCase();
+    if (letter !== currentLetter) {
+      currentLetter = letter;
+      const header = document.createElement('div');
+      header.className = 'section-header';
+      header.textContent = letter;
+      list.appendChild(header);
+      currentRow = null;
+      colIndex = 0;
+    }
+
+    if (!currentRow || colIndex >= 4) {
+      currentRow = document.createElement('div');
+      currentRow.className = 'app-row';
+      list.appendChild(currentRow);
+      colIndex = 0;
+    }
+
+    const tile = document.createElement('div');
+    tile.className = 'app-tile';
+    tile.innerHTML = `
+      <div class="app-icon" style="background:${app.color}22;">${app.glyph}</div>
+      <div class="app-label">${app.name}</div>`;
+    tile.addEventListener('click', () => launchApp(app.name));
+    currentRow.appendChild(tile);
+    colIndex++;
+  });
+}
+
+function updateRail() {
+  const list = document.getElementById('appList');
+  const rail = document.getElementById('railSegment');
+  const container = list.parentElement;
+
+  const scrollTop    = list.scrollTop;
+  const scrollHeight = list.scrollHeight - list.clientHeight;
+  const containerH   = container.offsetHeight;
+
+  const ratio  = scrollHeight > 0 ? scrollTop / scrollHeight : 0;
+  const segH   = Math.max(24, containerH * (list.clientHeight / list.scrollHeight));
+  const segTop = ratio * (containerH - segH);
+
+  rail.style.height = segH + 'px';
+  rail.style.top    = segTop + 'px';
+
+  // Update scroll label with current first-visible letter
+  const headers = list.querySelectorAll('.section-header');
+  let visibleLetter = 'A';
+  headers.forEach(h => {
+    if (h.offsetTop <= scrollTop + list.clientHeight * 0.3) visibleLetter = h.textContent;
+  });
+  document.getElementById('scrollLabel').textContent = visibleLetter;
+}
+
+function scrollBy(delta) {
+  const list = document.getElementById('appList');
+  list.scrollBy({ top: delta, behavior: 'smooth' });
+}
+
+function toggleDrawer() {
+  const d = document.getElementById('drawer');
+  if (d.classList.contains('hidden')) openDrawer();
+  else closeDrawer();
+}
+
+function openDrawer() {
+  document.getElementById('drawer').classList.remove('hidden');
+  updateRail();
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.add('hidden');
+}
+
+function launchApp(name) {
+  const t = document.getElementById('toast');
+  t.textContent = `Opening ${name}…`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown') scrollBy(80);
+  if (e.key === 'ArrowUp')   scrollBy(-80);
+  if (e.key === 'Escape')    closeDrawer();
+});
+
+buildList();
+
+const list = document.getElementById('appList');
+list.addEventListener('scroll', updateRail);
+
+openDrawer();
+setTimeout(updateRail, 50);
+</script>
+</body>
+</html>
