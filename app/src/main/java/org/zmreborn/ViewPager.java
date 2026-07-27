@@ -83,29 +83,57 @@ public class ViewPager extends HorizontalScrollView {
     }
 
     @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int pageWidth = View.MeasureSpec.getSize(widthMeasureSpec);
+        if (pageWidth > 0) {
+            updatePageWidths(pageWidth);
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
         if (width <= 0 || width == oldWidth) {
             return;
         }
         resizePages(width);
-        alignCurrentPage(width);
+        alignCurrentPage();
     }
 
     private void resizePages(int pageWidth) {
+        if (updatePageWidths(pageWidth)) {
+            this.mPageViewHolder.requestLayout();
+        }
+    }
+
+    private boolean updatePageWidths(int pageWidth) {
+        boolean changed = false;
         int pageCount = this.mPageViewHolder.getChildCount();
         for (int index = 0; index < pageCount; index++) {
             View page = this.mPageViewHolder.getChildAt(index);
-            page.setLayoutParams(new LinearLayout.LayoutParams(
-                    pageWidth, LinearLayout.LayoutParams.MATCH_PARENT));
+            changed = updatePageWidth(page, pageWidth) || changed;
         }
-        this.mPageViewHolder.requestLayout();
+        return changed;
     }
 
-    private void alignCurrentPage(final int pageWidth) {
+    private static boolean updatePageWidth(View page, int pageWidth) {
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) page.getLayoutParams();
+        if (params.width == pageWidth) {
+            return false;
+        }
+        params.width = pageWidth;
+        params.height = LinearLayout.LayoutParams.MATCH_PARENT;
+        return true;
+    }
+
+    private void alignCurrentPage() {
         post(new Runnable() {
             public void run() {
-                scrollTo(mCurrentPageIndex * pageWidth, 0);
+                int pageWidth = getPageWidth();
+                if (pageWidth > 0) {
+                    scrollTo(mCurrentPageIndex * pageWidth, 0);
+                }
             }
         });
     }
