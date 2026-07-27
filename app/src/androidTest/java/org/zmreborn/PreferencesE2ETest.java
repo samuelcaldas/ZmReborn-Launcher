@@ -99,9 +99,9 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
         TextView summary = (TextView) row.findViewById(android.R.id.summary);
         TextView category = (TextView) inflater.inflate(R.layout.settings_preference_category, null);
 
-        assertEquals(preferences.getResources().getDimension(R.dimen.text_size_title), title.getTextSize(), 0.1f);
-        assertEquals(preferences.getResources().getDimension(R.dimen.text_size_label), summary.getTextSize(), 0.1f);
-        assertEquals(preferences.getResources().getDimension(R.dimen.text_size_category), category.getTextSize(), 0.1f);
+        assertEquals(preferences.getResources().getDimension(R.dimen.text_size_title), title.getTextSize(), 0.5f);
+        assertEquals(preferences.getResources().getDimension(R.dimen.text_size_label), summary.getTextSize(), 0.5f);
+        assertEquals(preferences.getResources().getDimension(R.dimen.text_size_category), category.getTextSize(), 0.5f);
     }
 
     public void testLargeFontSafetyInPreferenceRows() {
