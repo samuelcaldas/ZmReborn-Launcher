@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZM Reborn — Horizontal App List (Paged Grid)</title>
+<style>
+  :root {
+    --slate:  #121A21;
+    --glass:  rgba(18,26,33,0.88);
+    --fog:    #EAF0F3;
+    --steel:  #B8C2C8;
+    --amber:  #F2B64A;
+    --ember:  #D95C4F;
+    --drawer-radius: 16px;
+    --tile-radius: 12px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #0d1117;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+    gap: 24px;
+    padding: 32px 16px;
+  }
+
+  h1 {
+    color: var(--fog);
+    font-size: 15px;
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  /* Phone frame */
+  .phone {
+    width: 360px;
+    height: 780px;
+    background: var(--slate);
+    border-radius: 36px;
+    border: 2px solid rgba(255,255,255,0.08);
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 32px 80px rgba(0,0,0,0.6);
+  }
+
+  /* Wallpaper */
+  .wallpaper {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 30%, rgba(242,182,74,0.06) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba(217,92,79,0.04) 0%, transparent 40%),
+      linear-gradient(160deg, #0f161c 0%, #121A21 60%, #0a1018 100%);
+  }
+
+  /* Abstract geometric wallpaper shapes */
+  .wallpaper::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image:
+      repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 40px),
+      repeating-linear-gradient(-45deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 60px);
+  }
+
+  /* Workspace icons (placeholder) */
+  .workspace {
+    position: absolute;
+    top: 60px;
+    left: 0; right: 0;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    opacity: 0.5;
+  }
+  .ws-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.06);
+    margin: 0 auto;
+  }
+
+  /* Status bar */
+  .statusbar {
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 20px;
+    color: var(--fog);
+    font-size: 11px;
+    font-weight: 600;
+    z-index: 10;
+    opacity: 0.8;
+  }
+
+  /* Dock bar */
+  .dockbar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 72px;
+    background: rgba(18,26,33,0.95);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    z-index: 5;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .dock-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    background: rgba(255,255,255,0.08);
+  }
+  .home-btn {
+    width: 48px;
+    height: 48px;
+    border-radius: 24px;
+    background: var(--amber);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.15s;
+  }
+  .home-btn:active { transform: scale(0.92); }
+  .home-btn svg { width: 22px; height: 22px; fill: var(--slate); }
+
+  /* Signal Rail */
+  .signal-rail-h {
+    position: absolute;
+    bottom: 72px;
+    left: 0; right: 0;
+    height: 2px;
+    background: rgba(184,194,200,0.2);
+    z-index: 4;
+  }
+
+  /* Drawer */
+  .drawer {
+    position: absolute;
+    bottom: 72px;
+    left: 0; right: 0;
+    height: 610px;
+    background: var(--glass);
+    backdrop-filter: blur(20px);
+    border-radius: var(--drawer-radius) var(--drawer-radius) 0 0;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-bottom: none;
+    display: flex;
+    flex-direction: column;
+    z-index: 3;
+    transform: translateY(0);
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+  .drawer.hidden { transform: translateY(100%); }
+
+  .drawer-handle {
+    width: 36px;
+    height: 4px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 2px;
+    margin: 12px auto 0;
+    flex-shrink: 0;
+  }
+
+  /* Page area */
+  .page-area {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Pages container */
+  .pages-track {
+    display: flex;
+    height: 100%;
+    transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .page {
+    min-width: 360px;
+    height: 100%;
+    padding: 16px 16px 8px;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(5, 1fr);
+    gap: 8px;
+    align-content: start;
+  }
+
+  .app-tile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 10px 4px 8px;
+    border-radius: var(--tile-radius);
+    cursor: pointer;
+    transition: background 0.12s;
+    gap: 6px;
+  }
+  .app-tile:hover { background: rgba(242,182,74,0.12); }
+  .app-tile:active { background: rgba(242,182,74,0.22); }
+  .app-tile.focused { outline: 2px solid var(--amber); outline-offset: 2px; }
+
+  .app-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .app-label {
+    font-size: 10px;
+    color: var(--fog);
+    text-align: center;
+    line-height: 1.3;
+    max-height: 2.6em;
+    overflow: hidden;
+    word-break: break-word;
+  }
+
+  /* Bottom controls */
+  .drawer-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    padding: 8px 20px 16px;
+    flex-shrink: 0;
+  }
+
+  .nav-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: rgba(255,255,255,0.08);
+    border-radius: 18px;
+    color: var(--fog);
+    font-size: 16px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s;
+  }
+  .nav-btn:hover { background: rgba(242,182,74,0.2); color: var(--amber); }
+  .nav-btn:disabled { opacity: 0.3; cursor: default; }
+
+  /* Signal Rail — page position */
+  .page-rail {
+    flex: 1;
+    height: 2px;
+    background: rgba(184,194,200,0.2);
+    border-radius: 1px;
+    position: relative;
+    overflow: hidden;
+  }
+  .page-rail-segment {
+    position: absolute;
+    top: 0;
+    height: 3px;
+    background: var(--amber);
+    border-radius: 1.5px;
+    transition: left 0.35s cubic-bezier(0.4,0,0.2,1), width 0.35s;
+  }
+
+  .close-btn {
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: rgba(255,255,255,0.08);
+    border-radius: 18px;
+    color: var(--steel);
+    font-size: 14px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.12s, color 0.12s;
+  }
+  .close-btn:hover { background: rgba(217,92,79,0.2); color: var(--ember); }
+
+  /* Toast */
+  .toast {
+    position: absolute;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(18,26,33,0.95);
+    border: 1px solid rgba(255,255,255,0.1);
+    color: var(--fog);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 11px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.2s, transform 0.2s;
+    pointer-events: none;
+    z-index: 20;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  /* Legend */
+  .legend {
+    background: rgba(18,26,33,0.8);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 12px;
+    padding: 16px 20px;
+    max-width: 360px;
+    width: 100%;
+  }
+  .legend h2 {
+    color: var(--amber);
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.8px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+  .legend ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .legend li {
+    color: var(--steel);
+    font-size: 12px;
+    line-height: 1.4;
+    display: flex;
+    gap: 8px;
+  }
+  .legend li::before { content: '—'; color: var(--amber); flex-shrink: 0; }
+</style>
+</head>
+<body>
+
+<h1>Horizontal App List · ZM Reborn</h1>
+
+<div class="phone" id="phone">
+  <div class="wallpaper"></div>
+
+  <div class="statusbar">
+    <span>9:41</span>
+    <span>●●● ▲ 100%</span>
+  </div>
+
+  <!-- Workspace placeholder icons -->
+  <div class="workspace">
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+    <div class="ws-icon"></div>
+  </div>
+
+  <!-- Drawer -->
+  <div class="drawer hidden" id="drawer">
+    <div class="drawer-handle"></div>
+
+    <div class="page-area">
+      <div class="pages-track" id="pagesTrack">
+        <!-- Pages injected by JS -->
+      </div>
+    </div>
+
+    <div class="drawer-controls">
+      <button class="nav-btn" id="prevBtn" onclick="changePage(-1)" disabled>‹</button>
+      <div class="page-rail">
+        <div class="page-rail-segment" id="railSegment"></div>
+      </div>
+      <button class="nav-btn" id="nextBtn" onclick="changePage(1)">›</button>
+      <button class="close-btn" onclick="closeDrawer()" title="Close">✕</button>
+    </div>
+  </div>
+
+  <!-- Dock -->
+  <div class="dockbar">
+    <div class="dock-icon"></div>
+    <div class="dock-icon"></div>
+    <button class="home-btn" onclick="toggleDrawer()" id="homeBtn" title="Open apps">
+      <svg viewBox="0 0 24 24"><path d="M4 8h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4zM4 14h4v4H4zm6 0h4v4h-4zm6 0h4v4h-4z"/></svg>
+    </button>
+    <div class="dock-icon"></div>
+    <div class="dock-icon"></div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<div class="legend">
+  <h2>Horizontal Paged Grid</h2>
+  <ul>
+    <li>Tap grid button to open/close drawer</li>
+    <li>‹ › arrows page through app grid (left/right)</li>
+    <li>Amber Signal Rail shows current page position</li>
+    <li>Tap any app tile to simulate launch</li>
+    <li>4 columns × 5 rows per page — swipe pages</li>
+  </ul>
+</div>
+
+<script>
+const APPS = [
+  {name:'Calendar', color:'#F2B64A', glyph:'📅'},
+  {name:'Camera', color:'#5C8AF2', glyph:'📷'},
+  {name:'Chrome', color:'#EAF0F3', glyph:'🌐'},
+  {name:'Clock', color:'#D95C4F', glyph:'⏰'},
+  {name:'Contacts', color:'#4AF2B6', glyph:'👤'},
+  {name:'Drive', color:'#F2B64A', glyph:'💾'},
+  {name:'Files', color:'#B8C2C8', glyph:'📁'},
+  {name:'Gallery', color:'#F264B4', glyph:'🖼'},
+  {name:'Gmail', color:'#D95C4F', glyph:'✉️'},
+  {name:'Maps', color:'#4AF2B6', glyph:'🗺'},
+  {name:'Messages', color:'#5C8AF2', glyph:'💬'},
+  {name:'Music', color:'#F2B64A', glyph:'🎵'},
+  {name:'Phone', color:'#4AF264', glyph:'📞'},
+  {name:'Photos', color:'#F264B4', glyph:'📸'},
+  {name:'Play Store', color:'#4AF264', glyph:'▶'},
+  {name:'Settings', color:'#B8C2C8', glyph:'⚙'},
+  {name:'Slack', color:'#F264B4', glyph:'#'},
+  {name:'Spotify', color:'#4AF264', glyph:'♪'},
+  {name:'Twitter', color:'#5C8AF2', glyph:'✦'},
+  {name:'WhatsApp', color:'#4AF264', glyph:'💬'},
+];
+
+const COLS = 4, ROWS = 5, PER_PAGE = COLS * ROWS;
+let currentPage = 0;
+const totalPages = Math.ceil(APPS.length / PER_PAGE);
+
+function buildPages() {
+  const track = document.getElementById('pagesTrack');
+  for (let p = 0; p < totalPages; p++) {
+    const page = document.createElement('div');
+    page.className = 'page';
+    const slice = APPS.slice(p * PER_PAGE, (p+1) * PER_PAGE);
+    slice.forEach(app => {
+      const tile = document.createElement('div');
+      tile.className = 'app-tile';
+      tile.innerHTML = `
+        <div class="app-icon" style="background:${app.color}22;">${app.glyph}</div>
+        <div class="app-label">${app.name}</div>`;
+      tile.addEventListener('click', () => launchApp(app.name));
+      page.appendChild(tile);
+    });
+    // Fill empty slots for visual completeness
+    for (let i = slice.length; i < PER_PAGE; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'app-tile';
+      page.appendChild(empty);
+    }
+    track.appendChild(page);
+  }
+}
+
+function updateRail() {
+  const seg = document.getElementById('railSegment');
+  const railWidth = seg.parentElement.offsetWidth;
+  const segWidth = railWidth / totalPages;
+  seg.style.width = segWidth + 'px';
+  seg.style.left = (currentPage * segWidth) + 'px';
+}
+
+function changePage(delta) {
+  const newPage = currentPage + delta;
+  if (newPage < 0 || newPage >= totalPages) return;
+  currentPage = newPage;
+  document.getElementById('pagesTrack').style.transform = `translateX(-${currentPage * 360}px)`;
+  document.getElementById('prevBtn').disabled = currentPage === 0;
+  document.getElementById('nextBtn').disabled = currentPage === totalPages - 1;
+  updateRail();
+}
+
+function toggleDrawer() {
+  const d = document.getElementById('drawer');
+  if (d.classList.contains('hidden')) openDrawer();
+  else closeDrawer();
+}
+
+function openDrawer() {
+  document.getElementById('drawer').classList.remove('hidden');
+  updateRail();
+}
+
+function closeDrawer() {
+  document.getElementById('drawer').classList.add('hidden');
+}
+
+function launchApp(name) {
+  const t = document.getElementById('toast');
+  t.textContent = `Opening ${name}…`;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+// Keyboard nav
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowRight') changePage(1);
+  if (e.key === 'ArrowLeft')  changePage(-1);
+  if (e.key === 'Escape')     closeDrawer();
+});
+
+buildPages();
+// Start open
+openDrawer();
+</script>
+</body>
+</html>

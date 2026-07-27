@@ -86,3 +86,6 @@ lint/tmp/
 # Local Android emulator and SDK state
 .android/
 *.hprof
+
+# Playwright MCP
+.playwright-mcp/
