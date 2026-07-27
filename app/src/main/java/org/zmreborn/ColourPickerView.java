@@ -116,7 +116,7 @@ public class ColourPickerView extends View {
         this.mHueTrackerPaint.setStrokeWidth(this.mDensity * 2.0f);
         this.mHueTrackerPaint.setAntiAlias(true);
         this.mAlphaTextPaint.setColor(-14935012);
-        this.mAlphaTextPaint.setTextSize(14.0f * this.mDensity);
+        this.mAlphaTextPaint.setTextSize(getResources().getDimension(R.dimen.text_size_body));
         this.mAlphaTextPaint.setAntiAlias(true);
         this.mAlphaTextPaint.setTextAlign(Paint.Align.CENTER);
         this.mAlphaTextPaint.setFakeBoldText(true);

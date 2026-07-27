@@ -2,6 +2,9 @@ package org.zmreborn;
 
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
+import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import java.util.ArrayList;
 
 public class ApplicationsDrawerE2ETest extends ActivityInstrumentationTestCase2<Launcher> {
 
@@ -125,6 +128,34 @@ public class ApplicationsDrawerE2ETest extends ActivityInstrumentationTestCase2<
             applicationsView.close(false);
             assertFalse("Drawer must be closed on iteration " + i, launcher.isApplicationsGridOpen());
         }
+    }
+
+    public void testPagingViewCreatesScrollableViewportPages() {
+        final Launcher launcher = getActivity();
+        final ViewPager[] pagerHolder = new ViewPager[1];
+        launcher.runOnUiThread(new Runnable() {
+            public void run() {
+                pagerHolder[0] = addTwoPagePager(launcher);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        ViewPager pager = pagerHolder[0];
+        LinearLayout pageHolder = (LinearLayout) pager.getChildAt(0);
+        assertEquals(2, pageHolder.getChildCount());
+        assertEquals(pager.getWidth(), pageHolder.getChildAt(0).getWidth());
+        assertEquals(pager.getWidth(), pageHolder.getChildAt(1).getWidth());
+        assertTrue("Multiple pages must create horizontal scroll range", pager.canScrollHorizontally(1));
+    }
+
+    private static ViewPager addTwoPagePager(Launcher launcher) {
+        ViewPager pager = new ViewPager(launcher);
+        launcher.addContentView(pager, new FrameLayout.LayoutParams(320, 240));
+        ArrayList<View> pages = new ArrayList<View>();
+        pages.add(new View(launcher));
+        pages.add(new View(launcher));
+        pager.setPagingViews(pages);
+        return pager;
     }
 
     public void testDrawerMinimumTouchTargets() {

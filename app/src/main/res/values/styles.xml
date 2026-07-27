@@ -1,7 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="WorkspaceIcon">
-        <item name="android:textSize">14sp</item>
+    <style name="TextAppearance.ZmReborn" parent="">
+        <item name="android:fontFamily">sans-serif</item>
+    </style>
+    <style name="TextAppearance.ZmReborn.Category">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_size_category</item>
+    </style>
+    <style name="TextAppearance.ZmReborn.Label">
+        <item name="android:textSize">@dimen/text_size_label</item>
+    </style>
+    <style name="TextAppearance.ZmReborn.Body">
+        <item name="android:textSize">@dimen/text_size_body</item>
+    </style>
+    <style name="TextAppearance.ZmReborn.Title">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_size_title</item>
+    </style>
+    <style name="TextAppearance.ZmReborn.Symbol">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_size_symbol</item>
+    </style>
+    <style name="TextAppearance.ZmReborn.Display">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_size_display</item>
+    </style>
+    <style name="WorkspaceIcon" parent="@style/TextAppearance.ZmReborn.Body">
         <item name="android:textColor">@color/zm_reborn_fog</item>
         <item name="android:ellipsize">end</item>
         <item name="android:gravity">center</item>

@@ -4,6 +4,13 @@
 
 ### Bug Fixes
 
+- Fixed horizontal Applications paging by sizing every page to the current `ViewPager`
+  viewport, recalculating widths after size changes, and keeping indicator geometry aligned
+  with the actual scroll width.
+- Restored touch navigation in Preferences by leaving row click/focus ownership with the
+  framework `ListView`; selected-state styling preserves DPAD feedback without intercepting taps.
+- Standardized launcher typography on semantic category, label, body, title, symbol, and
+  display roles using the platform sans-serif family and `sp`-backed size tokens.
 - Fixed `NullPointerException` crash on API 35 in Applications grid and Action bindings
   preference screens caused by numeric `<array>` entry values being resolved as integer
   resource types by `TypedArray.getTextArray()`, returning null `CharSequence` elements.
@@ -25,6 +32,13 @@
 
 ### Testing
 
+- Added regression coverage for horizontal page scroll range, touch-opening nested
+  Preference screens, Settings row interaction ownership, and typography token/style contracts.
+- API 35 emulator smoke confirmed horizontal drawer transition from page 1 to page 2,
+  touch-opened General/Workspace/Applications grid/Action bindings/Dock screens, and no
+  fatal, verifier, missing-method, or `UnsupportedOperationException` log entries.
+- Targeted API 35 instrumentation passed all three new regression tests. API 24 runtime
+  smoke remains pending because no local API 24 emulator image is available.
 - Added Docker emulator runtime (`tools/Dockerfile.emulator`, `tools/emulator-entrypoint.sh`)
   with API 35 Google APIs x86_64 AVD, KVM acceleration, SwiftShader GPU.
 - Added emulator APK test skill and driver (`driver.sh`) for headless screenshot sweeps

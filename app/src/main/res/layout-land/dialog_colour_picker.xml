@@ -19,7 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <TextView
-            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textAppearance="@style/TextAppearance.ZmReborn.Label"
             android:textColor="@color/zm_reborn_steel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -33,13 +33,14 @@
             android:layout_height="wrap_content">
             <TextView
                 android:id="@+id/old_colour_label"
+                android:textAppearance="@style/TextAppearance.ZmReborn.Label"
                 android:textColor="@color/zm_reborn_steel"
                 android:text="@string/dialog_colour_picker_old_colour"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1" />
             <TextView
-                android:textSize="20sp"
+                android:textAppearance="@style/TextAppearance.ZmReborn.Symbol"
                 android:textColor="@color/zm_reborn_amber"
                 android:gravity="center"
                 android:text="@string/dialog_colour_picker_arrow"
@@ -49,6 +50,7 @@
                 android:paddingRight="8dp" />
             <TextView
                 android:id="@+id/new_colour_label"
+                android:textAppearance="@style/TextAppearance.ZmReborn.Label"
                 android:textColor="@color/zm_reborn_amber"
                 android:gravity="right"
                 android:text="@string/dialog_colour_picker_new_colour"

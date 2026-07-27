@@ -1,5 +1,6 @@
 package org.zmreborn;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -11,14 +12,11 @@ import android.widget.LinearLayout;
 import java.util.ArrayList;
 
 public class ViewPager extends HorizontalScrollView {
-    private static final int sSwipeThresholdVelocity = 500;
-    /* access modifiers changed from: private */
-    public int mCurrentPageIndex = 0;
-    /* access modifiers changed from: private */
-    public GestureDetector mGestureDetector;
+    private static final int SWIPE_THRESHOLD_VELOCITY = 500;
+    private int mCurrentPageIndex;
+    private GestureDetector mGestureDetector;
     private OnPageScrollListener mOnPageScrollListener;
-    /* access modifiers changed from: private */
-    public LinearLayout mPageViewHolder;
+    private LinearLayout mPageViewHolder;
 
     public static abstract class OnPageScrollListener {
         public abstract void onScroll();
@@ -40,114 +38,167 @@ public class ViewPager extends HorizontalScrollView {
     }
 
     private void init() {
-        Context context = getContext();
-        FrameLayout.LayoutParams layoutParams = new FrameLayout.LayoutParams(-1, -1);
-        this.mPageViewHolder = new LinearLayout(context);
-        this.mPageViewHolder.setOrientation(0);
-        this.mPageViewHolder.setLayoutParams(layoutParams);
-        addView(this.mPageViewHolder);
+        setFillViewport(true);
+        this.mPageViewHolder = new LinearLayout(getContext());
+        this.mPageViewHolder.setOrientation(LinearLayout.HORIZONTAL);
+        addView(this.mPageViewHolder, new FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        this.mGestureDetector = new GestureDetector(getContext(), new PageViewGestureDetector());
+        setOnTouchListener(new PageTouchListener());
     }
 
     public void setOnPageScrollListener(OnPageScrollListener onPageScrollListener) {
         this.mOnPageScrollListener = onPageScrollListener;
     }
 
-    /* access modifiers changed from: protected */
-    public void setPagingViews(ArrayList<View> items) {
-        LinearLayout pageViewHolder = this.mPageViewHolder;
-        for (int i = 0; i < items.size(); i++) {
-            pageViewHolder.addView(items.get(i));
+    protected void setPagingViews(ArrayList<View> items) {
+        int pageWidth = resolvePageWidth();
+        for (View item : items) {
+            addPage(item, pageWidth);
         }
-        if (items.size() == 0) {
-            this.mCurrentPageIndex = 0;
-            scrollTo(0, 0);
+        if (items.isEmpty()) {
+            resetScroll();
         }
-        setOnTouchListener(new View.OnTouchListener() {
-            public boolean onTouch(View view, MotionEvent motionEvent) {
-                if (ViewPager.this.mGestureDetector.onTouchEvent(motionEvent)) {
-                    return true;
-                }
-                if (motionEvent.getAction() != 1 && motionEvent.getAction() != 3) {
-                    return false;
-                }
-                int pageCount = ViewPager.this.getPageCount();
-                if (pageCount <= 0) {
-                    return true;
-                }
-                int scrollX = ViewPager.this.getScrollX();
-                int pageViewWidth = view.getMeasuredWidth();
-                if (pageViewWidth <= 0) {
-                    return true;
-                }
-                ViewPager.this.mCurrentPageIndex = ((pageViewWidth / 2) + scrollX) / pageViewWidth;
-                if (ViewPager.this.mCurrentPageIndex >= pageCount) {
-                    ViewPager.this.mCurrentPageIndex = pageCount - 1;
-                }
-                ViewPager.this.smoothScrollTo(ViewPager.this.mCurrentPageIndex * pageViewWidth, 0);
-                return true;
-            }
-        });
-        this.mGestureDetector = new GestureDetector(new PageViewGestureDetector(this, (PageViewGestureDetector) null));
+        requestLayout();
     }
 
-    /* access modifiers changed from: protected */
-    public void clearPagingViews() {
+    private void addPage(View page, int pageWidth) {
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                pageWidth, LinearLayout.LayoutParams.MATCH_PARENT);
+        this.mPageViewHolder.addView(page, layoutParams);
+    }
+
+    private int resolvePageWidth() {
+        int pageWidth = getWidth();
+        if (pageWidth > 0) {
+            return pageWidth;
+        }
+        return getResources().getDisplayMetrics().widthPixels;
+    }
+
+    protected void clearPagingViews() {
         this.mPageViewHolder.removeAllViewsInLayout();
         this.mPageViewHolder.invalidate();
-        this.mCurrentPageIndex = 0;
-        scrollTo(0, 0);
+        resetScroll();
     }
 
-    /* access modifiers changed from: protected */
-    public void onScrollChanged(int l, int t, int oldl, int oldt) {
-        super.onScrollChanged(l, t, oldl, oldt);
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        int pageWidth = View.MeasureSpec.getSize(widthMeasureSpec);
+        if (pageWidth > 0) {
+            updatePageWidths(pageWidth);
+        }
+        super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+    }
+
+    @Override
+    protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+        super.onSizeChanged(width, height, oldWidth, oldHeight);
+        if (width <= 0 || width == oldWidth) {
+            return;
+        }
+        resizePages(width);
+        alignCurrentPage();
+    }
+
+    private void resizePages(int pageWidth) {
+        if (updatePageWidths(pageWidth)) {
+            this.mPageViewHolder.requestLayout();
+        }
+    }
+
+    private boolean updatePageWidths(int pageWidth) {
+        boolean changed = false;
+        int pageCount = this.mPageViewHolder.getChildCount();
+        for (int index = 0; index < pageCount; index++) {
+            View page = this.mPageViewHolder.getChildAt(index);
+            changed = updatePageWidth(page, pageWidth) || changed;
+        }
+        return changed;
+    }
+
+    private static boolean updatePageWidth(View page, int pageWidth) {
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) page.getLayoutParams();
+        if (params.width == pageWidth) {
+            return false;
+        }
+        params.width = pageWidth;
+        params.height = LinearLayout.LayoutParams.MATCH_PARENT;
+        return true;
+    }
+
+    private void alignCurrentPage() {
+        post(new Runnable() {
+            public void run() {
+                int pageWidth = getPageWidth();
+                if (pageWidth > 0) {
+                    scrollTo(mCurrentPageIndex * pageWidth, 0);
+                }
+            }
+        });
+    }
+
+    @Override
+    protected void onScrollChanged(int left, int top, int oldLeft, int oldTop) {
+        super.onScrollChanged(left, top, oldLeft, oldTop);
         onScrolling();
     }
 
+    @Override
     public boolean onTrackballEvent(MotionEvent motionEvent) {
         return true;
     }
 
-    private class PageViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
-        private PageViewGestureDetector() {
-        }
-
-        /* synthetic */ PageViewGestureDetector(ViewPager viewPager, PageViewGestureDetector pageViewGestureDetector) {
-            this();
-        }
-
-        public boolean onFling(MotionEvent motionEvent1, MotionEvent motionEvent2, float velocityX, float velocityY) {
-            int i;
-            int pageViewCount = ViewPager.this.mPageViewHolder.getChildCount();
-            if (pageViewCount <= 0) {
-                return false;
-            }
-            if (velocityX < 0.0f && Math.abs(velocityX) > 500.0f) {
-                int pageViewWidth = ViewPager.this.getMeasuredWidth();
-                if (pageViewWidth <= 0) {
-                    return false;
-                }
-                ViewPager.this.mCurrentPageIndex = ViewPager.this.mCurrentPageIndex < pageViewCount + -1 ? ViewPager.this.mCurrentPageIndex + 1 : pageViewCount - 1;
-                ViewPager.this.smoothScrollTo(ViewPager.this.mCurrentPageIndex * pageViewWidth, 0);
-                return true;
-            } else if (velocityX <= 0.0f || Math.abs(velocityX) <= 500.0f) {
-                return false;
-            } else {
-                int pageViewWidth2 = ViewPager.this.getMeasuredWidth();
-                if (pageViewWidth2 <= 0) {
-                    return false;
-                }
-                ViewPager viewPager = ViewPager.this;
-                if (ViewPager.this.mCurrentPageIndex > 0) {
-                    i = ViewPager.this.mCurrentPageIndex - 1;
-                } else {
-                    i = 0;
-                }
-                viewPager.mCurrentPageIndex = i;
-                ViewPager.this.smoothScrollTo(ViewPager.this.mCurrentPageIndex * pageViewWidth2, 0);
+    private final class PageTouchListener implements View.OnTouchListener {
+        @SuppressLint("ClickableViewAccessibility")
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (mGestureDetector.onTouchEvent(motionEvent)) {
                 return true;
             }
+            if (!isRelease(motionEvent)) {
+                return false;
+            }
+            snapToNearestPage();
+            return true;
         }
+    }
+
+    private static boolean isRelease(MotionEvent motionEvent) {
+        int action = motionEvent.getActionMasked();
+        return action == MotionEvent.ACTION_UP || action == MotionEvent.ACTION_CANCEL;
+    }
+
+    private void snapToNearestPage() {
+        int pageCount = getPageCount();
+        int pageWidth = getPageWidth();
+        if (pageCount <= 0 || pageWidth <= 0) {
+            return;
+        }
+        int nearestPage = ((pageWidth / 2) + getScrollX()) / pageWidth;
+        moveToPage(Math.min(nearestPage, pageCount - 1));
+    }
+
+    private final class PageViewGestureDetector extends GestureDetector.SimpleOnGestureListener {
+        @Override
+        public boolean onFling(MotionEvent firstEvent, MotionEvent secondEvent,
+                float velocityX, float velocityY) {
+            if (Math.abs(velocityX) <= SWIPE_THRESHOLD_VELOCITY) {
+                return false;
+            }
+            int pageOffset = velocityX < 0.0f ? 1 : -1;
+            return moveToPage(mCurrentPageIndex + pageOffset);
+        }
+    }
+
+    private boolean moveToPage(int requestedPage) {
+        int pageCount = getPageCount();
+        int pageWidth = getPageWidth();
+        if (pageCount <= 0 || pageWidth <= 0) {
+            return false;
+        }
+        this.mCurrentPageIndex = Math.max(0, Math.min(requestedPage, pageCount - 1));
+        smoothScrollTo(this.mCurrentPageIndex * pageWidth, 0);
+        return true;
     }
 
     private void onScrolling() {
@@ -161,13 +212,15 @@ public class ViewPager extends HorizontalScrollView {
         scrollTo(0, 0);
     }
 
-    /* access modifiers changed from: protected */
-    public int getPageCount() {
+    protected int getPageCount() {
         return this.mPageViewHolder.getChildCount();
     }
 
-    /* access modifiers changed from: protected */
-    public int getCurrentPageIndex() {
+    protected int getCurrentPageIndex() {
         return this.mCurrentPageIndex;
+    }
+
+    protected int getPageWidth() {
+        return getWidth();
     }
 }

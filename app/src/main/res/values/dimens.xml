@@ -31,5 +31,10 @@
     <dimen name="navigation_strip_size">57dp</dimen>
     <dimen name="rail_inset">4dp</dimen>
     <dimen name="label_min_height">44dp</dimen>
-    <dimen name="small_label_text_size">13sp</dimen>
+    <dimen name="text_size_category">12sp</dimen>
+    <dimen name="text_size_label">13sp</dimen>
+    <dimen name="text_size_body">14sp</dimen>
+    <dimen name="text_size_title">16sp</dimen>
+    <dimen name="text_size_symbol">20sp</dimen>
+    <dimen name="text_size_display">30sp</dimen>
 </resources>

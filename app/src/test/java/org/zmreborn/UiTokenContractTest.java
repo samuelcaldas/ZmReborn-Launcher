@@ -35,13 +35,36 @@ public class UiTokenContractTest {
                 "selector_corner_radius", "rail_thickness", "rail_active_thickness",
                 "screen_indicator_dots_height", "drawer_horizontal_padding",
                 "drawer_vertical_padding", "folder_spacing", "dialog_spacing",
-                "navigation_strip_size", "rail_inset");
+                "navigation_strip_size", "rail_inset", "text_size_category",
+                "text_size_label", "text_size_body", "text_size_title",
+                "text_size_symbol", "text_size_display");
         assertTrue("minimum_touch_target must be at least 48dp",
                 parseDp(dimensions, "minimum_touch_target") >= 48f);
         assertEquals(2f, parseDp(dimensions, "rail_thickness"), 0f);
         assertEquals(3f, parseDp(dimensions, "rail_active_thickness"), 0f);
         assertTrue("rail_active_thickness must exceed rail_thickness",
                 parseDp(dimensions, "rail_active_thickness") > parseDp(dimensions, "rail_thickness"));
+        assertEquals(12f, parseSp(dimensions, "text_size_category"), 0f);
+        assertEquals(13f, parseSp(dimensions, "text_size_label"), 0f);
+        assertEquals(14f, parseSp(dimensions, "text_size_body"), 0f);
+        assertEquals(16f, parseSp(dimensions, "text_size_title"), 0f);
+        assertEquals(20f, parseSp(dimensions, "text_size_symbol"), 0f);
+        assertEquals(30f, parseSp(dimensions, "text_size_display"), 0f);
+    }
+
+    @Test
+    public void typographyStylesUseSemanticScale() throws Exception {
+        Map<String, String> styles = parseValues("styles.xml", "style", "TextAppearance.ZmReborn");
+        assertRequiredNames(styles, "TextAppearance.ZmReborn", "TextAppearance.ZmReborn.Category",
+                "TextAppearance.ZmReborn.Label", "TextAppearance.ZmReborn.Body",
+                "TextAppearance.ZmReborn.Title", "TextAppearance.ZmReborn.Symbol",
+                "TextAppearance.ZmReborn.Display");
+        assertStyleToken(styles, "Category", "text_size_category");
+        assertStyleToken(styles, "Label", "text_size_label");
+        assertStyleToken(styles, "Body", "text_size_body");
+        assertStyleToken(styles, "Title", "text_size_title");
+        assertStyleToken(styles, "Symbol", "text_size_symbol");
+        assertStyleToken(styles, "Display", "text_size_display");
     }
 
     @Test
@@ -107,6 +130,17 @@ public class UiTokenContractTest {
         String value = required(dimensions, name).trim();
         assertTrue(name + " must use dp", value.endsWith("dp"));
         return parseDimension(value);
+    }
+
+    private static float parseSp(Map<String, String> dimensions, String name) {
+        String value = required(dimensions, name).trim();
+        assertTrue(name + " must use sp", value.endsWith("sp"));
+        return parseDimension(value);
+    }
+
+    private static void assertStyleToken(Map<String, String> styles, String style, String token) {
+        String value = required(styles, "TextAppearance.ZmReborn." + style);
+        assertTrue(style + " must use " + token, value.contains("@dimen/" + token));
     }
 
     private static String required(Map<String, String> values, String name) {

@@ -1255,6 +1255,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         gridView.setAdapter(new ApplicationsAdapter(this, folderInfo.getContents()));
         TextView emptyView = new TextView(this);
         emptyView.setText(R.string.app_list_folder_empty);
+        emptyView.setTextAppearance(R.style.TextAppearance_ZmReborn_Body);
         emptyView.setTextColor(getColor(R.color.zm_reborn_fog));
         emptyView.setGravity(17);
         FrameLayout content = new FrameLayout(this);
@@ -1266,8 +1267,8 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         builder.setView(content).setNegativeButton(R.string.button_close, null);
         TextView titleView = new TextView(this);
         titleView.setText(folderInfo.title);
+        titleView.setTextAppearance(R.style.TextAppearance_ZmReborn_Title);
         titleView.setTextColor(getColor(R.color.zm_reborn_amber));
-        titleView.setTextSize(18);
         titleView.setPadding(12, 12, 12, 12);
         builder.setCustomTitle(titleView);
         this.mAppListFolderDialog = builder.create();

@@ -39,11 +39,10 @@ Semantic aliases: `window_background` and `grid_dark_background` → slate; `bub
 
 ### Type and control spacing
 
-- Workspace labels use `14sp`, fog text, end ellipsis, centered gravity, two lines, and 5dp horizontal padding. [`app/src/main/res/values/styles.xml:3-13`](../app/src/main/res/values/styles.xml#L3-L13)
-- Portrait workspace icon treatment uses 4dp top padding, 3dp left/right margins, 13dp top margin, 8dp bottom margin, and 5dp drawable padding. Landscape uses 2dp top padding, 10dp left/right margins, and 3dp drawable padding. [`app/src/main/res/values/styles.xml:14-27`](../app/src/main/res/values/styles.xml#L14-L27)
-- Search button padding is 10dp left/right, 7dp top, and 9dp bottom. [`app/src/main/res/values/styles.xml:28-32`](../app/src/main/res/values/styles.xml#L28-L32)
-- Drawer `application_boxed_grid` labels use `13sp`, two lines, `end` ellipsis, and 5dp/2dp vertical/horizontal padding. [`app/src/main/res/layout-port/application_boxed_grid.xml:2`](../app/src/main/res/layout-port/application_boxed_grid.xml#L2)
-- Settings title/summary labels use `16sp`/`13sp`; folder titles use `17sp`; widget/search and state surfaces add `14sp`/`16sp` labels. [`app/src/main/res/layout/settings_preference.xml:22-35`](../app/src/main/res/layout/settings_preference.xml#L22-L35), [`app/src/main/res/layout-port/user_folder.xml:2-4`](../app/src/main/res/layout-port/user_folder.xml#L2-L4), [`app/src/main/res/layout/widget_search.xml:22-45`](../app/src/main/res/layout/widget_search.xml#L22-L45), [`app/src/main/res/layout-port/launcher.xml:17-22`](../app/src/main/res/layout-port/launcher.xml#L17-L22)
+- Semantic type scale: category `12sp`, compact label `13sp`, body `14sp`, title `16sp`, symbol `20sp`, and numeric display `30sp`. All roles use platform `sans-serif`; title/category/symbol/display roles use `sans-serif-medium`. [`app/src/main/res/values/dimens.xml`](../app/src/main/res/values/dimens.xml), [`app/src/main/res/values/styles.xml`](../app/src/main/res/values/styles.xml)
+- Workspace/search text uses the body role; drawer labels and summaries use the compact-label role; Settings/folder/state/widget headings use the title role. Portrait and landscape resources share the same role definitions instead of local size literals.
+- Workspace labels retain fog text, end ellipsis, centered gravity, two lines, and 5dp horizontal padding. Portrait workspace icon treatment retains 4dp top padding, 3dp left/right margins, 13dp top margin, 8dp bottom margin, and 5dp drawable padding. Landscape retains 2dp top padding, 10dp left/right margins, and 3dp drawable padding.
+- Drawer labels retain two lines and end ellipsis. Live-folder titles now use the same steel color and title role as user-folder titles.
 
 ### Dimensions
 
@@ -59,10 +58,11 @@ All values below are current resource tokens from [`app/src/main/res/values/dime
 | Signal Rail and indicator | Rail `2dp`; active rail `3dp`; dots height `20dp`; rail inset `4dp`. |
 | Drawer/folder/dialog | Drawer horizontal/vertical padding = `12dp`/`8dp`; folder spacing = `8dp`; dialog spacing = `16dp`. |
 | Navigation | `navigation_strip_size` = `57dp`. |
+| Typography | Category `12sp`; label `13sp`; body `14sp`; title `16sp`; symbol `20sp`; display `30sp`. |
 
 ### Timing
 
-`duration_fast` = `120ms`, `duration_short` = `180ms`, `duration_medium` = `240ms`, and `duration_long` = `600ms`. [`app/src/main/res/values/integers.xml:3-6`](../app/src/main/res/values/integers.xml#L3-L6) `UiTokenContractTest` asserts the exact palette, dimensions, touch/rail contracts, and timings. [`app/src/test/java/org/zmreborn/UiTokenContractTest.java:16-55`](../app/src/test/java/org/zmreborn/UiTokenContractTest.java#L16-L55)
+`duration_fast` = `120ms`, `duration_short` = `180ms`, `duration_medium` = `240ms`, and `duration_long` = `600ms`. [`app/src/main/res/values/integers.xml:3-6`](../app/src/main/res/values/integers.xml#L3-L6) `UiTokenContractTest` asserts the palette, dimensions, semantic typography scale/styles, touch/rail contracts, and timings. [`app/src/test/java/org/zmreborn/UiTokenContractTest.java`](../app/src/test/java/org/zmreborn/UiTokenContractTest.java)
 
 ## Portrait and landscape shell geometry
 
@@ -116,7 +116,7 @@ Home action and drawer open/close are controlled by `Launcher.openApplicationsGr
 
 Grid behavior confirmed in [`ApplicationsGridView.java:208-270`](../app/src/main/java/org/zmreborn/ApplicationsGridView.java#L208-L270): loading disables actions and reports loading, application delivery installs an adapter, empty/error disable actions and report their states, and `clearState` re-enables the view and reports ready. Click launches an application or opens an app-list folder; long press starts a drawer drag or app-list-folder action. [`app/src/main/java/org/zmreborn/ApplicationsGridView.java:125-165`](../app/src/main/java/org/zmreborn/ApplicationsGridView.java#L125-L165)
 
-Paging behavior confirmed in [`ApplicationsPagingView.java:88-165`](../app/src/main/java/org/zmreborn/ApplicationsPagingView.java#L88-L165): loading/empty/error/ready use the same state callbacks, measured width/height feed `DrawerLayoutMetrics`, and pages are created from rows and columns. Metrics use measured content bounds, padding, and `48dp` minimum cell dimensions. [`app/src/main/java/org/zmreborn/ApplicationsPagingView.java:167-176`](../app/src/main/java/org/zmreborn/ApplicationsPagingView.java#L167-L176) Page contents are partitioned by `rows × columns`; empty lists produce no pages and each non-empty page is a bounded sublist. [`app/src/main/java/org/zmreborn/ApplicationsPagingView.java:178-193`](../app/src/main/java/org/zmreborn/ApplicationsPagingView.java#L178-L193), [`app/src/main/java/org/zmreborn/ApplicationsPagePartition.java:7-28`](../app/src/main/java/org/zmreborn/ApplicationsPagePartition.java#L7-L28)
+Paging behavior uses measured width/height for `DrawerLayoutMetrics`, partitions content by `rows × columns`, and creates bounded non-empty pages. `ViewPager` gives every page exactly one viewport width, re-applies that width after size changes, and snaps gestures against the same width used by the indicator. This guarantees a horizontal scroll range whenever more than one page exists. [`app/src/main/java/org/zmreborn/ApplicationsPagingView.java`](../app/src/main/java/org/zmreborn/ApplicationsPagingView.java), [`app/src/main/java/org/zmreborn/ViewPager.java`](../app/src/main/java/org/zmreborn/ViewPager.java), [`app/src/main/java/org/zmreborn/ApplicationsPagePartition.java`](../app/src/main/java/org/zmreborn/ApplicationsPagePartition.java)
 
 Drawer labels use `13sp`, two lines, and end ellipsis in the boxed grid/page layouts. [`app/src/main/res/layout-port/application_boxed_grid.xml:2`](../app/src/main/res/layout-port/application_boxed_grid.xml#L2), [`app/src/main/res/layout-port/application_boxed_page.xml:2`](../app/src/main/res/layout-port/application_boxed_page.xml#L2)
 
@@ -154,7 +154,7 @@ Grid and paging both open app-list folders on click and show folder actions on l
 
 ### Preferences
 
-`Preferences.onCreate` inflates the preference XML, applies the slate settings surface, binds restart and loader-reload listeners, clamps default screen when screen count changes, configures application-grid row/column controls, wires dock controls, and exposes restart/reset actions. [`app/src/main/java/org/zmreborn/Preferences.java:23-129`](../app/src/main/java/org/zmreborn/Preferences.java#L23-L129) The XML contains General, Workspace, Applications Grid, Action Bindings, Dock, restart, reset, wallpaper controls, and workspace/application-grid rows and columns. [`app/src/main/res/xml/preferences.xml:3-72`](../app/src/main/res/xml/preferences.xml#L3-L72)
+`Preferences.onCreate` inflates the preference XML, applies the slate settings surface, binds restart and loader-reload listeners, clamps default screen when screen count changes, configures application-grid row/column controls, wires dock controls, and exposes restart/reset actions. Custom row content remains non-clickable and non-focusable so `PreferenceActivity`/`ListView` owns touch dispatch; selected-state styling supplies DPAD feedback without intercepting taps. [`app/src/main/java/org/zmreborn/Preferences.java`](../app/src/main/java/org/zmreborn/Preferences.java), [`app/src/main/res/layout/settings_preference.xml`](../app/src/main/res/layout/settings_preference.xml), [`app/src/main/res/drawable/settings_preference_selector.xml`](../app/src/main/res/drawable/settings_preference_selector.xml)
 
 Preference changes persist through default `SharedPreferences`; selected language is persisted before restart, and the launcher reloads orientation/fullscreen, grid state, wallpaper, indicator, dock widths, and dock background on resume. [`app/src/main/java/org/zmreborn/PreferencesUtil.java:10-160`](../app/src/main/java/org/zmreborn/PreferencesUtil.java#L10-L160), [`app/src/main/java/org/zmreborn/Launcher.java:545-588`](../app/src/main/java/org/zmreborn/Launcher.java#L545-L588) Reset deletes the preferences file and restarts the process. [`app/src/main/java/org/zmreborn/Preferences.java:218-242`](../app/src/main/java/org/zmreborn/Preferences.java#L218-L242)
 
@@ -172,7 +172,7 @@ Confirmed content-description wiring covers the drawer toggle, delete zone, work
 
 Ready drawer state calls `focusFirstApplicationsItem`: grid selects item zero and requests focus; other implementations locate the first actionable child, then fall back to the implementing view. [`app/src/main/java/org/zmreborn/Launcher.java:436-461`](../app/src/main/java/org/zmreborn/Launcher.java#L436-L461) The grid XML declares next-focus links toward the drawer controls. [`app/src/main/res/layout-port/apps_grid_view.xml:2`](../app/src/main/res/layout-port/apps_grid_view.xml#L2) `48dp` minimum touch targets are explicit in the token contract and widget/search/state surfaces. [`app/src/main/res/values/dimens.xml:13-21`](../app/src/main/res/values/dimens.xml#L13-L21), [`app/src/main/res/layout/widget_search.xml:22-45`](../app/src/main/res/layout/widget_search.xml#L22-L45), [`app/src/main/res/layout-port/launcher.xml:20-22`](../app/src/main/res/layout-port/launcher.xml#L20-L22)
 
-Large-font behavior has only resource evidence: labels are expressed in `14sp`, `13sp`, `16sp`, and `17sp`, with the dimensions above. There is no current device proof of large-font rendering. Task **#12 focus/folders polish remains pending**.
+Large-font behavior uses semantic `sp` tokens and the platform scaled-density path, including custom colour-picker canvas text. There is no current device proof of large-font rendering. Task **#12 focus/folders polish remains pending**.
 
 ## System bars and fullscreen across API 8–35
 
