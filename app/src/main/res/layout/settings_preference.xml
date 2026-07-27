@@ -11,7 +11,8 @@
     android:paddingBottom="@dimen/space_8"
     android:minHeight="@dimen/settings_row_height"
     android:background="@drawable/settings_preference_selector"
-    android:focusable="true"
+    android:clickable="false"
+    android:focusable="false"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">
     <LinearLayout

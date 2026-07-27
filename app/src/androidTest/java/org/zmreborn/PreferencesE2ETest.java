@@ -5,6 +5,7 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 import android.test.ActivityInstrumentationTestCase2;
+import android.test.TouchUtils;
 import android.view.View;
 
 public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Preferences> {
@@ -18,6 +19,20 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
         assertEquals(36, countLeafPreferences(preferences.getPreferenceScreen()));
         assertNotNull(preferences.findPreference(preferences.getString(R.string.preferences_key_application)));
         assertNotNull(preferences.findPreference(preferences.getString(R.string.preferences_key_reset)));
+    }
+
+    public void testPreferenceScreenOpensFromTouch() {
+        Preferences preferences = getActivity();
+        getInstrumentation().waitForIdleSync();
+        PreferenceScreen generalScreen = (PreferenceScreen) preferences.getPreferenceScreen().getPreference(0);
+        View generalRow = preferences.getListView().getChildAt(0);
+
+        TouchUtils.clickView(this, generalRow);
+        getInstrumentation().waitForIdleSync();
+
+        assertNotNull("General preference screen must create a dialog", generalScreen.getDialog());
+        assertTrue("General preference screen must open from touch", generalScreen.getDialog().isShowing());
+        generalScreen.getDialog().dismiss();
     }
 
     public void testApplicationRowShowsRebrandedIdentityWithoutLink() {
