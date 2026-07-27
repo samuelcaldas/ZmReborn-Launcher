@@ -1,5 +1,6 @@
 package org.zmreborn;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
@@ -121,6 +122,7 @@ public class ViewPager extends HorizontalScrollView {
     }
 
     private final class PageTouchListener implements View.OnTouchListener {
+        @SuppressLint("ClickableViewAccessibility")
         public boolean onTouch(View view, MotionEvent motionEvent) {
             if (mGestureDetector.onTouchEvent(motionEvent)) {
                 return true;
