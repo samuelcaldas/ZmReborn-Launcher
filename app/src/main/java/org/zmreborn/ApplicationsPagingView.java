@@ -340,9 +340,12 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     /* access modifiers changed from: private */
     public void indicate() {
         int pageCount = this.mViewPager.getPageCount();
-        if (pageCount > 0 && getWidth() > 0) {
-            this.mScreenIndicator.indicate(((float) this.mViewPager.getScrollX()) / ((float) (pageCount * getWidth())));
+        int pageWidth = this.mViewPager.getPageWidth();
+        if (pageCount <= 0 || pageWidth <= 0) {
+            return;
         }
+        float progress = ((float) this.mViewPager.getScrollX()) / ((float) (pageCount * pageWidth));
+        this.mScreenIndicator.indicate(progress);
     }
 
     private void clampCurrentPageIndex() {
