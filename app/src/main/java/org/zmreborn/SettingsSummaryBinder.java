@@ -62,9 +62,23 @@ final class SettingsSummaryBinder implements SharedPreferences.OnSharedPreferenc
     }
 
     private void bindListSummary(ListPreference preference) {
-        CharSequence entry = preference.getEntry();
-        if (entry != null) {
-            preference.setSummary(entry);
+        CharSequence summary = resolveListSummary(preference.getEntries(),
+                preference.getEntryValues(), preference.getValue());
+        preference.setSummary(summary);
+    }
+
+    static CharSequence resolveListSummary(CharSequence[] entries, CharSequence[] entryValues,
+            String value) {
+        if (entries == null || entryValues == null || value == null) {
+            return null;
         }
+        int count = Math.min(entries.length, entryValues.length);
+        for (int index = 0; index < count; index++) {
+            CharSequence entryValue = entryValues[index];
+            if (entryValue != null && value.contentEquals(entryValue)) {
+                return entries[index];
+            }
+        }
+        return null;
     }
 }

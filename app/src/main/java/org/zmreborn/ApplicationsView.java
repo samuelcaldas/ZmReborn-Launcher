@@ -36,4 +36,6 @@ public interface ApplicationsView {
     void setMode(int i);
 
     void setNumColumns(int i);
+
+    void setSystemBarInsets(int left, int top, int right, int bottom);
 }

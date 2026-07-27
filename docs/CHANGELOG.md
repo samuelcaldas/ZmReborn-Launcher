@@ -239,6 +239,18 @@ Added revision-linked capture tracking under `docs/captures/`:
 - Recorded current revision `68d3786` and required homescreen, drawer, folder, and settings captures.
 - No runtime PNGs were fabricated: capture remains pending because no Android device/emulator is attached and `/opt/android-sdk` is unavailable in the current environment.
 
+## Drawer Safe-Area Runtime Validation — 2026-07-19
+
+- Built and installed current `main` source in Docker on the API 35 emulator (`320 × 640`, portrait).
+- Added visible-window inset handling to vertical and paged drawer renderers, preserving existing layout padding while reserving status/navigation bar space.
+- Added close-control margin handling so the drawer close button remains above the navigation bar in portrait and landscape.
+- Added unit coverage proving status/navigation inset padding reduces available drawer height before row sizing.
+- Hardened Preferences list-summary binding for unset or mismatched stored values; API 35 root Preferences now opens without the prior `SettingsSummaryBinder` null-value crash.
+- Initial hierarchy showed app tiles at y=0 and close control through y=640; fixed hierarchy reports app tiles beginning at y=24 and close control ending at y=616.
+- Verified captures: `docs/captures/2026-07-19-api35-portrait-app-drawer-safe-area.png` and `docs/captures/2026-07-19-api35-portrait-preferences-root.png`.
+- API 35 instrumentation suite passed on connected Docker emulator: 9 tests, including drawer inflation/open-close, launcher flows, and Preferences flows.
+- Landscape, vertical-grid, folder, large-font, and API 10 captures remain pending; see [`docs/captures/2026-07-19-current-state.md`](captures/2026-07-19-current-state.md).
+
 ## GitHub Release Automation — 2026-07-18
 
 Added protected signed APK release automation without publishing a new tag or release:

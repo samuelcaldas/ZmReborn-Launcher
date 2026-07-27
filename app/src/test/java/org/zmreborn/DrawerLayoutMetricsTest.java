@@ -38,4 +38,13 @@ public class DrawerLayoutMetricsTest {
         assertEquals(1, metrics.getCellWidth());
         assertEquals(1, metrics.getCellHeight());
     }
+
+    @Test
+    public void reservesStatusAndNavigationInsetsBeforeSizingRows() {
+        DrawerLayoutMetrics metrics = DrawerLayoutMetrics.calculate(320, 640, 8, 4,
+                0, 64, 48, 48);
+
+        assertEquals(576, metrics.getAvailableHeight());
+        assertTrue(metrics.getCellHeight() * metrics.getRows() <= 576);
+    }
 }

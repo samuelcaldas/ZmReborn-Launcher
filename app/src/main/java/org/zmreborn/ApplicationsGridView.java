@@ -20,6 +20,10 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
     private boolean mDestroyed;
     public int mMode;
     private boolean mResetMode;
+    private int mBasePaddingBottom;
+    private int mBasePaddingLeft;
+    private int mBasePaddingRight;
+    private int mBasePaddingTop;
     /* access modifiers changed from: private */
     public boolean mScrollFromListener;
 
@@ -78,6 +82,14 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
         };
     }
 
+    public void setSystemBarInsets(int left, int top, int right, int bottom) {
+        setPadding(this.mBasePaddingLeft + Math.max(0, left),
+                this.mBasePaddingTop + Math.max(0, top),
+                this.mBasePaddingRight + Math.max(0, right),
+                this.mBasePaddingBottom + Math.max(0, bottom));
+        requestLayout();
+    }
+
     public void setBackgroundAlpha(int alpha) {
         int i = 0;
         setBackgroundColor(Color.argb(alpha, 18, 26, 33));
@@ -118,6 +130,11 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
 
     /* access modifiers changed from: protected */
     public void onFinishInflate() {
+        super.onFinishInflate();
+        this.mBasePaddingLeft = getPaddingLeft();
+        this.mBasePaddingTop = getPaddingTop();
+        this.mBasePaddingRight = getPaddingRight();
+        this.mBasePaddingBottom = getPaddingBottom();
         setOnItemClickListener(this);
         setOnItemLongClickListener(this);
     }
