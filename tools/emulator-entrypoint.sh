@@ -44,13 +44,18 @@ configure_avd() {
 }
 
 start_emulator() {
-    printf 'Starting emulator %s...\n' "${AVD_NAME}"
+    printf 'Starting emulator %s...\\n' "${AVD_NAME}"
+    local accel_flag="-accel on"
+    if [[ ! -e /dev/kvm ]]; then
+        printf 'KVM unavailable, falling back to software acceleration\\n'
+        accel_flag="-accel off"
+    fi
     exec "${SDK}/emulator/emulator" \
         -avd "${AVD_NAME}" \
         -no-window \
         -no-audio \
         -no-boot-anim \
-        -accel on \
+        ${accel_flag} \
         -memory 2048 \
         -gpu swiftshader_indirect \
         -no-snapshot \
