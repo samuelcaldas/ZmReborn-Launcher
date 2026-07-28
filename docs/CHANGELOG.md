@@ -1,5 +1,140 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Gesture Modernization — Phase 4: Material 3 Expressive Visual Refresh — 2026-07-28
+
+### Dynamic wallpaper-adaptive color
+
+- Added `org.zmreborn.theme.WallpaperColorExtractor` — extracts the system wallpaper's primary seed color via `WallpaperManager.getWallpaperColors(FLAG_SYSTEM)` (API 27+) and derives a 6-role M3-inspired tonal palette using HSL lightness steps. Static amber-seed fallback on API 24–26 and on null/SecurityException.
+- Colors cached in `SharedPreferences` (`org.zmreborn.theme.wallpaper_colors`) to avoid blocking cold start.
+- `Launcher.onCreate()` calls `WallpaperColorExtractor.refresh()` on every cold start.
+- `WallpaperIntentReceiver.onReceive()` calls `WallpaperColorExtractor.refresh()` on wallpaper change, so accent colors update within one launch cycle.
+
+### M3 color role tokens
+
+- Added 13 static M3 role tokens to `res/values/colors.xml`: `m3_primary` (#fff2b64a), `m3_on_primary`, `m3_primary_container`, `m3_on_primary_container`, `m3_surface` (#ff121a21), `m3_on_surface`, `m3_surface_variant`, `m3_on_surface_variant`, `m3_outline`, `m3_outline_variant`, `m3_error`, `m3_on_error`, `m3_ripple_primary` (#33f2b64a).
+- Semantic aliases (`window_background`, `gesture_color`, `uncertain_gesture_color`, `bubble_dark_background`, `appwidget_error_color`, `snag_callout_color`, `preferences_default_general_selector_colour_*`) remapped to M3 roles.
+- Original 6 primitive tokens (`zm_reborn_*`) preserved as fallback layer.
+
+### Shape, elevation, and ripple
+
+- Added 5-tier shape scale to `dimens.xml`: `shape_corner_extra_small`=4dp, `small`=6dp, `medium`=8dp, `large`=12dp, `extra_large`=16dp.
+- Added elevation tier scale: `elevation_surface`=0dp, `elevation_dock`=4dp, `elevation_folder`=6dp, `elevation_drawer_header`=2dp.
+- `Dock.onFinishInflate()` now calls `setElevation(elevation_dock)`.
+- `Folder.onFinishInflate()` now calls `setElevation(elevation_folder)`.
+- `ApplicationsPagingView.onFinishInflate()` now calls `setElevation(elevation_drawer_header)`.
+- `res/drawable/settings_preference_selector.xml` replaced `<selector>` with `<ripple android:color="@color/m3_ripple_primary">`, preserving `state_selected`/`state_focused` items with M3 surface-variant fill and primary stroke.
+
+### Typography
+
+- Added `TextAppearance.ZmReborn.Headline` style (sans-serif-medium, 20sp, letterSpacing 0.00) to `styles.xml`.
+- Added `text_size_headline=20sp` to `dimens.xml`.
+- Added `android:letterSpacing` to all existing `TextAppearance.ZmReborn.*` roles per M3 spec.
+
+### M3 Expressive motion
+
+- `res/anim/apps_scale_in.xml`: enter — decelerate, 450ms scale (0.85→1), 400ms alpha, `pivotY=70%`.
+- `res/anim/apps_scale_out.xml`: exit — accelerate, 200ms scale (1→0.9), 200ms alpha, `pivotY=70%`.
+
+### Tests and validation
+
+- New `WallpaperColorExtractorTest` (9 pure JVM tests): tonal ramp role count, hue preservation, lightness contracts (dark on-primary, bright on-surface, midtone outline), saturation clamping, gray-seed zero-saturation, fallback alpha opacity.
+- Expanded `UiTokenContractTest`: M3 token presence assertion (`m3ColorRoleTokensPresent`), shape tier ordering invariants, `text_size_headline` value assertion, Headline style in typography scale.
+- Updated `SettingsResourceContractTest`: selector accent reference updated from `zm_reborn_amber` to `m3_primary` (semantically equivalent, both #fff2b64a).
+- Updated `UiTokenContractTest.assertPositiveDimensions` to allow `0dp` (covers `elevation_surface`).
+- Lint baseline updated to include intentionally programmatic-only resources (M3 role tokens, shape tier, Headline style).
+- Build: `assembleDebug` — 0 errors, 3 deprecation warnings. APK 757,782 bytes, SHA-256 `1545749ffa260620e9a512050b40d1af593edd5366222bd6d5df4668b3f89255`.
+- Tests: all pass (prior 100 + 9 new `WallpaperColorExtractorTest` + expanded contract tests).
+- Lint: 0 errors (317 filtered by baseline).
+- `git diff --check`: clean.
+
+
+
+- Changed fresh-install default for `preferences_default_action_swipe_up` from `"1"` (None)
+  to `"2"` (Open applications), matching Pixel launcher convention.
+- Changed fresh-install default for `preferences_default_action_swipe_down` from `"2"`
+  (Open applications) to `"1"` (None).
+- Existing users' `SharedPreferences` values are unaffected; defaults only apply when no saved
+  value exists. The configurable action-binding system is preserved intact.
+
+### Validation — 2026-07-28
+
+- `./tools/build_apk.sh` passes. APK 753,480 bytes,
+  SHA-256: `017a7c0e3b3f1c9a75e1f10540a73c2e9d8c47c8e8ed4de73d9368b9af2a7a50`.
+- `:app:testDebugUnitTest` passes (100 tests, 0 failures). No test hardcoded the old default
+  numeric values; all swipe-preference tests reference resource keys only.
+- `:app:lint` passes (0 errors, 0 warnings outside baseline).
+- `git diff --check` passes.
+
+
+
+- Registers `BackGestureCompat` from `Launcher#onCreate` and unregisters its callback in
+  `onDestroy`. API 33+ routes through `OnBackInvokedDispatcher`; API 24–32 keep existing
+  key-event routing without loading newer framework classes.
+- Consolidated callback and legacy-key handling through one Launcher-owned close sequence:
+  applications drawer → open folder → existing preview dismissal → home-screen no-op. This
+  preserves prior launcher behavior while allowing predictive-back callback delivery.
+- API 34 callback progress now previews closure on the active drawer or folder using reversible
+  alpha and scale transforms. Cancel and commit reset transforms before any view is hidden.
+- `Workspace` now applies API 29+ exclusion rectangles only for an edge whose configured swipe
+  action is **Open applications**. Unbound or differently bound actions receive an empty list,
+  leaving horizontal system-back edges available to Android. The implementation never excludes
+  left or right back edges.
+- Added JVM null-boundary coverage for `BackGestureCompat`, plus API instrumentation coverage
+  for drawer/folder close, home-screen no-op, preview cancellation, and workspace exclusions.
+
+### Validation status — 2026-07-28
+
+- `git diff --check` passes.
+- `./tools/build_apk.sh` passes. APK: `app/build/outputs/apk/debug/app-debug.apk`,
+  753,480 bytes, SHA-256: `e7549880ecd246e9d38e193ca3615dd5d95e5e9a6c654f9c2bf9016ded0b3497`.
+- `:app:testDebugUnitTest` passes. 100 tests, 0 failures, 0 errors. Includes
+  `BackGestureCompatTest` (3 JVM null-boundary tests), `GestureExclusionCompatTest`, and
+  `WindowInsetsCompatTest`.
+- `:app:lint` passes. 0 errors, 0 warnings outside baseline.
+- Build image: `cimg/android:2025.12` (CircleCI verified publisher, tagged locally as
+  `zeam-docker-dev:android35`). Contains `platforms;android-35`, `build-tools;35.0.1`,
+  JDK 21. Build ran with `--no-daemon` under `docker-dev` context.
+- API 35 gestural-nav instrumentation (`PredictiveBackE2ETest`) remains pending: requires
+  a running emulator. No pass or fail claim is made for on-device callback delivery.
+
+## Gesture Modernization — Phase 1: Compatibility Bridges & Inset Plumbing — 2026-07-28
+
+- Added `org.zmreborn.compat` package: `WindowInsetsCompat`, `GestureExclusionCompat`,
+  `BackGestureCompat`. Each isolates its API 29/30/33/34 platform class references inside
+  dedicated nested static classes (`Api29`, `Api30`, `Api33`, `Api34`) so those classes are
+  only loaded and verified when actually invoked behind a matching `SDK_INT` guard, keeping
+  the outer, universally-loaded class free of any bytecode reference unavailable at `minSdk` 24.
+- Wired real `WindowInsets` consumption through `Launcher#applySystemInsets`, propagating
+  system-bar and gesture insets to `Workspace`, `DragLayer`, `Dock`, and the Applications
+  drawer (`ApplicationsPagingView`/`ApplicationsGridView` via the `ApplicationsView` interface).
+- Added `android:enableOnBackInvokedCallback="true"` to the manifest ahead of Phase 2's
+  predictive-back gesture; `BackGestureCompat` is implemented but not yet wired into `Launcher`.
+- Marked `values-v35/styles.xml`'s edge-to-edge opt-out as transitional; it stays in place
+  until Phase 2's predictive-back and inset handling are verified on an API 35 smoke pass.
+- Fixed 21 new lint errors (`NewApi`, `InlinedApi`, `UnusedAttribute`) surfaced by the new
+  compat classes: added `@TargetApi` to each version-scoped nested class and
+  `tools:targetApi="33"` to the manifest's `<application>` element, and moved
+  `android.graphics.Insets` field access out of `WindowInsetsCompat`'s always-loaded outer
+  class into its `Api29`/`Api30` nested classes.
+
+### Testing
+
+- Added `WindowInsetsCompatTest`, `GestureExclusionCompatTest` (unit, covering the
+  API-gated null/no-op fallback paths reachable under this project's unmocked-stub-jar JVM
+  test environment).
+- Extended `LauncherE2ETest` with a system-inset-wiring regression test asserting `Dock`
+  receives insets from the root `DecorView` listener and content stays inside system-bar bounds.
+  API 35 testing caught that the legacy edge-to-edge opt-out consumed insets before `DragLayer`;
+  moving the listener to `DecorView` while chaining its normal `onApplyWindowInsets` fixed it.
+- API 35 instrumentation passes all 10 `LauncherE2ETest` cases; the targeted inset test also
+  passes with gestural navigation active. Filtered logcat shows no fatal, verifier,
+  missing-method, or `UnsupportedOperationException` entries.
+- `./tools/build_apk.sh`, `:app:testDebugUnitTest`, `:app:lint`, and `git diff --check` pass.
+
+## [3.1.11-alpha-rc4]
+
+Material 3 Expressive visual refresh: wallpaper-adaptive color, M3 role tokens, elevation on Dock/Folder/ApplicationsPagingView, RippleDrawable feedback, shape tier scale, M3 Expressive motion (450ms enter / 200ms exit, pivotY=70%), Headline typography tier with M3 letter-spacing.
+
 ## [3.1.11-alpha-rc3]
 
 ### Bug Fixes

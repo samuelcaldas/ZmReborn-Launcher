@@ -34,8 +34,8 @@ android {
         minSdkVersion 24
         targetSdkVersion 35
         resConfigs "en", "pt-rBR"
-        versionCode 114
-        versionName "3.1.11-alpha-rc3"
+        versionCode 115
+        versionName "3.1.11-alpha-rc4"
     }
 
     bundle {
