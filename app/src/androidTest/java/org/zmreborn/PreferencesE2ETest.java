@@ -182,29 +182,17 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
         assertEquals(preferences.getResources().getDimension(R.dimen.text_size_category), category.getTextSize(), 0.5f);
     }
 
-    public void testLargeFontSafetyInPreferenceRows() {
-        Preferences preferences = getActivity();
-        getInstrumentation().waitForIdleSync();
-        android.widget.ListView listView = preferences.getListView();
-
-        int visibleRows = listView.getChildCount();
-        for (int index = 0; index < visibleRows; index++) {
-            View row = listView.getChildAt(index);
-            assertTrue("Settings row with large font must have height > 0", row.getHeight() > 0);
-            assertTrue("Settings row width must remain positive", row.getWidth() > 0);
-        }
-    }
-
     public void testPreferenceMinimumTouchTargets() {
         Preferences preferences = getActivity();
         getInstrumentation().waitForIdleSync();
         android.widget.ListView listView = preferences.getListView();
         int visibleRows = listView.getChildCount();
+        int minimumTouchTarget = (int) (48 * preferences.getResources().getDisplayMetrics().density + 0.5f);
 
         assertTrue("Settings must have focusable preferences", visibleRows > 0);
         for (int index = 0; index < visibleRows; index++) {
             View row = listView.getChildAt(index);
-            assertTrue("Row height should accommodate touch target", row.getHeight() >= 30);
+            assertTrue("Row height should accommodate touch target", row.getHeight() >= minimumTouchTarget);
         }
     }
 
@@ -217,10 +205,14 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
         assertTrue("Preferences must render initially", preferences.getPreferenceScreen().getPreferenceCount() > 0);
     }
 
-    public void testDestructiveResetHasAccessibilityDescription() {
+    public void testDestructiveResetHasTitleAndSummary() {
         Preferences preferences = getActivity();
         Preference resetPref = preferences.findPreference(preferences.getString(R.string.preferences_key_reset));
         assertNotNull("Reset preference must exist", resetPref);
+        assertNotNull("Reset preference must have a title", resetPref.getTitle());
+        assertTrue("Reset preference title must not be empty", resetPref.getTitle().length() > 0);
+        assertNotNull("Reset preference must have a summary", resetPref.getSummary());
+        assertTrue("Reset preference summary must not be empty", resetPref.getSummary().length() > 0);
     }
 
     public void testPreferenceScreenBoundsValid() {

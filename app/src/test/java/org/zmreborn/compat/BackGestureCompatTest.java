@@ -16,7 +16,7 @@ public class BackGestureCompatTest {
     }
 
     @Test
-    public void registrationIgnoresNullHandler() {
+    public void registrationIgnoresAllNullInputs() {
         assertNull(BackGestureCompat.registerBackHandler(null, null));
     }
 

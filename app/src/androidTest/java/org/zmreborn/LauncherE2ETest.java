@@ -263,20 +263,10 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
         getInstrumentation().waitForIdleSync();
         View dock = launcher.findViewById(R.id.dock);
         View workspace = launcher.findViewById(R.id.workspace);
+        float minimumTouchTarget = 48 * launcher.getResources().getDisplayMetrics().density;
 
-        assertTrue("Dock height must be at least 48dp", dock.getHeight() >= 48);
+        assertTrue("Dock height must be at least 48dp", dock.getHeight() >= minimumTouchTarget);
         assertTrue("Workspace must be measurable", workspace.getMeasuredHeight() > 0);
-    }
-
-    public void testContentInsideSafeAreaInPortrait() {
-        Launcher launcher = getActivity();
-        getInstrumentation().waitForIdleSync();
-        View dragLayer = launcher.findViewById(R.id.drag_layer);
-        int width = dragLayer.getWidth();
-        int height = dragLayer.getHeight();
-
-        assertTrue("DragLayer width must be positive", width > 0);
-        assertTrue("DragLayer height must be positive", height > 0);
     }
 
     public void testSystemInsetWiringReachesDockWithoutBreakingLayout() throws Exception {

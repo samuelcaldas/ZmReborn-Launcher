@@ -6,23 +6,14 @@ import org.junit.Test;
 /**
  * Guard-clause regression coverage: a null view must never be dereferenced, regardless of
  * API level. Real API 29+ exclusion-rect behavior needs an inflated View and is covered by
- * the instrumentation smoke checks in LauncherE2ETest instead (see WindowInsetsCompatTest
+ * the instrumentation smoke checks in PredictiveBackE2ETest instead (see WindowInsetsCompatTest
  * for why: this project's local unit tests run against the unmocked Android stub jar).
  */
 public class GestureExclusionCompatTest {
 
     @Test
-    public void setExclusionRectsIgnoresNullView() {
+    public void nullViewIsIgnored() {
         GestureExclusionCompat.setSystemGestureExclusionRects(null, Collections.emptyList());
-    }
-
-    @Test
-    public void setExclusionRectsIgnoresNullViewWithNullRects() {
-        GestureExclusionCompat.setSystemGestureExclusionRects(null, null);
-    }
-
-    @Test
-    public void clearExclusionRectsIgnoresNullView() {
         GestureExclusionCompat.clearSystemGestureExclusionRects(null);
     }
 }

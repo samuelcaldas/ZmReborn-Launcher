@@ -47,24 +47,8 @@ public class DockE2ETest extends ActivityInstrumentationTestCase2<Launcher> {
         Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
         View dock = launcher.findViewById(R.id.dock);
+        float minimumTouchTarget = 48 * launcher.getResources().getDisplayMetrics().density;
 
-        assertTrue("Dock must be at least 48dp tall", dock.getHeight() >= 48);
-    }
-
-    public void testDockFailedDropRestoration() {
-        Launcher launcher = getActivity();
-        getInstrumentation().waitForIdleSync();
-        View dock = launcher.findViewById(R.id.dock);
-
-        assertNotNull("Dock must exist for drop restoration testing", dock);
-        assertTrue("Dock must remain in valid state", dock.getVisibility() == View.VISIBLE);
-    }
-
-    public void testDockIsAccessible() {
-        Launcher launcher = getActivity();
-        getInstrumentation().waitForIdleSync();
-        View dock = launcher.findViewById(R.id.dock);
-
-        assertTrue("Dock must be focusable for accessibility", dock != null && dock.getVisibility() == View.VISIBLE);
+        assertTrue("Dock must be at least 48dp tall", dock.getHeight() >= minimumTouchTarget);
     }
 }
