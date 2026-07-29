@@ -5,6 +5,8 @@ readonly ROOT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")/.." && pwd)"
 readonly DOCKER_CONTEXT="${DOCKER_CONTEXT:-docker-dev}"
 readonly DOCKER_IMAGE="${DOCKER_IMAGE:-zeam-docker-dev:android35}"
 readonly GRADLE_CACHE_VOLUME="${GRADLE_CACHE_VOLUME:-zeam-gradle-cache}"
+readonly ANDROID_USER_HOME_VOLUME="${ANDROID_USER_HOME_VOLUME:-zeam-android-user-home}"
+readonly JAVA_HOME_IN_CONTAINER="${JAVA_HOME_IN_CONTAINER:-/usr/lib/jvm/java-17-openjdk-amd64}"
 readonly APK_RELATIVE_PATH="app/build/outputs/apk/debug/app-debug.apk"
 readonly APK_PATH="${ROOT_DIR}/${APK_RELATIVE_PATH}"
 readonly BUILD_LOG="$(mktemp)"
@@ -25,7 +27,7 @@ usage() {
         'Builds the debug APK inside Docker.' \
         'Success output contains only APK path, byte size, and SHA-256.' \
         'Optional environment overrides: DOCKER_CONTEXT, DOCKER_IMAGE,' \
-        'GRADLE_CACHE_VOLUME.'
+        'GRADLE_CACHE_VOLUME, ANDROID_USER_HOME_VOLUME, JAVA_HOME_IN_CONTAINER.'
 }
 
 validate_arguments() {
@@ -99,9 +101,14 @@ fail_with_log() {
 run_build() {
     local image_id="$1"
     if docker_cli --context "${DOCKER_CONTEXT}" run --rm --pull=never \
+        --user root \
+        -e HOME=/root \
+        -e GRADLE_USER_HOME=/root/.gradle \
+        -e JAVA_HOME="${JAVA_HOME_IN_CONTAINER}" \
         -e TZ=America/Sao_Paulo \
         -v "${ROOT_DIR}:/workspace" \
         -v "${GRADLE_CACHE_VOLUME}:/root/.gradle" \
+        -v "${ANDROID_USER_HOME_VOLUME}:/root/.android" \
         -w /workspace \
         "${image_id}" \
         ./gradlew --quiet :app:assembleDebug --no-daemon --console=plain \
