@@ -89,3 +89,4 @@ lint/tmp/
 
 # Playwright MCP
 .playwright-mcp/
+*.png

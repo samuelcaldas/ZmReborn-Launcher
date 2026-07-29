@@ -31,7 +31,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
         libatk1.0-0 \
         libpangocairo-1.0-0 \
         libgtk-3-0 \
+        novnc \
         socat \
+        websockify \
+        x11vnc \
+        xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 # Install system image (emulator already in base image; ignore SIGPIPE from yes pipe)
@@ -43,7 +47,10 @@ RUN "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" \
 # Accept all licenses
 RUN yes | "${ANDROID_SDK_ROOT}/cmdline-tools/latest/bin/sdkmanager" --licenses || true
 
-EXPOSE 5555
+EXPOSE 5555 6080
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=5m --retries=3 \
+    CMD bash -ec 'exec 3<>/dev/tcp/127.0.0.1/6080 && "${ANDROID_SDK_ROOT}/platform-tools/adb" get-state | grep -qx device'
 
 COPY tools/emulator-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

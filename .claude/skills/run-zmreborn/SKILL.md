@@ -1,70 +1,70 @@
 ---
 name: run-zmreborn
-description: build APK from current codebase, deploy to Android emulator, run ZM Reborn launcher for manual testing; use when asked to run the app, test on emulator, deploy APK, build and install, or take a screenshot of the running launcher
+description: build APK from current codebase, deploy to Android emulator, open local noVNC browser interaction, test ZM Reborn manually, install APK, or capture emulator screenshot
 ---
 
-Builds the debug APK via Docker (`tools/build_apk.sh`), starts the `zeam-runtime` emulator container if needed, installs the APK, and launches the launcher for manual interaction. All paths relative to repo root.
+Builds debug APK, reuses static `zeam-runtime`, installs current build, launches launcher, then opens local noVNC manual controls. Paths relative repo root. Browser URL: `http://127.0.0.1:6080/vnc.html?autoconnect=true&resize=scale`.
 
 Driver: `.claude/skills/run-zmreborn/driver.sh`
 
-## Prerequisites
+## One-time image update
 
-- Docker context `docker-dev` available
-- Image `zeam-docker-dev:android35` present (build)
-- Image `zeam-docker-emulator:android35` present (emulator)
-- `/dev/kvm` accessible on host (emulator needs KVM)
+Run after this skill changes emulator image. Rebuild adds Xvfb, x11vnc, noVNC, and websockify:
 
-## Run: deploy (agent path — full pipeline)
+```bash
+env -u DOCKER_HOST docker --context docker-dev build -f tools/Dockerfile.emulator -t zeam-docker-emulator:android35 .
+```
+
+Recreate static runtime once. This removes its volatile 9 GB tmpfs AVD state, then creates same fixed container name with loopback-only noVNC mapping:
+
+```bash
+bash .claude/skills/run-zmreborn/driver.sh recreate
+```
+
+## Run: build, deploy, interact
 
 ```bash
 bash .claude/skills/run-zmreborn/driver.sh deploy
 ```
 
-Runs: build → start container → install → launch → screenshot.
-Screenshot lands at `/tmp/zeam-captures/launched.png`.
-Takes ~3 min on cold container start (boot), ~30 s if already running.
+Open `http://127.0.0.1:6080/vnc.html?autoconnect=true&resize=scale` in browser on Docker host. Click/tap Android emulator directly in noVNC. Screenshot from deploy lands at `/tmp/zeam-captures/launched.png`.
 
-## Run: individual steps
+## Individual commands
 
 ```bash
-bash .claude/skills/run-zmreborn/driver.sh build            # build APK only
-bash .claude/skills/run-zmreborn/driver.sh start            # start/wait for emulator
-bash .claude/skills/run-zmreborn/driver.sh install          # install built APK
-bash .claude/skills/run-zmreborn/driver.sh install /path/to/other.apk
-bash .claude/skills/run-zmreborn/driver.sh launch           # force-stop + start Launcher
-bash .claude/skills/run-zmreborn/driver.sh shot my-label    # screenshot to /tmp/zeam-captures/my-label.png
+bash .claude/skills/run-zmreborn/driver.sh build
+bash .claude/skills/run-zmreborn/driver.sh start
+bash .claude/skills/run-zmreborn/driver.sh install
+bash .claude/skills/run-zmreborn/driver.sh launch
+bash .claude/skills/run-zmreborn/driver.sh shot my-label
 ```
 
-## Manual interaction after deploy
+## ADB fallback
+
+Use Docker-exec ADB for deterministic screenshots and diagnostics. Host ADB at `localhost:5555` is unreliable in this setup.
 
 ```bash
 EXEC="env -u DOCKER_HOST docker --context docker-dev exec zeam-runtime"
-
-$EXEC adb shell input tap X Y                        # tap
-$EXEC adb shell input swipe X Y X Y 2000             # long-press (2 s)
-$EXEC adb shell input keyevent 3                     # HOME
-$EXEC adb shell input keyevent 4                     # BACK
-$EXEC adb exec-out screencap -p > /tmp/shot.png      # screenshot to host
-$EXEC adb shell am start -n org.zmreborn/.Preferences  # open Preferences (requires adb root first)
+$EXEC adb shell input tap 540 900
+$EXEC adb shell input swipe 540 900 540 900 2000
+$EXEC adb shell input keyevent 3
+$EXEC adb shell input keyevent 4
+$EXEC adb exec-out screencap -p > /tmp/zeam-captures/shot.png
 ```
 
-See `run-emulator-apk-test` for known screen coordinates and crash recovery.
+## Security and lifecycle
 
-## Gotchas
-
-- **`docker cp` to `/data/local/tmp/` fails** — the driver copies the APK to container `/tmp/` first, then `adb install -r /tmp/zeam-test.apk`. Do not bypass this.
-- **Black homescreen on first launch** — wallpaper access throws `RemoteException` before workspace data loads. Force-stop + restart via `launch` fixes it. The driver does this automatically.
-- **`adb root` required before `install`** — without it, `/data/local/tmp` is not writable and streaming install silently fails.
-- **Static container name `zeam-runtime`** — driver creates/reuses this name. If a container from a previous session is stopped, it restarts it rather than creating a duplicate. Run `docker --context docker-dev rm zeam-runtime` to reset state.
-- **KVM required** — emulator refuses to start without `/dev/kvm`. Pass `--device /dev/kvm` as the driver does.
-- **`localhost:5555` ADB shows offline** — all ADB must go through `docker exec zeam-runtime`. Host ADB cannot connect.
+- noVNC binds only to `127.0.0.1:6080`. Never change binding to `0.0.0.0` without authentication and TLS.
+- Raw VNC stays container-internal on `localhost:5900`; no host VNC port exists.
+- Driver reuses valid `zeam-runtime`; no resource-wasting duplicate containers.
+- Docker cannot add a port map to existing container. Driver fails fast when it detects stale mapping/image; rebuild image then run `recreate`.
+- `/dev/kvm` is preferred; driver falls back to slow software acceleration when unavailable. Runtime still needs 9 GB RAM for AVD tmpfs and `docker-dev` context.
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
-| `Docker image unavailable` | Build or load `zeam-docker-emulator:android35` into `docker-dev` context |
-| `container name already in use` | `env -u DOCKER_HOST docker --context docker-dev rm zeam-runtime` then redeploy |
-| Boot timeout after 5 min | Check `docker logs zeam-runtime` for emulator crash; KVM may not be available |
-| `adb: failed to stat /tmp/zeam-test.apk` | Run `adb root` inside the container before install |
-| Launcher shows black screen | Run `bash .claude/skills/run-zmreborn/driver.sh launch` to force-restart |
+| `lacks local noVNC` or `uses stale emulator image` | Rebuild image, then run `bash .claude/skills/run-zmreborn/driver.sh recreate`. |
+| Browser cannot connect | Check `docker logs zeam-runtime`; ensure host opens `127.0.0.1:6080`, not container IP. |
+| Container boot timeout | Verify `/dev/kvm` access and 9 GB available RAM for `/root/.android` tmpfs. |
+| APK install fails | Driver uses `/tmp/zeam-test.apk` after `adb root`; do not copy directly to `/data/local/tmp`. |

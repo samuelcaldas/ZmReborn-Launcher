@@ -1,5 +1,16 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Docker emulator local noVNC interaction — 2026-07-29
+
+- Added Xvfb-backed Android Emulator display, internal loopback-only x11vnc bridge, and noVNC/websockify browser endpoint.
+- `zeam-runtime` maps noVNC only to `127.0.0.1:6080`; raw VNC remains inside container on `localhost:5900` and no unauthenticated remote endpoint is published.
+- `run-zmreborn` detects stale image/port mappings before deployment and requires explicit `recreate`, preserving fixed-name runtime reuse during normal runs.
+- Updated emulator testing skill and README with browser interaction, Docker-exec ADB fallback, and static-container lifecycle instructions.
+
+### Validation — 2026-07-29
+
+- Pending emulator-image rebuild and noVNC browser interaction evidence.
+
 ## Build tooling — AGP 8.6.0 upgrade — 2026-07-29
 
 - Upgraded Android Gradle Plugin from `8.5.2` to `8.6.0`, the minimum officially supported version

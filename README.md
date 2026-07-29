@@ -101,54 +101,39 @@ Fresh installations use a gesture-first vertical application drawer with respons
 
 ## Docker emulator testing
 
-The emulator image `zeam-docker-emulator:android35` runs an API 35 AVD with KVM acceleration. Build it once from the repo root (requires internet; downloads ~1 GB):
+The emulator image `zeam-docker-emulator:android35` runs an API 35 AVD with KVM acceleration and browser-based noVNC interaction. Build it from the repo root (requires internet; downloads ~1 GB):
 
 ```sh
-docker --context docker-dev build \
+env -u DOCKER_HOST docker --context docker-dev build \
     -f tools/Dockerfile.emulator \
     -t zeam-docker-emulator:android35 \
     .
 ```
 
-Prerequisites: Docker context `docker-dev`, KVM device (`/dev/kvm`), and the base image `zeam-docker-dev:android35`. The emulator container requires `--device /dev/kvm` and exposes ADB on port 5555.
+Prerequisites: Docker context `docker-dev` and base image `zeam-docker-dev:android35`. `/dev/kvm` is preferred; without it runtime falls back to much slower software acceleration. noVNC binds only to Docker-host loopback at `127.0.0.1:6080`; raw VNC stays internal to container.
 
-Start the emulator:
+Build, create/reuse fixed `zeam-runtime`, install current APK, and launch it:
 
 ```sh
-docker --context docker-dev run -d --rm \
-    --name zeam-runtime \
-    --device /dev/kvm \
-    -p 5555:5555 \
-    zeam-docker-emulator:android35
+bash .claude/skills/run-zmreborn/driver.sh deploy
 ```
 
-Wait for full boot (typically 60–120 s), then connect ADB:
+Open `http://127.0.0.1:6080/vnc.html?autoconnect=true&resize=scale` in a browser on Docker host, then click/tap emulator directly. Existing containers cannot gain new port bindings; after rebuilding image, run `bash .claude/skills/run-zmreborn/driver.sh recreate` once.
+
+Use Docker-exec ADB for deterministic install, input, logs, and screenshots; host ADB at `localhost:5555` can be offline:
 
 ```sh
-adb connect localhost:5555
-adb wait-for-device
-# Confirm device shows as `emulator-5554` or `localhost:5555`
-adb devices
-```
-
-Install the debug APK and set ZM Reborn as the default launcher, then use standard ADB screenshot capture:
-
-```sh
-adb install -r app/build/outputs/apk/debug/app-debug.apk
-# Set ZM Reborn as default launcher via system picker shown on first HOME press
-adb shell monkey -p org.zmreborn -c android.intent.category.LAUNCHER 1
-
-# Capture a screenshot
-adb shell screencap -p /data/local/tmp/screen.png
-adb pull /data/local/tmp/screen.png docs/captures/screen.png
+EXEC="env -u DOCKER_HOST docker --context docker-dev exec zeam-runtime"
+$EXEC adb shell monkey -p org.zmreborn -c android.intent.category.LAUNCHER 1
+$EXEC adb exec-out screencap -p > /tmp/zeam-captures/screen.png
 ```
 
 Stop the container when done:
 
 ```sh
-docker --context docker-dev stop zeam-runtime
+env -u DOCKER_HOST docker --context docker-dev stop zeam-runtime
 ```
 
-The entrypoint (`tools/emulator-entrypoint.sh`) creates the AVD on first run if absent, applies a headless config (2048 MB RAM, SwiftShader GPU, 1080×1920 px, 420 dpi), and starts the emulator with `-no-window -no-audio -no-boot-anim -no-snapshot`.
+The entrypoint (`tools/emulator-entrypoint.sh`) creates AVD on first run, configures 2048 MB RAM, SwiftShader GPU, 1080×1920 px, 420 dpi, then starts Xvfb, local x11vnc, and noVNC before launching emulator without a host window.
 
 See [`docs/CHANGELOG.md`](docs/CHANGELOG.md) for detailed reconstruction evidence and known risks.

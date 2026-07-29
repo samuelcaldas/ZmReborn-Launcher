@@ -63,9 +63,11 @@ launch_prefs() {
 cmd_install() {
     local apk_path="${2:-}"
     [[ -z "${apk_path}" ]] && { echo "Usage: $0 install <apk-path>"; exit 1; }
-    local remote="/data/local/tmp/zeam-test.apk"
+    local remote="/tmp/zeam-test.apk"
     echo "Copying APK…"
     docker --context docker-dev cp "${apk_path}" "${CONTAINER}:${remote}"
+    ${EXEC} adb root 2>/dev/null || true
+    sleep 1
     ${EXEC} adb install -r "${remote}"
     echo "Installed."
 }

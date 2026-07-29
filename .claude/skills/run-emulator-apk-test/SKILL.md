@@ -14,13 +14,13 @@ Container `zeam-runtime` must be running. Start it if needed:
 
 ```bash
 env -u DOCKER_HOST docker --context docker-dev run -d --name zeam-runtime \
-    --device /dev/kvm -p 5555:5555 \
+    --device /dev/kvm -p 5555:5555 -p 127.0.0.1:6080:6080 \
     --tmpfs /root/.android:exec,size=9g \
     -v /home/samuelcaldas/repos/zmreborn/tools/emulator-entrypoint.sh:/entrypoint.sh:ro \
     zeam-docker-emulator:android35
 ```
 
-Wait for boot (BOOT COMPLETE in logs, ~3–5 min on first run).
+Wait for boot (BOOT COMPLETE in logs, ~3–5 min on first run). Open `http://127.0.0.1:6080/vnc.html?autoconnect=true&resize=scale` on the Docker host for manual interaction. noVNC is loopback-only; raw VNC remains container-internal.
 
 ## Install APK
 
