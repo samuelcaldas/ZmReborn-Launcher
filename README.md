@@ -44,7 +44,7 @@ Current layout:
 
 ## Toolchain
 
-Validation uses JDK 17, Gradle Wrapper 8.7, Android Gradle Plugin 8.5.2, Android SDK Platform 35, and Build Tools 34.0.0. `adb` and Android Emulator are used for device checks; Docker and KVM are used for validation environments.
+Validation uses JDK 17, Gradle Wrapper 8.7, Android Gradle Plugin 8.6.0, Android SDK Platform 35, and Build Tools 34.0.0. `adb` and Android Emulator are used for device checks; Docker and KVM are used for validation environments.
 
 ## Build
 

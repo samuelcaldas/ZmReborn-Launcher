@@ -184,6 +184,9 @@ API 35 instrumentation coverage includes:
 - `ApplicationsDrawerE2ETest` — workspace rendering during drawer exit, close-animation action suppression through decor-root pointer dispatch, stale-close reopen protection, search query retention, immutable binding, unremembered refresh reset, and visible empty-adapter recovery that restores original items and closes the drawer;
 - `PredictiveBackE2ETest` — registered platform predictive-back callback object invocation/delivery, handler previews, and top/bottom gesture exclusions;
 - `LauncherE2ETest` — measured production widget-span clamping and pre-measure geometry rejection;
+- `WidgetResizeInstrumentationTest` — provider-axis handle selection, 48dp handle geometry, valid
+  and occupied candidates, fixed-provider behavior, outside cancellation, and accessibility-click
+  cancellation without premature layout mutation;
 - `PreferencesE2ETest` — real activity recreation and `ListPreference` rehydration;
 - accessibility coverage for the production horizontal pager and indicator page-count semantics;
 - existing launcher, drawer, focus, inset, Settings, localization, and public-resource tests.
@@ -192,7 +195,7 @@ Latest fresh build and runtime evidence is recorded in `docs/CHANGELOG.md`. API 
 
 ## Runtime evidence and remaining validation
 
-Fresh API 35 evidence is recorded in `docs/CHANGELOG.md`. The precise empty-adapter recovery regression compiles, but a complete post-fix API 35 instrumentation rerun is blocked by unrelated Google/phone system ANRs and instrumentation lifecycle timeouts after emulator reboot. No performed result substitutes for API 24 or SystemUI gesture validation.
+Fresh API 35 evidence is recorded in `docs/CHANGELOG.md`. Six widget-resize component tests and three targeted Launcher, drawer, and Preferences smoke tests passed on API 35 with clean filtered launcher logcat. This component coverage does not exercise a real external widget provider. The precise empty-adapter recovery regression compiles, but a complete post-fix API 35 instrumentation rerun remains blocked by unrelated Google/phone system ANRs and instrumentation lifecycle timeouts after emulator reboot. No performed result substitutes for API 24, real-provider, or SystemUI gesture validation.
 
 Remaining runtime gaps:
 

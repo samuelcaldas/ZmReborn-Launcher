@@ -1,5 +1,29 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Build tooling — AGP 8.6.0 upgrade — 2026-07-29
+
+- Upgraded Android Gradle Plugin from `8.5.2` to `8.6.0`, the minimum officially supported version
+  for `compileSdk 35` per the AGP 8.6.0 release notes.
+- Gradle Wrapper (`8.7`), JDK (`17`), `compileSdk`/`targetSdkVersion` (`35`), `minSdkVersion` (`24`),
+  Java 8 source/target compatibility, and all existing dependency versions remain unchanged.
+- No third-party runtime dependencies added. No Kotlin, R8/D8 override, NDK, or `buildToolsVersion`
+  changes made. One-line change in `build.gradle`; `CLAUDE.md` and `README.md` updated to match.
+- `local.properties` is not committed; Docker wrapper resolves the SDK from container environment.
+  The `sdk.dir` advisory warning is a non-blocking informational emitted when the untracked local file
+  references the host-only `/opt/android-sdk`; the Docker wrapper build succeeds regardless.
+- Lint passed with existing `app/lint-baseline.xml`; no new issues introduced by the upgrade.
+  Baseline metadata (`lint 8.5.2`, `AGP (8.5.2)`) records the generating version; AGP 8.6.0 reads
+  and applies it correctly. Baseline requires regeneration only if new issues appear or are waived.
+
+### Validation — 2026-07-29
+
+- JVM unit tests: **167 tests**, 31 result files, 0 failures, 0 errors, 0 skipped.
+- Android-test Java compilation: passed.
+- Lint: passed (baseline unchanged).
+- `git diff --check`: passed.
+- `./tools/build_apk.sh`: passed. Debug APK: **798,938 bytes**;
+  SHA-256 `768c586cf2bcd372bf0c901dcf81e0b44ab1a545b5b89beff197fba23cf4ecf9`.
+
 ## Persisted appearance modes and palette sources — 2026-07-29
 
 ### Appearance persistence and resources
@@ -98,8 +122,17 @@
   delivery, wallpaper receiver scheduling, measured widget geometry, and gesture exclusion combinations.
 - Final fast-scroll/RTL static validation passed: 155 JVM tests, 0 failures, 0 errors, 0 skipped;
   Android-test Java compilation, `:app:lint`, and `git diff --check` passed.
-- `./tools/build_apk.sh` passed. Debug APK: 896,852 bytes; SHA-256
-  `a6ea7dbb9948a9e03bd8ab4ef994b8a77dbcbdf47a3f0f6d5ac93f932e3cb880`.
+- Final full working-tree validation passed: 167 JVM tests across 31 result files, with 0
+  failures, 0 errors, and 0 skipped; Android-test Java compilation, `:app:lint`,
+  `git diff --check`, and parsing all 29 changed XML files passed.
+- `WidgetResizeInstrumentationTest` passed all 6 component tests on API 35 in 102.099 seconds,
+  covering provider-axis handles, 48dp targets, valid and occupied candidates, fixed providers,
+  outside cancellation, and accessibility-click cancellation without premature layout mutation.
+- Targeted API 35 Launcher, drawer, and Preferences smoke passed all 3 tests in 57.372 seconds.
+  Filtered logcat contained no launcher fatal exception, verifier failure, missing-method/class
+  failure, `UnsupportedOperationException`, or launcher ANR.
+- Final `./tools/build_apk.sh` passed. Debug APK: 903,707 bytes; SHA-256
+  `b0ba47f78f7169ad8ffd6781706fc6cba470892e080241059964508df04eae00`.
 - The pre-fix 80-test API 35 instrumentation result is historical and does not validate this fix.
   No API 35 device run validates final fast-scroll/RTL behavior: an emulator reboot triggered
   unrelated Google/phone system ANRs and instrumentation lifecycle timeouts. The compiled

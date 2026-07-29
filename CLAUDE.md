@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Toolchain and Commands
 
-- Use JDK 17, Gradle Wrapper 8.7, Android Gradle Plugin 8.5.2, SDK 35, Build Tools 34.0.0, and `minSdk` 24.
+- Use JDK 17, Gradle Wrapper 8.7, Android Gradle Plugin 8.6.0, SDK 35, Build Tools 34.0.0, and `minSdk` 24.
 - Always build local debug APKs with `./tools/build_apk.sh`; never invoke `assembleDebug` directly.
 - The wrapper owns Docker context `docker-dev`, resolves image `zeam-docker-dev:android35` to its inspected local image ID, forbids pulls, mounts the Gradle cache, provides the Android SDK, and returns concise build output.
 
