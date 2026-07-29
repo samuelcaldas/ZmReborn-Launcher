@@ -1,13 +1,131 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Persisted appearance modes and palette sources — 2026-07-29
+
+### Appearance persistence and resources
+
+- Added persisted Follow-system, Light, and Dark appearance modes. Activity configuration is wrapped
+  so the selected mode applies consistently through launcher and Settings recreation.
+- Added theme resource qualifiers for light, dark, and system-following appearance values, preserving
+  semantic launcher and Settings color tokens across configuration changes.
+- Retained palette state refreshes after recreation, so the active palette is reapplied without losing
+  the selected appearance mode or requiring a wallpaper change.
+
+### Palette source compatibility
+
+- API 31+ obtains dynamic palette resources through a configuration-wrapped context and bypasses stale
+  resource/cache entries when the active appearance configuration changes.
+- API 24–30 uses a brightness-prefixed schema-v2 wallpaper palette cache, keeping light and dark
+  palette entries distinct while retaining compatible cached wallpaper-derived colors.
+
+### Tests and validation
+
+- Updated JVM and Android instrumentation coverage for persisted appearance selection, configuration
+  wrapping, dynamic-resource cache bypass, brightness-prefixed schema-v2 cache behavior, recreation,
+  and retained palette refresh.
+- 149 JVM tests passed. Android-test compilation passed. Lint passed. `git diff --check` passed.
+- `./tools/build_apk.sh` passed, producing an 890,264-byte APK with SHA-256
+  `7f57ba56f5739bf53e6ad5e6bc19a6aee0efb70d4b66dc042757d51bf6327dfd`.
+- API 35 runtime attempt was blocked because `docker-dev` lacks `/dev/kvm` and host `adb` is
+  unavailable. API 24 runtime remains unavailable.
+
+## Launcher UI/UX modernization — 2026-07-29
+
+### Home, dock, drawer, and icons
+
+- Empty workspaces now remain intentionally blank; zero/one-page indicators stay hidden and
+  multi-page dots sit above bottom navigation/dock space.
+- Fresh installs use responsive vertical `GridView.AUTO_FIT` application layout. Existing saved
+  drawer choices remain unchanged. Automatic, Comfortable, Default, and Compact density presets
+  select width-driven cell geometry; portrait and landscape share spacing and two-line labels.
+- Vertical mode now integrates accent-insensitive, case-insensitive search with prefix-first ranking,
+  clear/no-results affordances, query retention through model refresh, and stable-anchor restoration.
+  Empty-query multi-section results expose a 48dp accent-normalized alphabetical fast-scroll rail
+  that preserves source positions, adapts labels to available height, hides during search reordering,
+  and supports touch, keyboard, and per-section accessibility navigation. Rail selection/virtual IDs
+  remain stable through usable compaction, all drawer input is suppressed during close, and RTL mirrors
+  rail position, grid inset, plus directional focus. Adapter snapshots,
+  deterministic profile-sensitive stable IDs, and mutation-free binding keep filtered/package-refresh
+  state independent from shared model objects.
+- Both vertical and paged drawers suppress click/long-click actions throughout close animations and
+  reset transforms before reopening. Reopening invalidates stale animated-close callbacks so a late
+  callback cannot hide the reopened grid.
+- First-run dock bootstrap resolves installed Phone, Messages, Browser, Camera, and Contacts
+  handlers through implicit intents, deduplicates components, and never inserts a drawer shortcut.
+- Shared icon normalization keeps API 26+ adaptive drawables live, supplies deterministic null
+  fallback, and raster-normalizes only legacy drawables. `TextView` bindings now use view-owned
+  drawable copies with explicit positive bounds, avoiding blank adaptive icons and callback/bounds
+  conflicts across drawer, workspace, and dock.
+- Remembered vertical drawer position is preserved when focus returns. Empty-query package refresh
+  still resets to top when remember-position is disabled; clearing search restores its explicit
+  pre-search anchor. `ApplicationsDrawerView.captureScrollState()` returns an empty state when its
+  adapter is absent or empty, or the visible position is invalid, preventing refresh crashes. While
+  API 35 forced edge-to-edge remains opted out, drawer system-bar padding is zeroed because decor
+  fitting has already applied those insets; gesture insets continue to reach drawer and workspace.
+
+### Palette, widgets, and Settings
+
+- Wallpaper palette refresh runs through a dedicated single-thread launcher executor instead of
+  process-global `AsyncTask` scheduling. Wallpaper broadcasts retain
+  `BroadcastReceiver.PendingResult` lifetime on launcher-live and launcher-absent paths, then post
+  live palette reapplication to the UI thread. Controlled instrumentation dispatch exercises the
+  registered production receiver path and waits on the same executor queue.
+- Widget picker/configuration tracks allocated IDs through recreation, rejects stale or mismatched
+  successful results, and releases abandoned IDs even when cancellation data is null. Initial spans
+  wait for measured target-screen `CellLayout` geometry, use signed gaps, clamp to grid bounds, and
+  publish provider size options only after current geometry becomes ready. Deferred placement keeps
+  its original target screen across layout delay and activity recreation.
+- Direct widget resize uses provider-axis handles and cell snapping, enforces provider minimum
+  dimensions, rejects occupied or out-of-bounds spans, persists accepted changes, and refreshes
+  provider options from measured geometry. Cancelled resize gestures restore the original span
+  without persistence or provider-option refresh.
+- Settings boolean rows use platform `SwitchPreference`, exact semantic thumb/track state lists,
+  borderless normal rows, focused/selected outline/ripple feedback, and cached wallpaper surface.
+  Vertical drawer density is exposed as a localized `ListPreference`; legacy row/column controls
+  remain available only for horizontal paging.
+
+### Regression coverage and validation
+
+- Added/expanded JVM contracts for blank home, dock resolution, normalized drawer filtering,
+  stable/profile-sensitive IDs, stable-anchor restoration, responsive density breakpoints,
+  close-state guards, dedicated wallpaper scheduling, explicit adaptive-icon bounds, signed widget
+  gaps and clamping, pure resize geometry/source contracts, exact switch style/state chains,
+  production fallback colors, and ripple ordering.
+- Added/expanded API instrumentation for integrated search and immutable binding, stale-close reopen
+  protection, unremembered package-refresh reset, visible empty-to-populated adapter refresh that
+  restores original items and closes the drawer, adaptive-icon compound bounds, close-animation action
+  suppression, production pager accessibility, Preferences recreation, registered platform back callback
+  delivery, wallpaper receiver scheduling, measured widget geometry, and gesture exclusion combinations.
+- Final fast-scroll/RTL static validation passed: 155 JVM tests, 0 failures, 0 errors, 0 skipped;
+  Android-test Java compilation, `:app:lint`, and `git diff --check` passed.
+- `./tools/build_apk.sh` passed. Debug APK: 896,852 bytes; SHA-256
+  `a6ea7dbb9948a9e03bd8ab4ef994b8a77dbcbdf47a3f0f6d5ac93f932e3cb880`.
+- The pre-fix 80-test API 35 instrumentation result is historical and does not validate this fix.
+  No API 35 device run validates final fast-scroll/RTL behavior: an emulator reboot triggered
+  unrelated Google/phone system ANRs and instrumentation lifecycle timeouts. The compiled
+  fast-scroll and empty-adapter regressions remain unexecuted on-device.
+- Post-fix API 35 cold-launch/model-refresh smoke succeeded: launcher started; the drawer showed
+  18 apps and its search field. Filtered logcat after that smoke had no launcher `FATAL`,
+  `IndexOutOfBoundsException`, verifier, missing-method, or `UnsupportedOperationException` entries.
+- Real external-provider widget resize runtime validation remains unperformed on API 24 and API 35.
+- No API 24 device or local emulator image is available, so API 24 runtime smoke remains unperformed.
+  Instrumentation invokes the registered API 35 predictive-back callback object, but an actual
+  SystemUI edge gesture remains unverified.
+
+### Deferred scope
+
+- Drawer suggestions, profile-aware icon cache, automatic neighboring-item reflow and snackbar undo,
+  Material sheets, complete Settings hierarchy, optional accessibility drawer button, and forced
+  edge-to-edge opt-in remain deferred.
+
 ## Gesture Modernization — Phase 4: Material 3 Expressive Visual Refresh — 2026-07-28
 
 ### Dynamic wallpaper-adaptive color
 
-- Added `org.zmreborn.theme.WallpaperColorExtractor` — extracts the system wallpaper's primary seed color via `WallpaperManager.getWallpaperColors(FLAG_SYSTEM)` (API 27+) and derives a 6-role M3-inspired tonal palette using HSL lightness steps. Static amber-seed fallback on API 24–26 and on null/SecurityException.
+- Added `org.zmreborn.theme.WallpaperColorExtractor` — extracts the system wallpaper's primary seed color via `WallpaperManager.getWallpaperColors(FLAG_SYSTEM)` (API 27+) and derives a 6-role M3-inspired tonal palette using HSV value steps. Static amber-seed fallback on API 24–26 and on null/SecurityException.
 - Colors cached in `SharedPreferences` (`org.zmreborn.theme.wallpaper_colors`) to avoid blocking cold start.
-- `Launcher.onCreate()` calls `WallpaperColorExtractor.refresh()` on every cold start.
-- `WallpaperIntentReceiver.onReceive()` calls `WallpaperColorExtractor.refresh()` on wallpaper change, so accent colors update within one launch cycle.
+- `Launcher.onCreate()` schedules `WallpaperColorExtractor.refresh()` through a serial background executor on every cold start.
+- `WallpaperIntentReceiver.onReceive()` retains broadcast lifetime with `goAsync()`, schedules serialized extraction, and reapplies the palette after wallpaper changes.
 
 ### M3 color role tokens
 
@@ -37,7 +155,7 @@
 
 ### Tests and validation
 
-- New `WallpaperColorExtractorTest` (9 pure JVM tests): tonal ramp role count, hue preservation, lightness contracts (dark on-primary, bright on-surface, midtone outline), saturation clamping, gray-seed zero-saturation, fallback alpha opacity.
+- New `WallpaperColorExtractorTest` (9 pure JVM tests): tonal ramp role count, hue preservation, HSV value contracts (dark on-primary, bright on-surface, midtone outline), saturation clamping, gray-seed zero-saturation, fallback alpha opacity.
 - Expanded `UiTokenContractTest`: M3 token presence assertion (`m3ColorRoleTokensPresent`), shape tier ordering invariants, `text_size_headline` value assertion, Headline style in typography scale.
 - Updated `SettingsResourceContractTest`: selector accent reference updated from `zm_reborn_amber` to `m3_primary` (semantically equivalent, both #fff2b64a).
 - Updated `UiTokenContractTest.assertPositiveDimensions` to allow `0dp` (covers `elevation_surface`).
