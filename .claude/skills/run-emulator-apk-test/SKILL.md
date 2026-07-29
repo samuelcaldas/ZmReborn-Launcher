@@ -16,7 +16,7 @@ Container `zeam-runtime` must be running. Start it if needed:
 env -u DOCKER_HOST docker --context docker-dev run -d --name zeam-runtime \
     --device /dev/kvm -p 5555:5555 \
     --tmpfs /root/.android:exec,size=9g \
-    -v /home/samuelcaldas/repos/zeam/tools/emulator-entrypoint.sh:/entrypoint.sh:ro \
+    -v /home/samuelcaldas/repos/zmreborn/tools/emulator-entrypoint.sh:/entrypoint.sh:ro \
     zeam-docker-emulator:android35
 ```
 

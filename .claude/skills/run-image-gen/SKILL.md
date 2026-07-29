@@ -29,7 +29,7 @@ No manual install needed. `uv run --with pillow` fetches Pillow on first use.
 
 ## Run: driver (agent path)
 
-All paths are relative to the repo root `/home/samuelcaldas/repos/zeam`.
+All paths are relative to the repo root `/home/samuelcaldas/repos/zmreborn`.
 
 ### Generate launcher icons at all Android densities
 

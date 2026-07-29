@@ -6,7 +6,6 @@ set -Eeuo pipefail
 CONTAINER="${CONTAINER:-zeam-runtime}"
 OUT_DIR="${OUT_DIR:-/tmp/zeam-captures}"
 EXEC="env -u DOCKER_HOST docker --context docker-dev exec ${CONTAINER}"
-APK_PATH="${1:-}"
 
 mkdir -p "${OUT_DIR}"
 
@@ -62,10 +61,11 @@ launch_prefs() {
 # ─── install ──────────────────────────────────────────────────────────────────
 
 cmd_install() {
-    [[ -z "${APK_PATH}" ]] && { echo "Usage: $0 <apk-path>"; exit 1; }
+    local apk_path="${2:-}"
+    [[ -z "${apk_path}" ]] && { echo "Usage: $0 install <apk-path>"; exit 1; }
     local remote="/data/local/tmp/zeam-test.apk"
     echo "Copying APK…"
-    docker --context docker-dev cp "${APK_PATH}" "${CONTAINER}:${remote}"
+    docker --context docker-dev cp "${apk_path}" "${CONTAINER}:${remote}"
     ${EXEC} adb install -r "${remote}"
     echo "Installed."
 }
@@ -144,7 +144,7 @@ cmd_shot() {
 # ─── dispatch ─────────────────────────────────────────────────────────────────
 
 case "${1:-screenshot_all}" in
-    install)        cmd_install ;;
+    install)        cmd_install "$@" ;;
     screenshot_all) cmd_screenshot_all ;;
     shot)           cmd_shot "${2:-}" ;;
     *)              echo "Commands: install <apk> | screenshot_all | shot <name>"; exit 1 ;;
