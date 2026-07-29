@@ -293,6 +293,11 @@
   missing-method, or `UnsupportedOperationException` entries.
 - `./tools/build_apk.sh`, `:app:testDebugUnitTest`, `:app:lint`, and `git diff --check` pass.
 
+## [3.1.11-alpha-rc5]
+
+- Added local noVNC browser interaction for the Docker Android emulator, backed by Xvfb and an internal loopback-only VNC bridge.
+- Added runtime recreate checks that detect stale emulator image or port mappings before deployment.
+
 ## [3.1.11-alpha-rc4]
 
 Material 3 Expressive visual refresh: wallpaper-adaptive color, M3 role tokens, elevation on Dock/Folder/ApplicationsPagingView, RippleDrawable feedback, shape tier scale, M3 Expressive motion (450ms enter / 200ms exit, pivotY=70%), Headline typography tier with M3 letter-spacing.
