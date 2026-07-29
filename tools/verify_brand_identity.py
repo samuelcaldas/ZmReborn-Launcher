@@ -23,12 +23,12 @@ ICON_SIZES = {
     "drawable-xxxhdpi/ic_launcher.png": 192,
 }
 PALETTE = {
-    "zm_reborn_slate": "#ff121a21",
-    "zm_reborn_glass": "#d9121a21",
-    "zm_reborn_fog": "#ffeaf0f3",
-    "zm_reborn_steel": "#ffb8c2c8",
-    "zm_reborn_amber": "#fff2b64a",
-    "zm_reborn_ember": "#ffd95c4f",
+    "zm_reborn_slate": "@color/m3_surface",
+    "zm_reborn_glass": "@color/m3_surface_glass",
+    "zm_reborn_fog": "@color/m3_on_surface",
+    "zm_reborn_steel": "@color/m3_outline",
+    "zm_reborn_amber": "@color/m3_primary",
+    "zm_reborn_ember": "@color/m3_error",
 }
 ROOT = Path(__file__).resolve().parents[1]
 
