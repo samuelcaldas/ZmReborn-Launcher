@@ -216,6 +216,40 @@ public class UiModernizationContractTest {
                 "this.mAppWidgetManager.updateAppWidgetOptions("));
     }
 
+    @Test
+    public void resizableWidgetsUseDirectCellSnappedOverlay() throws Exception {
+        String launcher = read("main/java/org/zmreborn/Launcher.java");
+        String cellLayout = read("main/java/org/zmreborn/CellLayout.java");
+        String resizeFrame = read("main/java/org/zmreborn/WidgetResizeFrame.java");
+        String strings = read("main/res/values/strings.xml");
+        String portugueseStrings = read("main/res/values-pt-rBR/strings.xml");
+        String commit = sourceSection(launcher,
+                "    private void commitWidgetResize(",
+                "    private void dismissWidgetResize(WidgetResizeSession session)");
+        assertTrue(launcher.contains("!showWidgetResize(pressedView)"));
+        assertTrue(launcher.contains(
+                "providerInfo.resizeMode == AppWidgetProviderInfo.RESIZE_NONE"));
+        assertTrue(launcher.contains("new FrameLayout.LayoutParams(-1, -1)"));
+        assertTrue(launcher.contains("if (dismissWidgetResize())"));
+        assertTrue(launcher.contains("dismissWidgetResize();\n        super.onPause();"));
+        assertTrue(commit.contains("applyResizeCandidate(session.widgetView, candidate)"));
+        assertTrue(commit.contains("LauncherModel.updateItemInDatabase(this, session.widgetInfo)"));
+        assertTrue(commit.contains("updateAppWidgetSizeOptions(session.widgetInfo)"));
+        assertTrue(commit.indexOf("LauncherModel.updateItemInDatabase")
+                < commit.indexOf("updateAppWidgetSizeOptions"));
+        assertTrue(cellLayout.contains("findOccupiedCells(xCount, yCount, this.mOccupied, ignoredView)"));
+        assertTrue(cellLayout.contains("static ResizeCandidate calculateResizeCandidate"));
+        assertTrue(cellLayout.contains("throw new IllegalArgumentException(\"Unknown resize edge\")"));
+        assertTrue(resizeFrame.contains("private static final int HANDLE_SIZE_DP = 48"));
+        assertTrue(resizeFrame.contains("AppWidgetProviderInfo.RESIZE_HORIZONTAL"));
+        assertTrue(resizeFrame.contains("AppWidgetProviderInfo.RESIZE_VERTICAL"));
+        assertTrue(resizeFrame.contains("R.string.widget_resize_invalid_span"));
+        assertTrue(resizeFrame.contains("setContentDescription"));
+        assertTrue(strings.contains("name=\"widget_resize_handle_bottom_right\""));
+        assertTrue(portugueseStrings.contains("name=\"widget_resize_handle_bottom_right\""));
+        assertFalse(launcher.contains("R.layout.widget_span"));
+    }
+
     private static void assertDefaultHandlerQueries(String manifest) {
         assertTrue(manifest.contains("android.intent.action.DIAL"));
         assertTrue(manifest.contains("android.intent.action.SENDTO"));
