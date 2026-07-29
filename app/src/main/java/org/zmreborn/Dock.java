@@ -35,6 +35,7 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
     private View mScrollView;
     private View mSelectedView;
     private DockDragTransaction mDragTransaction;
+    private Rect mSystemBarInsets;
 
     public Dock(Context context) {
         super(context);
@@ -52,11 +53,16 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
         this.mDragController = dragController;
     }
 
+    public void setSystemBarInsets(Rect insets) {
+        this.mSystemBarInsets = insets;
+    }
+
     /* access modifiers changed from: protected */
     public void onFinishInflate() {
         this.mItemHolder = (LinearLayout) findViewById(R.id.dock_item_holder);
         this.mScrollView = findViewById(R.id.dock_scroll_view);
         this.mScrollView.setBackgroundColor(0);
+        setElevation(getResources().getDimension(R.dimen.elevation_dock));
         super.onFinishInflate();
     }
 

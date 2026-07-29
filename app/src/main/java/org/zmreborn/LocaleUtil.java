@@ -20,13 +20,23 @@ final class LocaleUtil {
 
     static Context wrap(Context baseContext) {
         requireContext(baseContext);
+        Configuration baseConfiguration = baseContext.getResources().getConfiguration();
+        Configuration configuration = new Configuration(baseConfiguration);
         Locale locale = localeForLanguage(getSelectedLanguage(baseContext));
-        if (locale == null) {
+        if (locale != null) {
+            configuration.setLocale(locale);
+        }
+        Appearance.Brightness brightness = Appearance.brightnessFor(
+                Appearance.getSelectedAppearance(baseContext));
+        Configuration brightnessConfiguration = Appearance.applyBrightness(configuration, brightness);
+        if (brightness == Appearance.Brightness.SYSTEM) {
+            brightnessConfiguration = Appearance.applySystemNightMode(
+                    configuration, Resources.getSystem().getConfiguration());
+        }
+        if (locale == null && brightnessConfiguration.uiMode == baseConfiguration.uiMode) {
             return baseContext;
         }
-        Configuration configuration = new Configuration(baseContext.getResources().getConfiguration());
-        configuration.setLocale(locale);
-        return baseContext.createConfigurationContext(configuration);
+        return baseContext.createConfigurationContext(brightnessConfiguration);
     }
 
     static String getSelectedLanguage(Context context) {

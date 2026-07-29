@@ -129,7 +129,7 @@ public class LauncherModel {
                             if (applicationItemInfo.title == null) {
                                 applicationItemInfo.title = resolveInfo.activityInfo.name;
                             }
-                            applicationItemInfo.icon = Utilities.createIconThumbnail(resolveInfo.activityInfo.loadIcon(packageManager), launcher);
+                            applicationItemInfo.icon = Utilities.normalizeApplicationIcon(resolveInfo.activityInfo.loadIcon(packageManager), launcher);
                             applicationItemInfo.filtered = true;
                             applicationItemInfo.setActivity(componentName, 270532608);
                             applicationItemInfos.add(applicationItemInfo);
@@ -728,7 +728,7 @@ public class LauncherModel {
         }
         ApplicationItemInfo applicationItemInfo = new ApplicationItemInfo();
         ActivityInfo activityInfo = resolveInfo.activityInfo;
-        applicationItemInfo.icon = Utilities.createIconThumbnail(activityInfo.loadIcon(packageManager), context);
+        applicationItemInfo.icon = Utilities.normalizeApplicationIcon(activityInfo.loadIcon(packageManager), context);
         if (applicationItemInfo.title == null || applicationItemInfo.title.length() == 0) {
             applicationItemInfo.title = activityInfo.loadLabel(packageManager);
         }
@@ -750,7 +750,7 @@ public class LauncherModel {
                 PackageManager packageManager = context.getPackageManager();
                 try {
                     Resources resources = packageManager.getResourcesForApplication(packageName);
-                    applicationItemInfo.icon = Utilities.createIconThumbnail(resources.getDrawable(resources.getIdentifier(resourceName, (String) null, (String) null)), context);
+                    applicationItemInfo.icon = Utilities.normalizeApplicationIcon(resources.getDrawable(resources.getIdentifier(resourceName, (String) null, (String) null)), context);
                 } catch (Exception e) {
                     applicationItemInfo.icon = packageManager.getDefaultActivityIcon();
                 }

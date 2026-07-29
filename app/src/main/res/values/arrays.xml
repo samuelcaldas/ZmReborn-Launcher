@@ -38,6 +38,18 @@
         <item>1</item>
         <item>2</item>
     </string-array>
+    <array name="preferences_entries_apps_grid_densities">
+        <item>Automatic</item>
+        <item>Comfortable</item>
+        <item>Default</item>
+        <item>Compact</item>
+    </array>
+    <string-array name="preferences_entry_values_apps_grid_densities" translatable="false">
+        <item>automatic</item>
+        <item>comfortable</item>
+        <item>default</item>
+        <item>compact</item>
+    </string-array>
     <array name="preferences_entries_dock_backgrounds">
         <item>Dark</item>
         <item>Dark fade</item>
@@ -85,6 +97,16 @@
         <item></item>
         <item>en</item>
         <item>pt-BR</item>
+    </string-array>
+    <array name="preferences_entries_application_appearances">
+        <item>Follow system</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </array>
+    <string-array name="preferences_values_application_appearances" translatable="false">
+        <item>system</item>
+        <item>light</item>
+        <item>dark</item>
     </string-array>
     <array name="wallpapers">
     </array>

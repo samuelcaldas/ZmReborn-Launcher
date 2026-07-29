@@ -6,17 +6,17 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.ResolveInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
-import android.graphics.LinearGradient;
 import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.PaintFlagsDrawFilter;
 import android.graphics.PorterDuff;
-import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
-import android.graphics.Shader;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.LayerDrawable;
 import android.graphics.drawable.PaintDrawable;
+import android.widget.TextView;
+import org.zmreborn.compat.AdaptiveIconCompat;
 
 final class Utilities {
     private static final Rect sBounds = new Rect();
@@ -33,12 +33,45 @@ final class Utilities {
         sCanvas.setDrawFilter(new PaintFlagsDrawFilter(4, 2));
     }
 
-    static Drawable createIconThumbnail(Drawable icon, Context context) {
-        if (sIconWidth == -1) {
-            int dimension = (int) context.getResources().getDimension(17104896);
-            sIconHeight = dimension;
-            sIconWidth = dimension;
+    private static void ensureIconSize(Context context) {
+        if (sIconWidth > 0 && sIconHeight > 0) {
+            return;
         }
+        int dimension = Math.max(1,
+                (int) context.getResources().getDimension(17104896));
+        sIconHeight = dimension;
+        sIconWidth = dimension;
+    }
+
+    static Drawable normalizeApplicationIcon(Drawable icon, Context context) {
+        Drawable resolvedIcon = icon;
+        if (resolvedIcon == null) {
+            resolvedIcon = context.getResources().getDrawable(R.drawable.ic_launcher_application);
+        }
+        if (AdaptiveIconCompat.isAdaptiveIcon(resolvedIcon)) {
+            return resolvedIcon;
+        }
+        return createIconThumbnail(resolvedIcon, context);
+    }
+
+    static Drawable setCompoundApplicationIcon(
+            TextView view, Drawable icon, Context context) {
+        Drawable resolvedIcon = normalizeApplicationIcon(icon, context);
+        ensureIconSize(context);
+        Drawable boundIcon = copyDrawable(resolvedIcon, context);
+        boundIcon.setBounds(0, 0, sIconWidth, sIconHeight);
+        view.setCompoundDrawables(null, boundIcon, null, null);
+        return resolvedIcon;
+    }
+
+    static Drawable createIconThumbnail(Drawable icon, Context context) {
+        if (icon == null) {
+            return normalizeApplicationIcon(null, context);
+        }
+        if (AdaptiveIconCompat.isAdaptiveIcon(icon)) {
+            return icon;
+        }
+        ensureIconSize(context);
         int width = sIconWidth;
         int height = sIconHeight;
         if (icon instanceof PaintDrawable) {
@@ -90,11 +123,7 @@ final class Utilities {
     }
 
     static Bitmap createBitmapThumbnail(Bitmap bitmap, Context context) {
-        if (sIconWidth == -1) {
-            int dimension = (int) context.getResources().getDimension(17104896);
-            sIconHeight = dimension;
-            sIconWidth = dimension;
-        }
+        ensureIconSize(context);
         int width = sIconWidth;
         int height = sIconHeight;
         int bitmapWidth = bitmap.getWidth();
@@ -132,31 +161,7 @@ final class Utilities {
     }
 
     static Drawable createDockIconThumbnail(Drawable icon, Context context) {
-        int dimension = (int) context.getResources().getDimension(17104896);
-        sIconHeight = dimension;
-        sIconWidth = dimension;
-        int width = sIconWidth;
-        int height = sIconHeight;
-        float ratio = ((float) sIconHeight) / (((float) sIconHeight) * 1.225f);
-        Bitmap originalBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        Canvas canvas1 = new Canvas();
-        canvas1.setBitmap(originalBitmap);
-        icon.setBounds(0, 0, width, height);
-        icon.draw(canvas1);
-        Matrix matrix = new Matrix();
-        matrix.preScale(1.0f, -1.0f);
-        Bitmap reflectionImage = Bitmap.createBitmap(originalBitmap, 0, height / 2, width, height / 2, matrix, false);
-        Bitmap bitmapWithReflection = Bitmap.createBitmap(width, (int) (((float) height) * 1.225f), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(bitmapWithReflection);
-        canvas.drawBitmap(reflectionImage, 0.0f, (float) (height - 6), (Paint) null);
-        Paint paint = new Paint();
-        paint.setShader(new LinearGradient(0.0f, (float) originalBitmap.getHeight(), 0.0f, (float) bitmapWithReflection.getHeight(), 1895825407, 16777215, Shader.TileMode.CLAMP));
-        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.DST_IN));
-        canvas.drawRect(0.0f, (float) (height - 6), (float) width, (float) bitmapWithReflection.getHeight(), paint);
-        canvas.drawBitmap(originalBitmap, 0.0f, 0.0f, (Paint) null);
-        originalBitmap.recycle();
-        reflectionImage.recycle();
-        return new FastBitmapDrawable(Bitmap.createScaledBitmap(bitmapWithReflection, Math.round(((float) sIconWidth) * ratio), sIconHeight, true));
+        return normalizeApplicationIcon(icon, context);
     }
 
     static boolean canUninstallApplication(Context context, ApplicationItemInfo applicationItemInfo) {
@@ -171,15 +176,73 @@ final class Utilities {
     }
 
     static Drawable overlayUninstallIcon(Context context, Drawable iconDrawable) {
+        Drawable normalizedIcon = normalizeApplicationIcon(iconDrawable, context);
+        Bitmap iconBitmap = getMutableBitmap(normalizedIcon);
+        Drawable overlay = context.getResources().getDrawable(R.drawable.overlay_uninstall);
+        if (iconBitmap != null && overlay instanceof BitmapDrawable) {
+            Bitmap overlayBitmap = ((BitmapDrawable) overlay).getBitmap();
+            return new FastBitmapDrawable(addOverlay(iconBitmap, overlayBitmap));
+        }
+        return new LayerDrawable(new Drawable[]{
+                copyDrawable(normalizedIcon, context), overlay});
+    }
+
+    static Drawable adjustIconOpacity(Drawable iconDrawable) {
         if (iconDrawable == null) {
             return null;
         }
         Bitmap iconBitmap = getMutableBitmap(iconDrawable);
-        return iconBitmap != null ? new FastBitmapDrawable(addOverlay(iconBitmap, ((BitmapDrawable) context.getResources().getDrawable(R.drawable.overlay_uninstall)).getBitmap())) : iconDrawable;
+        if (iconBitmap != null) {
+            return new FastBitmapDrawable(adjustOpacity(iconBitmap, 95));
+        }
+        Drawable fadedIcon = copyDrawable(iconDrawable);
+        fadedIcon.setAlpha(95);
+        return fadedIcon;
     }
 
-    static Drawable adjustIconOpacity(Drawable iconDrawable) {
-        return new FastBitmapDrawable(adjustOpacity(getMutableBitmap(iconDrawable), 95));
+    private static Drawable copyDrawable(Drawable drawable, Context context) {
+        Drawable.ConstantState constantState = drawable.getConstantState();
+        if (constantState != null) {
+            Drawable copy = constantState.newDrawable(context.getResources()).mutate();
+            copyDrawableProperties(drawable, copy);
+            return copy;
+        }
+        if (drawable instanceof FastBitmapDrawable) {
+            return new FastBitmapDrawable(
+                    ((FastBitmapDrawable) drawable).getBitmap());
+        }
+        return rasterizeDrawableCopy(drawable);
+    }
+
+    private static void copyDrawableProperties(
+            Drawable source, Drawable destination) {
+        destination.setAlpha(source.getAlpha());
+        destination.setColorFilter(source.getColorFilter());
+        destination.setLevel(source.getLevel());
+        destination.setState(source.getState());
+        destination.setVisible(source.isVisible(), false);
+    }
+
+    private static Drawable rasterizeDrawableCopy(Drawable drawable) {
+        Bitmap bitmap = Bitmap.createBitmap(
+                sIconWidth, sIconHeight, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(bitmap);
+        Rect oldBounds = new Rect(drawable.getBounds());
+        try {
+            drawable.setBounds(0, 0, sIconWidth, sIconHeight);
+            drawable.draw(canvas);
+        } finally {
+            drawable.setBounds(oldBounds);
+        }
+        return new FastBitmapDrawable(bitmap);
+    }
+
+    private static Drawable copyDrawable(Drawable drawable) {
+        Drawable.ConstantState constantState = drawable.getConstantState();
+        if (constantState == null) {
+            return drawable.mutate();
+        }
+        return constantState.newDrawable().mutate();
     }
 
     private static Bitmap getMutableBitmap(Drawable iconDrawable) {

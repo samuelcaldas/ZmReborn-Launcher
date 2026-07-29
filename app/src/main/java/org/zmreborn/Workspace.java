@@ -30,8 +30,10 @@ import android.widget.Scroller;
 import android.widget.TextView;
 import java.util.ArrayList;
 import org.zmreborn.CellLayout;
+import org.zmreborn.compat.GestureExclusionCompat;
 
 public class Workspace extends ViewGroup implements DropTarget, DragSource, DragScroller, GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener, GestureDetector.OnDoubleTapListener {
+    private static final int ACTION_OPEN_APPLICATIONS = 2;
     private static final int INVALID_SCREEN = -1;
     private static final int PREVIEWS_CLOSED = 4;
     private static final int PREVIEWS_CLOSING = 2;
@@ -80,6 +82,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     private int mScrollingBounce;
     private long mStartTime;
     private int mStatus;
+    private Rect mSystemGestureInsets;
     private int[] mTargetCell;
     private int[] mTempCell;
     private int[] mTempEstimate;
@@ -465,7 +468,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
             for (int i = 0; i < count; i++) {
                 drawChild(canvas, getChildAt(i), getDrawingTime());
             }
-        } else if (!this.mLauncher.isApplicationsGridOpen() && !this.mLauncher.isFullScreenPreviewing()) {
+        } else if (!this.mLauncher.isApplicationsGridLogicallyOpen() && !this.mLauncher.isFullScreenPreviewing()) {
             if (this.mTouchState != 1 && this.mNextScreen == INVALID_SCREEN) {
                 drawChild(canvas, getChildAt(this.mScreenCurrent), getDrawingTime());
             } else {
@@ -535,6 +538,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
                 childLeft += childWidth;
             }
         }
+        updateSystemGestureExclusionRects();
         if (!this.mLiveWallpaperSupport) {
             return;
         }
@@ -1049,6 +1053,46 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         this.mDragger = dragger;
     }
 
+    public void setSystemGestureInsets(Rect insets) {
+        this.mSystemGestureInsets = insets;
+        updateSystemGestureExclusionRects();
+    }
+
+    /* access modifiers changed from: package-private */
+    void updateSystemGestureExclusionRects() {
+        if (this.mLauncher == null || this.mSystemGestureInsets == null
+                || getWidth() == 0 || getHeight() == 0) {
+            GestureExclusionCompat.clearSystemGestureExclusionRects(this);
+            return;
+        }
+        ArrayList<Rect> rects = new ArrayList<>();
+        addSwipeDownExclusionRect(rects);
+        addSwipeUpExclusionRect(rects);
+        GestureExclusionCompat.setSystemGestureExclusionRects(this, rects);
+    }
+
+    private void addSwipeDownExclusionRect(ArrayList<Rect> rects) {
+        if (PreferencesUtil.getActionBindingForSwipeDown(this.mLauncher)
+                != ACTION_OPEN_APPLICATIONS) {
+            return;
+        }
+        int edgeHeight = Math.min(getHeight(), this.mSystemGestureInsets.top);
+        if (edgeHeight > 0) {
+            rects.add(new Rect(0, 0, getWidth(), edgeHeight));
+        }
+    }
+
+    private void addSwipeUpExclusionRect(ArrayList<Rect> rects) {
+        if (PreferencesUtil.getActionBindingForSwipeUp(this.mLauncher)
+                != ACTION_OPEN_APPLICATIONS) {
+            return;
+        }
+        int edgeHeight = Math.min(getHeight(), this.mSystemGestureInsets.bottom);
+        if (edgeHeight > 0) {
+            rects.add(new Rect(0, getHeight() - edgeHeight, getWidth(), getHeight()));
+        }
+    }
+
     public void onDropCompleted(View target, boolean success) {
         clearVacantCache();
         if (success) {
@@ -1220,8 +1264,8 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
                     if ((applicationItemInfo.itemType == 0 || applicationItemInfo.itemType == 1) && "android.intent.action.MAIN".equals(intent.getAction()) && name != null && packageName.equals(name.getPackageName()) && (icon = Launcher.getModel().getApplicationItemInfoIconOrNull(this.mLauncher.getPackageManager(), applicationItemInfo)) != null && icon != applicationItemInfo.icon) {
                         applicationItemInfo.filtered = true;
                         applicationItemInfo.icon.setCallback((Drawable.Callback) null);
-                        applicationItemInfo.icon = Utilities.createIconThumbnail(icon, getContext());
-                        ((TextView) view).setCompoundDrawablesWithIntrinsicBounds((Drawable) null, applicationItemInfo.icon, (Drawable) null, (Drawable) null);
+                        applicationItemInfo.icon = Utilities.setCompoundApplicationIcon(
+                                (TextView) view, icon, getContext());
                     }
                 } else if (itemInfo instanceof UserFolderInfo) {
                     ArrayList<ApplicationItemInfo> applicationItemInfos = ((UserFolderInfo) itemInfo).contents;
@@ -1235,7 +1279,8 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
                             boolean folderUpdated = false;
                             if (!(icon2 == null || icon2 == applicationItemInfo2.icon)) {
                                 applicationItemInfo2.icon.setCallback((Drawable.Callback) null);
-                                applicationItemInfo2.icon = Utilities.createIconThumbnail(icon2, this.mLauncher);
+                                applicationItemInfo2.icon = Utilities.normalizeApplicationIcon(
+                                        icon2, this.mLauncher);
                                 applicationItemInfo2.filtered = true;
                                 folderUpdated = true;
                             }

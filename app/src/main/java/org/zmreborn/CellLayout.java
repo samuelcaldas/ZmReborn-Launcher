@@ -2,7 +2,6 @@ package org.zmreborn;
 
 import android.app.WallpaperManager;
 import android.content.Context;
-import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.Rect;
@@ -18,6 +17,10 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 
 public class CellLayout extends ViewGroup {
+    static final int RESIZE_EDGE_NONE = 0;
+    static final int RESIZE_EDGE_START = 1;
+    static final int RESIZE_EDGE_END = 2;
+
     private int mCellHeight;
     private final CellInfo mCellInfo;
     private int mCellWidth;
@@ -517,9 +520,191 @@ public class CellLayout extends ViewGroup {
     }
 
     public int[] rectToCell(int width, int height) {
-        Resources resources = getResources();
-        int smallerSize = Math.min(resources.getDimensionPixelSize(R.dimen.cell_width), resources.getDimensionPixelSize(R.dimen.cell_height));
-        return new int[]{(width + smallerSize) / smallerSize, (height + smallerSize) / smallerSize};
+        return calculateClampedSpans(width, height, this.mCellWidth, this.mCellHeight,
+                this.mWidthGap, this.mHeightGap, getAvailableColumns(), getAvailableRows());
+    }
+
+    int[] spanToPixels(int spanX, int spanY) {
+        return new int[]{calculateSpanPixels(spanX, this.mCellWidth, this.mWidthGap),
+                calculateSpanPixels(spanY, this.mCellHeight, this.mHeightGap)};
+    }
+
+    boolean isWidgetSizingGeometryReady() {
+        return isLaidOut() && !isLayoutRequested()
+                && getMeasuredWidth() > 0 && getMeasuredHeight() > 0
+                && getWidth() > 0 && getHeight() > 0
+                && getCountX() > 0 && getCountY() > 0
+                && this.mCellWidth > 0 && this.mCellHeight > 0
+                && ((long) this.mCellWidth + this.mWidthGap) > 0
+                && ((long) this.mCellHeight + this.mHeightGap) > 0;
+    }
+
+    static int[] calculateClampedSpans(int width, int height, int cellWidth, int cellHeight,
+            int widthGap, int heightGap, int availableColumns, int availableRows) {
+        int spanX = calculateSpan(width, cellWidth, widthGap);
+        int spanY = calculateSpan(height, cellHeight, heightGap);
+        return new int[]{clampSpan(spanX, availableColumns), clampSpan(spanY, availableRows)};
+    }
+
+    static int calculateSpan(int requestedSize, int cellSize, int gap) {
+        if (cellSize <= 0) {
+            throw new IllegalArgumentException("cellSize must be positive");
+        }
+        long stride = (long) cellSize + gap;
+        if (stride <= 0) {
+            throw new IllegalArgumentException("cellSize + gap must be positive");
+        }
+        long required = Math.max(0L, requestedSize) + gap;
+        long span = required <= 0 ? 1L
+                : (required / stride) + (required % stride == 0 ? 0L : 1L);
+        return (int) Math.min(Integer.MAX_VALUE, span);
+    }
+
+    static int clampSpan(int calculatedSpan, int availableCells) {
+        return Math.min(Math.max(1, calculatedSpan), Math.max(1, availableCells));
+    }
+
+    static int calculateSpanPixels(int span, int cellSize, int gap) {
+        if (cellSize <= 0) {
+            throw new IllegalArgumentException("cellSize must be positive");
+        }
+        long stride = (long) cellSize + gap;
+        if (stride <= 0) {
+            throw new IllegalArgumentException("cellSize + gap must be positive");
+        }
+        long safeSpan = Math.max(1L, span);
+        long pixels = cellSize + ((safeSpan - 1L) * stride);
+        return (int) Math.min(Integer.MAX_VALUE, pixels);
+    }
+
+    ResizeCandidate findResizeCandidate(LayoutParams layoutParams,
+            int pointerX, int pointerY, int horizontalEdge, int verticalEdge,
+            int minimumSpanX, int minimumSpanY) {
+        if (layoutParams == null || !isWidgetSizingGeometryReady()) {
+            return null;
+        }
+        int[] cell = new int[2];
+        pointToCellExact(pointerX, pointerY, cell);
+        return calculateResizeCandidate(layoutParams.cellX, layoutParams.cellY,
+                layoutParams.cellHSpan, layoutParams.cellVSpan, cell[0], cell[1],
+                horizontalEdge, verticalEdge, minimumSpanX, minimumSpanY,
+                getCountX(), getCountY());
+    }
+
+    boolean isResizeCandidateVacant(ResizeCandidate candidate, View ignoredView) {
+        if (candidate == null || ignoredView == null) {
+            return false;
+        }
+        int xCount = getCountX();
+        int yCount = getCountY();
+        if (!candidate.isWithinBounds(xCount, yCount)) {
+            return false;
+        }
+        findOccupiedCells(xCount, yCount, this.mOccupied, ignoredView);
+        return isEmpty(candidate.cellX, candidate.lastCellX(),
+                candidate.cellY, candidate.lastCellY(), this.mOccupied);
+    }
+
+    boolean applyResizeCandidate(View child, ResizeCandidate candidate) {
+        if (child == null || !isResizeCandidateVacant(candidate, child)) {
+            return false;
+        }
+        ViewGroup.LayoutParams params = child.getLayoutParams();
+        if (!(params instanceof LayoutParams)) {
+            return false;
+        }
+        LayoutParams layoutParams = (LayoutParams) params;
+        if (candidate.matches(layoutParams)) {
+            return false;
+        }
+        layoutParams.cellX = candidate.cellX;
+        layoutParams.cellY = candidate.cellY;
+        layoutParams.cellHSpan = candidate.spanX;
+        layoutParams.cellVSpan = candidate.spanY;
+        layoutParams.regenerateId = true;
+        child.requestLayout();
+        requestLayout();
+        invalidate();
+        return true;
+    }
+
+    static ResizeCandidate calculateResizeCandidate(int cellX, int cellY,
+            int spanX, int spanY, int pointerCellX, int pointerCellY,
+            int horizontalEdge, int verticalEdge, int minimumSpanX,
+            int minimumSpanY, int columnCount, int rowCount) {
+        validateResizeEdge(horizontalEdge);
+        validateResizeEdge(verticalEdge);
+        validateGridDimensions(columnCount, rowCount);
+        if (!isWithinBounds(cellX, cellY, spanX, spanY, columnCount, rowCount)) {
+            return null;
+        }
+        int safeMinimumSpanX = clampSpan(minimumSpanX, columnCount);
+        int safeMinimumSpanY = clampSpan(minimumSpanY, rowCount);
+        int lastCellX = calculateResizeLastCell(cellX, spanX, pointerCellX,
+                horizontalEdge, safeMinimumSpanX, columnCount);
+        int lastCellY = calculateResizeLastCell(cellY, spanY, pointerCellY,
+                verticalEdge, safeMinimumSpanY, rowCount);
+        int resizedCellX = calculateResizeCellStart(cellX, spanX, pointerCellX,
+                horizontalEdge, safeMinimumSpanX);
+        int resizedCellY = calculateResizeCellStart(cellY, spanY, pointerCellY,
+                verticalEdge, safeMinimumSpanY);
+        int resizedSpanX = (lastCellX - resizedCellX) + 1;
+        int resizedSpanY = (lastCellY - resizedCellY) + 1;
+        if (resizedSpanX < safeMinimumSpanX || resizedSpanY < safeMinimumSpanY) {
+            return null;
+        }
+        return new ResizeCandidate(resizedCellX, resizedCellY,
+                resizedSpanX, resizedSpanY);
+    }
+
+    private static void validateResizeEdge(int edge) {
+        if (edge < RESIZE_EDGE_NONE || edge > RESIZE_EDGE_END) {
+            throw new IllegalArgumentException("Unknown resize edge");
+        }
+    }
+
+    private static void validateGridDimensions(int columnCount, int rowCount) {
+        if (columnCount <= 0 || rowCount <= 0) {
+            throw new IllegalArgumentException("Grid dimensions must be positive");
+        }
+    }
+
+    private static int calculateResizeLastCell(int cell, int span, int pointerCell,
+            int edge, int minimumSpan, int availableCells) {
+        int lastCell = cell + span - 1;
+        if (edge != RESIZE_EDGE_END) {
+            return lastCell;
+        }
+        return clamp(pointerCell, cell + minimumSpan - 1, availableCells - 1);
+    }
+
+    private static int calculateResizeCellStart(int cell, int span, int pointerCell,
+            int edge, int minimumSpan) {
+        if (edge != RESIZE_EDGE_START) {
+            return cell;
+        }
+        int lastCell = cell + span - 1;
+        return clamp(pointerCell, 0, lastCell - minimumSpan + 1);
+    }
+
+    private static int clamp(int value, int minimum, int maximum) {
+        return Math.max(minimum, Math.min(value, maximum));
+    }
+
+    private static boolean isWithinBounds(int cellX, int cellY, int spanX,
+            int spanY, int columnCount, int rowCount) {
+        return cellX >= 0 && cellY >= 0 && spanX > 0 && spanY > 0
+                && cellX + spanX <= columnCount && cellY + spanY <= rowCount;
+    }
+
+    private int getAvailableColumns() {
+        int columns = getCountX();
+        return Math.max(1, columns > 0 ? columns : this.mColumns);
+    }
+
+    private int getAvailableRows() {
+        int rows = getCountY();
+        return Math.max(1, rows > 0 ? rows : this.mRows);
     }
 
     public boolean getVacantCell(int[] vacant, int spanX, int spanY) {
@@ -677,11 +862,45 @@ public class CellLayout extends ViewGroup {
             this.width = (((myCellHSpan * cellWidth) + ((myCellHSpan - 1) * widthGap)) - this.leftMargin) - this.rightMargin;
             this.height = (((myCellVSpan * cellHeight) + ((myCellVSpan - 1) * heightGap)) - this.topMargin) - this.bottomMargin;
             if (autoStretch) {
-                this.width = ((cellWidth * myCellHSpan) - this.rightMargin) - this.leftMargin;
-                this.height = cellHeight * myCellVSpan;
+                this.width = (calculateSpanPixels(myCellHSpan, cellWidth, widthGap) - this.rightMargin) - this.leftMargin;
+                this.height = (calculateSpanPixels(myCellVSpan, cellHeight, heightGap) - this.bottomMargin) - this.topMargin;
             }
             this.f0x = ((cellWidth + widthGap) * myCellX) + hStartPadding + this.leftMargin;
             this.f1y = ((cellHeight + heightGap) * myCellY) + vStartPadding + this.topMargin;
+        }
+    }
+
+    static final class ResizeCandidate {
+        final int cellX;
+        final int cellY;
+        final int spanX;
+        final int spanY;
+
+        ResizeCandidate(int cellX, int cellY, int spanX, int spanY) {
+            this.cellX = cellX;
+            this.cellY = cellY;
+            this.spanX = spanX;
+            this.spanY = spanY;
+        }
+
+        int lastCellX() {
+            return this.cellX + this.spanX - 1;
+        }
+
+        int lastCellY() {
+            return this.cellY + this.spanY - 1;
+        }
+
+        boolean matches(LayoutParams layoutParams) {
+            return this.cellX == layoutParams.cellX
+                    && this.cellY == layoutParams.cellY
+                    && this.spanX == layoutParams.cellHSpan
+                    && this.spanY == layoutParams.cellVSpan;
+        }
+
+        boolean isWithinBounds(int columnCount, int rowCount) {
+            return CellLayout.isWithinBounds(this.cellX, this.cellY,
+                    this.spanX, this.spanY, columnCount, rowCount);
         }
     }
 

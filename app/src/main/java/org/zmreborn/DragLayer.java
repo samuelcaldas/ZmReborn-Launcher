@@ -75,6 +75,7 @@ public class DragLayer extends FrameLayout implements DragController {
     /* access modifiers changed from: private */
     public int mScrollState = 0;
     private boolean mShouldDrop;
+    private Rect mSystemGestureInsets;
     private float mTouchOffsetX;
     private float mTouchOffsetY;
     private final Paint mTrashPaint = new Paint();
@@ -90,6 +91,10 @@ public class DragLayer extends FrameLayout implements DragController {
         this.mRectPaint = new Paint();
         this.mRectPaint.setColor(COLOR_NORMAL);
         this.mOrientation = ((WindowManager) context.getSystemService("window")).getDefaultDisplay().getOrientation();
+    }
+
+    public void setSystemGestureInsets(Rect insets) {
+        this.mSystemGestureInsets = insets;
     }
 
     public void startDrag(View view, DragSource source, Object dragInfo, int dragAction) {

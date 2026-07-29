@@ -73,6 +73,14 @@ public class UserFolder extends Folder implements DropTarget {
         updateSignalRail();
     }
 
+    @Override
+    void refreshPalette() {
+        super.refreshPalette();
+        if (this.mSignalRail != null) {
+            this.mSignalRail.refreshPalette();
+        }
+    }
+
     private void updateSignalRail() {
         if (this.mSignalRail != null && this.mFolderInfo != null) {
             int itemCount = 0;

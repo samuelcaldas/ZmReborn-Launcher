@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Preserved API 24–30 dark fallback roles. -->
+    <color name="m3_primary">#fff2b64a</color>
+    <color name="m3_on_primary">#ff121a21</color>
+    <color name="m3_primary_container">#ff3d2e00</color>
+    <color name="m3_on_primary_container">#fff2b64a</color>
+    <color name="m3_surface">#ff121a21</color>
+    <color name="m3_on_surface">#ffeaf0f3</color>
+    <color name="m3_surface_variant">#ff1e2832</color>
+    <color name="m3_on_surface_variant">#ffb8c2c8</color>
+    <color name="m3_outline">#ffb8c2c8</color>
+    <color name="m3_outline_variant">#ff3a4550</color>
+    <color name="m3_error">#ffd95c4f</color>
+    <color name="m3_on_error">#ff1a0000</color>
+</resources>

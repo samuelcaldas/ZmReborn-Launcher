@@ -25,6 +25,7 @@ import android.content.res.Configuration;
 import android.content.res.Resources;
 import android.database.ContentObserver;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.Rect;
 import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
@@ -53,6 +54,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
+import android.view.WindowInsets;
 import android.view.animation.AnimationUtils;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -61,7 +63,6 @@ import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import java.io.DataInputStream;
@@ -73,9 +74,15 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import org.zmreborn.CellLayout;
 import org.zmreborn.LauncherSettings;
+import org.zmreborn.compat.BackGestureCompat;
+import org.zmreborn.compat.WindowInsetsCompat;
+import org.zmreborn.theme.WallpaperColorExtractor;
 
 public final class Launcher extends Activity implements View.OnClickListener, View.OnLongClickListener, DragController.DragListener {
     static final int APPWIDGET_HOST_ID = 1024;
@@ -103,6 +110,8 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private static final int APPLICATIONS_STATE_LOADING = 1;
     private static final int APPLICATIONS_STATE_EMPTY = 2;
     private static final int APPLICATIONS_STATE_ERROR = 3;
+    private static final float BACK_PREVIEW_ALPHA_DISTANCE = 0.35f;
+    private static final float BACK_PREVIEW_SCALE_DISTANCE = 0.08f;
     private static final String PREFERENCES = "launcher.preferences";
     private static final boolean PROFILE_ROTATE = false;
     private static final boolean PROFILE_STARTUP = false;
@@ -123,6 +132,12 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private static final String RUNTIME_STATE_PENDING_ADD_SCREEN = "launcher.add_screen";
     private static final String RUNTIME_STATE_PENDING_ADD_SPAN_X = "launcher.add_spanX";
     private static final String RUNTIME_STATE_PENDING_ADD_SPAN_Y = "launcher.add_spanY";
+    private static final String RUNTIME_STATE_PENDING_APPWIDGET_ID =
+            "launcher.pending_appwidget_id";
+    private static final String RUNTIME_STATE_PENDING_APPWIDGET_PLACEMENT =
+            "launcher.pending_appwidget_placement";
+    private static final String RUNTIME_STATE_PENDING_APPWIDGET_INSERT_AT_FIRST =
+            "launcher.pending_appwidget_insert_at_first";
     private static final String RUNTIME_STATE_PENDING_FOLDER_RENAME = "launcher.rename_folder";
     private static final String RUNTIME_STATE_PENDING_FOLDER_RENAME_ID = "launcher.rename_folder_id";
     private static final String RUNTIME_STATE_USER_FOLDERS = "launcher.user_folder";
@@ -135,6 +150,8 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     static boolean sRestart = false;
     static boolean sRestartLoaders = false;
     private static int sScreen = 2;
+    static volatile boolean sSuppressWallpaperRefreshForTests;
+    private static final Executor sWallpaperRefreshExecutor = Executors.newSingleThreadExecutor();
     private static WallpaperIntentReceiver sWallpaperReceiver;
     /* access modifiers changed from: private */
     public CellLayout.CellInfo mAddItemCellInfo;
@@ -143,12 +160,29 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     public LauncherAppWidgetHost mAppWidgetHost;
     private AppWidgetManager mAppWidgetManager;
     private boolean mApplicationsGridOpen = false;
+    private String mAppearanceFingerprint;
     private int mApplicationsState = APPLICATIONS_STATE_READY;
     private FrameLayout mApplicationsStateOverlay;
+    private Object mBackGestureRegistration;
+    private View mBackPreviewTarget;
+    private final BackGestureCompat.BackHandler mBackHandler = new BackGestureCompat.BackHandler() {
+        public void onBackInvoked() {
+            Launcher.this.handleBackInvoked();
+        }
+
+        public void onBackProgressed(float progress) {
+            Launcher.this.onBackProgressed(progress);
+        }
+
+        public void onBackCancelled() {
+            Launcher.this.onBackCancelled();
+        }
+    };
     private TextView mApplicationsStateMessage;
     private Button mApplicationsStateRetry;
     private Button mApplicationsStateClose;
     private AlertDialog mAppListFolderDialog;
+    private AppListFolderPaletteBinder mAppListFolderPaletteBinder;
     private final BroadcastReceiver mApplicationsReceiver = new ApplicationsIntentReceiver(this, (ApplicationsIntentReceiver) null);
     /* access modifiers changed from: private */
     public ApplicationsView mApplicationsView;
@@ -164,6 +198,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     /* access modifiers changed from: private */
     public Dock mDock;
     private DragLayer mDragLayer;
+    private WidgetResizeSession mWidgetResizeSession;
     /* access modifiers changed from: private */
     public FolderInfo mFolderInfo;
     private boolean mFullScreenPreviews = LOGD;
@@ -177,6 +212,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private boolean mPreviewsShowing = false;
     private boolean mRestoring;
     private int mRotation;
+    private int mPendingAppWidgetId = -1;
+    private boolean mPendingAppWidgetPlacement;
+    private boolean mPendingAppWidgetInsertAtFirst;
+    private View.OnLayoutChangeListener mPendingAppWidgetPlacementListener;
+    private CellLayout mPendingAppWidgetPlacementLayout;
     private Bundle mSavedInstanceState;
     private Bundle mSavedState;
     private ScreenIndicator mScreenIndicator;
@@ -194,6 +234,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     /* access modifiers changed from: protected */
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.mAppearanceFingerprint = Appearance.fingerprint(this);
         this.mInflater = getLayoutInflater();
         this.mAppWidgetManager = AppWidgetManager.getInstance(this);
         this.mAppWidgetHost = new LauncherAppWidgetHost(this, APPWIDGET_HOST_ID);
@@ -208,6 +249,9 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         setWallpaperDimension();
         setContentView(R.layout.launcher);
         setupViews();
+        refreshWallpaperColorsAsync();
+        this.mBackGestureRegistration = BackGestureCompat.registerBackHandler(
+                this, this.mBackHandler);
         registerIntentReceivers();
         registerContentObservers();
         this.mSavedState = savedInstanceState;
@@ -362,6 +406,25 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         }
     }
 
+    static void setWallpaperRefreshSuppressedForTests(boolean suppressed) {
+        sSuppressWallpaperRefreshForTests = suppressed;
+    }
+
+    static void dispatchWallpaperRefreshForTests(Context context) {
+        if (context == null) {
+            throw new IllegalArgumentException("context must not be null");
+        }
+        WallpaperIntentReceiver wallpaperReceiver = sWallpaperReceiver;
+        if (wallpaperReceiver == null) {
+            throw new IllegalStateException("Wallpaper receiver is unavailable");
+        }
+        wallpaperReceiver.dispatchWallpaperRefresh(context, null);
+    }
+
+    static void runAfterWallpaperRefreshesForTests(Runnable runnable) {
+        sWallpaperRefreshExecutor.execute(runnable);
+    }
+
     private void startLoaders() {
         boolean z = LOGD;
         sLauncherModel.loadApplications(LOGD, this.mApplicationsView);
@@ -444,9 +507,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                         || Launcher.this.mApplicationsState != APPLICATIONS_STATE_READY) {
                     return;
                 }
-                if (Launcher.this.mApplicationsView instanceof ApplicationsGridView) {
-                    ApplicationsGridView gridView = (ApplicationsGridView) Launcher.this.mApplicationsView;
-                    gridView.setSelection(0);
+                ApplicationsGridView gridView = Launcher.this.getVerticalApplicationsGrid();
+                if (gridView != null) {
+                    if (!PreferencesUtil.rememberApplicationsPosition(Launcher.this)) {
+                        gridView.setSelection(0);
+                    }
                     gridView.setFocusableInTouchMode(true);
                     gridView.requestFocus();
                     return;
@@ -460,6 +525,16 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 applicationsView.requestFocus();
             }
         });
+    }
+
+    private ApplicationsGridView getVerticalApplicationsGrid() {
+        if (this.mApplicationsView instanceof ApplicationsGridView) {
+            return (ApplicationsGridView) this.mApplicationsView;
+        }
+        if (this.mApplicationsView instanceof ApplicationsDrawerView) {
+            return ((ApplicationsDrawerView) this.mApplicationsView).getGridView();
+        }
+        return null;
     }
 
     private View findFirstActionableView(View root) {
@@ -492,59 +567,83 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     /* access modifiers changed from: protected */
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        int appWidgetId;
-        boolean z = false;
         this.mWaitingForResult = false;
-        if (resultCode == -1 && this.mAddItemCellInfo != null) {
-            switch (requestCode) {
-                case 1:
-                    CellLayout.CellInfo cellInfo = this.mAddItemCellInfo;
-                    if (!this.mDesktopLocked) {
-                        z = true;
-                    }
-                    completeAddShortcut(data, cellInfo, z);
-                    return;
-                case 4:
-                    CellLayout.CellInfo cellInfo2 = this.mAddItemCellInfo;
-                    if (!this.mDesktopLocked) {
-                        z = true;
-                    }
-                    completeAddLiveFolder(data, cellInfo2, z);
-                    return;
-                case 5:
-                    CellLayout.CellInfo cellInfo3 = this.mAddItemCellInfo;
-                    if (!this.mDesktopLocked) {
-                        z = true;
-                    }
-                    completeAddAppWidget(data, cellInfo3, z);
-                    return;
-                case 6:
-                    CellLayout.CellInfo cellInfo4 = this.mAddItemCellInfo;
-                    if (!this.mDesktopLocked) {
-                        z = true;
-                    }
-                    completeAddApplication(this, data, cellInfo4, z);
-                    return;
-                case 7:
-                    processShortcut(data, 6, 1);
-                    return;
-                case 8:
-                    addLiveFolder(data);
-                    return;
-                case 9:
-                    addAppWidget(data);
-                    return;
-                default:
-                    return;
+        if (isAppWidgetRequest(requestCode)) {
+            data = normalizeAppWidgetResult(resultCode, data);
+            if (data == null) {
+                return;
             }
-        } else if ((requestCode == 9 || requestCode == 5) && resultCode == 0 && data != null && (appWidgetId = data.getIntExtra("appWidgetId", -1)) != -1) {
-            this.mAppWidgetHost.deleteAppWidgetId(appWidgetId);
+        }
+        if (resultCode != RESULT_OK || this.mAddItemCellInfo == null) {
+            return;
+        }
+        boolean insertAtFirst = !this.mDesktopLocked;
+        handleSuccessfulActivityResult(requestCode, data, insertAtFirst);
+    }
+
+    private boolean isAppWidgetRequest(int requestCode) {
+        return requestCode == REQUEST_PICK_APPWIDGET
+                || requestCode == REQUEST_CREATE_APPWIDGET;
+    }
+
+    private Intent normalizeAppWidgetResult(int resultCode, Intent data) {
+        if (resultCode != RESULT_OK || this.mAddItemCellInfo == null) {
+            releasePendingAppWidgetId(data);
+            return null;
+        }
+        int pendingAppWidgetId = this.mPendingAppWidgetId;
+        if (pendingAppWidgetId == -1) {
+            return null;
+        }
+        if (data != null && data.getIntExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_ID, -1) != -1
+                && data.getIntExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, -1)
+                != pendingAppWidgetId) {
+            releasePendingAppWidgetId(null);
+            return null;
+        }
+        Intent normalizedData = data == null ? new Intent() : data;
+        normalizedData.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
+                pendingAppWidgetId);
+        return normalizedData;
+    }
+
+    private void handleSuccessfulActivityResult(
+            int requestCode, Intent data, boolean insertAtFirst) {
+        switch (requestCode) {
+            case REQUEST_CREATE_SHORTCUT:
+                completeAddShortcut(data, this.mAddItemCellInfo, insertAtFirst);
+                return;
+            case REQUEST_CREATE_LIVE_FOLDER:
+                completeAddLiveFolder(data, this.mAddItemCellInfo, insertAtFirst);
+                return;
+            case REQUEST_CREATE_APPWIDGET:
+                completeAddAppWidget(data, this.mAddItemCellInfo, insertAtFirst);
+                return;
+            case REQUEST_PICK_APPLICATION:
+                completeAddApplication(this, data, this.mAddItemCellInfo, insertAtFirst);
+                return;
+            case REQUEST_PICK_SHORTCUT:
+                processShortcut(data, REQUEST_PICK_APPLICATION,
+                        REQUEST_CREATE_SHORTCUT);
+                return;
+            case REQUEST_PICK_LIVE_FOLDER:
+                addLiveFolder(data);
+                return;
+            case REQUEST_PICK_APPWIDGET:
+                addAppWidget(data);
+                return;
+            default:
         }
     }
 
     /* access modifiers changed from: protected */
     public void onResume() {
         super.onResume();
+        if (!Appearance.fingerprint(this).equals(this.mAppearanceFingerprint)) {
+            recreate();
+            return;
+        }
         if (sRestart) {
             Preferences.alertRestart(this);
         }
@@ -552,13 +651,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         boolean landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
         this.mRotation = landscape ? 1 : 0;
         int rotation = this.mRotation;
-        if (this.mApplicationsView instanceof ApplicationsGridView) {
-            if (rotation == 0) {
-                this.mApplicationsView.setNumColumns(PreferencesUtil.getAppsGridVerticalScrollingContentColumnsPortrait(this));
-            } else {
-                this.mApplicationsView.setNumColumns(PreferencesUtil.getAppsGridVerticalScrollingContentColumnsLandscape(this));
-            }
-        } else if (this.mApplicationsView instanceof ApplicationsPagingView) {
+        if (this.mApplicationsView instanceof ApplicationsPagingView) {
             ApplicationsPagingView applicationsPagingView = (ApplicationsPagingView) this.mApplicationsView;
             if (rotation == 0) {
                 applicationsPagingView.setNumRows(PreferencesUtil.getAppsGridHorizontalPagingContentRowsPortrait(this));
@@ -589,6 +682,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     /* access modifiers changed from: protected */
     public void onPause() {
+        dismissWidgetResize();
         super.onPause();
     }
 
@@ -653,6 +747,12 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             if (currentScreen > -1) {
                 this.mWorkspace.setCurrentScreen(currentScreen);
             }
+            this.mPendingAppWidgetId = savedState.getInt(
+                    RUNTIME_STATE_PENDING_APPWIDGET_ID, -1);
+            this.mPendingAppWidgetPlacement = savedState.getBoolean(
+                    RUNTIME_STATE_PENDING_APPWIDGET_PLACEMENT, false);
+            this.mPendingAppWidgetInsertAtFirst = savedState.getBoolean(
+                    RUNTIME_STATE_PENDING_APPWIDGET_INSERT_AT_FIRST, false);
             int addScreen = savedState.getInt(RUNTIME_STATE_PENDING_ADD_SCREEN, -1);
             if (addScreen > -1) {
                 this.mAddItemCellInfo = new CellLayout.CellInfo();
@@ -663,8 +763,17 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 addItemCellInfo.cellY = savedState.getInt(RUNTIME_STATE_PENDING_ADD_CELL_Y);
                 addItemCellInfo.spanX = savedState.getInt(RUNTIME_STATE_PENDING_ADD_SPAN_X);
                 addItemCellInfo.spanY = savedState.getInt(RUNTIME_STATE_PENDING_ADD_SPAN_Y);
-                addItemCellInfo.findVacantCellsFromOccupied(savedState.getBooleanArray(RUNTIME_STATE_PENDING_ADD_OCCUPIED_CELLS), savedState.getInt(RUNTIME_STATE_PENDING_ADD_COUNT_X), savedState.getInt(RUNTIME_STATE_PENDING_ADD_COUNT_Y));
+                boolean[] occupiedCells = savedState.getBooleanArray(
+                        RUNTIME_STATE_PENDING_ADD_OCCUPIED_CELLS);
+                int countX = savedState.getInt(RUNTIME_STATE_PENDING_ADD_COUNT_X);
+                int countY = savedState.getInt(RUNTIME_STATE_PENDING_ADD_COUNT_Y);
+                if (occupiedCells != null && countX > 0 && countY > 0) {
+                    addItemCellInfo.findVacantCellsFromOccupied(occupiedCells, countX, countY);
+                }
                 this.mRestoring = LOGD;
+            }
+            if (this.mPendingAppWidgetPlacement) {
+                resumePendingAppWidgetPlacement();
             }
             if (savedState.getBoolean(RUNTIME_STATE_PENDING_FOLDER_RENAME, false)) {
                 this.mFolderInfo = sLauncherModel.getFolderById(this, savedState.getLong(RUNTIME_STATE_PENDING_FOLDER_RENAME_ID));
@@ -687,7 +796,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 appsGridStub.setLayoutResource(R.layout.apps_paging_view);
                 break;
             default:
-                appsGridStub.setLayoutResource(R.layout.apps_paging_view);
+                appsGridStub.setLayoutResource(R.layout.apps_grid_view);
                 break;
         }
         this.mApplicationsView = (ApplicationsView) appsGridStub.inflate();
@@ -738,6 +847,24 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         dragLayer.addDragListener(this);
         deleteZone.setHandle(new View(this));
         this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.workspace_screen_indicator);
+        getWindow().getDecorView().setOnApplyWindowInsetsListener(
+                new View.OnApplyWindowInsetsListener() {
+                    public WindowInsets onApplyWindowInsets(View view, WindowInsets insets) {
+                        return view.onApplyWindowInsets(Launcher.this.applySystemInsets(insets));
+                    }
+                });
+    }
+
+    private WindowInsets applySystemInsets(WindowInsets insets) {
+        Rect systemBarInsets = WindowInsetsCompat.getSystemBarInsets(insets);
+        Rect gestureInsets = WindowInsetsCompat.getSystemGestureInsets(insets);
+        // Decor fitting already keeps drawer outside system bars while edge-to-edge is opted out.
+        this.mApplicationsView.setSystemBarInsets(0, 0, 0, 0);
+        this.mApplicationsView.setSystemGestureInsets(gestureInsets);
+        this.mWorkspace.setSystemGestureInsets(gestureInsets);
+        this.mDragLayer.setSystemGestureInsets(gestureInsets);
+        this.mDock.setSystemBarInsets(systemBarInsets);
+        return insets;
     }
 
     private void loadPreferences() {
@@ -756,6 +883,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         loadIndicator();
         loadDockWidths();
         loadDockBackground();
+        this.mWorkspace.updateSystemGestureExclusionRects();
     }
 
     private void loadDockWidths() {
@@ -780,42 +908,149 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     private void loadDockBackground() {
-        Dock dock = this.mDock;
-        Resources resources = getResources();
-        String dockBackgroundType = PreferencesUtil.getDockBackgroundType(this);
-        String[] dockBackgrounds = resources.getStringArray(R.array.preferences_values_dock_backgrounds);
-        dock.setBackgroundColor(getColor(R.color.zm_reborn_glass));
-        for (int i = 0; i < dockBackgrounds.length; i++) {
-            if (dockBackgrounds[i].equals(dockBackgroundType)) {
-                switch (i) {
-                    case 0:
-                        dock.setBackgroundColor(getColor(R.color.zm_reborn_glass));
-                        break;
-                    case 1:
-                        dock.setBackgroundColor(getColor(R.color.zm_reborn_glass));
-                        break;
-                    case 2:
-                        dock.setBackgroundDrawable((Drawable) null);
-                        break;
-                    case 3:
-                        dock.setBackgroundColor(getColor(R.color.zm_reborn_slate));
-                        break;
-                    case 4:
-                        dock.setBackgroundColor(getColor(R.color.zm_reborn_steel));
-                        break;
-                    case 5:
-                        dock.setBackgroundResource(R.drawable.dock_bg_bar_grey);
-                        break;
-                    case 6:
-                        dock.setBackgroundColor(getColor(R.color.zm_reborn_glass));
-                        break;
-                    default:
-                        dock.setBackgroundColor(getColor(R.color.zm_reborn_glass));
-                        break;
-                }
+        String selected = PreferencesUtil.getDockBackgroundType(this);
+        String[] backgrounds = getResources().getStringArray(
+                R.array.preferences_values_dock_backgrounds);
+        applyDockBackground(this.mDock, 0);
+        for (int index = 0; index < backgrounds.length; index++) {
+            if (backgrounds[index].equals(selected)) {
+                applyDockBackground(this.mDock, index);
+                break;
             }
         }
-        dock.invalidate();
+        this.mDock.invalidate();
+    }
+
+    private void applyDockBackground(Dock dock, int backgroundIndex) {
+        int surface = WallpaperColorExtractor.getSurface(this);
+        int surfaceVariant = WallpaperColorExtractor.getSurfaceVariant(this);
+        switch (backgroundIndex) {
+            case 2:
+                dock.setBackgroundDrawable(null);
+                return;
+            case 3:
+                dock.setBackgroundColor(surface);
+                return;
+            case 4:
+                dock.setBackgroundColor(surfaceVariant);
+                return;
+            case 5:
+                dock.setBackgroundResource(R.drawable.dock_bg_bar_grey);
+                return;
+            case 6:
+                dock.setBackgroundColor(withAlpha(surfaceVariant, 217));
+                return;
+            default:
+                dock.setBackgroundColor(withAlpha(surface, 217));
+        }
+    }
+
+    private static int withAlpha(int color, int alpha) {
+        return Color.argb(alpha, Color.red(color), Color.green(color),
+                Color.blue(color));
+    }
+
+    private static class AppListFolderPaletteBinder {
+        private final FrameLayout mContent;
+        private final TextView mTitle;
+
+        private AppListFolderPaletteBinder(FrameLayout content, TextView title) {
+            this.mContent = content;
+            this.mTitle = title;
+        }
+
+        void apply(Context context) {
+            int surface = WallpaperColorExtractor.getSurface(context);
+            this.mContent.setBackgroundColor(withAlpha(surface, 217));
+            this.mTitle.setTextColor(WallpaperColorExtractor.getPrimary(context));
+            applyGridView(surface);
+            applyEmptyView(context);
+        }
+
+        private void applyGridView(int surface) {
+            GridView gridView = getGridView();
+            if (gridView == null) {
+                return;
+            }
+            gridView.setBackgroundColor(surface);
+            if (gridView.getAdapter() instanceof ApplicationsAdapter) {
+                ((ApplicationsAdapter) gridView.getAdapter()).notifyDataSetChanged();
+            }
+        }
+
+        private void applyEmptyView(Context context) {
+            TextView emptyView = getEmptyView();
+            if (emptyView != null) {
+                emptyView.setTextColor(WallpaperColorExtractor.getOnSurface(context));
+            }
+        }
+
+        private GridView getGridView() {
+            for (int index = 0; index < this.mContent.getChildCount(); index++) {
+                View child = this.mContent.getChildAt(index);
+                if (child instanceof GridView) {
+                    return (GridView) child;
+                }
+            }
+            return null;
+        }
+
+        private TextView getEmptyView() {
+            for (int index = 0; index < this.mContent.getChildCount(); index++) {
+                View child = this.mContent.getChildAt(index);
+                if (child instanceof TextView) {
+                    return (TextView) child;
+                }
+            }
+            return null;
+        }
+    }
+
+    private void refreshWallpaperColorsAsync() {
+        refreshWallpaperColorsAsync(null);
+    }
+
+    private void refreshWallpaperColorsAsync(
+            final BroadcastReceiver.PendingResult pendingResult) {
+        final Context applicationContext = LocaleUtil.wrap(getApplicationContext());
+        sWallpaperRefreshExecutor.execute(new Runnable() {
+            public void run() {
+                try {
+                    WallpaperColorExtractor.refresh(applicationContext);
+                    Launcher.this.runOnUiThread(new Runnable() {
+                        public void run() {
+                            applyWallpaperPalette();
+                        }
+                    });
+                } finally {
+                    if (pendingResult != null) {
+                        pendingResult.finish();
+                    }
+                }
+            }
+        });
+    }
+
+    private void applyWallpaperPalette() {
+        if (this.mDestroyed || this.mApplicationsView == null || this.mDock == null) {
+            return;
+        }
+        this.mApplicationsView.setBackgroundAlpha(
+                PreferencesUtil.getAppsGridBackgroundAlpha(this));
+        this.mApplicationsView.refreshPalette();
+        loadDockBackground();
+        if (this.mScreenIndicator != null) {
+            this.mScreenIndicator.refreshPalette();
+        }
+        if (this.mWorkspace != null) {
+            Folder folder = this.mWorkspace.getOpenFolder();
+            if (folder != null) {
+                folder.refreshPalette();
+            }
+        }
+        if (this.mAppListFolderPaletteBinder != null) {
+            this.mAppListFolderPaletteBinder.apply(this);
+        }
     }
 
     private void loadIndicator() {
@@ -865,10 +1100,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     public View createShortcut(int layoutResId, ViewGroup parent, ApplicationItemInfo info) {
         TextView favorite = (TextView) this.mInflater.inflate(layoutResId, parent, false);
         if (!info.filtered) {
-            info.icon = Utilities.createIconThumbnail(info.icon, this);
+            info.icon = Utilities.normalizeApplicationIcon(info.icon, this);
             info.filtered = LOGD;
         }
-        favorite.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, info.icon, (Drawable) null, (Drawable) null);
+        info.icon = Utilities.setCompoundApplicationIcon(favorite, info.icon, this);
         if (PreferencesUtil.isShowShortcutTitlesEnabled(this)) {
             favorite.setText(info.title);
         }
@@ -951,40 +1186,130 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         }
     }
 
-    private void completeAddAppWidget(Intent data, CellLayout.CellInfo cellInfo, boolean insertAtFirst) {
-        Bundle extras = data.getExtras();
-        final int appWidgetId = extras.getInt("appWidgetId", -1);
-        Log.d(LOG_TAG, "dumping extras content=" + extras.toString());
-        final AppWidgetProviderInfo appWidgetInfo = this.mAppWidgetManager.getAppWidgetInfo(appWidgetId);
-        final int[] spans = ((CellLayout) this.mWorkspace.getChildAt(cellInfo.screen)).rectToCell(appWidgetInfo.minWidth, appWidgetInfo.minHeight);
-        final CellLayout.CellInfo cInfo = cellInfo;
-        View widgetSpanView = View.inflate(this, R.layout.widget_span, (ViewGroup) null);
-        final NumberPicker columnsPicker = (NumberPicker) widgetSpanView.findViewById(R.id.widget_columns_span);
-        columnsPicker.setRange(1, this.mWorkspace.getCurrentDesktopColumns());
-        columnsPicker.setCurrent(spans[0]);
-        final NumberPicker rowsPicker = (NumberPicker) widgetSpanView.findViewById(R.id.widget_rows_span);
-        rowsPicker.setRange(1, this.mWorkspace.getCurrentDesktopRows());
-        rowsPicker.setCurrent(spans[1]);
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        ScrollView scrollView = new ScrollView(this);
-        scrollView.addView(widgetSpanView);
-        builder.setView(scrollView);
-        AlertDialog alertDialog = builder.create();
-        alertDialog.setTitle(getString(R.string.dialog_title_widget_span));
-        final boolean z = insertAtFirst;
-        alertDialog.setButton(-1, getString(R.string.button_ok), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogInterface, int which) {
-                spans[1] = rowsPicker.getCurrent();
-                spans[0] = columnsPicker.getCurrent();
-                Launcher.this.realAddWidget(appWidgetInfo, cInfo, spans, appWidgetId, z);
+    private void completeAddAppWidget(
+            Intent data, CellLayout.CellInfo cellInfo, boolean insertAtFirst) {
+        int appWidgetId = data.getIntExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+        if (appWidgetId != this.mPendingAppWidgetId) {
+            return;
+        }
+        AppWidgetProviderInfo appWidgetInfo =
+                this.mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+        if (appWidgetId == -1 || appWidgetInfo == null) {
+            releasePendingAppWidgetId(data);
+            return;
+        }
+        this.mPendingAppWidgetId = appWidgetId;
+        schedulePendingAppWidgetPlacement(appWidgetInfo, cellInfo, insertAtFirst);
+    }
+
+    private void resumePendingAppWidgetPlacement() {
+        if (this.mPendingAppWidgetId == -1 || this.mAddItemCellInfo == null) {
+            releasePendingAppWidgetId(null);
+            return;
+        }
+        AppWidgetProviderInfo appWidgetInfo = this.mAppWidgetManager.getAppWidgetInfo(
+                this.mPendingAppWidgetId);
+        if (appWidgetInfo == null) {
+            releasePendingAppWidgetId(null);
+            return;
+        }
+        schedulePendingAppWidgetPlacement(appWidgetInfo, this.mAddItemCellInfo,
+                this.mPendingAppWidgetInsertAtFirst);
+    }
+
+    private void schedulePendingAppWidgetPlacement(
+            final AppWidgetProviderInfo appWidgetInfo,
+            final CellLayout.CellInfo cellInfo, boolean insertAtFirst) {
+        removePendingAppWidgetPlacementListener();
+        this.mPendingAppWidgetPlacement = LOGD;
+        this.mPendingAppWidgetInsertAtFirst = insertAtFirst;
+        final int appWidgetId = this.mPendingAppWidgetId;
+        final CellLayout targetLayout = getCellLayoutForScreen(cellInfo.screen);
+        if (appWidgetId == -1 || targetLayout == null) {
+            releasePendingAppWidgetId(null);
+            return;
+        }
+        if (targetLayout.isWidgetSizingGeometryReady()) {
+            placePendingAppWidget(appWidgetInfo, cellInfo, targetLayout, appWidgetId);
+            return;
+        }
+        this.mPendingAppWidgetPlacementLayout = targetLayout;
+        this.mPendingAppWidgetPlacementListener = new View.OnLayoutChangeListener() {
+            public void onLayoutChange(View view, int left, int top, int right, int bottom,
+                    int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if (!Launcher.this.isPendingAppWidgetPlacementCurrent(
+                        appWidgetId, cellInfo, targetLayout)) {
+                    Launcher.this.abandonPendingAppWidgetPlacement(appWidgetId);
+                    return;
+                }
+                if (!targetLayout.isWidgetSizingGeometryReady()) {
+                    return;
+                }
+                Launcher.this.placePendingAppWidget(
+                        appWidgetInfo, cellInfo, targetLayout, appWidgetId);
             }
-        });
-        alertDialog.setButton(-2, getString(R.string.button_cancel), new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialogInterface, int which) {
-                dialogInterface.dismiss();
-            }
-        });
-        alertDialog.show();
+        };
+        targetLayout.addOnLayoutChangeListener(this.mPendingAppWidgetPlacementListener);
+        targetLayout.requestLayout();
+    }
+
+    private boolean isPendingAppWidgetPlacementCurrent(int appWidgetId,
+            CellLayout.CellInfo cellInfo, CellLayout targetLayout) {
+        return !this.mDestroyed
+                && this.mPendingAppWidgetPlacement
+                && this.mPendingAppWidgetId == appWidgetId
+                && this.mAddItemCellInfo == cellInfo
+                && getCellLayoutForScreen(cellInfo.screen) == targetLayout;
+    }
+
+    private void placePendingAppWidget(AppWidgetProviderInfo appWidgetInfo,
+            CellLayout.CellInfo cellInfo, CellLayout targetLayout, int appWidgetId) {
+        if (!isPendingAppWidgetPlacementCurrent(appWidgetId, cellInfo, targetLayout)) {
+            abandonPendingAppWidgetPlacement(appWidgetId);
+            return;
+        }
+        removePendingAppWidgetPlacementListener();
+        int[] spans = targetLayout.rectToCell(
+                appWidgetInfo.minWidth, appWidgetInfo.minHeight);
+        realAddWidget(appWidgetInfo, cellInfo, spans, appWidgetId,
+                this.mPendingAppWidgetInsertAtFirst);
+    }
+
+    private void abandonPendingAppWidgetPlacement(int appWidgetId) {
+        removePendingAppWidgetPlacementListener();
+        if (this.mDestroyed && getChangingConfigurations() != 0) {
+            return;
+        }
+        if (this.mPendingAppWidgetId == appWidgetId) {
+            releasePendingAppWidgetId(null);
+            return;
+        }
+        if (appWidgetId != -1) {
+            this.mAppWidgetHost.deleteAppWidgetId(appWidgetId);
+        }
+    }
+
+    private void removePendingAppWidgetPlacementListener() {
+        if (this.mPendingAppWidgetPlacementLayout != null
+                && this.mPendingAppWidgetPlacementListener != null) {
+            this.mPendingAppWidgetPlacementLayout.removeOnLayoutChangeListener(
+                    this.mPendingAppWidgetPlacementListener);
+        }
+        this.mPendingAppWidgetPlacementLayout = null;
+        this.mPendingAppWidgetPlacementListener = null;
+    }
+
+    private CellLayout getCellLayoutForScreen(int screen) {
+        if (this.mWorkspace == null || screen < 0
+                || screen >= this.mWorkspace.getChildCount()) {
+            return null;
+        }
+        View child = this.mWorkspace.getChildAt(screen);
+        if (!(child instanceof CellLayout)) {
+            return null;
+        }
+        return (CellLayout) child;
     }
 
     public LauncherAppWidgetHost getAppWidgetHost() {
@@ -1053,6 +1378,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     public void onNewIntent(Intent intent) {
         super.onNewIntent(intent);
         if ("android.intent.action.MAIN".equals(intent.getAction())) {
+            dismissWidgetResize();
             closeSystemDialogs();
             this.mIsNewIntent = LOGD;
             if ((intent.getFlags() & 4194304) != 4194304) {
@@ -1117,18 +1443,31 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         if (this.mApplicationsGridOpen && isConfigurationChange) {
             outState.putBoolean(RUNTIME_STATE_ALL_APPS_FOLDER, LOGD);
         }
-        if (this.mAddItemCellInfo != null && this.mAddItemCellInfo.valid && this.mWaitingForResult) {
+        boolean savePendingAdd = this.mAddItemCellInfo != null
+                && (this.mWaitingForResult || this.mPendingAppWidgetPlacement);
+        if (savePendingAdd) {
             CellLayout.CellInfo addItemCellInfo = this.mAddItemCellInfo;
-            CellLayout layout = (CellLayout) this.mWorkspace.getChildAt(addItemCellInfo.screen);
+            CellLayout layout = getCellLayoutForScreen(addItemCellInfo.screen);
             outState.putInt(RUNTIME_STATE_PENDING_ADD_SCREEN, addItemCellInfo.screen);
             outState.putInt(RUNTIME_STATE_PENDING_ADD_CELL_X, addItemCellInfo.cellX);
             outState.putInt(RUNTIME_STATE_PENDING_ADD_CELL_Y, addItemCellInfo.cellY);
             outState.putInt(RUNTIME_STATE_PENDING_ADD_SPAN_X, addItemCellInfo.spanX);
             outState.putInt(RUNTIME_STATE_PENDING_ADD_SPAN_Y, addItemCellInfo.spanY);
-            outState.putInt(RUNTIME_STATE_PENDING_ADD_COUNT_X, layout.getCountX());
-            outState.putInt(RUNTIME_STATE_PENDING_ADD_COUNT_Y, layout.getCountY());
-            outState.putBooleanArray(RUNTIME_STATE_PENDING_ADD_OCCUPIED_CELLS, layout.getOccupiedCells());
+            if (layout != null) {
+                outState.putInt(RUNTIME_STATE_PENDING_ADD_COUNT_X, layout.getCountX());
+                outState.putInt(RUNTIME_STATE_PENDING_ADD_COUNT_Y, layout.getCountY());
+                outState.putBooleanArray(RUNTIME_STATE_PENDING_ADD_OCCUPIED_CELLS,
+                        layout.getOccupiedCells());
+            }
         }
+        if (this.mPendingAppWidgetId != -1) {
+            outState.putInt(RUNTIME_STATE_PENDING_APPWIDGET_ID,
+                    this.mPendingAppWidgetId);
+        }
+        outState.putBoolean(RUNTIME_STATE_PENDING_APPWIDGET_PLACEMENT,
+                this.mPendingAppWidgetPlacement);
+        outState.putBoolean(RUNTIME_STATE_PENDING_APPWIDGET_INSERT_AT_FIRST,
+                this.mPendingAppWidgetInsertAtFirst);
         if (this.mFolderInfo != null && this.mWaitingForResult) {
             outState.putBoolean(RUNTIME_STATE_PENDING_FOLDER_RENAME, LOGD);
             outState.putLong(RUNTIME_STATE_PENDING_FOLDER_RENAME_ID, this.mFolderInfo.f3id);
@@ -1137,6 +1476,14 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     public void onDestroy() {
         this.mDestroyed = LOGD;
+        dismissWidgetResize();
+        removePendingAppWidgetPlacementListener();
+        if (getChangingConfigurations() == 0) {
+            releasePendingAppWidgetId(null);
+        }
+        onBackCancelled();
+        BackGestureCompat.unregisterBackHandler(this, this.mBackGestureRegistration);
+        this.mBackGestureRegistration = null;
         super.onDestroy();
         try {
             this.mAppWidgetHost.stopListening();
@@ -1154,6 +1501,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     public void startActivityForResult(Intent intent, int requestCode) {
+        dismissWidgetResize();
         closeApplications(false);
         if (requestCode >= 0) {
             this.mWaitingForResult = LOGD;
@@ -1245,7 +1593,6 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         gridView.setNumColumns(requestedColumns);
         gridView.setVerticalSpacing(7);
         gridView.setPadding(4, 4, 4, 4);
-        gridView.setBackgroundColor(getColor(R.color.zm_reborn_slate));
         gridView.setOnItemClickListener(new android.widget.AdapterView.OnItemClickListener() {
             public void onItemClick(android.widget.AdapterView parent, View view, int position, long id) {
                 ApplicationItemInfo application = (ApplicationItemInfo) parent.getItemAtPosition(position);
@@ -1256,25 +1603,27 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         TextView emptyView = new TextView(this);
         emptyView.setText(R.string.app_list_folder_empty);
         emptyView.setTextAppearance(R.style.TextAppearance_ZmReborn_Body);
-        emptyView.setTextColor(getColor(R.color.zm_reborn_fog));
         emptyView.setGravity(17);
         FrameLayout content = new FrameLayout(this);
         content.addView(gridView, new FrameLayout.LayoutParams(-1, -1));
         content.addView(emptyView, new FrameLayout.LayoutParams(-1, -1));
         gridView.setEmptyView(emptyView);
-        content.setBackgroundColor(getColor(R.color.zm_reborn_glass));
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setView(content).setNegativeButton(R.string.button_close, null);
         TextView titleView = new TextView(this);
         titleView.setText(folderInfo.title);
         titleView.setTextAppearance(R.style.TextAppearance_ZmReborn_Title);
-        titleView.setTextColor(getColor(R.color.zm_reborn_amber));
         titleView.setPadding(12, 12, 12, 12);
         builder.setCustomTitle(titleView);
         this.mAppListFolderDialog = builder.create();
+        this.mAppListFolderPaletteBinder = new AppListFolderPaletteBinder(content, titleView);
+        this.mAppListFolderPaletteBinder.apply(this);
         this.mAppListFolderDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
             public void onDismiss(DialogInterface dialog) {
-                Launcher.this.mAppListFolderDialog = null;
+                if (dialog == Launcher.this.mAppListFolderDialog) {
+                    Launcher.this.mAppListFolderDialog = null;
+                    Launcher.this.mAppListFolderPaletteBinder = null;
+                }
             }
         });
         this.mAppListFolderDialog.show();
@@ -1294,9 +1643,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         final EditText titleInput = new EditText(this);
         titleInput.setSingleLine(true);
         titleInput.setHint(R.string.folder_name);
-        titleInput.setBackgroundColor(getColor(R.color.zm_reborn_glass));
-        titleInput.setTextColor(getColor(R.color.zm_reborn_fog));
-        titleInput.setHintTextColor(getColor(R.color.zm_reborn_steel));
+        titleInput.setBackgroundColor(
+                WallpaperColorExtractor.getSurfaceVariant(this));
+        titleInput.setTextColor(WallpaperColorExtractor.getOnSurface(this));
+        titleInput.setHintTextColor(WallpaperColorExtractor.getOutline(this));
         AlertDialog.Builder builder = new AlertDialog.Builder(this).setTitle(R.string.menu_new_app_list_folder)
                 .setView(titleInput)
                 .setNegativeButton(R.string.button_cancel, null)
@@ -1333,8 +1683,9 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         final EditText titleInput = new EditText(this);
         titleInput.setSingleLine(true);
         titleInput.setText(folderInfo.title);
-        titleInput.setBackgroundColor(getColor(R.color.zm_reborn_glass));
-        titleInput.setTextColor(getColor(R.color.zm_reborn_fog));
+        titleInput.setBackgroundColor(
+                WallpaperColorExtractor.getSurfaceVariant(this));
+        titleInput.setTextColor(WallpaperColorExtractor.getOnSurface(this));
         new AlertDialog.Builder(this).setTitle(R.string.rename_folder_title).setView(titleInput)
                 .setNegativeButton(R.string.button_cancel, null)
                 .setPositiveButton(R.string.button_done, new DialogInterface.OnClickListener() {
@@ -1481,21 +1832,68 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     /* access modifiers changed from: package-private */
     public void addAppWidget(Intent data) {
-        int appWidgetId = data.getIntExtra("appWidgetId", -1);
+        int appWidgetId = data.getIntExtra(
+                AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+        this.mPendingAppWidgetId = appWidgetId;
         if (SEARCH_WIDGET.equals(data.getStringExtra(EXTRA_CUSTOM_WIDGET))) {
-            this.mAppWidgetHost.deleteAppWidgetId(appWidgetId);
+            releasePendingAppWidgetId(data);
             addSearch();
             return;
         }
-        AppWidgetProviderInfo appWidget = this.mAppWidgetManager.getAppWidgetInfo(appWidgetId);
-        if (appWidget.configure != null) {
-            Intent intent = new Intent("android.appwidget.action.APPWIDGET_CONFIGURE");
-            intent.putExtra("appWidgetId", appWidgetId);
-            intent.setComponent(appWidget.configure);
-            startActivityForResult(intent, 5);
+        AppWidgetProviderInfo appWidget =
+                this.mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+        if (appWidget == null) {
+            releasePendingAppWidgetId(data);
             return;
         }
-        onActivityResult(5, -1, data);
+        if (appWidget.configure == null) {
+            onActivityResult(REQUEST_CREATE_APPWIDGET, RESULT_OK, data);
+            return;
+        }
+        startAppWidgetConfiguration(appWidget, appWidgetId, data);
+    }
+
+    private void startAppWidgetConfiguration(
+            AppWidgetProviderInfo appWidget, int appWidgetId, Intent resultData) {
+        Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        intent.setComponent(appWidget.configure);
+        try {
+            startActivityForResult(intent, REQUEST_CREATE_APPWIDGET);
+        } catch (ActivityNotFoundException exception) {
+            Log.e(LOG_TAG, "Unable to configure app widget " + appWidget.provider,
+                    exception);
+            releasePendingAppWidgetId(resultData);
+        }
+    }
+
+    private void startAppWidgetPicker(Intent pickIntent) {
+        try {
+            startActivityForResult(pickIntent, REQUEST_PICK_APPWIDGET);
+        } catch (ActivityNotFoundException exception) {
+            Log.e(LOG_TAG, "Unable to open app widget picker", exception);
+            releasePendingAppWidgetId(pickIntent);
+        }
+    }
+
+    private void releasePendingAppWidgetId(Intent resultData) {
+        removePendingAppWidgetPlacementListener();
+        int appWidgetId = this.mPendingAppWidgetId;
+        if (appWidgetId == -1 && resultData != null) {
+            appWidgetId = resultData.getIntExtra(
+                    AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
+        }
+        if (appWidgetId != -1) {
+            this.mAppWidgetHost.deleteAppWidgetId(appWidgetId);
+        }
+        clearPendingAppWidgetId();
+    }
+
+    private void clearPendingAppWidgetId() {
+        removePendingAppWidgetPlacementListener();
+        this.mPendingAppWidgetId = -1;
+        this.mPendingAppWidgetPlacement = false;
+        this.mPendingAppWidgetInsertAtFirst = false;
     }
 
     /* access modifiers changed from: package-private */
@@ -1616,7 +2014,13 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     private boolean findSlot(CellLayout.CellInfo cellInfo, int[] xy, int spanX, int spanY) {
         if (!cellInfo.findCellForSpan(xy, spanX, spanY)) {
-            if (!this.mWorkspace.findAllVacantCells(this.mSavedState != null ? this.mSavedState.getBooleanArray(RUNTIME_STATE_PENDING_ADD_OCCUPIED_CELLS) : null).findCellForSpan(xy, spanX, spanY)) {
+            CellLayout targetLayout = getCellLayoutForScreen(cellInfo.screen);
+            boolean[] occupiedCells = this.mSavedState == null ? null
+                    : this.mSavedState.getBooleanArray(
+                            RUNTIME_STATE_PENDING_ADD_OCCUPIED_CELLS);
+            CellLayout.CellInfo vacantCells = targetLayout == null ? null
+                    : targetLayout.findAllVacantCells(occupiedCells, null);
+            if (vacantCells == null || !vacantCells.findCellForSpan(xy, spanX, spanY)) {
                 Toast.makeText(this, getString(R.string.out_of_space), 0).show();
                 return false;
             }
@@ -1701,19 +2105,63 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                         return LOGD;
                     }
                     this.mWorkspace.dispatchKeyEvent(event);
-                    if (this.mApplicationsGridOpen) {
-                        closeApplications();
-                    } else {
-                        closeFolder();
-                    }
-                    if (!isPreviewsShowing()) {
-                        return LOGD;
-                    }
-                    dismissPreviews();
+                    handleBackInvoked();
                     return LOGD;
             }
         }
         return super.dispatchKeyEvent(event);
+    }
+
+    private void handleBackInvoked() {
+        resetBackPreview();
+        if (dismissWidgetResize()) {
+            return;
+        }
+        if (this.mApplicationsGridOpen) {
+            closeApplications();
+        } else {
+            closeFolder();
+        }
+        if (isPreviewsShowing()) {
+            dismissPreviews();
+        }
+    }
+
+    private void onBackProgressed(float progress) {
+        View target = getBackPreviewTarget();
+        if (target == null) {
+            return;
+        }
+        this.mBackPreviewTarget = target;
+        float boundedProgress = Math.max(0.0f, Math.min(1.0f, progress));
+        target.setAlpha(1.0f - (BACK_PREVIEW_ALPHA_DISTANCE * boundedProgress));
+        float scale = 1.0f - (BACK_PREVIEW_SCALE_DISTANCE * boundedProgress);
+        target.setScaleX(scale);
+        target.setScaleY(scale);
+    }
+
+    private void onBackCancelled() {
+        resetBackPreview();
+    }
+
+    private View getBackPreviewTarget() {
+        if (this.mWidgetResizeSession != null) {
+            return this.mWidgetResizeSession.frame;
+        }
+        if (this.mApplicationsGridOpen) {
+            return this.mApplicationsView.getImplementingView();
+        }
+        return this.mWorkspace.getOpenFolder();
+    }
+
+    private void resetBackPreview() {
+        if (this.mBackPreviewTarget == null) {
+            return;
+        }
+        this.mBackPreviewTarget.setAlpha(1.0f);
+        this.mBackPreviewTarget.setScaleX(1.0f);
+        this.mBackPreviewTarget.setScaleY(1.0f);
+        this.mBackPreviewTarget = null;
     }
 
     private void closeApplications() {
@@ -1776,7 +2224,8 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         }
         try {
             file.createNewFile();
-        } catch (IOException e) {
+        } catch (IOException exception) {
+            Log.w(LOG_TAG, "Unable to persist dock bootstrap marker", exception);
         }
         return LOGD;
     }
@@ -1787,56 +2236,105 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     /* access modifiers changed from: package-private */
     public void bootstrapDock() {
-        ApplicationItemInfo applicationItemInfo;
         Log.d(LOG_TAG, "-- bootstrapDock()");
-        Dock dock = this.mDock;
+        ArrayList<ApplicationItemInfo> applications = resolveDefaultDockApplications();
+        for (int index = 0; index < applications.size(); index++) {
+            this.mDock.sendDrop(applications.get(index));
+        }
+    }
+
+    private ArrayList<ApplicationItemInfo> resolveDefaultDockApplications() {
         ArrayList<ApplicationItemInfo> applications = new ArrayList<>();
-        ArrayList<Intent> launchIntents = new ArrayList<>();
+        ArrayList<Intent> intents = createDefaultDockIntents();
+        for (int index = 0; index < intents.size(); index++) {
+            addResolvedDockApplication(applications, intents.get(index));
+        }
+        return applications;
+    }
+
+    private ArrayList<Intent> createDefaultDockIntents() {
+        ArrayList<Intent> intents = new ArrayList<>();
+        intents.add(new Intent(Intent.ACTION_DIAL, Uri.parse("tel:")));
+        intents.add(new Intent(Intent.ACTION_SENDTO, Uri.parse("smsto:")));
+        intents.add(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.example.com")));
+        intents.add(new Intent("android.media.action.IMAGE_CAPTURE"));
+        intents.add(new Intent(Intent.ACTION_VIEW,
+                Uri.parse("content://com.android.contacts/contacts")));
+        return intents;
+    }
+
+    private void addResolvedDockApplication(ArrayList<ApplicationItemInfo> applications,
+            Intent intent) {
         PackageManager packageManager = getPackageManager();
-        ApplicationItemInfo dialerApplicationItemInfo = getApplicationItemInfoOrNull(new ComponentName("com.android.contacts", "com.android.contacts.DialtactsActivity"));
-        if (dialerApplicationItemInfo != null) {
-            applications.add(dialerApplicationItemInfo);
+        ResolveInfo resolveInfo = packageManager.resolveActivity(
+                intent, PackageManager.MATCH_DEFAULT_ONLY);
+        if (!isValidDockResolveInfo(resolveInfo)) {
+            resolveInfo = selectDockResolveInfo(resolveInfo,
+                    packageManager.queryIntentActivities(intent,
+                            PackageManager.MATCH_DEFAULT_ONLY));
         }
-        ApplicationItemInfo dialerApplicationItemInfo2 = getApplicationItemInfoOrNull(new ComponentName("com.android.contacts", "com.sec.android.app.contacts.DialerEntryActivity"));
-        if (dialerApplicationItemInfo2 != null) {
-            applications.add(dialerApplicationItemInfo2);
-        }
-        ApplicationItemInfo dialerApplicationItemInfo3 = getApplicationItemInfoOrNull(new ComponentName("com.android.htccontacts", "com.android.htccontacts.DialerTabActivity"));
-        if (dialerApplicationItemInfo3 != null) {
-            applications.add(dialerApplicationItemInfo3);
-        }
-        launchIntents.add(packageManager.getLaunchIntentForPackage("com.android.htccontacts"));
-        launchIntents.add(packageManager.getLaunchIntentForPackage("com.android.mms"));
-        launchIntents.add(packageManager.getLaunchIntentForPackage("com.google.android.gm"));
-        launchIntents.add(packageManager.getLaunchIntentForPackage("com.google.android.talk"));
-        Intent browserIntent = packageManager.getLaunchIntentForPackage("com.android.browser");
-        if (browserIntent == null) {
-            browserIntent = packageManager.getLaunchIntentForPackage("com.google.android.browser");
-        }
-        if (browserIntent != null) {
-            launchIntents.add(browserIntent);
-        }
-        for (int i = 0; i < launchIntents.size(); i++) {
-            Intent launchIntent = launchIntents.get(i);
-            if (!(launchIntent == null || (applicationItemInfo = getApplicationItemInfoOrNull(launchIntent.getComponent())) == null)) {
-                applications.add(applicationItemInfo);
-            }
-        }
-        if (applications.size() > 4) {
-            for (int i2 = 0; i2 < applications.size(); i2++) {
-                if (i2 == 4) {
-                    dock.sendDrop(applications.get(i2));
-                    dock.sendDrop(new ApplicationsGridItemInfo(this));
-                } else {
-                    dock.sendDrop(applications.get(i2));
-                }
-            }
+        if (resolveInfo == null) {
             return;
         }
-        dock.sendDrop(new ApplicationsGridItemInfo(this));
-        for (int i3 = 0; i3 < applications.size(); i3++) {
-            dock.sendDrop(applications.get(i3));
+        ComponentName componentName = new ComponentName(
+                resolveInfo.activityInfo.packageName, resolveInfo.activityInfo.name);
+        if (containsComponent(applications, componentName)) {
+            return;
         }
+        ApplicationItemInfo application = getApplicationItemInfoOrNull(componentName);
+        if (application != null) {
+            applications.add(application);
+        }
+    }
+
+    static ResolveInfo selectDockResolveInfo(ResolveInfo resolvedActivity,
+            List<ResolveInfo> candidates) {
+        if (isValidDockResolveInfo(resolvedActivity)) {
+            return resolvedActivity;
+        }
+        if (candidates == null) {
+            return null;
+        }
+        ResolveInfo selected = null;
+        for (int index = 0; index < candidates.size(); index++) {
+            ResolveInfo candidate = candidates.get(index);
+            if (!isValidDockResolveInfo(candidate)) {
+                continue;
+            }
+            if (selected == null) {
+                selected = candidate;
+                continue;
+            }
+            ActivityInfo candidateActivity = candidate.activityInfo;
+            ActivityInfo selectedActivity = selected.activityInfo;
+            int packageComparison = candidateActivity.packageName.compareTo(
+                    selectedActivity.packageName);
+            if (packageComparison < 0 || (packageComparison == 0
+                    && candidateActivity.name.compareTo(selectedActivity.name) < 0)) {
+                selected = candidate;
+            }
+        }
+        return selected;
+    }
+
+    private static boolean isValidDockResolveInfo(ResolveInfo resolveInfo) {
+        if (resolveInfo == null || resolveInfo.activityInfo == null) {
+            return false;
+        }
+        ActivityInfo activityInfo = resolveInfo.activityInfo;
+        return activityInfo.packageName != null && activityInfo.packageName.length() > 0
+                && activityInfo.name != null && activityInfo.name.length() > 0
+                && !"android".equals(activityInfo.packageName);
+    }
+
+    private boolean containsComponent(ArrayList<ApplicationItemInfo> applications,
+            ComponentName componentName) {
+        for (int index = 0; index < applications.size(); index++) {
+            if (componentName.equals(applications.get(index).intent.getComponent())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private ApplicationItemInfo getApplicationItemInfoOrNull(ComponentName componentName) {
@@ -1844,18 +2342,20 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         try {
             ActivityInfo activityInfo = packageManager.getActivityInfo(componentName, 0);
             ApplicationItemInfo applicationItemInfo = new ApplicationItemInfo();
-            applicationItemInfo.icon = Utilities.createIconThumbnail(activityInfo.loadIcon(packageManager), this);
+            Drawable icon = activityInfo.loadIcon(packageManager);
+            applicationItemInfo.icon = Utilities.normalizeApplicationIcon(icon, this);
             applicationItemInfo.container = -1;
             applicationItemInfo.filtered = false;
             applicationItemInfo.title = activityInfo.loadLabel(packageManager);
             applicationItemInfo.setActivity(componentName, 270532608);
             return applicationItemInfo;
-        } catch (Exception e) {
+        } catch (PackageManager.NameNotFoundException exception) {
             return null;
         }
     }
 
     private void bindDesktopItems(ArrayList<ItemInfo> shortcuts, ArrayList<LauncherAppWidgetInfo> appWidgets) {
+        dismissWidgetResize();
         if (shortcuts != null && appWidgets != null) {
             Workspace workspace = this.mWorkspace;
             int count = workspace.getChildCount();
@@ -1914,17 +2414,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         if (dockItems.size() > 0) {
             dock.addItemViews(dockItems);
         }
-        if (this.mBootstrap) {
-            if (dockItems.size() == 0) {
-                bootstrapDock();
-            } else {
-                File file = new File(String.valueOf(Preferences.getApplicationDataPath(this)) + "dirty");
-                if (file.exists()) {
-                    dock.sendDrop(new ApplicationsGridItemInfo(this), 0);
-                    file.delete();
-                }
-            }
+        if (this.mBootstrap && dockItems.size() == 0) {
+            bootstrapDock();
         }
+        deleteLegacyDrawerBootstrapMarker();
         workspace.requestLayout();
         if (end >= count) {
             finishBindDesktopItems();
@@ -1932,6 +2425,14 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             return;
         }
         binder.obtainMessage(1, i, count).sendToTarget();
+    }
+
+    private void deleteLegacyDrawerBootstrapMarker() {
+        File marker = new File(
+                String.valueOf(Preferences.getApplicationDataPath(this)) + "dirty");
+        if (marker.exists() && !marker.delete()) {
+            Log.w(LOG_TAG, "Unable to delete legacy drawer bootstrap marker");
+        }
     }
 
     private void finishBindDesktopItems() {
@@ -1986,6 +2487,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             LauncherAppWidgetInfo launcherAppWidgetInfo = appWidgets.removeFirst();
             int appWidgetId = launcherAppWidgetInfo.appWidgetId;
             AppWidgetProviderInfo appWidgetInfo = this.mAppWidgetManager.getAppWidgetInfo(appWidgetId);
+            updateAppWidgetSizeOptions(launcherAppWidgetInfo);
             launcherAppWidgetInfo.hostView = this.mAppWidgetHost.createView(this, appWidgetId, appWidgetInfo);
             Log.d(LOG_TAG, String.format("about to setAppWidget for id=%d, info=%s", new Object[]{Integer.valueOf(appWidgetId), appWidgetInfo}));
             launcherAppWidgetInfo.hostView.setAppWidget(appWidgetId, appWidgetInfo);
@@ -2084,6 +2586,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         if (this.mDesktopLocked) {
             return false;
         }
+        View pressedView = view;
         if (!(view instanceof CellLayout)) {
             view = (View) view.getParent();
         }
@@ -2097,11 +2600,111 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                     this.mWorkspace.setAllowLongPress(false);
                     showLauncherDialog(cellInfo);
                 }
-            } else if (!(cellInfo.cell instanceof Folder)) {
+            } else if (!(cellInfo.cell instanceof Folder)
+                    && !showWidgetResize(pressedView)) {
                 this.mWorkspace.startDrag(cellInfo);
             }
         }
         return LOGD;
+    }
+
+    private boolean showWidgetResize(View view) {
+        if (!(view instanceof LauncherAppWidgetHostView)
+                || !(view.getTag() instanceof LauncherAppWidgetInfo)
+                || !(view.getParent() instanceof CellLayout)) {
+            return false;
+        }
+        LauncherAppWidgetInfo widgetInfo = (LauncherAppWidgetInfo) view.getTag();
+        AppWidgetProviderInfo providerInfo = this.mAppWidgetManager.getAppWidgetInfo(
+                widgetInfo.appWidgetId);
+        if (providerInfo == null
+                || providerInfo.resizeMode == AppWidgetProviderInfo.RESIZE_NONE) {
+            return false;
+        }
+        CellLayout cellLayout = (CellLayout) view.getParent();
+        if (!cellLayout.isWidgetSizingGeometryReady()) {
+            return false;
+        }
+        dismissWidgetResize();
+        WidgetResizeSession session = new WidgetResizeSession(this, cellLayout,
+                (LauncherAppWidgetHostView) view, widgetInfo, providerInfo);
+        if (!session.frame.supportsResize()) {
+            return false;
+        }
+        this.mWidgetResizeSession = session;
+        this.mWorkspace.setAllowLongPress(false);
+        this.mDragLayer.addView(session.frame,
+                new FrameLayout.LayoutParams(-1, -1));
+        session.frame.bringToFront();
+        session.frame.requestFocus();
+        return true;
+    }
+
+    private void commitWidgetResize(WidgetResizeSession session,
+            CellLayout.ResizeCandidate candidate) {
+        if (session != this.mWidgetResizeSession
+                || !session.cellLayout.applyResizeCandidate(session.widgetView, candidate)) {
+            dismissWidgetResize(session);
+            return;
+        }
+        CellLayout.LayoutParams params = (CellLayout.LayoutParams)
+                session.widgetView.getLayoutParams();
+        session.widgetInfo.cellX = params.cellX;
+        session.widgetInfo.cellY = params.cellY;
+        session.widgetInfo.spanX = params.cellHSpan;
+        session.widgetInfo.spanY = params.cellVSpan;
+        LauncherModel.updateItemInDatabase(this, session.widgetInfo);
+        updateAppWidgetSizeOptions(session.widgetInfo);
+        dismissWidgetResize(session);
+    }
+
+    private void dismissWidgetResize(WidgetResizeSession session) {
+        if (session == this.mWidgetResizeSession) {
+            dismissWidgetResize();
+        }
+    }
+
+    private boolean dismissWidgetResize() {
+        WidgetResizeSession session = this.mWidgetResizeSession;
+        if (session == null) {
+            return false;
+        }
+        this.mWidgetResizeSession = null;
+        if (session.frame.getParent() == this.mDragLayer) {
+            this.mDragLayer.removeView(session.frame);
+        }
+        return true;
+    }
+
+    boolean isWidgetResizeShowing() {
+        return this.mWidgetResizeSession != null;
+    }
+
+    private static final class WidgetResizeSession implements WidgetResizeFrame.Callback {
+        final CellLayout cellLayout;
+        final WidgetResizeFrame frame;
+        final LauncherAppWidgetInfo widgetInfo;
+        final LauncherAppWidgetHostView widgetView;
+        private final Launcher launcher;
+
+        WidgetResizeSession(Launcher launcher, CellLayout cellLayout,
+                LauncherAppWidgetHostView widgetView, LauncherAppWidgetInfo widgetInfo,
+                AppWidgetProviderInfo providerInfo) {
+            this.launcher = launcher;
+            this.cellLayout = cellLayout;
+            this.widgetView = widgetView;
+            this.widgetInfo = widgetInfo;
+            this.frame = new WidgetResizeFrame(launcher, cellLayout, widgetView,
+                    providerInfo, this);
+        }
+
+        public void onWidgetResizeCancelled() {
+            this.launcher.dismissWidgetResize(this);
+        }
+
+        public void onWidgetResizeCommitted(CellLayout.ResizeCandidate candidate) {
+            this.launcher.commitWidgetResize(this, candidate);
+        }
     }
 
     static LauncherModel getModel() {
@@ -2109,12 +2712,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     private void closeApplicationsFromStateOverlay() {
-        if (this.mApplicationsView instanceof ApplicationsGridView
-                && ((ApplicationsGridView) this.mApplicationsView).mMode != ApplicationsView.MODE_DEFAULT) {
-            this.mApplicationsView.setMode(ApplicationsView.MODE_DEFAULT);
-        }
-        if (this.mApplicationsView instanceof ApplicationsPagingView
-                && ((ApplicationsPagingView) this.mApplicationsView).mMode != ApplicationsView.MODE_DEFAULT) {
+        if (this.mApplicationsView.getMode() != ApplicationsView.MODE_DEFAULT) {
             this.mApplicationsView.setMode(ApplicationsView.MODE_DEFAULT);
         }
         closeAllApplications();
@@ -2218,13 +2816,15 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         public Dialog createDialog() {
             Launcher.this.mWaitingForResult = Launcher.LOGD;
             View layout = View.inflate(Launcher.this, R.layout.rename_folder, (ViewGroup) null);
-            layout.setBackgroundColor(Launcher.this.getColor(R.color.zm_reborn_glass));
+            layout.setBackgroundColor(withAlpha(
+                    WallpaperColorExtractor.getSurface(Launcher.this), 217));
             this.mInput = (EditText) layout.findViewById(R.id.folder_name);
-            this.mInput.setBackgroundColor(Launcher.this.getColor(R.color.zm_reborn_slate));
-            this.mInput.setTextColor(Launcher.this.getColor(R.color.zm_reborn_fog));
+            this.mInput.setBackgroundColor(
+                    WallpaperColorExtractor.getSurfaceVariant(Launcher.this));
+            this.mInput.setTextColor(WallpaperColorExtractor.getOnSurface(Launcher.this));
             TextView label = (TextView) layout.findViewById(R.id.label);
             if (label != null) {
-                label.setTextColor(Launcher.this.getColor(R.color.zm_reborn_amber));
+                label.setTextColor(WallpaperColorExtractor.getPrimary(Launcher.this));
             }
             AlertDialog.Builder builder = new AlertDialog.Builder(Launcher.this);
             builder.setTitle(Launcher.this.getString(R.string.rename_folder_title));
@@ -2380,8 +2980,9 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             switch (which) {
                 case 0:
                     int appWidgetId = Launcher.this.mAppWidgetHost.allocateAppWidgetId();
-                    Intent pickIntent = new Intent("android.appwidget.action.APPWIDGET_PICK");
-                    pickIntent.putExtra("appWidgetId", appWidgetId);
+                    Launcher.this.mPendingAppWidgetId = appWidgetId;
+                    Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
+                    pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
                     ArrayList<AppWidgetProviderInfo> customInfo = new ArrayList<>();
                     AppWidgetProviderInfo appWidgetProviderInfo = new AppWidgetProviderInfo();
                     appWidgetProviderInfo.provider = new ComponentName(Launcher.this.getPackageName(), "XXX.YYY");
@@ -2394,7 +2995,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                     bundle.putString(Launcher.EXTRA_CUSTOM_WIDGET, Launcher.SEARCH_WIDGET);
                     customExtras.add(bundle);
                     pickIntent.putParcelableArrayListExtra("customExtras", customExtras);
-                    Launcher.this.startActivityForResult(pickIntent, 9);
+                    Launcher.this.startAppWidgetPicker(pickIntent);
                     return;
                 case 1:
                     Launcher.this.pickShortcut(7, R.string.title_select_shortcut);
@@ -2584,7 +3185,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     public View createSmallShortcut(int layoutResId, ViewGroup parent, ApplicationItemInfo info) {
         ImageView imageView = (ImageView) this.mInflater.inflate(layoutResId, parent, false);
         if (!info.filtered) {
-            info.icon = Utilities.createIconThumbnail(info.icon, this);
+            info.icon = Utilities.normalizeApplicationIcon(info.icon, this);
             info.filtered = LOGD;
         }
         imageView.setImageDrawable(Utilities.createDockIconThumbnail(info.icon, this));
@@ -2658,6 +3259,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     public void showPreviews(int start, int end) {
+        dismissWidgetResize();
         this.mPreviewsShowing = LOGD;
         hideDesktop(LOGD);
         this.mWorkspace.lock();
@@ -2672,6 +3274,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     private void openApplicationsGrid(boolean animated) {
+        dismissWidgetResize();
         if (!this.mApplicationsGridOpen) {
             this.mDock.hide(false);
             this.mWorkspace.enableChildrenCache();
@@ -2727,6 +3330,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     /* access modifiers changed from: package-private */
+    boolean isApplicationsGridLogicallyOpen() {
+        return this.mApplicationsGridOpen;
+    }
+
+    /* access modifiers changed from: package-private */
     public boolean isApplicationsGridOpen() {
         if (this.mApplicationsView == null || this.mApplicationsView.getImplementingView().getVisibility() != 0) {
             return false;
@@ -2747,10 +3355,40 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         }
 
         public void onReceive(Context context, Intent intent) {
-            Launcher launcher;
-            Workspace workspace;
-            if (this.mLauncher != null && (launcher = (Launcher) this.mLauncher.get()) != null && (workspace = launcher.getWorkspace()) != null) {
-                workspace.setWallpaper(Launcher.LOGD);
+            PendingResult pendingResult = goAsync();
+            dispatchWallpaperRefresh(context, pendingResult);
+        }
+
+        void dispatchWallpaperRefresh(final Context context,
+                final PendingResult pendingResult) {
+            if (Launcher.sSuppressWallpaperRefreshForTests) {
+                finishPendingResult(pendingResult);
+                return;
+            }
+            Launcher launcher = this.mLauncher == null ? null : this.mLauncher.get();
+            if (launcher != null) {
+                launcher.refreshWallpaperColorsAsync(pendingResult);
+                Workspace workspace = launcher.getWorkspace();
+                if (workspace != null) {
+                    workspace.setWallpaper(Launcher.LOGD);
+                }
+                return;
+            }
+            final Context applicationContext = LocaleUtil.wrap(context.getApplicationContext());
+            sWallpaperRefreshExecutor.execute(new Runnable() {
+                public void run() {
+                    try {
+                        WallpaperColorExtractor.refresh(applicationContext);
+                    } finally {
+                        finishPendingResult(pendingResult);
+                    }
+                }
+            });
+        }
+
+        private void finishPendingResult(PendingResult pendingResult) {
+            if (pendingResult != null) {
+                pendingResult.finish();
             }
         }
     }
@@ -2829,25 +3467,87 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     /* access modifiers changed from: private */
-    public void realAddWidget(AppWidgetProviderInfo appWidgetInfo, CellLayout.CellInfo cellInfo, int[] spans, int appWidgetId, boolean insertAtFirst) {
+    public void realAddWidget(AppWidgetProviderInfo appWidgetInfo,
+            CellLayout.CellInfo cellInfo, int[] spans, int appWidgetId,
+            boolean insertAtFirst) {
         int[] xy = this.mCellCoordinates;
-        if (findSlot(cellInfo, xy, spans[0], spans[1])) {
-            LauncherAppWidgetInfo launcherAppWidgetInfo = new LauncherAppWidgetInfo(appWidgetId);
-            launcherAppWidgetInfo.spanX = spans[0];
-            launcherAppWidgetInfo.spanY = spans[1];
-            LauncherModel.addItemToDatabase(this, launcherAppWidgetInfo, -100, this.mWorkspace.getCurrentScreen(), xy[0], xy[1], false);
-            if (!this.mRestoring) {
-                sLauncherModel.addDesktopAppWidget(launcherAppWidgetInfo);
-                launcherAppWidgetInfo.hostView = this.mAppWidgetHost.createView(this, appWidgetId, appWidgetInfo);
-                launcherAppWidgetInfo.hostView.setAppWidget(appWidgetId, appWidgetInfo);
-                launcherAppWidgetInfo.hostView.setTag(launcherAppWidgetInfo);
-                this.mWorkspace.addInCurrentScreen(launcherAppWidgetInfo.hostView, xy[0], xy[1], launcherAppWidgetInfo.spanX, launcherAppWidgetInfo.spanY, insertAtFirst);
-            } else if (sLauncherModel.isDesktopLoaded()) {
-                sLauncherModel.addDesktopAppWidget(launcherAppWidgetInfo);
-            }
-        } else if (appWidgetId != -1) {
-            this.mAppWidgetHost.deleteAppWidgetId(appWidgetId);
+        if (!findSlot(cellInfo, xy, spans[0], spans[1])) {
+            releasePendingAppWidgetId(null);
+            return;
         }
+        LauncherAppWidgetInfo widgetInfo = createAppWidgetInfo(
+                appWidgetId, cellInfo, spans, xy);
+        if (!this.mRestoring) {
+            bindNewAppWidget(widgetInfo, appWidgetInfo, xy, insertAtFirst);
+        } else if (sLauncherModel.isDesktopLoaded()) {
+            sLauncherModel.addDesktopAppWidget(widgetInfo);
+        }
+        clearPendingAppWidgetId();
+    }
+
+    private LauncherAppWidgetInfo createAppWidgetInfo(int appWidgetId,
+            CellLayout.CellInfo cellInfo, int[] spans, int[] xy) {
+        LauncherAppWidgetInfo widgetInfo = new LauncherAppWidgetInfo(appWidgetId);
+        widgetInfo.spanX = spans[0];
+        widgetInfo.spanY = spans[1];
+        LauncherModel.addItemToDatabase(this, widgetInfo, -100,
+                cellInfo.screen, xy[0], xy[1], false);
+        return widgetInfo;
+    }
+
+    private void bindNewAppWidget(LauncherAppWidgetInfo widgetInfo,
+            AppWidgetProviderInfo providerInfo, int[] xy, boolean insertAtFirst) {
+        sLauncherModel.addDesktopAppWidget(widgetInfo);
+        updateAppWidgetSizeOptions(widgetInfo);
+        widgetInfo.hostView = this.mAppWidgetHost.createView(
+                this, widgetInfo.appWidgetId, providerInfo);
+        widgetInfo.hostView.setAppWidget(widgetInfo.appWidgetId, providerInfo);
+        widgetInfo.hostView.setTag(widgetInfo);
+        this.mWorkspace.addInScreen(widgetInfo.hostView, widgetInfo.screen, xy[0], xy[1],
+                widgetInfo.spanX, widgetInfo.spanY, insertAtFirst);
+    }
+
+    private void updateAppWidgetSizeOptions(final LauncherAppWidgetInfo widgetInfo) {
+        final CellLayout targetLayout = getCellLayoutForScreen(widgetInfo.screen);
+        if (targetLayout == null) {
+            return;
+        }
+        if (targetLayout.isWidgetSizingGeometryReady()) {
+            updateAppWidgetSizeOptionsWhenReady(widgetInfo, targetLayout);
+            return;
+        }
+        targetLayout.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            public void onLayoutChange(View view, int left, int top, int right, int bottom,
+                    int oldLeft, int oldTop, int oldRight, int oldBottom) {
+                if (Launcher.this.mDestroyed
+                        || Launcher.this.getCellLayoutForScreen(widgetInfo.screen)
+                        != targetLayout) {
+                    targetLayout.removeOnLayoutChangeListener(this);
+                    return;
+                }
+                if (!targetLayout.isWidgetSizingGeometryReady()) {
+                    return;
+                }
+                targetLayout.removeOnLayoutChangeListener(this);
+                Launcher.this.updateAppWidgetSizeOptionsWhenReady(widgetInfo, targetLayout);
+            }
+        });
+        targetLayout.requestLayout();
+    }
+
+    private void updateAppWidgetSizeOptionsWhenReady(LauncherAppWidgetInfo widgetInfo,
+            CellLayout targetLayout) {
+        int[] size = targetLayout.spanToPixels(widgetInfo.spanX, widgetInfo.spanY);
+        float density = getResources().getDisplayMetrics().density;
+        int width = Math.max(1, Math.round(size[0] / density));
+        int height = Math.max(1, Math.round(size[1] / density));
+        Bundle options = new Bundle();
+        options.putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_WIDTH, width);
+        options.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_WIDTH, width);
+        options.putInt(AppWidgetManager.OPTION_APPWIDGET_MIN_HEIGHT, height);
+        options.putInt(AppWidgetManager.OPTION_APPWIDGET_MAX_HEIGHT, height);
+        this.mAppWidgetManager.updateAppWidgetOptions(
+                widgetInfo.appWidgetId, options);
     }
 
     public static int getScreenCount(Context context) {
@@ -2859,31 +3559,14 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     public void updateWorkspaceEmptyTip() {
-        TextView emptyTip = (TextView) findViewById(R.id.workspace_empty_tip);
-        if (emptyTip == null) {
-            return;
-        }
-        if (isApplicationsGridOpen() || (this.mWorkspace != null && this.mWorkspace.getOpenFolder() != null)) {
+        View emptyTip = findViewById(R.id.workspace_empty_tip);
+        if (emptyTip != null) {
             emptyTip.setVisibility(View.GONE);
-            return;
         }
-        boolean isEmpty = true;
-        if (this.mWorkspace != null) {
-            int count = this.mWorkspace.getChildCount();
-            for (int i = 0; i < count; i++) {
-                View child = this.mWorkspace.getChildAt(i);
-                if (child instanceof CellLayout) {
-                    if (((CellLayout) child).getChildCount() > 0) {
-                        isEmpty = false;
-                        break;
-                    }
-                }
-            }
-        }
-        emptyTip.setVisibility(isEmpty ? View.VISIBLE : View.GONE);
     }
 
     public void onDragStart(View view, DragSource source, Object info, int dragAction) {
+        dismissWidgetResize();
         TextView emptyTip = (TextView) findViewById(R.id.workspace_empty_tip);
         if (emptyTip != null) {
             emptyTip.setVisibility(View.GONE);

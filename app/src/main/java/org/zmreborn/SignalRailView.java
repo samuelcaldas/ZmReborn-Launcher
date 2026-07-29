@@ -2,8 +2,10 @@ package org.zmreborn;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.View;
+import org.zmreborn.theme.WallpaperColorExtractor;
 
 final class SignalRailView extends View {
     private final Paint mPaint = new Paint();
@@ -37,13 +39,20 @@ final class SignalRailView extends View {
     }
 
     private void initializeView(Context context) {
-        this.mTrackColor = context.getResources().getColor(R.color.zm_reborn_glass);
-        this.mActiveColor = context.getResources().getColor(R.color.zm_reborn_amber);
+        refreshPalette();
         this.mTrackThickness = dimension(context, R.dimen.rail_thickness);
         this.mActiveThickness = dimension(context, R.dimen.rail_active_thickness);
         this.mInset = dimension(context, R.dimen.rail_inset);
         this.mPaint.setStyle(Paint.Style.FILL);
         this.mPaint.setAntiAlias(false);
+    }
+
+    void refreshPalette() {
+        int surface = WallpaperColorExtractor.getSurface(getContext());
+        this.mTrackColor = Color.argb(217, Color.red(surface), Color.green(surface),
+                Color.blue(surface));
+        this.mActiveColor = WallpaperColorExtractor.getPrimary(getContext());
+        invalidate();
     }
 
     void setTotalItems(int totalItems) {

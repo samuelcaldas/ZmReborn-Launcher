@@ -59,6 +59,19 @@ class ApplicationItemInfo extends ItemInfo {
         this.itemType = 0;
     }
 
+    String getStableKey() {
+        if (this.componentName != null && this.componentName.length() > 0) {
+            return "component:" + this.componentName;
+        }
+        if (this.intent != null && this.intent.getComponent() != null) {
+            return "component:" + this.intent.getComponent().flattenToString();
+        }
+        if (this.intent != null) {
+            return "intent:" + this.intent.toUri(0);
+        }
+        return "title:" + String.valueOf(this.title);
+    }
+
     /* access modifiers changed from: package-private */
     public void onAddToDatabase(ContentValues values) {
         String titleStr;

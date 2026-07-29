@@ -2,7 +2,7 @@
 <TextView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@android:id/title"
     android:textAppearance="@style/TextAppearance.ZmReborn.Category"
-    android:textColor="@color/zm_reborn_amber"
+    android:textColor="@color/m3_primary"
     android:gravity="center_vertical"
     android:paddingLeft="@dimen/space_16"
     android:paddingTop="@dimen/space_12"

@@ -2,6 +2,7 @@ package org.zmreborn;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,13 +14,14 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import org.zmreborn.ViewPager;
+import org.zmreborn.theme.WallpaperColorExtractor;
 
 public class ApplicationsPagingView extends FrameLayout implements ApplicationsView, View.OnClickListener, View.OnLongClickListener, DragSource {
     private static int sColumns;
     private static int sRows;
-    private Animation.AnimationListener mAnimationListener;
     private ArrayList<ApplicationItemInfo> mApplicationItemInfos;
     private boolean mActionsEnabled = true;
+    private boolean mClosing;
     private DragController mDragController;
     private boolean mDestroyed;
     private Launcher mLauncher;
@@ -31,6 +33,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     private int mBasePaddingLeft;
     private int mBasePaddingRight;
     private int mBasePaddingTop;
+    private Rect mSystemGestureInsets;
 
     public ApplicationsPagingView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -47,37 +50,21 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     /* access modifiers changed from: protected */
     public void onFinishInflate() {
         super.onFinishInflate();
+        setElevation(getResources().getDimension(R.dimen.elevation_drawer_header));
         this.mBasePaddingLeft = getPaddingLeft();
         this.mBasePaddingTop = getPaddingTop();
         this.mBasePaddingRight = getPaddingRight();
         this.mBasePaddingBottom = getPaddingBottom();
         this.mResetMode = true;
         this.mViewPager = (ViewPager) findViewById(R.id.view_pager);
-        this.mViewPager.setDrawingCacheEnabled(true);
-        setDrawingCacheEnabled(true);
-        this.mViewPager.setDrawingCacheQuality(524288);
+        this.mViewPager.setDrawingCacheEnabled(false);
+        setDrawingCacheEnabled(false);
         this.mViewPager.setOnPageScrollListener(new ViewPager.OnPageScrollListener() {
             public void onScroll() {
                 ApplicationsPagingView.this.indicate();
             }
         });
         this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.apps_paging_screen_indicator);
-        this.mAnimationListener = new Animation.AnimationListener() {
-            public void onAnimationStart(Animation animation) {
-            }
-
-            public void onAnimationRepeat(Animation animation) {
-            }
-
-            public void onAnimationEnd(Animation animation) {
-                ApplicationsPagingView.this.setDrawingCacheEnabled(false);
-                ApplicationsPagingView.this.postDelayed(new Runnable() {
-                    public void run() {
-                        ApplicationsPagingView.this.setDrawingCacheEnabled(true);
-                    }
-                }, 1);
-            }
-        };
     }
 
     public void setNumColumns(int columns) {
@@ -96,8 +83,36 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         requestLayout();
     }
 
+    public void setSystemGestureInsets(Rect insets) {
+        this.mSystemGestureInsets = insets;
+    }
+
     public void setBackgroundAlpha(int alpha) {
-        setBackgroundColor(Color.argb(alpha, 18, 26, 33));
+        int surface = WallpaperColorExtractor.getSurface(getContext());
+        int background = Color.argb(alpha, Color.red(surface),
+                Color.green(surface), Color.blue(surface));
+        setBackgroundColor(background);
+        invalidate();
+    }
+
+    @Override
+    public void refreshPalette() {
+        if (this.mDestroyed || this.mViewPager == null) {
+            return;
+        }
+        View pageHolder = this.mViewPager.getChildAt(0);
+        if (pageHolder instanceof ViewGroup) {
+            ViewGroup holder = (ViewGroup) pageHolder;
+            for (int index = 0; index < holder.getChildCount(); index++) {
+                View page = holder.getChildAt(index);
+                if (page instanceof ApplicationsPageView) {
+                    ((ApplicationsPageView) page).refreshPalette();
+                }
+            }
+        }
+        if (this.mScreenIndicator != null) {
+            this.mScreenIndicator.refreshPalette();
+        }
         invalidate();
     }
 
@@ -177,7 +192,6 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         this.mViewPager.clearPagingViews();
         this.mViewPager.setPagingViews(pageViews);
         clampCurrentPageIndex();
-        System.gc();
     }
 
     private DrawerLayoutMetrics calculatePageMetrics() {
@@ -187,8 +201,13 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
             width = getResources().getDisplayMetrics().widthPixels;
             height = getResources().getDisplayMetrics().heightPixels;
         }
+        int minimumCellWidth = getResources().getDimensionPixelSize(
+                R.dimen.drawer_cell_min_width);
+        int minimumCellHeight = getResources().getDimensionPixelSize(
+                R.dimen.drawer_cell_min_height);
         return DrawerLayoutMetrics.calculate(width, height, sRows, sColumns,
-                getPaddingLeft() + getPaddingRight(), getPaddingTop() + getPaddingBottom(), 48, 48);
+                getPaddingLeft() + getPaddingRight(), getPaddingTop() + getPaddingBottom(),
+                minimumCellWidth, minimumCellHeight);
     }
 
     private static LinkedHashMap<Integer, List<ApplicationItemInfo>> loadPageContents(int rows, int columns,
@@ -238,14 +257,15 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     }
 
     public void open(boolean animated) {
+        this.mClosing = false;
+        resetVisualState();
         buildPages();
         initIndicator();
+        setVisibility(VISIBLE);
         if (animated) {
-            Animation inAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.apps_scale_in);
-            inAnimation.setAnimationListener(this.mAnimationListener);
-            setAnimation(inAnimation);
+            startAnimation(AnimationUtils.loadAnimation(
+                    getContext(), R.anim.apps_scale_in));
         }
-        setVisibility(0);
         invalidate();
     }
 
@@ -257,10 +277,13 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
             this.mResetMode = true;
             return false;
         }
-        if (animated) {
-            setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.apps_scale_out));
+        this.mClosing = true;
+        resetVisualState();
+        if (!animated) {
+            setVisibility(INVISIBLE);
+            return true;
         }
-        setVisibility(4);
+        startAnimation(createCloseAnimation());
         return true;
     }
 
@@ -291,11 +314,17 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         return this.mLauncher;
     }
 
+    @Override
+    public int getMode() {
+        return this.mMode;
+    }
+
     public void onDropCompleted(View target, boolean success) {
     }
 
     public boolean onLongClick(View view) {
-        if (!this.mActionsEnabled || this.mMode != 0 || !view.isInTouchMode()) {
+        if (!this.mActionsEnabled || this.mClosing
+                || this.mMode != 0 || !view.isInTouchMode()) {
             return false;
         }
         ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) view.getTag();
@@ -310,7 +339,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     }
 
     public void onClick(View view) {
-        if (!this.mActionsEnabled) {
+        if (!this.mActionsEnabled || this.mClosing) {
             return;
         }
         ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) view.getTag();
@@ -358,5 +387,32 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         if (currentIndex >= pageCount) {
             this.mViewPager.resetScroll();
         }
+    }
+
+    private void resetVisualState() {
+        clearAnimation();
+        setAlpha(1.0f);
+        setScaleX(1.0f);
+        setScaleY(1.0f);
+        setTranslationX(0.0f);
+        setTranslationY(0.0f);
+    }
+
+    private Animation createCloseAnimation() {
+        Animation animation = AnimationUtils.loadAnimation(
+                getContext(), R.anim.apps_scale_out);
+        animation.setAnimationListener(new Animation.AnimationListener() {
+            public void onAnimationStart(Animation ignored) {
+            }
+
+            public void onAnimationRepeat(Animation ignored) {
+            }
+
+            public void onAnimationEnd(Animation ignored) {
+                setVisibility(INVISIBLE);
+                resetVisualState();
+            }
+        });
+        return animation;
     }
 }

@@ -23,14 +23,14 @@
         <TextView
             android:id="@android:id/title"
             android:textAppearance="@style/TextAppearance.ZmReborn.Title"
-            android:textColor="@color/zm_reborn_fog"
+            android:textColor="@color/m3_on_surface"
             android:gravity="center_vertical"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
         <TextView
             android:id="@android:id/summary"
             android:textAppearance="@style/TextAppearance.ZmReborn.Label"
-            android:textColor="@color/zm_reborn_steel"
+            android:textColor="@color/m3_on_surface_variant"
             android:layout_marginTop="3dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

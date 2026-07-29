@@ -10,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import java.util.List;
+import org.zmreborn.theme.WallpaperColorExtractor;
 
 public class ApplicationsPageView extends LinearLayout {
     private final LayoutInflater mLayoutInflater;
@@ -55,11 +56,32 @@ public class ApplicationsPageView extends LinearLayout {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
 
+    void refreshPalette() {
+        PageConfiguration configuration = (PageConfiguration) getTag();
+        if (configuration == null) {
+            return;
+        }
+        int measuredWidth = getMeasuredWidth();
+        int measuredHeight = getMeasuredHeight();
+        if (measuredWidth > 0 && measuredHeight > 0) {
+            rebuildPage(configuration, measuredWidth, measuredHeight);
+            return;
+        }
+        this.mRenderedWidth = -1;
+        this.mRenderedHeight = -1;
+        requestLayout();
+    }
+
     private void rebuildPage(PageConfiguration configuration, int measuredWidth, int measuredHeight) {
         removeAllViews();
+        int minimumCellWidth = getResources().getDimensionPixelSize(
+                R.dimen.drawer_cell_min_width);
+        int minimumCellHeight = getResources().getDimensionPixelSize(
+                R.dimen.drawer_cell_min_height);
         DrawerLayoutMetrics metrics = DrawerLayoutMetrics.calculate(measuredWidth, measuredHeight,
                 configuration.rows, configuration.columns,
-                getPaddingLeft() + getPaddingRight(), getPaddingTop() + getPaddingBottom(), 48, 48);
+                getPaddingLeft() + getPaddingRight(), getPaddingTop() + getPaddingBottom(),
+                minimumCellWidth, minimumCellHeight);
         int itemIndex = 0;
         for (int row = 0; row < metrics.getRows(); row++) {
             LinearLayout rowView = createRow(metrics.getCellHeight(), metrics.getAvailableWidth());
@@ -91,27 +113,32 @@ public class ApplicationsPageView extends LinearLayout {
                 R.layout.application_boxed_page, this, false);
         Drawable iconDrawable = resolveIcon(applicationItemInfo);
         if (applicationItemInfo instanceof AppListFolderInfo) {
-            textView.setTextColor(-1);
+            textView.setTextColor(WallpaperColorExtractor.getOnSurface(getContext()));
             textView.setBackgroundDrawable(SelectorDrawable.createSelector(getContext(), true));
         } else if (this.mUninstalling) {
             if (Utilities.canUninstallApplication(getContext(), applicationItemInfo)) {
-                textView.setTextColor(-1);
+                textView.setTextColor(WallpaperColorExtractor.getOnSurface(getContext()));
                 textView.setBackgroundColor(Color.TRANSPARENT);
             } else {
-                textView.setTextColor(-7829368);
+                textView.setTextColor(WallpaperColorExtractor.getOutline(getContext()));
                 textView.setBackgroundColor(Color.TRANSPARENT);
             }
         } else {
-            textView.setTextColor(-1);
+            textView.setTextColor(WallpaperColorExtractor.getOnSurface(getContext()));
             textView.setBackgroundDrawable(SelectorDrawable.createSelector(getContext(), true));
         }
-        textView.setCompoundDrawablesWithIntrinsicBounds(null, iconDrawable, null, null);
+        if (applicationItemInfo instanceof AppListFolderInfo) {
+            textView.setCompoundDrawablesWithIntrinsicBounds(
+                    null, iconDrawable, null, null);
+        } else {
+            Utilities.setCompoundApplicationIcon(
+                    textView, iconDrawable, getContext());
+        }
         textView.setOnLongClickListener(this.mOnLongClickListener);
         textView.setOnClickListener(this.mOnClickListener);
         textView.setText(applicationItemInfo.title);
         textView.setContentDescription(applicationItemInfo.title);
         textView.setTag(applicationItemInfo);
-        textView.setDrawingCacheQuality(View.DRAWING_CACHE_QUALITY_HIGH);
         textView.setLayoutParams(new LinearLayout.LayoutParams(cellWidth, rowHeight));
         return textView;
     }
@@ -120,10 +147,9 @@ public class ApplicationsPageView extends LinearLayout {
         if (applicationItemInfo instanceof AppListFolderInfo) {
             return getContext().getResources().getDrawable(R.drawable.ic_launcher_folder);
         }
-        if (!applicationItemInfo.filtered) {
-            applicationItemInfo.icon = Utilities.createIconThumbnail(applicationItemInfo.icon, getContext());
-            applicationItemInfo.filtered = true;
-        }
+        applicationItemInfo.icon = Utilities.normalizeApplicationIcon(
+                applicationItemInfo.icon, getContext());
+        applicationItemInfo.filtered = true;
         if (!this.mUninstalling) {
             return applicationItemInfo.icon;
         }

@@ -2,13 +2,16 @@
 <resources>
     <style name="TextAppearance.ZmReborn" parent="">
         <item name="android:fontFamily">sans-serif</item>
+        <item name="android:letterSpacing">0.00</item>
     </style>
     <style name="TextAppearance.ZmReborn.Category">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">@dimen/text_size_category</item>
+        <item name="android:letterSpacing">0.10</item>
     </style>
     <style name="TextAppearance.ZmReborn.Label">
         <item name="android:textSize">@dimen/text_size_label</item>
+        <item name="android:letterSpacing">0.01</item>
     </style>
     <style name="TextAppearance.ZmReborn.Body">
         <item name="android:textSize">@dimen/text_size_body</item>
@@ -16,6 +19,7 @@
     <style name="TextAppearance.ZmReborn.Title">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">@dimen/text_size_title</item>
+        <item name="android:letterSpacing">0.00</item>
     </style>
     <style name="TextAppearance.ZmReborn.Symbol">
         <item name="android:fontFamily">sans-serif-medium</item>
@@ -24,9 +28,15 @@
     <style name="TextAppearance.ZmReborn.Display">
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">@dimen/text_size_display</item>
+        <item name="android:letterSpacing">-0.02</item>
+    </style>
+    <style name="TextAppearance.ZmReborn.Headline">
+        <item name="android:fontFamily">sans-serif-medium</item>
+        <item name="android:textSize">@dimen/text_size_headline</item>
+        <item name="android:letterSpacing">0.00</item>
     </style>
     <style name="WorkspaceIcon" parent="@style/TextAppearance.ZmReborn.Body">
-        <item name="android:textColor">@color/zm_reborn_fog</item>
+        <item name="android:textColor">@color/m3_on_surface</item>
         <item name="android:ellipsize">end</item>
         <item name="android:gravity">center</item>
         <item name="android:paddingLeft">5dp</item>
@@ -59,7 +69,18 @@
         <item name="android:windowBackground">@null</item>
         <item name="android:windowNoTitle">true</item>
     </style>
-    <style name="LauncherTheme" parent="@android:style/Theme.Wallpaper.NoTitleBar" />
+    <style name="LauncherTheme" parent="@android:style/Theme.Wallpaper.NoTitleBar">
+        <item name="android:windowBackground">@color/m3_surface</item>
+        <item name="android:colorAccent">@color/m3_primary</item>
+        <item name="android:alertDialogTheme">@style/LauncherDialogTheme</item>
+    </style>
+    <style name="LauncherDialogTheme" parent="@android:style/Theme.Material.Light.Dialog.Alert">
+        <item name="android:colorAccent">@color/m3_primary</item>
+        <item name="android:windowBackground">@color/m3_surface</item>
+        <item name="android:colorBackground">@color/m3_surface</item>
+        <item name="android:textColorPrimary">@color/m3_on_surface</item>
+        <item name="android:textColorSecondary">@color/m3_on_surface_variant</item>
+    </style>
     <style name="DockBarIcon">
         <item name="android:gravity">center_horizontal</item>
         <item name="android:paddingLeft">0dp</item>
@@ -79,15 +100,21 @@
         <item name="android:layout">@layout/settings_preference</item>
         <item name="android:widgetLayout">@layout/settings_checkbox_widget</item>
     </style>
-    <style name="SettingsTheme" parent="@android:style/Theme.Black">
+    <style name="SettingsSwitchPreferenceStyle">
+        <item name="android:layout">@layout/settings_preference</item>
+        <item name="android:widgetLayout">@layout/settings_switch_widget</item>
+    </style>
+    <style name="SettingsTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:windowNoTitle">true</item>
-        <item name="android:windowBackground">@color/zm_reborn_slate</item>
-        <item name="android:colorBackground">@color/zm_reborn_slate</item>
-        <item name="android:textColorPrimary">@color/zm_reborn_fog</item>
-        <item name="android:textColorSecondary">@color/zm_reborn_steel</item>
+        <item name="android:windowBackground">@color/m3_surface</item>
+        <item name="android:colorBackground">@color/m3_surface</item>
+        <item name="android:colorAccent">@color/m3_primary</item>
+        <item name="android:textColorPrimary">@color/m3_on_surface</item>
+        <item name="android:textColorSecondary">@color/m3_on_surface_variant</item>
         <item name="android:preferenceStyle">@style/SettingsPreferenceStyle</item>
         <item name="android:preferenceCategoryStyle">@style/SettingsPreferenceCategoryStyle</item>
         <item name="android:checkBoxPreferenceStyle">@style/SettingsCheckBoxPreferenceStyle</item>
+        <item name="android:switchPreferenceStyle">@style/SettingsSwitchPreferenceStyle</item>
         <item name="android:dialogPreferenceStyle">@style/SettingsPreferenceStyle</item>
     </style>
 </resources>

@@ -1,5 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- M3 Expressive: emphasized decelerate on enter — longer duration, bigger scale travel -->
 <set xmlns:android="http://schemas.android.com/apk/res/android">
-    <alpha android:interpolator="@android:anim/decelerate_interpolator" android:duration="300" android:fromAlpha="0" android:toAlpha="1"/>
-    <scale android:interpolator="@android:anim/decelerate_interpolator" android:duration="350" android:pivotX="50%" android:pivotY="50%" android:fromXScale="1.25" android:toXScale="1" android:fromYScale="1.25" android:toYScale="1"/>
+    <alpha
+        android:interpolator="@android:anim/decelerate_interpolator"
+        android:duration="400"
+        android:fromAlpha="0"
+        android:toAlpha="1" />
+    <scale
+        android:interpolator="@android:anim/decelerate_interpolator"
+        android:duration="450"
+        android:pivotX="50%"
+        android:pivotY="70%"
+        android:fromXScale="0.85"
+        android:toXScale="1"
+        android:fromYScale="0.85"
+        android:toYScale="1" />
 </set>

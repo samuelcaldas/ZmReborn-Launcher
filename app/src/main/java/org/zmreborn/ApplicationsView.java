@@ -1,5 +1,6 @@
 package org.zmreborn;
 
+import android.graphics.Rect;
 import android.view.View;
 import java.util.ArrayList;
 
@@ -12,6 +13,8 @@ public interface ApplicationsView {
     View getImplementingView();
 
     Launcher getLauncher();
+
+    int getMode();
 
     void onDestroy();
 
@@ -29,6 +32,8 @@ public interface ApplicationsView {
 
     void setBackgroundAlpha(int i);
 
+    void refreshPalette();
+
     void setDragController(DragController dragController);
 
     void setLauncher(Launcher launcher);
@@ -38,4 +43,6 @@ public interface ApplicationsView {
     void setNumColumns(int i);
 
     void setSystemBarInsets(int left, int top, int right, int bottom);
+
+    void setSystemGestureInsets(Rect insets);
 }

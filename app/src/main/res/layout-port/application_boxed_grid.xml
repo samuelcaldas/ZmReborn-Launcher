@@ -1,2 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TextView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res-auto" android:textAppearance="@style/TextAppearance.ZmReborn.Label" android:textColor="@color/bright_text_dark_focused" android:ellipsize="end" android:gravity="top|center_vertical|center_horizontal|center" android:id="@+id/name" android:paddingLeft="2dp" android:paddingTop="5dp" android:paddingRight="2dp" android:paddingBottom="5dp" android:layout_width="match_parent" android:layout_height="wrap_content" android:minHeight="@dimen/label_min_height" android:maxLines="2" android:singleLine="false" android:drawablePadding="0dp"/>
+<TextView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/name"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="@dimen/drawer_cell_min_height"
+    android:paddingStart="@dimen/space_4"
+    android:paddingTop="@dimen/space_4"
+    android:paddingEnd="@dimen/space_4"
+    android:paddingBottom="@dimen/space_4"
+    android:drawablePadding="@dimen/space_4"
+    android:gravity="top|center_horizontal"
+    android:maxLines="2"
+    android:ellipsize="end"
+    android:singleLine="false"
+    android:textAppearance="@style/TextAppearance.ZmReborn.Label"
+    android:textColor="@color/m3_on_surface" />

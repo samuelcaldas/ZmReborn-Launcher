@@ -48,6 +48,9 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
         this.mItems = Math.max(1, items);
         this.mCurrent = clampIndex(this.mCurrent);
         updateIndicator(getCurrentProgress());
+        if (!hasMultipleItems()) {
+            hide();
+        }
     }
 
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
@@ -87,7 +90,15 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
 
     public void setAutoHide(boolean autoHide) {
         this.mVisibleTime = autoHide ? getResources().getInteger(R.integer.duration_long) : -1;
-        setVisibility(autoHide ? INVISIBLE : VISIBLE);
+        setVisibility(autoHide || !hasMultipleItems() ? INVISIBLE : VISIBLE);
+    }
+
+    void refreshPalette() {
+        if (this.mIndicator instanceof SignalRailView) {
+            ((SignalRailView) this.mIndicator).refreshPalette();
+            return;
+        }
+        this.mIndicator.invalidate();
     }
 
     public void onAnimationEnd(Animation animation) {
@@ -147,6 +158,10 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
     }
 
     private void revealAndScheduleHide() {
+        if (!hasMultipleItems()) {
+            hide();
+            return;
+        }
         clearAnimation();
         setVisibility(VISIBLE);
         this.mHandler.removeCallbacks(this.mAutoHide);
@@ -156,6 +171,10 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
     }
 
     private void startHideAnimation() {
+        if (!hasMultipleItems()) {
+            hide();
+            return;
+        }
         if (this.mAnimation == null) {
             this.mAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.screen_indicator_fade_out);
             this.mAnimation.setAnimationListener(this);
@@ -165,6 +184,10 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
     }
 
     private void updateContentDescription() {
+        if (!hasMultipleItems()) {
+            setContentDescription(null);
+            return;
+        }
         setContentDescription(getResources().getString(
                 R.string.accessibility_page_indicator,
                 this.mCurrent + 1,
@@ -203,7 +226,9 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
     private void applyDotsLayout(FrameLayout.LayoutParams params) {
         params.width = LayoutParams.MATCH_PARENT;
         params.height = dimension(R.dimen.screen_indicator_dots_height);
-        params.gravity = Gravity.TOP;
+        params.gravity = Gravity.BOTTOM;
+        params.bottomMargin = dimension(R.dimen.navigation_strip_size)
+                + dimension(R.dimen.rail_inset);
     }
 
     private FrameLayout.LayoutParams createLayoutParams() {
@@ -280,6 +305,10 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
 
     private float getCurrentProgress() {
         return ((float) this.mCurrent) / this.mItems;
+    }
+
+    private boolean hasMultipleItems() {
+        return this.mItems > 1;
     }
 
     private void validateType(int type) {

@@ -18,6 +18,12 @@
         <item>Rolagem vertical</item>
         <item>Paginação horizontal</item>
     </array>
+    <array name="preferences_entries_apps_grid_densities">
+        <item>Automática</item>
+        <item>Confortável</item>
+        <item>Padrão</item>
+        <item>Compacta</item>
+    </array>
     <array name="preferences_entries_dock_backgrounds">
         <item>Escuro</item>
         <item>Escuro com degradê</item>
@@ -41,5 +47,10 @@
         <item>Padrão do sistema</item>
         <item>Inglês</item>
         <item>Português (Brasil)</item>
+    </array>
+    <array name="preferences_entries_application_appearances">
+        <item>Seguir sistema</item>
+        <item>Claro</item>
+        <item>Escuro</item>
     </array>
 </resources>

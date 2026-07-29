@@ -21,6 +21,7 @@
     <string name="preferences_key_action_swipe_down" translatable="false">action_swipe_down</string>
     <string name="preferences_key_action_double_tap" translatable="false">action_double_tap</string>
     <string name="preferences_key_apps_grid_type" translatable="false">apps_grid_type</string>
+    <string name="preferences_key_apps_grid_density" translatable="false">apps_grid_density</string>
     <string name="preferences_key_apps_grid_animated" translatable="false">apps_grid_animated</string>
     <string name="preferences_key_apps_grid_remember_position" translatable="false">apps_grid_remember_pos</string>
     <string name="preferences_key_apps_grid_bg_alpha" translatable="false">apps_grid_alpha</string>
@@ -43,6 +44,7 @@
     <string name="preferences_key_reset" translatable="false">reset</string>
     <string name="preferences_key_application" translatable="false">application</string>
     <string name="preferences_key_application_language" translatable="false">application_language</string>
+    <string name="preferences_key_application_appearance" translatable="false">application_appearance</string>
     <string name="preferences_default_general_fullscreen" translatable="false">false</string>
     <string name="preferences_default_general_sensor_orientation" translatable="false">false</string>
     <string name="preferences_default_workspace_number_of_screens" translatable="false">3</string>
@@ -64,17 +66,19 @@
     <string name="preferences_default_apps_grid_horizontal_paging_content_rows_land" translatable="false">3</string>
     <string name="preferences_default_apps_grid_horizontal_paging_content_columns_land" translatable="false">5</string>
     <string name="preferences_default_action_home_button" translatable="false">3</string>
-    <string name="preferences_default_action_swipe_up" translatable="false">1</string>
-    <string name="preferences_default_action_swipe_down" translatable="false">2</string>
+    <string name="preferences_default_action_swipe_up" translatable="false">2</string>
+    <string name="preferences_default_action_swipe_down" translatable="false">1</string>
     <string name="preferences_default_action_double_tap" translatable="false">5</string>
     <string name="preferences_default_workspace_screen_indicator_type" translatable="false">Slider</string>
-    <string name="preferences_default_apps_grid_type" translatable="false">2</string>
+    <string name="preferences_default_apps_grid_type" translatable="false">1</string>
+    <string name="preferences_default_apps_grid_density" translatable="false">automatic</string>
     <string name="preferences_default_dock_background" translatable="false">Dark</string>
     <string name="preferences_default_dock_item_alignment" translatable="false">Center</string>
     <string name="preferences_default_dock_reset_to" translatable="false">Start</string>
     <string name="preferences_default_dock_item_width" translatable="false">Medium</string>
     <string name="preferences_default_dock_reset_home" translatable="false">true</string>
     <string name="preferences_default_application_language" translatable="false"></string>
+    <string name="preferences_default_application_appearance" translatable="false">system</string>
     <string name="application_name">ZM Reborn</string>
     <string name="preferences_application_version_format">%1$s %2$s</string>
     <string name="application_copyright">Copyright © 2026 Samuel Caldas</string>
@@ -107,12 +111,17 @@
     <string name="accessibility_app_installed">%1$s, installed</string>
     <string name="accessibility_app_updated">%1$s, updated</string>
     <string name="accessibility_voice_search">Voice search</string>
+    <string name="accessibility_clear_apps_search">Clear application search</string>
+    <string name="accessibility_fast_scroll">Fast scroll applications alphabetically</string>
+    <string name="accessibility_fast_scroll_section">Fast scroll section %1$s</string>
     <string name="workspace_empty_tip">Long press to add shortcuts &amp; widgets</string>
     <string name="button_cancel">Cancel</string>
     <string name="group_applications">Applications</string>
     <string name="apps_loading">Loading apps…</string>
     <string name="apps_empty">No apps available</string>
     <string name="apps_load_error">Apps could not load</string>
+    <string name="apps_search_hint">Search apps</string>
+    <string name="apps_search_empty">No matching apps</string>
     <string name="try_again">Try again</string>
     <string name="group_add_apps_grid">Applications grid</string>
     <string name="group_search">Search</string>
@@ -161,6 +170,16 @@
     <string name="search_unavailable">Search unavailable. Check your connection and try again.</string>
     <string name="voice_search_unavailable">Voice search unavailable. Install or enable a voice search app and try again.</string>
     <string name="gadget_error_text">Problem loading widget</string>
+    <string name="widget_resize_span">%1$d × %2$d</string>
+    <string name="widget_resize_invalid_span">%1$d × %2$d, unavailable</string>
+    <string name="widget_resize_handle_top_left">Resize widget from top left corner</string>
+    <string name="widget_resize_handle_top_right">Resize widget from top right corner</string>
+    <string name="widget_resize_handle_bottom_left">Resize widget from bottom left corner</string>
+    <string name="widget_resize_handle_bottom_right">Resize widget from bottom right corner</string>
+    <string name="widget_resize_handle_left">Resize widget from left edge</string>
+    <string name="widget_resize_handle_right">Resize widget from right edge</string>
+    <string name="widget_resize_handle_top">Resize widget from top edge</string>
+    <string name="widget_resize_handle_bottom">Resize widget from bottom edge</string>
     <string name="preferences_alert_dialog_restart_message">Restarting is required for your changes to take effect</string>
     <string name="preferences_alert_dialog_restart_button">Restart now</string>
     <string name="preferences_title_system_settings">Settings</string>
@@ -180,6 +199,7 @@
     <string name="preferences_category_content_grid">Content grid</string>
     <string name="preferences_title_general_fullscreen">Fullscreen</string>
     <string name="preferences_title_general_sensor_orientation">Sensor rotation</string>
+    <string name="preferences_title_application_appearance">Theme</string>
     <string name="preferences_title_general_selector_colour_pressed">Selector pressed colour</string>
     <string name="preferences_title_general_selector_colour_focused">Selector focused colour</string>
     <string name="preferences_title_workspace_number_of_screens">Number of screens</string>
@@ -198,6 +218,7 @@
     <string name="preferences_title_action_swipe_down">Swipe down</string>
     <string name="preferences_title_action_double_tap">Double tap</string>
     <string name="preferences_title_apps_grid_type">Type</string>
+    <string name="preferences_title_apps_grid_density">Grid density</string>
     <string name="preferences_title_apps_grid_content">Content</string>
     <string name="preferences_title_apps_grid_content_rows_portrait">Rows portrait</string>
     <string name="preferences_title_apps_grid_content_columns_portrait">Columns portrait</string>
@@ -214,6 +235,7 @@
     <string name="preferences_title_reset">Reset to default</string>
     <string name="preferences_title_restart">Restart now</string>
     <string name="preferences_summary_application_language">Select application display language. Requires restart.</string>
+    <string name="preferences_summary_application_appearance">Follow system light or dark mode</string>
     <string name="preferences_summary_general_fullscreen">Run in fullscreen mode</string>
     <string name="preferences_summary_general_sensor_orientation">Use sensor-based rotation</string>
     <string name="preferences_summary_general_selector_colour_pressed">Set the pressed selector colour</string>
@@ -234,6 +256,7 @@
     <string name="preferences_summary_action_swipe_down">Set the default swipe-down action</string>
     <string name="preferences_summary_action_double_tap">Set the default double-tap action</string>
     <string name="preferences_summary_apps_grid_type">Select the grid type</string>
+    <string name="preferences_summary_apps_grid_density">Set vertical drawer icon and label spacing</string>
     <string name="preferences_summary_apps_grid_content">Set the number of grid columns / rows</string>
     <string name="preferences_summary_apps_grid_content_rows_portrait">Set the number of rows in portrait</string>
     <string name="preferences_summary_apps_grid_content_columns_portrait">Set the number of columns in portrait</string>

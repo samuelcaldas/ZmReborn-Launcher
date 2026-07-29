@@ -104,6 +104,12 @@ public class PreferencesUtil {
         return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.preferences_key_apps_grid_type), context.getString(R.string.preferences_default_apps_grid_type)));
     }
 
+    static String getAppsGridDensity(Context context) {
+        return getSharedPreferences(context).getString(
+                context.getString(R.string.preferences_key_apps_grid_density),
+                context.getString(R.string.preferences_default_apps_grid_density));
+    }
+
     static int getAppsGridVerticalScrollingContentColumnsPortrait(Context context) {
         return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_apps_grid_vertical_scrolling_content_columns_port), Integer.parseInt(context.getString(R.string.preferences_default_apps_grid_vertical_scrolling_content_columns_port)));
     }

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="LauncherTheme" parent="@android:style/Theme.Wallpaper.NoTitleBar">
+        <item name="android:windowBackground">@color/m3_surface</item>
+        <item name="android:colorAccent">@color/m3_primary</item>
+        <item name="android:alertDialogTheme">@style/LauncherDialogTheme</item>
+    </style>
+    <style name="LauncherDialogTheme" parent="@android:style/Theme.Material.Dialog.Alert">
+        <item name="android:colorAccent">@color/m3_primary</item>
+        <item name="android:windowBackground">@color/m3_surface</item>
+        <item name="android:colorBackground">@color/m3_surface</item>
+        <item name="android:textColorPrimary">@color/m3_on_surface</item>
+        <item name="android:textColorSecondary">@color/m3_on_surface_variant</item>
+    </style>
+    <style name="SettingsTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/m3_surface</item>
+        <item name="android:colorBackground">@color/m3_surface</item>
+        <item name="android:colorAccent">@color/m3_primary</item>
+        <item name="android:textColorPrimary">@color/m3_on_surface</item>
+        <item name="android:textColorSecondary">@color/m3_on_surface_variant</item>
+        <item name="android:preferenceStyle">@style/SettingsPreferenceStyle</item>
+        <item name="android:preferenceCategoryStyle">@style/SettingsPreferenceCategoryStyle</item>
+        <item name="android:checkBoxPreferenceStyle">@style/SettingsCheckBoxPreferenceStyle</item>
+        <item name="android:switchPreferenceStyle">@style/SettingsSwitchPreferenceStyle</item>
+        <item name="android:dialogPreferenceStyle">@style/SettingsPreferenceStyle</item>
+    </style>
+</resources>

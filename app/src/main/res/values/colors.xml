@@ -1,20 +1,36 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="window_background">@color/zm_reborn_slate</color>
-    <color name="grid_dark_background">@color/zm_reborn_slate</color>
-    <color name="bubble_dark_background">@color/zm_reborn_glass</color>
-    <color name="delete_color_filter">@color/zm_reborn_ember</color>
-    <color name="appwidget_error_color">@color/zm_reborn_ember</color>
-    <color name="snag_callout_color">@color/zm_reborn_amber</color>
-    <color name="gesture_color">@color/zm_reborn_amber</color>
-    <color name="uncertain_gesture_color">@color/zm_reborn_steel</color>
-    <color name="preferences_default_general_selector_colour_pressed">@color/zm_reborn_amber</color>
-    <color name="preferences_default_general_selector_colour_focused">@color/zm_reborn_amber</color>
+    <!-- Legacy semantic aliases resolve through day/night M3 roles. -->
+    <color name="window_background">@color/m3_surface</color>
+    <color name="grid_dark_background">@color/m3_surface</color>
+    <color name="bubble_dark_background">@color/m3_surface_variant</color>
+    <color name="delete_color_filter">@color/m3_error</color>
+    <color name="appwidget_error_color">@color/m3_error</color>
+    <color name="snag_callout_color">@color/m3_primary</color>
+    <color name="gesture_color">@color/m3_primary</color>
+    <color name="uncertain_gesture_color">@color/m3_outline</color>
+    <color name="preferences_default_general_selector_colour_pressed">@color/m3_primary</color>
+    <color name="preferences_default_general_selector_colour_focused">@color/m3_primary</color>
 
-    <color name="zm_reborn_slate">#ff121a21</color>
-    <color name="zm_reborn_glass">#d9121a21</color>
-    <color name="zm_reborn_fog">#ffeaf0f3</color>
-    <color name="zm_reborn_steel">#ffb8c2c8</color>
-    <color name="zm_reborn_amber">#fff2b64a</color>
-    <color name="zm_reborn_ember">#ffd95c4f</color>
+    <!-- API 24–30 light fallback roles. API 31+ overrides roles with system dynamic colors. -->
+    <color name="m3_primary">#ff895b00</color>
+    <color name="m3_on_primary">#ffffffff</color>
+    <color name="m3_primary_container">#ffffddb0</color>
+    <color name="m3_on_primary_container">#ff2b1a00</color>
+    <color name="m3_surface">#fffff9f2</color>
+    <color name="m3_on_surface">#ff201b13</color>
+    <color name="m3_surface_variant">#fff1e1c9</color>
+    <color name="m3_on_surface_variant">#ff504533</color>
+    <color name="m3_outline">#ff827563</color>
+    <color name="m3_outline_variant">#ffd5c4ac</color>
+    <color name="m3_error">#ffba1a1a</color>
+    <color name="m3_on_error">#ffffffff</color>
+
+    <!-- Compatibility names retain their public resource identity, not fixed dark values. -->
+    <color name="zm_reborn_slate">@color/m3_surface</color>
+    <color name="zm_reborn_glass">@color/m3_surface_glass</color>
+    <color name="zm_reborn_fog">@color/m3_on_surface</color>
+    <color name="zm_reborn_steel">@color/m3_outline</color>
+    <color name="zm_reborn_amber">@color/m3_primary</color>
+    <color name="zm_reborn_ember">@color/m3_error</color>
 </resources>

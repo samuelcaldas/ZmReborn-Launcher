@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Switch xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@android:id/switch_widget"
+    style="@android:style/Widget.Material.CompoundButton.Switch"
+    android:layout_width="@dimen/minimum_touch_target"
+    android:layout_height="@dimen/minimum_touch_target"
+    android:minWidth="@dimen/minimum_touch_target"
+    android:minHeight="@dimen/minimum_touch_target"
+    android:thumbTint="@color/settings_switch_thumb_tint"
+    android:trackTint="@color/settings_switch_track_tint"
+    android:showText="false"
+    android:clickable="false"
+    android:focusable="false" />

@@ -10,6 +10,7 @@ import android.preference.Preference;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 import java.io.File;
+import org.zmreborn.theme.WallpaperColorExtractor;
 
 public class Preferences extends PreferenceActivity {
     private SettingsSummaryBinder mSummaryBinder;
@@ -23,10 +24,12 @@ public class Preferences extends PreferenceActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
-        getListView().setBackgroundColor(getColor(R.color.zm_reborn_slate));
+        getListView().setBackgroundColor(
+                WallpaperColorExtractor.getSurface(this));
         getListView().setDivider(null);
         getListView().setDividerHeight(0);
         bindLanguagePreference();
+        bindAppearancePreference();
         Preference.OnPreferenceChangeListener restartChangeListener = new Preference.OnPreferenceChangeListener() {
             public boolean onPreferenceChange(Preference preference, Object object) {
                 Launcher.sRestart = true;
@@ -72,6 +75,7 @@ public class Preferences extends PreferenceActivity {
             }
         });
         findPreference(getString(R.string.preferences_key_apps_grid_bg_alpha)).setOnPreferenceChangeListener(restartChangeListener);
+        findPreference(getString(R.string.preferences_key_apps_grid_density)).setOnPreferenceChangeListener(restartChangeListener);
         findPreference(getString(R.string.preferences_key_dock_item_width)).setOnPreferenceChangeListener(restartChangeListener);
         findPreference(getString(R.string.preferences_key_dock_item_alignment)).setOnPreferenceChangeListener(restartChangeListener);
         final Preference resetTo = findPreference(getString(R.string.preferences_key_dock_reset_to));
@@ -128,42 +132,40 @@ public class Preferences extends PreferenceActivity {
         });
     }
 
+    private void bindAppearancePreference() {
+        Preference appearancePreference = findPreference(
+                getString(R.string.preferences_key_application_appearance));
+        appearancePreference.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
+            public boolean onPreferenceChange(Preference preference, Object value) {
+                if (Appearance.persistSelectedAppearance(Preferences.this, String.valueOf(value))) {
+                    recreate();
+                }
+                return false;
+            }
+        });
+    }
+
     /* access modifiers changed from: private */
     public void loadAppsGridRowsColumns(int appsGridType) {
+        Preference appsGridDensity = findPreference(
+                getString(R.string.preferences_key_apps_grid_density));
+        appsGridDensity.setEnabled(appsGridType == 1);
         final DialogSeekBarPreference appsGridContentRowsPortrait = (DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_apps_grid_content_rows_port));
         final DialogSeekBarPreference appsGridContentColumnsPortrait = (DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_apps_grid_content_columns_port));
         final DialogSeekBarPreference appsGridContentRowsLandscape = (DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_apps_grid_content_rows_land));
         final DialogSeekBarPreference appsGridContentColumnsLandscape = (DialogSeekBarPreference) findPreference(getString(R.string.preferences_key_apps_grid_content_columns_land));
         if (appsGridType == 1) {
             appsGridContentRowsPortrait.setEnabled(false);
+            appsGridContentColumnsPortrait.setEnabled(false);
             appsGridContentRowsLandscape.setEnabled(false);
-            appsGridContentColumnsPortrait.setEnabled(true);
-            appsGridContentColumnsLandscape.setEnabled(true);
-            appsGridContentColumnsPortrait.setMin(4);
-            appsGridContentColumnsPortrait.setMax(6);
-            appsGridContentColumnsLandscape.setMin(4);
-            appsGridContentColumnsLandscape.setMax(6);
-            appsGridContentColumnsPortrait.setValue(PreferencesUtil.getAppsGridVerticalScrollingContentColumnsPortrait(this) - appsGridContentColumnsPortrait.getMin());
-            appsGridContentColumnsLandscape.setValue(PreferencesUtil.getAppsGridVerticalScrollingContentColumnsLandscape(this) - appsGridContentColumnsLandscape.getMin());
-            appsGridContentRowsPortrait.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) null);
-            appsGridContentRowsLandscape.setOnPreferenceChangeListener((Preference.OnPreferenceChangeListener) null);
-            appsGridContentColumnsPortrait.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                public boolean onPreferenceChange(Preference preference, Object value) {
-                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Preferences.this).edit();
-                    editor.putInt(Preferences.this.getString(R.string.preferences_key_apps_grid_vertical_scrolling_content_columns_port), ((Integer) value).intValue() + appsGridContentColumnsPortrait.getMin());
-                    editor.commit();
-                    return true;
-                }
-            });
-            appsGridContentColumnsLandscape.setOnPreferenceChangeListener(new Preference.OnPreferenceChangeListener() {
-                public boolean onPreferenceChange(Preference preference, Object value) {
-                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(Preferences.this).edit();
-                    editor.putInt(Preferences.this.getString(R.string.preferences_key_apps_grid_vertical_scrolling_content_columns_land), ((Integer) value).intValue() + appsGridContentColumnsLandscape.getMin());
-                    editor.commit();
-                    return true;
-                }
-            });
-        } else if (appsGridType == 2) {
+            appsGridContentColumnsLandscape.setEnabled(false);
+            appsGridContentRowsPortrait.setOnPreferenceChangeListener(null);
+            appsGridContentColumnsPortrait.setOnPreferenceChangeListener(null);
+            appsGridContentRowsLandscape.setOnPreferenceChangeListener(null);
+            appsGridContentColumnsLandscape.setOnPreferenceChangeListener(null);
+            return;
+        }
+        if (appsGridType == 2) {
             appsGridContentRowsPortrait.setEnabled(true);
             appsGridContentColumnsPortrait.setEnabled(true);
             appsGridContentRowsLandscape.setEnabled(true);

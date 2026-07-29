@@ -2,6 +2,7 @@ package org.zmreborn;
 
 import android.content.Context;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.AbsListView;
@@ -11,6 +12,7 @@ import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import org.zmreborn.theme.WallpaperColorExtractor;
 
 public class Folder extends LinearLayout implements DragSource, AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
     protected AbsListView mContent;
@@ -28,9 +30,11 @@ public class Folder extends LinearLayout implements DragSource, AdapterView.OnIt
     /* access modifiers changed from: protected */
     public void onFinishInflate() {
         super.onFinishInflate();
+        setElevation(getResources().getDimension(R.dimen.elevation_folder));
         Context context = getContext();
         this.mTextView = (TextView) findViewById(R.id.folder_name);
         this.mContent = (AbsListView) findViewById(R.id.folder_content);
+        refreshPalette();
         this.mContent.setOnItemClickListener(this);
         this.mContent.setOnItemLongClickListener(this);
         ImageButton renameButton = (ImageButton) findViewById(R.id.folder_button_rename);
@@ -95,6 +99,17 @@ public class Folder extends LinearLayout implements DragSource, AdapterView.OnIt
     }
 
     /* access modifiers changed from: package-private */
+    void refreshPalette() {
+        Context context = getContext();
+        this.mTextView.setTextColor(WallpaperColorExtractor.getOnSurface(context));
+        tintBackground(WallpaperColorExtractor.getSurface(context));
+        if (this.mContent.getAdapter() instanceof BaseAdapter) {
+            ((BaseAdapter) this.mContent.getAdapter()).notifyDataSetChanged();
+        }
+        invalidate();
+    }
+
+    /* access modifiers changed from: package-private */
     public void setLauncher(Launcher launcher) {
         this.mLauncher = launcher;
     }
@@ -113,6 +128,14 @@ public class Folder extends LinearLayout implements DragSource, AdapterView.OnIt
     public void onClose() {
         Workspace workspace = this.mLauncher.getWorkspace();
         workspace.getChildAt(workspace.getCurrentScreen()).requestFocus();
+    }
+
+    private void tintBackground(int color) {
+        Drawable background = getBackground();
+        if (background == null) {
+            return;
+        }
+        background.mutate().setTint(color);
     }
 
     private int getGridViewColumns(GridView gridView) {

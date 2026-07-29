@@ -32,12 +32,17 @@
     <string name="accessibility_app_installed">%1$s, instalado</string>
     <string name="accessibility_app_updated">%1$s, atualizado</string>
     <string name="accessibility_voice_search">Pesquisa por voz</string>
+    <string name="accessibility_clear_apps_search">Limpar pesquisa de aplicativos</string>
+    <string name="accessibility_fast_scroll">Navegar rapidamente pelos aplicativos em ordem alfabética</string>
+    <string name="accessibility_fast_scroll_section">Navegação rápida, seção %1$s</string>
     <string name="workspace_empty_tip">Mantenha pressionado para adicionar atalhos &amp; widgets</string>
     <string name="button_cancel">Cancelar</string>
     <string name="group_applications">Aplicativos</string>
     <string name="apps_loading">Carregando aplicativos…</string>
     <string name="apps_empty">Nenhum aplicativo disponível</string>
     <string name="apps_load_error">Não foi possível carregar os aplicativos</string>
+    <string name="apps_search_hint">Pesquisar aplicativos</string>
+    <string name="apps_search_empty">Nenhum aplicativo correspondente</string>
     <string name="try_again">Tentar novamente</string>
     <string name="group_add_apps_grid">Grade de aplicativos</string>
     <string name="group_search">Pesquisar</string>
@@ -86,6 +91,16 @@
     <string name="search_unavailable">Pesquisa indisponível. Verifique sua conexão e tente novamente.</string>
     <string name="voice_search_unavailable">Pesquisa por voz indisponível. Instale ou ative um aplicativo de pesquisa por voz e tente novamente.</string>
     <string name="gadget_error_text">Problema ao carregar widget</string>
+    <string name="widget_resize_span">%1$d × %2$d</string>
+    <string name="widget_resize_invalid_span">%1$d × %2$d, indisponível</string>
+    <string name="widget_resize_handle_top_left">Redimensionar widget pelo canto superior esquerdo</string>
+    <string name="widget_resize_handle_top_right">Redimensionar widget pelo canto superior direito</string>
+    <string name="widget_resize_handle_bottom_left">Redimensionar widget pelo canto inferior esquerdo</string>
+    <string name="widget_resize_handle_bottom_right">Redimensionar widget pelo canto inferior direito</string>
+    <string name="widget_resize_handle_left">Redimensionar widget pela borda esquerda</string>
+    <string name="widget_resize_handle_right">Redimensionar widget pela borda direita</string>
+    <string name="widget_resize_handle_top">Redimensionar widget pela borda superior</string>
+    <string name="widget_resize_handle_bottom">Redimensionar widget pela borda inferior</string>
     <string name="preferences_alert_dialog_restart_message">É necessário reiniciar para aplicar as alterações</string>
     <string name="preferences_alert_dialog_restart_button">Reiniciar agora</string>
     <string name="preferences_title_system_settings">Configurações</string>
@@ -105,6 +120,7 @@
     <string name="preferences_category_content_grid">Grade de conteúdo</string>
     <string name="preferences_title_general_fullscreen">Tela cheia</string>
     <string name="preferences_title_general_sensor_orientation">Rotação pelo sensor</string>
+    <string name="preferences_title_application_appearance">Tema</string>
     <string name="preferences_title_general_selector_colour_pressed">Cor do seletor pressionado</string>
     <string name="preferences_title_general_selector_colour_focused">Cor do seletor em foco</string>
     <string name="preferences_title_workspace_number_of_screens">Número de telas</string>
@@ -123,6 +139,7 @@
     <string name="preferences_title_action_swipe_down">Deslizar para baixo</string>
     <string name="preferences_title_action_double_tap">Toque duplo</string>
     <string name="preferences_title_apps_grid_type">Tipo</string>
+    <string name="preferences_title_apps_grid_density">Densidade da grade</string>
     <string name="preferences_title_apps_grid_content">Conteúdo</string>
     <string name="preferences_title_apps_grid_content_rows_portrait">Linhas no modo retrato</string>
     <string name="preferences_title_apps_grid_content_columns_portrait">Colunas no modo retrato</string>
@@ -139,6 +156,7 @@
     <string name="preferences_title_reset">Restaurar padrão</string>
     <string name="preferences_title_restart">Reiniciar agora</string>
     <string name="preferences_summary_application_language">Selecione idioma de exibição do aplicativo. É necessário reiniciar.</string>
+    <string name="preferences_summary_application_appearance">Seguir modo claro ou escuro do sistema</string>
     <string name="preferences_summary_general_fullscreen">Executar em tela cheia</string>
     <string name="preferences_summary_general_sensor_orientation">Usar rotação pelo sensor</string>
     <string name="preferences_summary_general_selector_colour_pressed">Definir cor do seletor pressionado</string>
@@ -159,6 +177,7 @@
     <string name="preferences_summary_action_swipe_down">Definir ação padrão ao deslizar para baixo</string>
     <string name="preferences_summary_action_double_tap">Definir ação padrão do toque duplo</string>
     <string name="preferences_summary_apps_grid_type">Selecionar tipo de grade</string>
+    <string name="preferences_summary_apps_grid_density">Definir espaçamento dos ícones e rótulos na gaveta vertical</string>
     <string name="preferences_summary_apps_grid_content">Definir número de colunas/linhas da grade</string>
     <string name="preferences_summary_apps_grid_content_rows_portrait">Definir número de linhas no modo retrato</string>
     <string name="preferences_summary_apps_grid_content_columns_portrait">Definir número de colunas no modo retrato</string>

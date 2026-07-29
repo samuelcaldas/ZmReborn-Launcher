@@ -13,6 +13,11 @@
     <dimen name="minimum_touch_target">48dp</dimen>
     <dimen name="drawer_cell_min_width">48dp</dimen>
     <dimen name="drawer_cell_min_height">64dp</dimen>
+    <dimen name="drawer_cell_compact_width">68dp</dimen>
+    <dimen name="drawer_cell_preferred_width">80dp</dimen>
+    <dimen name="drawer_cell_comfortable_width">96dp</dimen>
+    <dimen name="drawer_cell_expanded_width">112dp</dimen>
+    <dimen name="drawer_grid_spacing">8dp</dimen>
     <dimen name="dock_cell_width_portrait">53dp</dimen>
     <dimen name="dock_cell_height_portrait">56dp</dimen>
     <dimen name="dock_cell_width_landscape">54dp</dimen>
@@ -21,11 +26,25 @@
     <dimen name="settings_row_height">48dp</dimen>
     <dimen name="panel_corner_radius">8dp</dimen>
     <dimen name="selector_corner_radius">6dp</dimen>
+    <!-- M3 shape tier scale -->
+    <dimen name="shape_corner_extra_small">4dp</dimen>
+    <dimen name="shape_corner_small">6dp</dimen>
+    <dimen name="shape_corner_medium">8dp</dimen>
+    <dimen name="shape_corner_large">12dp</dimen>
+    <dimen name="shape_corner_extra_large">16dp</dimen>
+    <!-- M3 elevation tier scale -->
+    <dimen name="elevation_surface">0dp</dimen>
+    <dimen name="elevation_dock">4dp</dimen>
+    <dimen name="elevation_folder">6dp</dimen>
+    <dimen name="elevation_drawer_header">2dp</dimen>
     <dimen name="rail_thickness">2dp</dimen>
     <dimen name="rail_active_thickness">3dp</dimen>
     <dimen name="screen_indicator_dots_height">20dp</dimen>
     <dimen name="drawer_horizontal_padding">12dp</dimen>
     <dimen name="drawer_vertical_padding">8dp</dimen>
+    <dimen name="drawer_fast_scroll_width">48dp</dimen>
+    <dimen name="drawer_fast_scroll_text_size">12sp</dimen>
+    <dimen name="drawer_fast_scroll_min_section_height">18dp</dimen>
     <dimen name="folder_spacing">8dp</dimen>
     <dimen name="dialog_spacing">16dp</dimen>
     <dimen name="navigation_strip_size">57dp</dimen>
@@ -35,6 +54,7 @@
     <dimen name="text_size_label">13sp</dimen>
     <dimen name="text_size_body">14sp</dimen>
     <dimen name="text_size_title">16sp</dimen>
+    <dimen name="text_size_headline">20sp</dimen>
     <dimen name="text_size_symbol">20sp</dimen>
     <dimen name="text_size_display">30sp</dimen>
 </resources>

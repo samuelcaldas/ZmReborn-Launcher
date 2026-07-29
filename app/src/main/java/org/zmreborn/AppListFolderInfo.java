@@ -21,6 +21,11 @@ final class AppListFolderInfo extends ApplicationItemInfo {
         return folderId;
     }
 
+    @Override
+    String getStableKey() {
+        return "folder:" + this.folderId;
+    }
+
     ArrayList<ApplicationItemInfo> getContents() {
         return new ArrayList<>(contents);
     }
