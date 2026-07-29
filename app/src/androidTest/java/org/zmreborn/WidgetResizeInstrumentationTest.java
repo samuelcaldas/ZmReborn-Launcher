@@ -21,7 +21,7 @@ public class WidgetResizeInstrumentationTest
     }
 
     public void testHorizontalHandleCommitsOneCellCandidate() {
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runOnMain(new Runnable() {
             public void run() {
                 Fixture fixture = createFixture(
                         AppWidgetProviderInfo.RESIZE_HORIZONTAL, false);
@@ -46,7 +46,7 @@ public class WidgetResizeInstrumentationTest
     }
 
     public void testOccupiedCandidateDoesNotCommitOrMoveViews() {
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runOnMain(new Runnable() {
             public void run() {
                 Fixture fixture = createFixture(
                         AppWidgetProviderInfo.RESIZE_HORIZONTAL, true);
@@ -65,7 +65,7 @@ public class WidgetResizeInstrumentationTest
     }
 
     public void testNonResizableProviderExposesNoHandles() {
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runOnMain(new Runnable() {
             public void run() {
                 Fixture fixture = createFixture(
                         AppWidgetProviderInfo.RESIZE_NONE, false);
@@ -77,7 +77,7 @@ public class WidgetResizeInstrumentationTest
     }
 
     public void testBothAxesExposeCornerHandles() {
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runOnMain(new Runnable() {
             public void run() {
                 Fixture fixture = createFixture(
                         AppWidgetProviderInfo.RESIZE_HORIZONTAL
@@ -93,7 +93,7 @@ public class WidgetResizeInstrumentationTest
     }
 
     public void testOutsideTapCancelsWithoutMutation() {
-        getInstrumentation().runOnMainSync(new Runnable() {
+        runOnMain(new Runnable() {
             public void run() {
                 Fixture fixture = createFixture(
                         AppWidgetProviderInfo.RESIZE_HORIZONTAL, false);
@@ -105,6 +105,43 @@ public class WidgetResizeInstrumentationTest
                 assertPlacement(fixture.widget, 0, 0, 1, 1);
             }
         });
+    }
+
+    public void testFrameAccessibilityClickCancelsWithoutMutation() {
+        runOnMain(new Runnable() {
+            public void run() {
+                Fixture fixture = createFixture(
+                        AppWidgetProviderInfo.RESIZE_HORIZONTAL, false);
+                assertTrue(fixture.frame.performClick());
+                assertTrue("Frame accessibility click must cancel selection",
+                        fixture.callback.cancelled);
+                assertNull("Cancellation must not commit",
+                        fixture.callback.candidate);
+                assertPlacement(fixture.widget, 0, 0, 1, 1);
+            }
+        });
+    }
+
+    private void runOnMain(final Runnable action) {
+        final Throwable[] failure = new Throwable[1];
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                try {
+                    action.run();
+                } catch (Throwable throwable) {
+                    failure[0] = throwable;
+                }
+            }
+        });
+        if (failure[0] instanceof Error) {
+            throw (Error) failure[0];
+        }
+        if (failure[0] instanceof RuntimeException) {
+            throw (RuntimeException) failure[0];
+        }
+        if (failure[0] != null) {
+            throw new AssertionError(failure[0]);
+        }
     }
 
     private Fixture createFixture(int resizeMode, boolean addNeighbor) {
