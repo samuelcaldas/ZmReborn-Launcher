@@ -67,12 +67,12 @@ public class ApplicationIdentityContractTest {
     }
 
     private static void assertPalette(Map<String, String> colors) {
-        assertEquals("#ff121a21", colors.get("zm_reborn_slate"));
-        assertEquals("#d9121a21", colors.get("zm_reborn_glass"));
-        assertEquals("#ffeaf0f3", colors.get("zm_reborn_fog"));
-        assertEquals("#ffb8c2c8", colors.get("zm_reborn_steel"));
-        assertEquals("#fff2b64a", colors.get("zm_reborn_amber"));
-        assertEquals("#ffd95c4f", colors.get("zm_reborn_ember"));
+        assertEquals("@color/m3_surface", colors.get("zm_reborn_slate"));
+        assertEquals("@color/m3_surface_glass", colors.get("zm_reborn_glass"));
+        assertEquals("@color/m3_on_surface", colors.get("zm_reborn_fog"));
+        assertEquals("@color/m3_outline", colors.get("zm_reborn_steel"));
+        assertEquals("@color/m3_primary", colors.get("zm_reborn_amber"));
+        assertEquals("@color/m3_error", colors.get("zm_reborn_ember"));
     }
 
     private static Map<String, String> values(String relativePath, String tagName) throws Exception {

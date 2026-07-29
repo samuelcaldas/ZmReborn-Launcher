@@ -55,8 +55,8 @@ public class AccessibilityDescriptionContractTest {
                 adapter.contains("buildApplicationDescription"));
         assertTrue("Must call setContentDescription on items",
                 adapter.contains("setContentDescription"));
-        assertTrue("ApplicationItemInfo must supply title for description",
-                adapter.contains("applicationItemInfo.title"));
+        assertTrue("Description builder must derive descriptions from titles",
+                adapter.contains("info.title"));
     }
 
     @Test

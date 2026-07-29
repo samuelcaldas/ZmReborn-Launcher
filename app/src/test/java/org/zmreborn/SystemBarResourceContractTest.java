@@ -20,11 +20,13 @@ public class SystemBarResourceContractTest {
     }
 
     @Test
-    public void baseThemePreservesFrameworkWallpaperWindowBounds() throws Exception {
+    public void baseThemePreservesWallpaperParentAndSemanticColors() throws Exception {
         Element theme = findTheme("src/main/res/values/styles.xml", "LauncherTheme");
         assertEquals("@android:style/Theme.Wallpaper.NoTitleBar",
                 theme.getAttribute("parent"));
-        assertEquals(0, theme.getElementsByTagName("item").getLength());
+        assertEquals("@color/m3_surface", itemValue(theme, "android:windowBackground"));
+        assertEquals("@color/m3_primary", itemValue(theme, "android:colorAccent"));
+        assertEquals("@style/LauncherDialogTheme", itemValue(theme, "android:alertDialogTheme"));
     }
 
     @Test
