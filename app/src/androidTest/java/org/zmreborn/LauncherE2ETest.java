@@ -1,12 +1,15 @@
 package org.zmreborn;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ProviderInfo;
+import android.content.res.Configuration;
 import android.graphics.Rect;
 import android.preference.PreferenceManager;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
 import android.view.WindowManager;
+import java.lang.reflect.Field;
 import org.zmreborn.Launcher;
 
 public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> {
@@ -38,6 +41,65 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
         assertNotNull("ZM Reborn provider must resolve", provider);
         assertEquals(LauncherProvider.class.getName(), provider.name);
         assertEquals(BuildConfig.APPLICATION_ID + ".core", launcher.getApplicationInfo().processName);
+    }
+
+    public void testAppearanceFingerprintRecreatesLauncherOnResume() {
+        final Launcher launcher = getActivity();
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(launcher);
+        final String appearanceKey = launcher.getString(
+                R.string.preferences_key_application_appearance);
+        final boolean hadOriginalAppearance = preferences.contains(appearanceKey);
+        final String originalAppearance = preferences.getString(appearanceKey, null);
+        final String targetAppearance = Appearance.DARK.equals(
+                Appearance.getSelectedAppearance(launcher)) ? Appearance.LIGHT : Appearance.DARK;
+        android.app.Instrumentation.ActivityMonitor settingsMonitor = null;
+        android.app.Instrumentation.ActivityMonitor launcherMonitor = null;
+        Launcher recreatedLauncher = null;
+
+        try {
+            settingsMonitor = getInstrumentation().addMonitor(Preferences.class.getName(), null, false);
+            launcher.startActivity(new Intent(launcher, Preferences.class));
+            final Preferences settings = (Preferences) getInstrumentation().waitForMonitorWithTimeout(
+                    settingsMonitor, 30000L);
+            assertNotNull("Preferences activity must open", settings);
+            getInstrumentation().waitForIdleSync();
+            assertTrue("Target appearance must persist", preferences.edit()
+                    .putString(appearanceKey, targetAppearance).commit());
+            launcherMonitor = getInstrumentation().addMonitor(Launcher.class.getName(), null, false);
+            settings.runOnUiThread(new Runnable() {
+                public void run() {
+                    settings.finish();
+                }
+            });
+            recreatedLauncher = (Launcher) getInstrumentation().waitForMonitorWithTimeout(
+                    launcherMonitor, 30000L);
+            assertNotNull("Appearance change must recreate Launcher", recreatedLauncher);
+            assertNotSame("Appearance change must replace Launcher", launcher, recreatedLauncher);
+            getInstrumentation().waitForIdleSync();
+            assertEquals("Target appearance must persist", targetAppearance,
+                    preferences.getString(appearanceKey, null));
+            int expectedNightMode = Appearance.DARK.equals(targetAppearance)
+                    ? Configuration.UI_MODE_NIGHT_YES : Configuration.UI_MODE_NIGHT_NO;
+            assertEquals("Recreated Launcher must use target night mode", expectedNightMode,
+                    recreatedLauncher.getResources().getConfiguration().uiMode
+                            & Configuration.UI_MODE_NIGHT_MASK);
+            assertNotNull("Workspace must be inflated after appearance recreation",
+                    recreatedLauncher.findViewById(R.id.workspace));
+        } finally {
+            SharedPreferences.Editor editor = preferences.edit();
+            if (hadOriginalAppearance) {
+                editor.putString(appearanceKey, originalAppearance);
+            } else {
+                editor.remove(appearanceKey);
+            }
+            assertTrue("Original appearance preference must be restored", editor.commit());
+            if (launcherMonitor != null) {
+                getInstrumentation().removeMonitor(launcherMonitor);
+            }
+            if (settingsMonitor != null) {
+                getInstrumentation().removeMonitor(settingsMonitor);
+            }
+        }
     }
 
     public void testDrawerStaysInsideDragLayerBounds() {
@@ -215,5 +277,74 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
 
         assertTrue("DragLayer width must be positive", width > 0);
         assertTrue("DragLayer height must be positive", height > 0);
+    }
+
+    public void testSystemInsetWiringReachesDockWithoutBreakingLayout() throws Exception {
+        final Launcher launcher = getActivity();
+        getInstrumentation().waitForIdleSync();
+        launcher.runOnUiThread(new Runnable() {
+            public void run() {
+                launcher.getWindow().getDecorView().requestApplyInsets();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        assertNotNull("Dock must receive a system-bar insets Rect once the DecorView "
+                + "listener has fired", readPrivateRect(launcher.mDock, "mSystemBarInsets"));
+        assertLauncherInsideSystemBars(launcher);
+    }
+
+    public void testCurrentCellLayoutClampsOversizedWidgetDimensions() {
+        final Launcher launcher = getActivity();
+        final CellLayout[] layouts = new CellLayout[1];
+        final boolean[] measured = new boolean[1];
+        final boolean[] geometryReady = new boolean[1];
+        final int[] counts = new int[2];
+        final int[][] spans = new int[1][];
+        getInstrumentation().waitForIdleSync();
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                CellLayout layout = (CellLayout) launcher.mWorkspace.getChildAt(
+                        launcher.mWorkspace.getCurrentScreen());
+                layouts[0] = layout;
+                if (layout == null) {
+                    return;
+                }
+                measured[0] = layout.getMeasuredWidth() > 0 && layout.getMeasuredHeight() > 0;
+                geometryReady[0] = layout.isWidgetSizingGeometryReady();
+                if (!geometryReady[0]) {
+                    return;
+                }
+                counts[0] = layout.getCountX();
+                counts[1] = layout.getCountY();
+                spans[0] = layout.rectToCell(Integer.MAX_VALUE, Integer.MAX_VALUE);
+            }
+        });
+
+        assertNotNull("Current workspace page must be a CellLayout", layouts[0]);
+        assertTrue("Current CellLayout must be measured", measured[0]);
+        assertTrue("Widget-sizing geometry must be ready", geometryReady[0]);
+        assertNotNull("Oversized widget dimensions must resolve to spans", spans[0]);
+        assertEquals(counts[0], spans[0][0]);
+        assertEquals(counts[1], spans[0][1]);
+    }
+
+    public void testUnmeasuredCellLayoutHasNoWidgetSizingGeometry() {
+        final Launcher launcher = getActivity();
+        final boolean[] geometryReady = new boolean[1];
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                CellLayout layout = new CellLayout(launcher);
+                geometryReady[0] = layout.isWidgetSizingGeometryReady();
+            }
+        });
+
+        assertFalse("Unmeasured CellLayout geometry must not be ready", geometryReady[0]);
+    }
+
+    private static Rect readPrivateRect(Object target, String fieldName) throws Exception {
+        Field field = target.getClass().getDeclaredField(fieldName);
+        field.setAccessible(true);
+        return (Rect) field.get(target);
     }
 }

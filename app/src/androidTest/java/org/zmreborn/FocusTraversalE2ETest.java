@@ -17,88 +17,121 @@ public class FocusTraversalE2ETest extends ActivityInstrumentationTestCase2<Laun
     }
 
     public void testLauncherStartsWithFocus() {
-        Launcher launcher = getActivity();
+        final Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
-        View focusedView = launcher.getCurrentFocus();
 
-        assertNotNull("Launcher must have focused view", focusedView);
+        assertNotNull("Launcher must have focused view", launcher.getCurrentFocus());
     }
 
     public void testDPADRightNavigationFromWorkspace() {
-        Launcher launcher = getActivity();
+        final Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
 
-        View workspace = launcher.findViewById(R.id.workspace);
-        workspace.requestFocus();
+        View currentCellLayout = focusCurrentCellLayout(launcher);
         getInstrumentation().waitForIdleSync();
+        assertTrue("Current CellLayout must receive focus before right navigation",
+                currentCellLayout.hasFocus());
 
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_RIGHT);
         getInstrumentation().waitForIdleSync();
 
-        assertTrue("Navigation must occur without crashing", true);
+        assertNotNull("Right navigation must retain focus", launcher.getCurrentFocus());
     }
 
     public void testDPADLeftNavigationFromWorkspace() {
-        Launcher launcher = getActivity();
+        final Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
 
-        View workspace = launcher.findViewById(R.id.workspace);
-        workspace.requestFocus();
+        View currentCellLayout = focusCurrentCellLayout(launcher);
         getInstrumentation().waitForIdleSync();
+        assertTrue("Current CellLayout must receive focus before left navigation",
+                currentCellLayout.hasFocus());
 
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_LEFT);
         getInstrumentation().waitForIdleSync();
 
-        assertTrue("Left navigation must occur without crashing", true);
+        assertNotNull("Left navigation must retain focus", launcher.getCurrentFocus());
     }
 
     public void testDPADDownNavigationToDrawer() {
-        Launcher launcher = getActivity();
+        final Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
 
-        View workspace = launcher.findViewById(R.id.workspace);
-        workspace.requestFocus();
+        View currentCellLayout = focusCurrentCellLayout(launcher);
         getInstrumentation().waitForIdleSync();
+        assertTrue("Current CellLayout must receive focus before down navigation",
+                currentCellLayout.hasFocus());
 
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_DOWN);
         getInstrumentation().waitForIdleSync();
 
-        assertTrue("Down navigation must occur without crashing", true);
+        assertNotNull("Down navigation must retain focus", launcher.getCurrentFocus());
+    }
+
+    private View focusCurrentCellLayout(final Launcher launcher) {
+        final View[] cellLayout = new View[1];
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                cellLayout[0] = launcher.mWorkspace.getChildAt(
+                        launcher.mWorkspace.getCurrentScreen());
+                cellLayout[0].setFocusableInTouchMode(true);
+                cellLayout[0].requestFocus();
+            }
+        });
+        return cellLayout[0];
     }
 
     public void testDPADUpNavigationFromDrawer() {
-        Launcher launcher = getActivity();
+        final Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
 
-        launcher.mApplicationsView.open(false);
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                launcher.mApplicationsView.open(false);
+                View drawer = launcher.findViewById(R.id.apps_grid);
+                drawer.setFocusableInTouchMode(true);
+                drawer.requestFocus();
+            }
+        });
         getInstrumentation().waitForIdleSync();
+        View drawer = launcher.findViewById(R.id.apps_grid);
+        assertTrue("Drawer must receive focus before up navigation", drawer.hasFocus());
 
         getInstrumentation().sendKeyDownUpSync(KeyEvent.KEYCODE_DPAD_UP);
         getInstrumentation().waitForIdleSync();
 
-        assertTrue("Up navigation from drawer must work", true);
+        assertNotNull("Up navigation must retain focus", launcher.getCurrentFocus());
     }
 
     public void testDockItemsAreFocusable() {
-        Launcher launcher = getActivity();
+        final Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
-        View dock = launcher.findViewById(R.id.dock);
 
-        assertTrue("Dock must be accessible", dock != null && dock.getVisibility() == View.VISIBLE);
+        View dock = launcher.findViewById(R.id.dock);
+        assertNotNull("Dock must exist", dock);
+        assertEquals("Dock must be visible", View.VISIBLE, dock.getVisibility());
+        assertTrue("Dock must expose focusable items", dock.hasFocusable());
     }
 
     public void testDrawerItemsAreFocusable() {
-        Launcher launcher = getActivity();
+        final Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
-        launcher.mApplicationsView.open(false);
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                launcher.mApplicationsView.open(false);
+            }
+        });
         getInstrumentation().waitForIdleSync();
 
         View drawer = launcher.findViewById(R.id.apps_grid);
         assertNotNull("Drawer must exist", drawer);
+        assertEquals("Drawer must be visible", View.VISIBLE, drawer.getVisibility());
+        assertTrue("Drawer must expose focusable items", drawer.hasFocusable());
     }
 
     public void testFocusCycleDoesNotCrash() {
-        Launcher launcher = getActivity();
+        final Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
 
         for (int i = 0; i < 5; i++) {
@@ -106,11 +139,11 @@ public class FocusTraversalE2ETest extends ActivityInstrumentationTestCase2<Laun
             getInstrumentation().waitForIdleSync();
         }
 
-        assertTrue("Focus cycling must complete without crash", true);
+        assertNotNull("Focus cycling must retain focus", launcher.getCurrentFocus());
     }
 
     public void testFocusIsInitiallyNotInDrawer() {
-        Launcher launcher = getActivity();
+        final Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
 
         assertFalse("Drawer must initially be closed", launcher.isApplicationsGridOpen());
