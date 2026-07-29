@@ -52,7 +52,7 @@ Run unit tests or a single test:
 - Keep zero third-party app/runtime dependencies. Use Android SDK and Java APIs unless explicitly approved otherwise.
 - Use generated `R`; never restore JADX `C0041R` or frozen numeric resource IDs.
 - Avoid direct bytecode references to APIs unavailable at `minSdk` 24; use focused compatibility bridges.
-- Preserve fail-fast behavior and specific exception handling at system boundaries.
+- Mandatory: At boundaries, before side effects or heavy work, validate inputs, configuration, platform/runtime prerequisites, widget/grid geometry, and state invariants; reject invalid states with specific descriptive exceptions or explicit failures; never silently swallow, coerce, or defer them; catch only specific exceptions and preserve context when wrapping/rethrowing.
 
 ## Validation and Documentation
 
