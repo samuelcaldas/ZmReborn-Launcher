@@ -23,8 +23,28 @@
             <action android:name="android.intent.action.MAIN"/>
             <category android:name="android.intent.category.LAUNCHER"/>
         </intent>
+        <intent>
+            <action android:name="android.intent.action.DIAL"/>
+            <data android:scheme="tel"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.SENDTO"/>
+            <data android:scheme="smsto"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <category android:name="android.intent.category.BROWSABLE"/>
+            <data android:scheme="https"/>
+        </intent>
+        <intent>
+            <action android:name="android.media.action.IMAGE_CAPTURE"/>
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW"/>
+            <data android:scheme="content" android:host="com.android.contacts"/>
+        </intent>
     </queries>
-    <application android:label="@string/application_name" android:icon="@drawable/ic_launcher" android:name=".LauncherApplication" android:process="${applicationId}.core" android:hardwareAccelerated="true">
+    <application android:label="@string/application_name" android:icon="@drawable/ic_launcher" android:name=".LauncherApplication" android:process="${applicationId}.core" android:hardwareAccelerated="true" android:supportsRtl="true" android:enableOnBackInvokedCallback="true" tools:targetApi="33">
         <meta-data android:name="android.app.default_searchable" android:value="*"/>
         <activity android:theme="@style/LauncherTheme" android:name=".Launcher" android:clearTaskOnLaunch="true" android:stateNotNeeded="true" android:launchMode="singleTask" android:screenOrientation="nosensor" android:windowSoftInputMode="adjustPan" android:exported="true">
             <intent-filter>
