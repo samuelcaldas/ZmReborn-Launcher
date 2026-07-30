@@ -1,5 +1,23 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## [3.1.11-alpha-rc7]
+
+- Replaces modal quantity sliders with accessible inline `−` / `+` controls and moves
+  applications-grid transparency to an inline slider. Changes update immediately, persist through a
+  250 ms trailing debounce, and flush before Settings yields to Launcher.
+- Refactors horizontal application paging around proportional slot boundaries, measured viewport
+  layout, and item-ordinal position restoration. Portrait and landscape spacing now share navigation
+  strip dimensions and consistent cell padding.
+- Adds API 35 light/night Settings theme opt-outs for forced edge-to-edge, protecting system-bar
+  spacing while the full edge-to-edge migration remains deferred.
+- Preserves Android 24–35 compatibility boundaries, existing preference keys, public resource
+  contracts, reconstruction provenance, and zero third-party runtime dependencies.
+- Validation includes 169 JVM tests, Android-test compilation, lint, Docker-wrapper debug APK builds,
+  full API 35 numeric-settings instrumentation, focused Launcher recreation coverage, and changed-path
+  review. API 24 runtime and final API 24/API 35 horizontal-paging device smoke remain unperformed.
+  Software-emulator ANR interrupted clean manual API 35 app-grid slider, keyboard/DPAD, forced-RTL,
+  and TalkBack traversal; no result is claimed for those paths.
+
 ## Inline debounced numeric settings — 2026-07-30
 
 - Replaced eight modal quantity sliders with inline `−` / `+` controls for workspace screen
