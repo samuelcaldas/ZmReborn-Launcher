@@ -1,5 +1,45 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Horizontal paging grid visual refactor — 2026-07-30
+
+- **Cell/grid alignment fixed.** `DrawerLayoutMetrics` now exposes proportional integer slot
+  boundaries (`columnLeft`, `columnRight`, `rowTop`, `rowBottom`) using the formula
+  `boundary(i) = i * available / count`. Adjacent cells share exact boundaries with zero
+  remainder gap at the trailing edge, regardless of viewport-width divisibility.
+- **Orientation inconsistency fixed.** `apps_paging_view.xml` (portrait and landscape) replaced
+  hard-coded `40dp` dock-exclusion padding with `@dimen/navigation_strip_size`. Landscape
+  `apps_page_view.xml` asymmetric `paddingEnd="30dp"` equalized to `3dp`. Landscape
+  `application_boxed_page.xml` normalized to match portrait padding and `minHeight`.
+- **`ApplicationsPageView` replaced nested `LinearLayout` rows with a direct `ViewGroup`.** New
+  `onMeasure` measures each child to its exact slot dimensions; `onLayout` places each child at
+  its slot coordinates. Removes the double floor-division truncation that each row's `LinearLayout`
+  contributed.
+- **Position restoration by item ordinal.** `ApplicationsPagePartition.pageIndexForItemOrdinal()`
+  maps a saved item ordinal to its page after capacity changes. `ApplicationsPagingView` captures
+  the first visible ordinal before a rebuild and restores the containing page when remembered
+  position is enabled; resets to page zero otherwise.
+- **Deferred pager build on viewport.** `ViewPager.OnViewportChangedListener` fires on the first
+  real non-zero size change. `ApplicationsPagingView` uses this to rebuild when the initial build
+  used a display-metrics fallback width (i.e., before first layout).
+- No third-party dependencies added. `ApplicationsView` interface unchanged.
+
+### Validation — 2026-07-30
+
+- TDD: red tests written before each production change; all turned green after implementation.
+- JVM unit tests: `DrawerLayoutMetricsTest` (4 existing + 6 slot-boundary), `ApplicationsPagePartitionTest`
+  (9 existing + 6 ordinal-mapping). All passed.
+- Full JVM suite: BUILD SUCCESSFUL (all tests green).
+- Instrumentation compilation: `./gradlew :app:assembleDebugAndroidTest` BUILD SUCCESSFUL.
+  New `ApplicationsPagingViewInstrumentationTest` compiles; device-runtime evidence not yet obtained.
+- Lint: BUILD SUCCESSFUL with existing baseline (23 previously-baselined issues resolved by this
+  change; no new issues introduced).
+- `git diff --check`: passed.
+- `./tools/build_apk.sh`: passed. APK 1,008,198 bytes;
+  SHA-256 `2bf08365453dd2ac2c5fe686954c7920ea38a7d39f06bbef0f375eaae12d608e`.
+- API 24 and API 35 device runtime smoke: not yet performed (no connected device). Required before
+  shipping: portrait 4×4 and landscape 3×5 smoke, trailing-edge alignment visual check, rotation
+  with remembered position on and off, dock/indicator overlap check, TalkBack page count.
+
 ## Launcher settings persistence — 2026-07-29
 
 - `Launcher.sRestart`-backed preference changes recreate `Launcher` on return without killing the process.

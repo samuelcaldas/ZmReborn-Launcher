@@ -26,4 +26,10 @@ final class ApplicationsPagePartition {
         int start = calculatePageStart(pageIndex, requestedRows, requestedColumns);
         return Math.min(safeItemCount, start + calculateItemsPerPage(requestedRows, requestedColumns));
     }
+
+    static int pageIndexForItemOrdinal(int ordinal, int requestedRows, int requestedColumns) {
+        int safeOrdinal = Math.max(0, ordinal);
+        int itemsPerPage = calculateItemsPerPage(requestedRows, requestedColumns);
+        return safeOrdinal / itemsPerPage;
+    }
 }

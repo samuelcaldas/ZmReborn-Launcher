@@ -71,4 +71,48 @@ public class ApplicationsPagePartitionTest {
         int result = ApplicationsPagePartition.calculatePageStart(1000, 2, 3);
         assertTrue("Must handle large page index", result >= 0);
     }
+
+    @Test
+    public void ordinalOnFirstPageMapsToPageZero() {
+        assertEquals(0, ApplicationsPagePartition.pageIndexForItemOrdinal(0, 4, 4));
+        assertEquals(0, ApplicationsPagePartition.pageIndexForItemOrdinal(15, 4, 4));
+    }
+
+    @Test
+    public void ordinalOnSecondPageMapsToPageOne() {
+        assertEquals(1, ApplicationsPagePartition.pageIndexForItemOrdinal(16, 4, 4));
+        assertEquals(1, ApplicationsPagePartition.pageIndexForItemOrdinal(31, 4, 4));
+    }
+
+    @Test
+    public void ordinalOnThirdPageMapsToPageTwo() {
+        assertEquals(2, ApplicationsPagePartition.pageIndexForItemOrdinal(32, 4, 4));
+    }
+
+    @Test
+    public void negativeOrdinalMapsToPageZero() {
+        assertEquals(0, ApplicationsPagePartition.pageIndexForItemOrdinal(-1, 4, 4));
+        assertEquals(0, ApplicationsPagePartition.pageIndexForItemOrdinal(Integer.MIN_VALUE, 4, 4));
+    }
+
+    @Test
+    public void ordinalWithInvalidDimensionsUsesClampedCapacity() {
+        // invalid rows/cols clamp to 1×1 (capacity 1), so ordinal N → page N
+        assertEquals(0, ApplicationsPagePartition.pageIndexForItemOrdinal(0, 0, -1));
+        assertEquals(5, ApplicationsPagePartition.pageIndexForItemOrdinal(5, 0, 0));
+    }
+
+    @Test
+    public void ordinalMapsMaintainsConsistencyWithPageBounds() {
+        int rows = 3;
+        int cols = 5;
+        for (int page = 0; page < 4; page++) {
+            int start = ApplicationsPagePartition.calculatePageStart(page, rows, cols);
+            int end = ApplicationsPagePartition.calculatePageEnd(page, 100, rows, cols);
+            for (int ordinal = start; ordinal < end; ordinal++) {
+                assertEquals("Ordinal " + ordinal + " must map back to page " + page,
+                        page, ApplicationsPagePartition.pageIndexForItemOrdinal(ordinal, rows, cols));
+            }
+        }
+    }
 }

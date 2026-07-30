@@ -258,6 +258,44 @@ public class UiModernizationContractTest {
         assertTrue(manifest.contains("android:host=\"com.android.contacts\""));
     }
 
+    @Test
+    public void pagingViewRestoresPositionByItemOrdinalOnRebuild() throws Exception {
+        String paging = read("main/java/org/zmreborn/ApplicationsPagingView.java");
+        assertTrue("ApplicationsPagingView must use pageIndexForItemOrdinal for position restoration",
+                paging.contains("pageIndexForItemOrdinal"));
+        assertTrue("ApplicationsPagingView must capture the first visible ordinal before rebuild",
+                paging.contains("captureFirstVisibleOrdinal"));
+        assertTrue("ApplicationsPagingView must react to viewport changes",
+                paging.contains("onPagerViewportChanged"));
+    }
+
+    @Test
+    public void pagingLayoutsUseDimensionForDockExclusionNotHardcodedDp() throws Exception {
+        String portrait = read("main/res/layout-port/apps_paging_view.xml");
+        String landscape = read("main/res/layout-land/apps_paging_view.xml");
+        assertFalse("portrait paging layout must not contain 40dp literal",
+                portrait.contains("40dp"));
+        assertFalse("landscape paging layout must not contain 40dp literal",
+                landscape.contains("40dp"));
+        assertTrue("portrait paging layout must reference navigation_strip_size",
+                portrait.contains("navigation_strip_size"));
+        assertTrue("landscape paging layout must reference navigation_strip_size",
+                landscape.contains("navigation_strip_size"));
+    }
+
+    @Test
+    public void pagingPageAndCellLayoutsHaveEquivalentContentPaddingAcrossOrientations()
+            throws Exception {
+        String pagePort = read("main/res/layout-port/apps_page_view.xml");
+        String pageLand = read("main/res/layout-land/apps_page_view.xml");
+        String cellPort = read("main/res/layout-port/application_boxed_page.xml");
+        String cellLand = read("main/res/layout-land/application_boxed_page.xml");
+        assertFalse("landscape page view must not have asymmetric end padding 30dp",
+                pageLand.contains("30dp"));
+        assertTrue("landscape cell must define minHeight like portrait cell",
+                cellLand.contains("label_min_height"));
+    }
+
     private static void assertDrawerLayoutsHaveNoFixedColumns() throws Exception {
         String portrait = read("main/res/layout-port/apps_grid_view.xml");
         String landscape = read("main/res/layout-land/apps_grid_view.xml");

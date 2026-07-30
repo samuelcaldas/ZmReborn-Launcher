@@ -34,6 +34,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     private int mBasePaddingRight;
     private int mBasePaddingTop;
     private Rect mSystemGestureInsets;
+    private boolean mBuiltWithFallbackDimensions;
 
     public ApplicationsPagingView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
@@ -62,6 +63,11 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         this.mViewPager.setOnPageScrollListener(new ViewPager.OnPageScrollListener() {
             public void onScroll() {
                 ApplicationsPagingView.this.indicate();
+            }
+        });
+        this.mViewPager.setOnViewportChangedListener(new ViewPager.OnViewportChangedListener() {
+            public void onViewportChanged(int width, int height) {
+                ApplicationsPagingView.this.onPagerViewportChanged();
             }
         });
         this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.apps_paging_screen_indicator);
@@ -174,7 +180,11 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         if (this.mViewPager == null) {
             return;
         }
+        int priorFirstOrdinal = captureFirstVisibleOrdinal();
         ArrayList<ApplicationItemInfo> applicationItemInfos = this.mApplicationItemInfos;
+        int viewportWidth = this.mViewPager.getWidth();
+        int viewportHeight = this.mViewPager.getHeight();
+        this.mBuiltWithFallbackDimensions = (viewportWidth <= 0 || viewportHeight <= 0);
         DrawerLayoutMetrics metrics = calculatePageMetrics();
         LinkedHashMap<Integer, List<ApplicationItemInfo>> pageContents = loadPageContents(
                 metrics.getRows(), metrics.getColumns(), applicationItemInfos);
@@ -191,7 +201,23 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         }
         this.mViewPager.clearPagingViews();
         this.mViewPager.setPagingViews(pageViews);
-        clampCurrentPageIndex();
+        clampCurrentPageIndex(priorFirstOrdinal, metrics.getRows(), metrics.getColumns());
+    }
+
+    private int captureFirstVisibleOrdinal() {
+        if (this.mViewPager == null) {
+            return 0;
+        }
+        int currentPage = this.mViewPager.getCurrentPageIndex();
+        return ApplicationsPagePartition.calculatePageStart(currentPage, sRows, sColumns);
+    }
+
+    private void onPagerViewportChanged() {
+        if (this.mBuiltWithFallbackDimensions && this.mApplicationItemInfos != null
+                && !this.mApplicationItemInfos.isEmpty()) {
+            buildPages();
+            initIndicator();
+        }
     }
 
     private DrawerLayoutMetrics calculatePageMetrics() {
@@ -246,13 +272,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
                 this.mViewPager.resetScroll();
                 return;
             }
-            if (PreferencesUtil.rememberApplicationsPosition(getContext())) {
-                clampCurrentPageIndex();
-                this.mScreenIndicator.fullIndicate(this.mViewPager.getCurrentPageIndex());
-                return;
-            }
-            this.mScreenIndicator.fullIndicate(0);
-            this.mViewPager.resetScroll();
+            this.mScreenIndicator.fullIndicate(this.mViewPager.getCurrentPageIndex());
         }
     }
 
@@ -377,15 +397,21 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         this.mScreenIndicator.indicate(progress);
     }
 
-    private void clampCurrentPageIndex() {
+    private void clampCurrentPageIndex(int priorFirstOrdinal, int rows, int columns) {
         int pageCount = this.mViewPager.getPageCount();
         if (pageCount <= 0) {
             this.mViewPager.resetScroll();
             return;
         }
-        int currentIndex = this.mViewPager.getCurrentPageIndex();
-        if (currentIndex >= pageCount) {
+        if (!PreferencesUtil.rememberApplicationsPosition(getContext())) {
             this.mViewPager.resetScroll();
+            return;
+        }
+        int restoredPage = ApplicationsPagePartition.pageIndexForItemOrdinal(
+                priorFirstOrdinal, rows, columns);
+        int clampedPage = Math.min(restoredPage, pageCount - 1);
+        if (clampedPage != this.mViewPager.getCurrentPageIndex()) {
+            this.mViewPager.moveToPageForced(clampedPage);
         }
     }
 
