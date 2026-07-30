@@ -154,7 +154,13 @@ Settings styling includes:
 - primary outline and surface-variant fill for focused/selected rows;
 - framework-owned row click/focus behavior.
 
-Legacy row/column controls remain enabled only for horizontal paging. Vertical auto-fit mode disables fixed-column controls because runtime width determines column count. `Launcher.sRestart`-backed preference changes clear pending restart state and automatically recreate the `Launcher` activity on return. Appearance plus `Launcher.sRestart`-backed changes coalesce into one activity recreation. Workspace row and column values remain in default `SharedPreferences`; rebuilt `CellLayout` instances use the selected geometry. Drawer density is persisted through a vertical-only `ListPreference`.
+Eight count settings use inline `−` and `+` controls: workspace screen count/default screen, workspace rows/columns, and horizontal app-grid portrait/landscape rows/columns. Each action changes one unit, disables at its configured bound, consumes long press without repeating, and exposes a 48dp keyboard-focusable action with localized current-value/bound descriptions. Nested preference dialogs allow descendant focus so DPAD/keyboard navigation can reach these controls.
+
+Applications-grid transparency remains a raw `0..255` value but now uses an inline native slider in **Applications Grid → Appearance**. Numeric labels update immediately. Steppers and slider use a 250 ms trailing persistence window; `onPause()`/`onDestroy()` flush pending values before Settings yields to Launcher, while explicit process-restart paths add a durable commit barrier. Reset cancels callbacks then clears default `SharedPreferences` synchronously, preventing queued writes from restoring deleted settings.
+
+Horizontal app-grid controls remain enabled only for horizontal paging. Vertical auto-fit mode disables fixed row/column controls because runtime width determines geometry. Each accepted horizontal change writes its preference key and authoritative runtime alias in one editor transaction. Untouched disabled wrapper keys are not created by durable flushes.
+
+`Launcher.sRestart`-backed preference changes clear pending restart state and automatically recreate `Launcher` on return. Appearance plus `Launcher.sRestart`-backed changes coalesce into one activity recreation. Workspace row and column values remain in default `SharedPreferences`; rebuilt `CellLayout` instances use selected geometry. Drawer density remains a vertical-only `ListPreference`.
 
 Legacy popup, sheet, and navigation redesign remain deferred; externally-owned remote UI is not claimed as themed.
 
@@ -164,7 +170,7 @@ Legacy popup, sheet, and navigation redesign remain deferred; externally-owned r
 
 Launcher propagates gesture insets to workspace, drag layer, and drawer, and provides system-bar metadata to Dock. Because forced edge-to-edge remains opted out, decor fitting already positions drawer content outside system bars; drawer system-bar padding stays zero to avoid duplicate top/bottom spacing. Left/right system-back edges remain available. Registered API 33+ platform predictive-back callback object invocation/delivery closes drawer, then folder; API 34 adds reversible progress preview.
 
-`values-v35/styles.xml` still opts out of forced edge-to-edge enforcement. Full edge-to-edge migration remains deferred until runtime evidence covers all launcher surfaces.
+API 35 light/night Launcher and Settings themes opt out of forced edge-to-edge enforcement. Full edge-to-edge migration remains deferred until runtime evidence covers all launcher surfaces.
 
 ## Automated coverage
 
@@ -173,7 +179,7 @@ Focused JVM/resource/source coverage includes:
 - `CellLayoutSpanTest` — span ceiling, gaps, clamping, overflow, invalid geometry;
 - `WallpaperColorExtractorTest` — HSV role contracts and production fallback opacity;
 - `DrawerSearchFilterTest`, `DrawerScrollStateTest`, `DrawerDensityPolicyTest`, and `ApplicationsAdapterContractTest` — normalized ranking, immutable filtering, stable restoration/fallback, responsive density breakpoints, and deterministic profile-sensitive IDs;
-- `SettingsResourceContractTest` — switch semantics, drawer-density persistence, settings geometry, ripple root/color, persistence/resource contracts, and widget source contracts;
+- `SettingsResourceContractTest` and `SystemBarResourceContractTest` — switch semantics, eight inline steppers, inline transparency slider, 250 ms debounce, reset/storage contracts, settings geometry, semantic control colors, logical padding, API 35 theme opt-outs, and preserved public/widget source contracts;
 - `UiModernizationContractTest` — blank home, resolved dock handlers, integrated immutable drawer search, responsive/close-safe drawer, explicit icon bounds, dedicated wallpaper executor, and receiver dispatch;
 - existing drawer, token, compatibility, persistence, localization, and public-resource suites.
 
@@ -189,7 +195,7 @@ API 35 instrumentation coverage includes:
 - `WidgetResizeInstrumentationTest` — provider-axis handle selection, 48dp handle geometry, valid
   and occupied candidates, fixed-provider behavior, outside cancellation, and accessibility-click
   cancellation without premature layout mutation;
-- `PreferencesE2ETest` — real activity recreation and `ListPreference` rehydration;
+- `PreferencesE2ETest` — real activity recreation, `ListPreference` rehydration, immediate inline numeric updates, trailing debounce, lifecycle flush, bounds, listener rejection, app-grid alias transactions, storage reset, clamped-value correction, recycled slider rows, durable no-op behavior, and nested child focus;
 - accessibility coverage for the production horizontal pager and indicator page-count semantics;
 - existing launcher, drawer, focus, inset, Settings, localization, and public-resource tests.
 
@@ -197,11 +203,24 @@ Latest fresh build and runtime evidence is recorded in `docs/CHANGELOG.md`. API 
 
 ## Runtime evidence and remaining validation
 
-Fresh API 35 evidence is recorded in `docs/CHANGELOG.md`. Six widget-resize component tests and three targeted Launcher, drawer, and Preferences smoke tests passed on API 35 with clean filtered launcher logcat. This component coverage does not exercise a real external widget provider. The precise empty-adapter recovery regression compiles, but a complete post-fix API 35 instrumentation rerun remains blocked by unrelated Google/phone system ANRs and instrumentation lifecycle timeouts after emulator reboot. No performed result substitutes for API 24, real-provider, or SystemUI gesture validation.
+Fresh API 35 evidence is recorded in `docs/CHANGELOG.md`. Full `PreferencesE2ETest` coverage passed
+21 tests, including real inline controls, debounce, lifecycle persistence, alias transactions, reset,
+row recycling, and nested focus. Focused `LauncherE2ETest` coverage also passed workspace persistence,
+activity recreation, and rebuilt grid geometry. Filtered full-suite logcat contained no matching
+launcher fatal exception, launcher ANR, verifier/missing class or method failure, or
+`UnsupportedOperationException`.
+
+Manual API 35 screenshots confirmed Settings root system-bar spacing and rendered Workspace rows with
+all four inline steppers. Software-only emulator load later produced an input ANR while Android framework
+code laid out the nested preference list, so this attempt does not claim clean hands-on app-grid slider,
+keyboard/DPAD, or complete Settings traversal. Automated instrumentation remains separate evidence and
+does not convert this interrupted manual check into a pass.
 
 Remaining runtime gaps:
 
 - API 24 smoke is unperformed because no API 24 device or local emulator image is available;
+- clean manual API 35 traversal of app-grid transparency, keyboard/DPAD activation, forced RTL, and
+  TalkBack descriptions remains unperformed after the software-emulator ANR;
 - instrumentation invokes the retained registered predictive-back callback object, but an actual
   SystemUI edge gesture is unverified;
 - hands-on widget picker/configuration with a real external provider, provider rendering after

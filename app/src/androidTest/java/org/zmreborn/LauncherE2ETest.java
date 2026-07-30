@@ -1,10 +1,8 @@
 package org.zmreborn;
 
 import android.app.Activity;
-import android.app.AlertDialog;
 import android.app.Application;
 import android.app.Dialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ProviderInfo;
@@ -21,7 +19,6 @@ import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SeekBar;
 import java.lang.reflect.Field;
 import java.util.IdentityHashMap;
 import org.zmreborn.Launcher;
@@ -167,12 +164,16 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
                     settingsMonitor, 30000L);
             assertNotNull("Preferences activity must open", settings);
             getInstrumentation().waitForIdleSync();
-            changeWorkspaceGridPreference(settings, columnsKey, targetColumns);
-            changeWorkspaceGridPreference(settings, rowsKey, targetRows);
-            assertEquals("Selected rows must persist before Launcher reload", targetRows,
-                    preferences.getInt(rowsKey, -1));
-            assertEquals("Selected columns must persist before Launcher reload", targetColumns,
-                    preferences.getInt(columnsKey, -1));
+            changeWorkspaceGridPreference(settings, columnsKey, targetColumns,
+                    originalColumns);
+            int rowsBeforePause = changeWorkspaceGridPreference(settings, rowsKey, targetRows,
+                    originalRows);
+            assertEquals("Selected rows must update inline before persistence", targetRows,
+                    ((InlineStepperPreference) settings.findPreference(rowsKey)).getValue());
+            assertEquals("Selected columns must update inline before persistence", targetColumns,
+                    ((InlineStepperPreference) settings.findPreference(columnsKey)).getValue());
+            assertEquals("Latest grid change must remain pending inside input batch",
+                    originalRows, rowsBeforePause);
             assertTrue("Grid changes must request Launcher restart", Launcher.sRestart);
 
             launcher.getApplication().registerActivityLifecycleCallbacks(recreationObserver);
@@ -187,6 +188,10 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
             assertEquals("Grid reload must not terminate process", originalProcessId,
                     Process.myPid());
             getInstrumentation().waitForIdleSync();
+            assertEquals("Rows must flush before Launcher resumes", targetRows,
+                    preferences.getInt(rowsKey, -1));
+            assertEquals("Columns must flush before Launcher resumes", targetColumns,
+                    preferences.getInt(columnsKey, -1));
             assertEquals(targetRows, PreferencesUtil.getContentGridRows(recreatedLauncher));
             assertEquals(targetColumns, PreferencesUtil.getContentGridColumns(recreatedLauncher));
             assertWorkspaceGridGeometry(recreatedLauncher, targetRows, targetColumns);
@@ -446,8 +451,8 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
         assertFalse("Unmeasured CellLayout geometry must not be ready", geometryReady[0]);
     }
 
-    private void changeWorkspaceGridPreference(final Preferences settings, String key,
-            final int targetValue) {
+    private int changeWorkspaceGridPreference(final Preferences settings, final String key,
+            final int targetValue, final int storedFallback) {
         PreferenceScreen workspaceScreen = (PreferenceScreen) settings.getPreferenceScreen()
                 .getPreference(1);
         if (workspaceScreen.getDialog() == null || !workspaceScreen.getDialog().isShowing()) {
@@ -455,27 +460,32 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
         }
         Dialog workspaceDialog = workspaceScreen.getDialog();
         assertNotNull("Workspace preference screen must open", workspaceDialog);
-        ListView workspaceList = (ListView) workspaceDialog.findViewById(android.R.id.list);
+        final ListView workspaceList = (ListView) workspaceDialog.findViewById(android.R.id.list);
         assertNotNull("Workspace preference list must exist", workspaceList);
-        final DialogSeekBarPreference preference = (DialogSeekBarPreference) settings
+        final InlineStepperPreference preference = (InlineStepperPreference) settings
                 .findPreference(key);
-        clickPreference(workspaceList, preference);
-        final AlertDialog seekDialog = (AlertDialog) preference.getDialog();
-        assertNotNull("Grid preference dialog must open", seekDialog);
-        final SeekBar seekBar = (SeekBar) seekDialog.findViewById(R.id.my_bar);
-        assertNotNull("Grid preference seek bar must exist", seekBar);
+        final ListAdapter adapter = workspaceList.getAdapter();
+        final int position = preferencePosition(adapter, preference);
+        assertTrue("Grid preference must exist in Workspace screen", position >= 0);
+        final int[] storedValue = new int[1];
         getInstrumentation().runOnMainSync(new Runnable() {
             public void run() {
-                seekBar.setProgress(targetValue - preference.getMin());
-                preference.onClick(seekDialog, DialogInterface.BUTTON_POSITIVE);
-                seekDialog.dismiss();
+                View row = adapter.getView(position, null, workspaceList);
+                int actionId = targetValue > preference.getValue()
+                        ? R.id.increment : R.id.decrement;
+                View action = row.findViewById(actionId);
+                while (preference.getValue() != targetValue) {
+                    assertTrue("Inline grid action must handle click", action.performClick());
+                }
+                assertEquals(String.valueOf(targetValue), ((android.widget.TextView) row
+                        .findViewById(R.id.settings_numeric_value)).getText().toString());
+                storedValue[0] = PreferenceManager.getDefaultSharedPreferences(settings)
+                        .getInt(key, storedFallback);
             }
         });
-        getInstrumentation().waitForIdleSync();
         assertEquals("Grid preference object must retain selected value", targetValue,
                 preference.getValue());
-        assertEquals("Grid preference store must contain selected value", targetValue,
-                preference.getSharedPreferences().getInt(preference.getKey(), -1));
+        return storedValue[0];
     }
 
     private void clickPreference(final ListView listView, final Preference preference) {

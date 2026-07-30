@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:paddingStart="@dimen/space_16"
+    android:paddingTop="@dimen/space_8"
+    android:paddingEnd="@dimen/space_12"
+    android:paddingBottom="@dimen/space_8"
+    android:minHeight="@dimen/settings_row_height"
+    android:background="@drawable/settings_preference_selector"
+    android:clickable="false"
+    android:focusable="false"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1">
+            <TextView
+                android:id="@android:id/title"
+                android:textAppearance="@style/TextAppearance.ZmReborn.Title"
+                android:textColor="@color/m3_on_surface"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+            <TextView
+                android:id="@android:id/summary"
+                android:textAppearance="@style/TextAppearance.ZmReborn.Label"
+                android:textColor="@color/m3_on_surface_variant"
+                android:layout_marginTop="3dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+        <TextView
+            android:id="@+id/settings_numeric_value"
+            android:textAppearance="@style/TextAppearance.ZmReborn.Title"
+            android:textColor="@color/m3_on_surface"
+            android:gravity="center"
+            android:accessibilityLiveRegion="polite"
+            android:minWidth="@dimen/minimum_touch_target"
+            android:minHeight="@dimen/minimum_touch_target"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+    </LinearLayout>
+    <SeekBar
+        android:id="@+id/settings_inline_slider"
+        android:thumbTint="@color/m3_primary"
+        android:progressTint="@color/m3_primary"
+        android:progressBackgroundTint="@color/m3_outline_variant"
+        android:focusable="true"
+        android:minHeight="@dimen/minimum_touch_target"
+        android:paddingTop="@dimen/space_8"
+        android:paddingBottom="@dimen/space_8"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+</LinearLayout>

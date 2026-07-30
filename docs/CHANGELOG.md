@@ -1,5 +1,47 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Inline debounced numeric settings — 2026-07-30
+
+- Replaced eight modal quantity sliders with inline `−` / `+` controls for workspace screen
+  count/default screen, workspace rows/columns, and horizontal app-grid portrait/landscape
+  rows/columns. Buttons use bounded one-unit changes, disabled endpoint states, consumed long press,
+  48dp targets, semantic M3 colors, localized accessibility descriptions, and child-focus support in
+  root and nested legacy preference lists.
+- Moved applications-grid transparency to an inline native slider in its existing Appearance category,
+  retaining raw `0..255` semantics and immediate value feedback.
+- Added shared 250 ms trailing persistence. Pending values flush during Settings pause/destruction;
+  explicit process exits add a durable commit barrier without creating untouched disabled wrapper keys.
+  Horizontal app-grid preference keys and runtime aliases share one editor transaction.
+- Invalid stored bounded values are corrected, reset cancels pending callbacks and synchronously clears
+  default `SharedPreferences`, and recycled slider callbacks update only their originating row.
+- Added API 35 light/night Settings theme opt-outs for forced edge-to-edge. Legacy dialog seek-bar code,
+  public resource IDs/attributes, existing keys/defaults/categories, and zero-runtime-dependency contract
+  remain unchanged.
+
+### Validation — 2026-07-30
+
+- TDD red evidence included active `DialogSeekBarPreference` resource contracts, the expected
+  `InlineStepperPreference`/legacy-cast integration failure, stored `99` remaining outside an `8` bound,
+  missing reset helper, nested list child-focus rejection, missing API 35 Settings theme overrides, and
+  recycled slider callback updating the wrong row.
+- JVM: 169 tests across 31 result files, 0 failures, 0 errors, 0 skipped. Android-test assembly and Java
+  compilation passed.
+- Full API 35 `PreferencesE2ETest`: 21 tests passed in 341.617 seconds. Coverage includes rapid
+  debounce, bounds/listener rejection, screen-count dependency, lifecycle flush, transparency,
+  horizontal aliases, invalid-store correction, reset cancellation, nested child focus, slider row
+  recycling, and durable no-op behavior. Filtered logcat contained no matching launcher fatal exception,
+  verifier/missing class or method failure, `UnsupportedOperationException`, or launcher ANR.
+- Latest stabilized Preferences focus group: 4 tests passed in 88.241 seconds. Launcher workspace
+  persistence and rebuilt geometry: 1 test passed in 50.959 seconds.
+- Final changed-path review reported no issues. Final lint passed with existing baseline after
+  instrumentation stabilization; `git diff --check` passed.
+- `./tools/build_apk.sh` passed. Debug APK: 939,209 bytes; SHA-256
+  `4a9ff6d5dac74c672869096f064160d3512cfe5c4d127b6f12fab4cee59c5b6f`.
+- Manual API 35 screenshots confirmed root system-bar spacing and all four Workspace steppers. The
+  software-only emulator later raised an input ANR while framework code laid out the nested list, so
+  clean app-grid slider, keyboard/DPAD, forced-RTL, and TalkBack traversal are not claimed.
+- API 24 runtime remains unperformed because no local API 24 device/image is available.
+
 ## Horizontal paging grid visual refactor — 2026-07-30
 
 - **Cell/grid alignment fixed.** `DrawerLayoutMetrics` now exposes proportional integer slot

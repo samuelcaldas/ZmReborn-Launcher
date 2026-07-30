@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    <ImageButton
+        android:id="@+id/decrement"
+        android:src="@drawable/ic_settings_decrease"
+        android:contentDescription="@string/preferences_action_decrease"
+        android:background="@drawable/settings_numeric_action_background"
+        android:tint="@color/settings_numeric_icon_tint"
+        android:padding="@dimen/space_12"
+        android:clickable="true"
+        android:focusable="true"
+        android:minWidth="@dimen/minimum_touch_target"
+        android:minHeight="@dimen/minimum_touch_target"
+        android:layout_width="@dimen/minimum_touch_target"
+        android:layout_height="@dimen/minimum_touch_target" />
+    <TextView
+        android:id="@+id/settings_numeric_value"
+        android:textAppearance="@style/TextAppearance.ZmReborn.Title"
+        android:textColor="@color/m3_on_surface"
+        android:gravity="center"
+        android:accessibilityLiveRegion="polite"
+        android:focusable="false"
+        android:minWidth="@dimen/minimum_touch_target"
+        android:minHeight="@dimen/minimum_touch_target"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/minimum_touch_target" />
+    <ImageButton
+        android:id="@+id/increment"
+        android:src="@drawable/ic_settings_increase"
+        android:contentDescription="@string/preferences_action_increase"
+        android:background="@drawable/settings_numeric_action_background"
+        android:tint="@color/settings_numeric_icon_tint"
+        android:padding="@dimen/space_12"
+        android:clickable="true"
+        android:focusable="true"
+        android:minWidth="@dimen/minimum_touch_target"
+        android:minHeight="@dimen/minimum_touch_target"
+        android:layout_width="@dimen/minimum_touch_target"
+        android:layout_height="@dimen/minimum_touch_target" />
+</LinearLayout>

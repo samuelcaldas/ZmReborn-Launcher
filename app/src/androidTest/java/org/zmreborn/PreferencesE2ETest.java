@@ -1,9 +1,14 @@
 package org.zmreborn;
 
+import android.app.Activity;
+import android.app.Application;
+import android.app.Dialog;
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.ListPreference;
 import android.preference.Preference;
@@ -13,7 +18,15 @@ import android.test.ActivityInstrumentationTestCase2;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SeekBar;
 import android.widget.TextView;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Preferences> {
     private static final long ACTIVITY_RECREATION_TIMEOUT_MILLIS = 30000L;
@@ -85,76 +98,403 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
         assertFalse(application.isSelectable());
     }
 
-    public void testSeekPreferenceClampsStoredValueToNewMaximum() {
+    public void testInlineStepperDebouncesRapidTaps() {
         final Preferences preferences = getActivity();
-        final SharedPreferences sharedPreferences = android.preference.PreferenceManager.getDefaultSharedPreferences(preferences);
-        final String defaultKey = preferences.getString(R.string.preferences_key_workspace_default_screen);
-        final boolean hadDefaultValue = sharedPreferences.contains(defaultKey);
-        final int originalDefaultValue = sharedPreferences.getInt(defaultKey, 1);
-        final DialogSeekBarPreference defaultScreen = (DialogSeekBarPreference) preferences.findPreference(defaultKey);
-        assertEquals(1, defaultScreen.getMin());
+        final SharedPreferences sharedPreferences = android.preference.PreferenceManager
+                .getDefaultSharedPreferences(preferences);
+        final String key = preferences.getString(
+                R.string.preferences_key_workspace_content_grid_rows);
+        final boolean hadValue = sharedPreferences.contains(key);
+        final int originalValue = sharedPreferences.getInt(key, 4);
+        final boolean originalRestart = Launcher.sRestart;
+        final InlineStepperPreference stepper = (InlineStepperPreference) preferences
+                .findPreference(key);
+        final View row = bindPreferenceRow(preferences, stepper);
+        final int initialValue = stepper.getValue();
+        final int direction = stepper.getMax() - initialValue >= 2 ? 1 : -1;
+        final ImageButton action = (ImageButton) row.findViewById(
+                direction > 0 ? R.id.increment : R.id.decrement);
+        final int[] writeCount = new int[1];
+        final boolean[] storageStayedPending = new boolean[1];
+        SharedPreferences.OnSharedPreferenceChangeListener listener =
+                new SharedPreferences.OnSharedPreferenceChangeListener() {
+                    public void onSharedPreferenceChanged(SharedPreferences values,
+                            String changedKey) {
+                        if (key.equals(changedKey)) {
+                            writeCount[0]++;
+                        }
+                    }
+                };
+        sharedPreferences.registerOnSharedPreferenceChangeListener(listener);
         try {
-            preferences.runOnUiThread(new Runnable() {
+            getInstrumentation().runOnMainSync(new Runnable() {
                 public void run() {
-                    defaultScreen.setMax(7);
-                    defaultScreen.setValue(6);
-                    defaultScreen.setMax(1);
+                    assertTrue(action.performClick());
+                    assertTrue(action.performClick());
+                    storageStayedPending[0] = storedValueMatches(
+                            sharedPreferences, key, hadValue, originalValue);
                 }
             });
+            int expected = initialValue + (direction * 2);
+            assertEquals(expected, stepper.getValue());
+            assertEquals(String.valueOf(expected), ((TextView) row.findViewById(
+                    R.id.settings_numeric_value)).getText().toString());
+            assertTrue("Rapid taps must stay pending inside input batch",
+                    storageStayedPending[0]);
+            awaitIntPreference(sharedPreferences, key, expected);
+            SystemClock.sleep(350L);
             getInstrumentation().waitForIdleSync();
-            assertEquals(1, defaultScreen.getValue());
-            assertTrue(defaultScreen.getValue() <= defaultScreen.getMax());
+            assertEquals("Rapid taps must produce one trailing write", 1, writeCount[0]);
         } finally {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            if (hadDefaultValue) {
-                editor.putInt(defaultKey, originalDefaultValue);
-            } else {
-                editor.remove(defaultKey);
-            }
-            assertTrue(editor.commit());
+            sharedPreferences.unregisterOnSharedPreferenceChangeListener(listener);
+            restoreIntPreference(sharedPreferences, key, hadValue, originalValue);
+            Launcher.sRestart = originalRestart;
         }
     }
 
-    public void testReducingScreenCountPersistsDefaultScreenKey() {
+    public void testInlineStepperHonorsBoundsLongClickAndListenerRejection() {
         final Preferences preferences = getActivity();
-        final SharedPreferences sharedPreferences = android.preference.PreferenceManager.getDefaultSharedPreferences(preferences);
-        final String defaultKey = preferences.getString(R.string.preferences_key_workspace_default_screen);
-        final String screenCountKey = preferences.getString(R.string.preferences_key_workspace_number_of_screens);
-        final boolean hadDefaultValue = sharedPreferences.contains(defaultKey);
-        final int originalDefaultValue = sharedPreferences.getInt(defaultKey, 1);
-        final boolean hadScreenCountValue = sharedPreferences.contains(screenCountKey);
-        final int originalScreenCountValue = sharedPreferences.getInt(screenCountKey, 3);
-        final boolean originalRestart = Launcher.sRestart;
+        final String key = preferences.getString(
+                R.string.preferences_key_workspace_number_of_screens);
+        final InlineStepperPreference stepper = (InlineStepperPreference) preferences
+                .findPreference(key);
+        final Preference.OnPreferenceChangeListener originalListener =
+                stepper.getOnPreferenceChangeListener();
+        final int originalValue = stepper.getValue();
         try {
-            assertTrue(sharedPreferences.edit().putInt(defaultKey, 3).putInt(screenCountKey, 3).commit());
-            preferences.runOnUiThread(new Runnable() {
+            getInstrumentation().runOnMainSync(new Runnable() {
                 public void run() {
-                    DialogSeekBarPreference screenCount = (DialogSeekBarPreference) preferences.findPreference(screenCountKey);
-                    screenCount.getOnPreferenceChangeListener().onPreferenceChange(screenCount, Integer.valueOf(0));
+                    stepper.setValueFromRuntime(stepper.getMin());
                 }
             });
-            getInstrumentation().waitForIdleSync();
-            assertEquals(1, sharedPreferences.getInt(defaultKey, 0));
-            assertEquals(3, sharedPreferences.getInt(screenCountKey, 0));
+            View minimumRow = bindPreferenceRow(preferences, stepper);
+            final ImageButton decrement = (ImageButton) minimumRow.findViewById(R.id.decrement);
+            final ImageButton increment = (ImageButton) minimumRow.findViewById(R.id.increment);
+            assertFalse(decrement.isEnabled());
+            assertTrue(increment.isEnabled());
+            assertTrue(decrement.isFocusable());
+            assertTrue(increment.isFocusable());
+            performLongClick(decrement);
+            assertEquals(stepper.getMin(), stepper.getValue());
+            getInstrumentation().runOnMainSync(new Runnable() {
+                public void run() {
+                    stepper.setOnPreferenceChangeListener(
+                            new Preference.OnPreferenceChangeListener() {
+                                public boolean onPreferenceChange(Preference preference,
+                                        Object value) {
+                                    return false;
+                                }
+                            });
+                }
+            });
+            performClick(increment);
+            assertEquals(stepper.getMin(), stepper.getValue());
+            getInstrumentation().runOnMainSync(new Runnable() {
+                public void run() {
+                    stepper.setValueFromRuntime(stepper.getMax());
+                }
+            });
+            View maximumRow = bindPreferenceRow(preferences, stepper);
+            assertFalse(maximumRow.findViewById(R.id.increment).isEnabled());
+            assertTrue(maximumRow.findViewById(R.id.decrement).isEnabled());
         } finally {
             getInstrumentation().runOnMainSync(new Runnable() {
                 public void run() {
-                    Launcher.sRestart = originalRestart;
+                    stepper.setOnPreferenceChangeListener(originalListener);
+                    stepper.setValueFromRuntime(originalValue);
                 }
             });
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            if (hadDefaultValue) {
-                editor.putInt(defaultKey, originalDefaultValue);
-            } else {
-                editor.remove(defaultKey);
-            }
-            if (hadScreenCountValue) {
-                editor.putInt(screenCountKey, originalScreenCountValue);
-            } else {
-                editor.remove(screenCountKey);
-            }
-            assertTrue(editor.commit());
         }
+    }
+
+    public void testReducingScreenCountClampsDefaultAndFlushesOnPause() {
+        Context context = getInstrumentation().getTargetContext();
+        final SharedPreferences sharedPreferences = android.preference.PreferenceManager
+                .getDefaultSharedPreferences(context);
+        final String defaultKey = context.getString(
+                R.string.preferences_key_workspace_default_screen);
+        final String screenCountKey = context.getString(
+                R.string.preferences_key_workspace_number_of_screens);
+        final boolean hadDefault = sharedPreferences.contains(defaultKey);
+        final int originalDefault = sharedPreferences.getInt(defaultKey, 2);
+        final boolean hadScreenCount = sharedPreferences.contains(screenCountKey);
+        final int originalScreenCount = sharedPreferences.getInt(screenCountKey, 3);
+        final boolean originalRestart = Launcher.sRestart;
+        assertTrue(sharedPreferences.edit().putInt(defaultKey, 3)
+                .putInt(screenCountKey, 3).commit());
+        final Preferences preferences = getActivity();
+        final InlineStepperPreference screenCount = (InlineStepperPreference) preferences
+                .findPreference(screenCountKey);
+        final InlineStepperPreference defaultScreen = (InlineStepperPreference) preferences
+                .findPreference(defaultKey);
+        final View row = bindPreferenceRow(preferences, screenCount);
+        try {
+            getInstrumentation().runOnMainSync(new Runnable() {
+                public void run() {
+                    assertTrue(row.findViewById(R.id.decrement).performClick());
+                    assertEquals(2, defaultScreen.getMax());
+                    assertEquals(2, defaultScreen.getValue());
+                    preferences.finish();
+                }
+            });
+            getInstrumentation().waitForIdleSync();
+            assertEquals(2, sharedPreferences.getInt(screenCountKey, 0));
+            assertEquals(2, sharedPreferences.getInt(defaultKey, 0));
+            assertTrue(Launcher.sRestart);
+        } finally {
+            restoreIntPreference(sharedPreferences, defaultKey, hadDefault, originalDefault);
+            restoreIntPreference(sharedPreferences, screenCountKey, hadScreenCount,
+                    originalScreenCount);
+            Launcher.sRestart = originalRestart;
+        }
+    }
+
+    public void testInlineTransparencyUpdatesImmediatelyAndFlushesOnPause() {
+        Context context = getInstrumentation().getTargetContext();
+        final SharedPreferences sharedPreferences = android.preference.PreferenceManager
+                .getDefaultSharedPreferences(context);
+        final String key = context.getString(R.string.preferences_key_apps_grid_bg_alpha);
+        final boolean hadValue = sharedPreferences.contains(key);
+        final int originalValue = sharedPreferences.getInt(key, 255);
+        final boolean originalRestart = Launcher.sRestart;
+        assertTrue(sharedPreferences.edit().putInt(key, 255).commit());
+        final Preferences preferences = getActivity();
+        final InlineSliderPreference sliderPreference = (InlineSliderPreference) preferences
+                .findPreference(key);
+        final View row = bindPreferenceRow(preferences, sliderPreference);
+        final SeekBar slider = (SeekBar) row.findViewById(R.id.settings_inline_slider);
+        final boolean[] immediateValueVisible = new boolean[1];
+        PausedActivityObserver pauseObserver = new PausedActivityObserver(preferences);
+        preferences.getApplication().registerActivityLifecycleCallbacks(pauseObserver);
+        try {
+            getInstrumentation().runOnMainSync(new Runnable() {
+                public void run() {
+                    slider.setProgress(191);
+                    sliderPreference.onProgressChanged(slider, 191, true);
+                    slider.setProgress(192);
+                    sliderPreference.onProgressChanged(slider, 192, true);
+                    TextView value = (TextView) row.findViewById(R.id.settings_numeric_value);
+                    immediateValueVisible[0] = "192".contentEquals(value.getText());
+                    preferences.finish();
+                }
+            });
+            assertTrue("Settings must pause after finish", pauseObserver.awaitPause());
+            assertTrue("Inline alpha value must update before persistence",
+                    immediateValueVisible[0]);
+            assertEquals("Pause must flush final alpha", 192,
+                    sharedPreferences.getInt(key, -1));
+            assertTrue(Launcher.sRestart);
+        } finally {
+            preferences.getApplication().unregisterActivityLifecycleCallbacks(pauseObserver);
+            restoreIntPreference(sharedPreferences, key, hadValue, originalValue);
+            Launcher.sRestart = originalRestart;
+        }
+    }
+
+    public void testRecycledSliderCallbacksUpdateTheirOwnRow() {
+        final Preferences preferences = getActivity();
+        final InlineSliderPreference sliderPreference = (InlineSliderPreference) preferences
+                .findPreference(preferences.getString(
+                        R.string.preferences_key_apps_grid_bg_alpha));
+        final int originalValue = sliderPreference.getValue();
+        final boolean originalRestart = Launcher.sRestart;
+        final int targetValue = originalValue > sliderPreference.getMin()
+                ? originalValue - 1 : originalValue + 1;
+        final View firstRow = bindPreferenceRow(preferences, sliderPreference);
+        final View secondRow = bindPreferenceRow(preferences, sliderPreference);
+        final SeekBar firstSlider = (SeekBar) firstRow.findViewById(
+                R.id.settings_inline_slider);
+        final String[] boundValues = new String[2];
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                sliderPreference.onProgressChanged(firstSlider,
+                        targetValue - sliderPreference.getMin(), true);
+                TextView firstValue = (TextView) firstRow.findViewById(
+                        R.id.settings_numeric_value);
+                TextView secondValue = (TextView) secondRow.findViewById(
+                        R.id.settings_numeric_value);
+                boundValues[0] = firstValue.getText().toString();
+                boundValues[1] = secondValue.getText().toString();
+                sliderPreference.setValueFromRuntime(originalValue);
+            }
+        });
+        try {
+            assertEquals("Slider callback must update its own row",
+                    String.valueOf(targetValue), boundValues[0]);
+            assertEquals("Older row callback must not mutate latest bound row",
+                    String.valueOf(originalValue), boundValues[1]);
+        } finally {
+            Launcher.sRestart = originalRestart;
+        }
+    }
+
+    public void testDurableFlushSkipsUntouchedDisabledGridWrappers()
+            throws Exception {
+        Context context = getInstrumentation().getTargetContext();
+        final SharedPreferences sharedPreferences = android.preference.PreferenceManager
+                .getDefaultSharedPreferences(context);
+        String typeKey = context.getString(R.string.preferences_key_apps_grid_type);
+        boolean hadType = sharedPreferences.contains(typeKey);
+        String originalType = sharedPreferences.getString(typeKey, null);
+        int[] primaryResources = horizontalPrimaryKeyResources();
+        boolean[] hadPrimary = containsKeys(context, sharedPreferences, primaryResources);
+        int[] originalPrimary = readIntValues(context, sharedPreferences, primaryResources);
+        SharedPreferences.Editor setup = sharedPreferences.edit().putString(typeKey, "1");
+        removeKeys(context, setup, primaryResources);
+        assertTrue(setup.commit());
+        final Preferences preferences = getActivity();
+        final Method durableFlush = Preferences.class.getDeclaredMethod(
+                "flushNumericPreferencesDurably");
+        durableFlush.setAccessible(true);
+        final Throwable[] failure = new Throwable[1];
+        try {
+            getInstrumentation().runOnMainSync(new Runnable() {
+                public void run() {
+                    try {
+                        durableFlush.invoke(preferences);
+                    } catch (Throwable throwable) {
+                        failure[0] = throwable;
+                    }
+                }
+            });
+            if (failure[0] != null) {
+                fail("Durable flush failed: " + failure[0]);
+            }
+            for (int keyResource : primaryResources) {
+                assertFalse("Untouched disabled grid wrapper must remain absent",
+                        sharedPreferences.contains(context.getString(keyResource)));
+            }
+        } finally {
+            restoreStringPreference(sharedPreferences, typeKey, hadType, originalType);
+            restoreIntPreferences(context, sharedPreferences, primaryResources, hadPrimary,
+                    originalPrimary);
+        }
+    }
+
+    public void testHorizontalGridSteppersPersistPrimaryAndRuntimeAliases() {
+        Context context = getInstrumentation().getTargetContext();
+        final SharedPreferences sharedPreferences = android.preference.PreferenceManager
+                .getDefaultSharedPreferences(context);
+        String typeKey = context.getString(R.string.preferences_key_apps_grid_type);
+        boolean hadType = sharedPreferences.contains(typeKey);
+        String originalType = sharedPreferences.getString(typeKey, null);
+        int[] primaryResources = horizontalPrimaryKeyResources();
+        int[] aliasResources = horizontalAliasKeyResources();
+        boolean[] hadPrimary = containsKeys(context, sharedPreferences, primaryResources);
+        boolean[] hadAlias = containsKeys(context, sharedPreferences, aliasResources);
+        int[] originalPrimary = readIntValues(context, sharedPreferences, primaryResources);
+        int[] originalAlias = readIntValues(context, sharedPreferences, aliasResources);
+        int[] initialValues = {4, 4, 5, 3};
+        SharedPreferences.Editor setup = sharedPreferences.edit().putString(typeKey, "2");
+        putIntValues(context, setup, aliasResources, initialValues);
+        assertTrue(setup.commit());
+        final Preferences preferences = getActivity();
+        try {
+            for (int index = 0; index < primaryResources.length; index++) {
+                String key = context.getString(primaryResources[index]);
+                InlineStepperPreference stepper = (InlineStepperPreference) preferences
+                        .findPreference(key);
+                View row = bindPreferenceRow(preferences, stepper);
+                performClick(row.findViewById(R.id.increment));
+            }
+            for (int index = 0; index < primaryResources.length; index++) {
+                String primaryKey = context.getString(primaryResources[index]);
+                String aliasKey = context.getString(aliasResources[index]);
+                awaitIntPreference(sharedPreferences, primaryKey, initialValues[index] + 1);
+                assertEquals(initialValues[index] + 1,
+                        sharedPreferences.getInt(aliasKey, -1));
+            }
+        } finally {
+            restoreStringPreference(sharedPreferences, typeKey, hadType, originalType);
+            restoreIntPreferences(context, sharedPreferences, primaryResources, hadPrimary,
+                    originalPrimary);
+            restoreIntPreferences(context, sharedPreferences, aliasResources, hadAlias,
+                    originalAlias);
+        }
+    }
+
+    public void testOutOfRangeStoredStepperValueIsClampedAndPersisted() {
+        Context context = getInstrumentation().getTargetContext();
+        final SharedPreferences sharedPreferences = android.preference.PreferenceManager
+                .getDefaultSharedPreferences(context);
+        final String key = context.getString(
+                R.string.preferences_key_workspace_content_grid_rows);
+        final boolean hadValue = sharedPreferences.contains(key);
+        final int originalValue = sharedPreferences.getInt(key, 4);
+        assertTrue(sharedPreferences.edit().putInt(key, 99).commit());
+        final Preferences preferences = getActivity();
+        InlineStepperPreference stepper = (InlineStepperPreference) preferences
+                .findPreference(key);
+        try {
+            assertEquals(stepper.getMax(), stepper.getValue());
+            preferences.finish();
+            getInstrumentation().waitForIdleSync();
+            assertEquals(stepper.getMax(), sharedPreferences.getInt(key, -1));
+        } finally {
+            restoreIntPreference(sharedPreferences, key, hadValue, originalValue);
+        }
+    }
+
+    public void testResetClearsStorageAfterCancelingPendingNumericWrites()
+            throws Exception {
+        Context context = getInstrumentation().getTargetContext();
+        final SharedPreferences sharedPreferences = android.preference.PreferenceManager
+                .getDefaultSharedPreferences(context);
+        Map<String, ?> originalValues = new HashMap<String, Object>(
+                sharedPreferences.getAll());
+        final Preferences preferences = getActivity();
+        InlineStepperPreference stepper = (InlineStepperPreference) preferences.findPreference(
+                context.getString(R.string.preferences_key_workspace_content_grid_rows));
+        View row = bindPreferenceRow(preferences, stepper);
+        int actionId = stepper.getValue() < stepper.getMax()
+                ? R.id.increment : R.id.decrement;
+        performClick(row.findViewById(actionId));
+        final Method resetPreferences = Preferences.class.getDeclaredMethod("resetPreferences");
+        resetPreferences.setAccessible(true);
+        final Throwable[] failure = new Throwable[1];
+        try {
+            getInstrumentation().runOnMainSync(new Runnable() {
+                public void run() {
+                    try {
+                        resetPreferences.invoke(preferences);
+                    } catch (Throwable throwable) {
+                        failure[0] = throwable;
+                    }
+                }
+            });
+            if (failure[0] != null) {
+                fail("Reset failed: " + failure[0]);
+            }
+            assertTrue("Reset must clear in-memory and on-disk preferences",
+                    sharedPreferences.getAll().isEmpty());
+            SystemClock.sleep(350L);
+            getInstrumentation().waitForIdleSync();
+            assertTrue("Canceled debounce must not recreate reset values",
+                    sharedPreferences.getAll().isEmpty());
+        } finally {
+            restorePreferences(sharedPreferences, originalValues);
+        }
+    }
+
+    public void testNestedNumericScreensAllowChildFocus() {
+        Preferences preferences = getActivity();
+        PreferenceScreen workspace = (PreferenceScreen) preferences.getPreferenceScreen()
+                .getPreference(1);
+        ListView workspaceList = openPreferenceScreen(preferences, workspace);
+        InlineStepperPreference rows = (InlineStepperPreference) preferences.findPreference(
+                preferences.getString(R.string.preferences_key_workspace_content_grid_rows));
+        View row = preferenceRow(workspaceList, rows);
+        final View increment = row.findViewById(R.id.increment);
+        assertTrue("Nested preference list must allow child focus",
+                workspaceList.getItemsCanFocus());
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                assertTrue("Inline increment must accept keyboard focus",
+                        increment.requestFocus());
+            }
+        });
+        assertTrue(increment.hasFocus());
+        workspace.getDialog().dismiss();
     }
 
     public void testPreferenceRowsHavePositiveBounds() {
@@ -353,6 +693,208 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
         }
     }
 
+    private ListView openPreferenceScreen(final Preferences preferences,
+            final PreferenceScreen screen) {
+        final ListView rootList = preferences.getListView();
+        final ListAdapter adapter = rootList.getAdapter();
+        final int position = preferencePosition(adapter, screen);
+        assertTrue("Preference screen must exist in root list", position >= 0);
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                View row = adapter.getView(position, null, rootList);
+                rootList.performItemClick(row, position, adapter.getItemId(position));
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        Dialog dialog = screen.getDialog();
+        assertNotNull("Preference screen dialog must open", dialog);
+        ListView listView = (ListView) dialog.findViewById(android.R.id.list);
+        assertNotNull("Preference screen list must exist", listView);
+        return listView;
+    }
+
+    private View preferenceRow(final ListView listView, Preference preference) {
+        ListAdapter adapter = listView.getAdapter();
+        final int position = preferencePosition(adapter, preference);
+        assertTrue("Preference must exist in nested list", position >= 0);
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                listView.setSelection(position);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        int childIndex = position - listView.getFirstVisiblePosition();
+        View row = listView.getChildAt(childIndex);
+        assertNotNull("Nested preference row must become visible", row);
+        return row;
+    }
+
+    private static int preferencePosition(ListAdapter adapter, Preference preference) {
+        for (int position = 0; position < adapter.getCount(); position++) {
+            if (adapter.getItem(position) == preference) {
+                return position;
+            }
+        }
+        return -1;
+    }
+
+    private void performClick(final View view) {
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                assertTrue(view.performClick());
+            }
+        });
+    }
+
+    private void performLongClick(final View view) {
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                assertTrue(view.performLongClick());
+            }
+        });
+    }
+
+    private View bindPreferenceRow(final Preferences preferences,
+            final Preference preference) {
+        final View[] row = new View[1];
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                row[0] = preference.getView(null, preferences.getListView());
+            }
+        });
+        assertNotNull("Preference row must bind", row[0]);
+        return row[0];
+    }
+
+    private void awaitIntPreference(SharedPreferences preferences, String key,
+            int expectedValue) {
+        long deadline = SystemClock.uptimeMillis() + 3000L;
+        while (preferences.getInt(key, Integer.MIN_VALUE) != expectedValue
+                && SystemClock.uptimeMillis() < deadline) {
+            SystemClock.sleep(25L);
+        }
+        assertEquals("Timed out waiting for debounced preference: " + key, expectedValue,
+                preferences.getInt(key, Integer.MIN_VALUE));
+    }
+
+    private static boolean storedValueMatches(SharedPreferences preferences, String key,
+            boolean hadValue, int originalValue) {
+        if (preferences.contains(key) != hadValue) {
+            return false;
+        }
+        return !hadValue || preferences.getInt(key, Integer.MIN_VALUE) == originalValue;
+    }
+
+    private static int[] horizontalPrimaryKeyResources() {
+        return new int[] {
+                R.string.preferences_key_apps_grid_content_columns_port,
+                R.string.preferences_key_apps_grid_content_rows_port,
+                R.string.preferences_key_apps_grid_content_columns_land,
+                R.string.preferences_key_apps_grid_content_rows_land
+        };
+    }
+
+    private static int[] horizontalAliasKeyResources() {
+        return new int[] {
+                R.string.preferences_key_apps_grid_horizontal_paging_content_columns_port,
+                R.string.preferences_key_apps_grid_horizontal_paging_content_rows_port,
+                R.string.preferences_key_apps_grid_horizontal_paging_content_columns_land,
+                R.string.preferences_key_apps_grid_horizontal_paging_content_rows_land
+        };
+    }
+
+    private static boolean[] containsKeys(Context context, SharedPreferences preferences,
+            int[] keyResources) {
+        boolean[] result = new boolean[keyResources.length];
+        for (int index = 0; index < keyResources.length; index++) {
+            result[index] = preferences.contains(context.getString(keyResources[index]));
+        }
+        return result;
+    }
+
+    private static int[] readIntValues(Context context, SharedPreferences preferences,
+            int[] keyResources) {
+        int[] result = new int[keyResources.length];
+        for (int index = 0; index < keyResources.length; index++) {
+            result[index] = preferences.getInt(context.getString(keyResources[index]), 0);
+        }
+        return result;
+    }
+
+    private static void putIntValues(Context context, SharedPreferences.Editor editor,
+            int[] keyResources, int[] values) {
+        for (int index = 0; index < keyResources.length; index++) {
+            editor.putInt(context.getString(keyResources[index]), values[index]);
+        }
+    }
+
+    private static void removeKeys(Context context, SharedPreferences.Editor editor,
+            int[] keyResources) {
+        for (int keyResource : keyResources) {
+            editor.remove(context.getString(keyResource));
+        }
+    }
+
+    private static void restoreIntPreferences(Context context, SharedPreferences preferences,
+            int[] keyResources, boolean[] hadValues, int[] values) {
+        SharedPreferences.Editor editor = preferences.edit();
+        for (int index = 0; index < keyResources.length; index++) {
+            String key = context.getString(keyResources[index]);
+            if (hadValues[index]) {
+                editor.putInt(key, values[index]);
+            } else {
+                editor.remove(key);
+            }
+        }
+        assertTrue(editor.commit());
+    }
+
+    private static void restorePreferences(SharedPreferences preferences,
+            Map<String, ?> values) {
+        SharedPreferences.Editor editor = preferences.edit().clear();
+        for (Map.Entry<String, ?> entry : values.entrySet()) {
+            Object value = entry.getValue();
+            if (value instanceof Boolean) {
+                editor.putBoolean(entry.getKey(), ((Boolean) value).booleanValue());
+            } else if (value instanceof Integer) {
+                editor.putInt(entry.getKey(), ((Integer) value).intValue());
+            } else if (value instanceof Long) {
+                editor.putLong(entry.getKey(), ((Long) value).longValue());
+            } else if (value instanceof Float) {
+                editor.putFloat(entry.getKey(), ((Float) value).floatValue());
+            } else if (value instanceof String) {
+                editor.putString(entry.getKey(), (String) value);
+            } else if (value instanceof Set) {
+                editor.putStringSet(entry.getKey(), (Set<String>) value);
+            } else {
+                fail("Unsupported SharedPreferences value: " + value);
+            }
+        }
+        assertTrue(editor.commit());
+    }
+
+    private static void restoreIntPreference(SharedPreferences preferences, String key,
+            boolean hadValue, int value) {
+        SharedPreferences.Editor editor = preferences.edit();
+        if (hadValue) {
+            editor.putInt(key, value);
+        } else {
+            editor.remove(key);
+        }
+        assertTrue(editor.commit());
+    }
+
+    private static void restoreStringPreference(SharedPreferences preferences, String key,
+            boolean hadValue, String value) {
+        SharedPreferences.Editor editor = preferences.edit();
+        if (hadValue) {
+            editor.putString(key, value);
+        } else {
+            editor.remove(key);
+        }
+        assertTrue(editor.commit());
+    }
+
     private void restoreOrientation(final Preferences preferences, final int requestedOrientation,
             int expectedConfigurationOrientation, final int originalRequestedOrientation) {
         android.app.Instrumentation.ActivityMonitor monitor = getInstrumentation().addMonitor(
@@ -384,6 +926,60 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
             }
         });
         getInstrumentation().waitForIdleSync();
+    }
+
+    private static final class PausedActivityObserver
+            implements Application.ActivityLifecycleCallbacks {
+        private final Activity mTarget;
+        private boolean mPaused;
+
+        PausedActivityObserver(Activity target) {
+            mTarget = target;
+        }
+
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+        }
+
+        public void onActivityStarted(Activity activity) {
+        }
+
+        public void onActivityResumed(Activity activity) {
+        }
+
+        public synchronized void onActivityPaused(Activity activity) {
+            if (activity != mTarget) {
+                return;
+            }
+            mPaused = true;
+            notifyAll();
+        }
+
+        public void onActivityStopped(Activity activity) {
+        }
+
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+        }
+
+        public void onActivityDestroyed(Activity activity) {
+        }
+
+        synchronized boolean awaitPause() {
+            long deadline = SystemClock.uptimeMillis()
+                    + ACTIVITY_RECREATION_TIMEOUT_MILLIS;
+            while (!mPaused) {
+                long remaining = deadline - SystemClock.uptimeMillis();
+                if (remaining <= 0L) {
+                    return false;
+                }
+                try {
+                    wait(remaining);
+                } catch (InterruptedException exception) {
+                    Thread.currentThread().interrupt();
+                    return false;
+                }
+            }
+            return true;
+        }
     }
 
     private static boolean dispatchTouchEvent(View target, long downTime, long eventTime,

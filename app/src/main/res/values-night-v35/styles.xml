@@ -6,4 +6,18 @@
         <item name="android:alertDialogTheme">@style/LauncherDialogTheme</item>
         <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
     </style>
+    <style name="SettingsTheme" parent="@android:style/Theme.Material.NoActionBar">
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowBackground">@color/m3_surface</item>
+        <item name="android:colorBackground">@color/m3_surface</item>
+        <item name="android:colorAccent">@color/m3_primary</item>
+        <item name="android:textColorPrimary">@color/m3_on_surface</item>
+        <item name="android:textColorSecondary">@color/m3_on_surface_variant</item>
+        <item name="android:preferenceStyle">@style/SettingsPreferenceStyle</item>
+        <item name="android:preferenceCategoryStyle">@style/SettingsPreferenceCategoryStyle</item>
+        <item name="android:checkBoxPreferenceStyle">@style/SettingsCheckBoxPreferenceStyle</item>
+        <item name="android:switchPreferenceStyle">@style/SettingsSwitchPreferenceStyle</item>
+        <item name="android:dialogPreferenceStyle">@style/SettingsPreferenceStyle</item>
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+    </style>
 </resources>

@@ -202,6 +202,77 @@ public class SettingsResourceContractTest {
     }
 
     @Test
+    public void numericPreferencesUseInlineDebouncedControls() throws Exception {
+        Element root = parse("main/res/xml/preferences.xml").getDocumentElement();
+        String[] stepperKeys = {
+                "preferences_key_workspace_number_of_screens",
+                "preferences_key_workspace_default_screen",
+                "preferences_key_workspace_content_grid_columns",
+                "preferences_key_workspace_content_grid_rows",
+                "preferences_key_apps_grid_content_columns_port",
+                "preferences_key_apps_grid_content_rows_port",
+                "preferences_key_apps_grid_content_columns_land",
+                "preferences_key_apps_grid_content_rows_land"
+        };
+        for (String key : stepperKeys) {
+            Element preference = findPreference(root, key);
+            assertEquals("org.zmreborn.InlineStepperPreference", preference.getTagName());
+            assertFalse(preference.hasAttribute("android:dialogMessage"));
+        }
+        assertEquals(stepperKeys.length,
+                root.getElementsByTagName("org.zmreborn.InlineStepperPreference").getLength());
+        assertEquals(0,
+                root.getElementsByTagName("org.zmreborn.DialogSeekBarPreference").getLength());
+
+        Element transparency = findPreference(root, "preferences_key_apps_grid_bg_alpha");
+        assertEquals("org.zmreborn.InlineSliderPreference", transparency.getTagName());
+        assertFalse(transparency.hasAttribute("android:dialogMessage"));
+        assertEquals("@string/preferences_category_appearance",
+                ((Element) transparency.getParentNode()).getAttribute("android:title"));
+        assertEquals("@string/preferences_screen_title_applications_grid",
+                ((Element) transparency.getParentNode().getParentNode()).getAttribute("android:title"));
+
+        String base = read("main/java/org/zmreborn/DebouncedIntegerPreference.java");
+        assertTrue(base.contains("DEBOUNCE_MILLIS = 250L"));
+        assertTrue(base.contains(
+                "ATTRIBUTE_NAMESPACE = \"http://schemas.android.com/apk/res-auto\""));
+        assertTrue(base.contains("attrs.getAttributeIntValue(ATTRIBUTE_NAMESPACE, \"min\", 0)"));
+        assertTrue(base.contains("attrs.getAttributeIntValue(ATTRIBUTE_NAMESPACE, \"max\", 100)"));
+
+        Element stepper = parse("main/res/layout/settings_stepper_widget.xml")
+                .getDocumentElement();
+        assertEquals("LinearLayout", stepper.getTagName());
+        Element decrement = findElementByAttribute(stepper, "android:id", "@+id/decrement");
+        Element increment = findElementByAttribute(stepper, "android:id", "@+id/increment");
+        assertNumericActionGeometry(decrement);
+        assertNumericActionGeometry(increment);
+        Element value = findElementByAttribute(stepper, "android:id", "@+id/settings_numeric_value");
+        assertEquals("@dimen/minimum_touch_target", value.getAttribute("android:minWidth"));
+        assertEquals("@dimen/minimum_touch_target", value.getAttribute("android:minHeight"));
+
+        Element sliderRow = parse("main/res/layout/settings_inline_slider_preference.xml")
+                .getDocumentElement();
+        Element slider = findElementByAttribute(sliderRow, "android:id",
+                "@+id/settings_inline_slider");
+        assertEquals("SeekBar", slider.getTagName());
+        assertEquals("@dimen/minimum_touch_target", slider.getAttribute("android:minHeight"));
+
+        Element standardRow = parse("main/res/layout/settings_preference.xml")
+                .getDocumentElement();
+        assertEquals("@dimen/space_16", standardRow.getAttribute("android:paddingStart"));
+        assertEquals("@dimen/space_12", standardRow.getAttribute("android:paddingEnd"));
+        assertFalse(standardRow.hasAttribute("android:paddingLeft"));
+        assertFalse(standardRow.hasAttribute("android:paddingRight"));
+        Element widgetFrame = findElementByAttribute(standardRow, "android:id",
+                "@android:id/widget_frame");
+        assertEquals("@dimen/space_8", widgetFrame.getAttribute("android:paddingStart"));
+        assertFalse(widgetFrame.hasAttribute("android:paddingLeft"));
+
+        assertEnabledColorStateList("main/res/color/settings_numeric_icon_tint.xml",
+                "@color/m3_outline_variant", "@color/m3_primary");
+    }
+
+    @Test
     public void settingsSurfacesKeepBindingGeometryAndFocusTreatment() throws Exception {
         Element row = parse("main/res/layout/settings_preference.xml").getDocumentElement();
         assertEquals("LinearLayout", row.getTagName());
@@ -283,7 +354,8 @@ public class SettingsResourceContractTest {
         assertTrue(preferences.contains("applicationPreference.setSelectable(false)"));
         assertTrue(preferences.contains("preferences_confirm_reset"));
         assertTrue(preferences.contains("resetAlertRestart()"));
-        assertTrue(preferences.contains("getPreferencesFile(this).delete()"));
+        assertTrue(preferences.contains("preferences.edit().clear().commit()"));
+        assertFalse(preferences.contains("getPreferencesFile(this).delete()"));
         String resetStyle = read("main/java/org/zmreborn/SettingsPreference.java");
         assertTrue(resetStyle.contains("R.color.zm_reborn_ember"));
     }
@@ -365,6 +437,32 @@ public class SettingsResourceContractTest {
 
     private static String styleItem(Element style, String name) {
         return findNamedElement(style, "item", name).getTextContent().trim();
+    }
+
+    private static void assertNumericActionGeometry(Element action) {
+        assertEquals("ImageButton", action.getTagName());
+        assertEquals("@dimen/minimum_touch_target", action.getAttribute("android:layout_width"));
+        assertEquals("@dimen/minimum_touch_target", action.getAttribute("android:layout_height"));
+        assertEquals("@dimen/minimum_touch_target", action.getAttribute("android:minWidth"));
+        assertEquals("@dimen/minimum_touch_target", action.getAttribute("android:minHeight"));
+        assertEquals("@drawable/settings_numeric_action_background",
+                action.getAttribute("android:background"));
+        assertEquals("@color/settings_numeric_icon_tint", action.getAttribute("android:tint"));
+        assertEquals("true", action.getAttribute("android:clickable"));
+        assertEquals("true", action.getAttribute("android:focusable"));
+    }
+
+    private static void assertEnabledColorStateList(String relativePath, String disabledColor,
+            String defaultColor) throws Exception {
+        Element selector = parse(relativePath).getDocumentElement();
+        assertEquals("selector", selector.getTagName());
+        assertEquals(2, directElementCount(selector));
+        assertColorState(directItemAt(selector, 0), "android:state_enabled", "false",
+                disabledColor);
+        Element defaultItem = directItemAt(selector, 1);
+        assertEquals(1, defaultItem.getAttributes().getLength());
+        assertEquals(defaultColor, defaultItem.getAttribute("android:color"));
+        assertNoChildContent(defaultItem);
     }
 
     private static void assertColorStateList(String relativePath, String disabledColor,

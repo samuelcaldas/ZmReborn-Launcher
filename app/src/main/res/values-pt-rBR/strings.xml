@@ -35,6 +35,12 @@
     <string name="accessibility_clear_apps_search">Limpar pesquisa de aplicativos</string>
     <string name="accessibility_fast_scroll">Navegar rapidamente pelos aplicativos em ordem alfabética</string>
     <string name="accessibility_fast_scroll_section">Navegação rápida, seção %1$s</string>
+    <string name="preferences_action_decrease">Diminuir valor</string>
+    <string name="preferences_action_increase">Aumentar valor</string>
+    <string name="preferences_accessibility_current_value">%1$s: %2$d</string>
+    <string name="preferences_accessibility_decrease_value">Diminuir %1$s. Valor atual: %2$d. Mínimo: %3$d.</string>
+    <string name="preferences_accessibility_increase_value">Aumentar %1$s. Valor atual: %2$d. Máximo: %3$d.</string>
+    <string name="preferences_accessibility_slider_value">%1$s. Valor atual: %2$d de %3$d.</string>
     <string name="workspace_empty_tip">Mantenha pressionado para adicionar atalhos &amp; widgets</string>
     <string name="button_cancel">Cancelar</string>
     <string name="group_applications">Aplicativos</string>

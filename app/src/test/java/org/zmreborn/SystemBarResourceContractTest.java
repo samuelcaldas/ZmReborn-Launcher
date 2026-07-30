@@ -39,6 +39,22 @@ public class SystemBarResourceContractTest {
                 itemValue(theme, "android:windowOptOutEdgeToEdgeEnforcement"));
     }
 
+    @Test
+    public void api35SettingsThemesOptOutOfForcedEdgeToEdge() throws Exception {
+        Element lightTheme = findTheme(
+                "src/main/res/values-v35/styles.xml", "SettingsTheme");
+        assertEquals("@android:style/Theme.Material.Light.NoActionBar",
+                lightTheme.getAttribute("parent"));
+        assertEquals("true",
+                itemValue(lightTheme, "android:windowOptOutEdgeToEdgeEnforcement"));
+        Element darkTheme = findTheme(
+                "src/main/res/values-night-v35/styles.xml", "SettingsTheme");
+        assertEquals("@android:style/Theme.Material.NoActionBar",
+                darkTheme.getAttribute("parent"));
+        assertEquals("true",
+                itemValue(darkTheme, "android:windowOptOutEdgeToEdgeEnforcement"));
+    }
+
     private static Element findTheme(String relativePath, String name) throws Exception {
         NodeList styles = parseProjectFile(relativePath).getElementsByTagName("style");
         return findByAttribute(styles, "name", name);
