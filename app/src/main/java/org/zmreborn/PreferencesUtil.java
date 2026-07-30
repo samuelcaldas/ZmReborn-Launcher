@@ -33,7 +33,7 @@ public class PreferencesUtil {
     static boolean isManageWallpaperEnabled(Context context) {
         SharedPreferences preferences = getSharedPreferences(context);
         String key = context.getString(R.string.preferences_key_workspace_manage_wallpaper);
-        boolean enabled = preferences.getBoolean(key, true);
+        boolean enabled = preferences.getBoolean(key, Boolean.parseBoolean(context.getString(R.string.preferences_default_workspace_manage_wallpaper)));
         preferences.edit().putBoolean(key, enabled).commit();
         return enabled;
     }

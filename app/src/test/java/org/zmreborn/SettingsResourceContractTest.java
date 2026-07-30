@@ -49,7 +49,7 @@ public class SettingsResourceContractTest {
             {"preferences_key_workspace_content_grid_rows", "workspace_content_grid_rows", "preferences_title_workspace_content_grid_rows", "@string/preferences_default_workspace_content_grid_rows", "preferences_summary_workspace_content_grid_rows"},
             {"preferences_key_workspace_content_grid_auto_fit", "workspace_content_grid_auto_fit", "preferences_title_workspace_content_grid_auto_fit", "@string/preferences_default_workspace_content_grid_auto_fit", "preferences_summary_workspace_content_grid_auto_fit"},
             {"preferences_key_workspace_show_shortcut_titles", "draw_shortcut_titles", "preferences_title_workspace_show_shortcut_titles", "@string/preferences_default_workspace_show_shortcut_titles", "preferences_summary_workspace_show_shortcut_titles"},
-            {"preferences_key_workspace_manage_wallpaper", "workspace_manage_wallpaper", "preferences_title_workspace_manage_wallpaper", null, "preferences_summary_workspace_manage_wallpaper"},
+            {"preferences_key_workspace_manage_wallpaper", "workspace_manage_wallpaper", "preferences_title_workspace_manage_wallpaper", "@string/preferences_default_workspace_manage_wallpaper", "preferences_summary_workspace_manage_wallpaper"},
             {"preferences_key_workspace_scroll_wallpaper", "workspace_scroll_wallpaper", "preferences_title_workspace_scroll_wallpaper", "@string/preferences_default_workspace_scroll_wallpaper", "preferences_summary_workspace_scroll_wallpaper"},
             {"preferences_key_apps_grid_type", "apps_grid_type", "preferences_title_apps_grid_type", "@string/preferences_default_apps_grid_type", "preferences_summary_apps_grid_type"},
             {"preferences_key_apps_grid_density", "apps_grid_density", "preferences_title_apps_grid_density", "@string/preferences_default_apps_grid_density", "preferences_summary_apps_grid_density"},
@@ -78,6 +78,7 @@ public class SettingsResourceContractTest {
     public void preferencesKeepAllKeysDefaultsStoredValuesAndSummaries() throws Exception {
         Element root = parse("main/res/xml/preferences.xml").getDocumentElement();
         Map<String, String> strings = values("main/res/values/strings.xml", "string");
+        strings.putAll(values("main/res/values/defaults.xml", "string"));
         assertEquals(38, countPreferences(root));
         assertFalse("Preference dependencies must remain explicit in Java", containsDependency(root));
         assertEquals(PREFERENCE_CONTRACT.length, countPreferences(root));
@@ -108,6 +109,7 @@ public class SettingsResourceContractTest {
     public void booleanPreferencesUsePlatformSwitches() throws Exception {
         Element root = parse("main/res/xml/preferences.xml").getDocumentElement();
         Map<String, String> strings = values("main/res/values/strings.xml", "string");
+        strings.putAll(values("main/res/values/defaults.xml", "string"));
         assertEquals(BOOLEAN_PREFERENCE_CONTRACT.length,
                 root.getElementsByTagName("SwitchPreference").getLength());
         for (String[] contract : BOOLEAN_PREFERENCE_CONTRACT) {
@@ -396,6 +398,60 @@ public class SettingsResourceContractTest {
     }
 
     @Test
+    public void defaultsPlacedInDedicatedFile() throws Exception {
+        String[] expectedDefaults = {
+            "preferences_default_general_fullscreen",
+            "preferences_default_general_sensor_orientation",
+            "preferences_default_workspace_number_of_screens",
+            "preferences_default_workspace_default_screen",
+            "preferences_default_workspace_elastic_scrolling",
+            "preferences_default_workspace_screen_looping",
+            "preferences_default_workspace_content_grid_rows",
+            "preferences_default_workspace_content_grid_columns",
+            "preferences_default_workspace_content_grid_auto_fit",
+            "preferences_default_workspace_show_shortcut_titles",
+            "preferences_default_workspace_manage_wallpaper",
+            "preferences_default_workspace_scroll_wallpaper",
+            "preferences_default_apps_grid_animated",
+            "preferences_default_apps_grid_remember_position",
+            "preferences_default_apps_grid_bg_alpha",
+            "preferences_default_apps_grid_vertical_scrolling_content_columns_port",
+            "preferences_default_apps_grid_vertical_scrolling_content_columns_land",
+            "preferences_default_apps_grid_horizontal_paging_content_rows_port",
+            "preferences_default_apps_grid_horizontal_paging_content_columns_port",
+            "preferences_default_apps_grid_horizontal_paging_content_rows_land",
+            "preferences_default_apps_grid_horizontal_paging_content_columns_land",
+            "preferences_default_action_home_button",
+            "preferences_default_action_swipe_up",
+            "preferences_default_action_swipe_down",
+            "preferences_default_action_double_tap",
+            "preferences_default_workspace_screen_indicator_type",
+            "preferences_default_apps_grid_type",
+            "preferences_default_apps_grid_density",
+            "preferences_default_dock_background",
+            "preferences_default_dock_item_alignment",
+            "preferences_default_dock_reset_to",
+            "preferences_default_dock_item_width",
+            "preferences_default_dock_reset_home",
+            "preferences_default_application_language",
+            "preferences_default_application_appearance",
+        };
+        Map<String, String> defaults = values("main/res/values/defaults.xml", "string");
+        Map<String, String> strings = values("main/res/values/strings.xml", "string");
+        assertEquals("defaults.xml must contain exactly 35 entries",
+                expectedDefaults.length, defaults.size());
+        for (String name : expectedDefaults) {
+            assertTrue("defaults.xml must contain " + name, defaults.containsKey(name));
+            assertFalse("strings.xml must not contain " + name, strings.containsKey(name));
+        }
+        String preferencesUtil = read("main/java/org/zmreborn/PreferencesUtil.java");
+        assertFalse("PreferencesUtil must not hardcode manage_wallpaper default",
+                preferencesUtil.contains("getBoolean(\n") && preferencesUtil.contains(", true)"));
+        assertTrue("PreferencesUtil must reference manage_wallpaper default resource",
+                preferencesUtil.contains("preferences_default_workspace_manage_wallpaper"));
+    }
+
+    @Test
     public void wallpaperAndWidgetSurfacesPreserveSelectionAndBinding() throws Exception {
         String wallpaper = read("main/res/layout/wallpaper_chooser.xml");
         assertTrue(wallpaper.contains("@color/zm_reborn_slate"));
@@ -433,9 +489,7 @@ public class SettingsResourceContractTest {
                     preference.getAttribute("android:defaultValue")));
             return;
         }
-        assertEquals("preferences_key_workspace_manage_wallpaper", key);
-        assertFalse(preference.hasAttribute("android:defaultValue"));
-        assertEquals(expected, booleanFallback(read("main/java/org/zmreborn/PreferencesUtil.java"), key));
+        fail("SwitchPreference " + key + " missing android:defaultValue");
     }
 
     private static String resolveString(Map<String, String> strings, String reference) {
@@ -444,16 +498,6 @@ public class SettingsResourceContractTest {
         String value = strings.get(reference.substring("@string/".length()));
         assertNotNull("Missing default string: " + reference, value);
         return value.trim();
-    }
-
-    private static String booleanFallback(String source, String key) {
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(
-                "String\\s+key\\s*=\\s*context\\.getString\\(\\s*R\\.string\\." + key
-                        + "\\s*\\)\\s*;\\s*boolean\\s+enabled\\s*=\\s*preferences\\.getBoolean"
-                        + "\\(\\s*key\\s*,\\s*(true|false)\\s*\\)");
-        java.util.regex.Matcher matcher = pattern.matcher(source);
-        assertTrue("Missing Java boolean fallback for " + key, matcher.find());
-        return matcher.group(1);
     }
 
     private static Element findNamedElement(Element root, String tagName, String name) {

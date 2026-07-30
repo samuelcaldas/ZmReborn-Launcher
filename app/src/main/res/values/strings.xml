@@ -45,40 +45,6 @@
     <string name="preferences_key_application" translatable="false">application</string>
     <string name="preferences_key_application_language" translatable="false">application_language</string>
     <string name="preferences_key_application_appearance" translatable="false">application_appearance</string>
-    <string name="preferences_default_general_fullscreen" translatable="false">false</string>
-    <string name="preferences_default_general_sensor_orientation" translatable="false">false</string>
-    <string name="preferences_default_workspace_number_of_screens" translatable="false">3</string>
-    <string name="preferences_default_workspace_default_screen" translatable="false">2</string>
-    <string name="preferences_default_workspace_elastic_scrolling" translatable="false">true</string>
-    <string name="preferences_default_workspace_screen_looping" translatable="false">true</string>
-    <string name="preferences_default_workspace_content_grid_rows" translatable="false">4</string>
-    <string name="preferences_default_workspace_content_grid_columns" translatable="false">4</string>
-    <string name="preferences_default_workspace_content_grid_auto_fit" translatable="false">false</string>
-    <string name="preferences_default_workspace_show_shortcut_titles" translatable="false">true</string>
-    <string name="preferences_default_workspace_scroll_wallpaper" translatable="false">true</string>
-    <string name="preferences_default_apps_grid_animated" translatable="false">true</string>
-    <string name="preferences_default_apps_grid_remember_position" translatable="false">true</string>
-    <string name="preferences_default_apps_grid_bg_alpha" translatable="false">255</string>
-    <string name="preferences_default_apps_grid_vertical_scrolling_content_columns_port" translatable="false">4</string>
-    <string name="preferences_default_apps_grid_vertical_scrolling_content_columns_land" translatable="false">5</string>
-    <string name="preferences_default_apps_grid_horizontal_paging_content_rows_port" translatable="false">4</string>
-    <string name="preferences_default_apps_grid_horizontal_paging_content_columns_port" translatable="false">4</string>
-    <string name="preferences_default_apps_grid_horizontal_paging_content_rows_land" translatable="false">3</string>
-    <string name="preferences_default_apps_grid_horizontal_paging_content_columns_land" translatable="false">5</string>
-    <string name="preferences_default_action_home_button" translatable="false">3</string>
-    <string name="preferences_default_action_swipe_up" translatable="false">2</string>
-    <string name="preferences_default_action_swipe_down" translatable="false">1</string>
-    <string name="preferences_default_action_double_tap" translatable="false">5</string>
-    <string name="preferences_default_workspace_screen_indicator_type" translatable="false">Slider</string>
-    <string name="preferences_default_apps_grid_type" translatable="false">1</string>
-    <string name="preferences_default_apps_grid_density" translatable="false">automatic</string>
-    <string name="preferences_default_dock_background" translatable="false">Dark</string>
-    <string name="preferences_default_dock_item_alignment" translatable="false">Center</string>
-    <string name="preferences_default_dock_reset_to" translatable="false">Start</string>
-    <string name="preferences_default_dock_item_width" translatable="false">Medium</string>
-    <string name="preferences_default_dock_reset_home" translatable="false">true</string>
-    <string name="preferences_default_application_language" translatable="false"></string>
-    <string name="preferences_default_application_appearance" translatable="false">system</string>
     <string name="application_name">ZM Reborn</string>
     <string name="preferences_application_version_format">%1$s %2$s</string>
     <string name="application_copyright">Copyright © 2026 Samuel Caldas</string>

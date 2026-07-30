@@ -29,7 +29,7 @@
             <SwitchPreference android:title="@string/preferences_title_workspace_show_shortcut_titles" android:key="@string/preferences_key_workspace_show_shortcut_titles" android:summary="@string/preferences_summary_workspace_show_shortcut_titles" android:defaultValue="@string/preferences_default_workspace_show_shortcut_titles"/>
         </PreferenceCategory>
         <PreferenceCategory android:title="@string/preferences_category_wallpaper">
-            <SwitchPreference android:title="@string/preferences_title_workspace_manage_wallpaper" android:key="@string/preferences_key_workspace_manage_wallpaper" android:summary="@string/preferences_summary_workspace_manage_wallpaper"/>
+            <SwitchPreference android:title="@string/preferences_title_workspace_manage_wallpaper" android:key="@string/preferences_key_workspace_manage_wallpaper" android:summary="@string/preferences_summary_workspace_manage_wallpaper" android:defaultValue="@string/preferences_default_workspace_manage_wallpaper"/>
             <SwitchPreference android:title="@string/preferences_title_workspace_scroll_wallpaper" android:key="@string/preferences_key_workspace_scroll_wallpaper" android:summary="@string/preferences_summary_workspace_scroll_wallpaper" android:defaultValue="@string/preferences_default_workspace_scroll_wallpaper"/>
         </PreferenceCategory>
     </PreferenceScreen>

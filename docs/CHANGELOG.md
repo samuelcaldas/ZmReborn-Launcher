@@ -24,6 +24,42 @@
   Software-emulator ANR interrupted clean manual API 35 app-grid slider, keyboard/DPAD, forced-RTL,
   and TalkBack traversal; no result is claimed for those paths.
 
+## Unified preference defaults seed file — 2026-07-30
+
+- **New `values/defaults.xml`.** All 35 launcher preference default values now live in one dedicated
+  file. 34 `preferences_default_*` string entries moved verbatim from `strings.xml`; one new entry
+  (`preferences_default_workspace_manage_wallpaper = true`) added to normalize the only default that
+  was previously hardcoded in Java with no XML declaration.
+- **`strings.xml` cleaned.** Lines 48–81 removed; only keys, titles, summaries, and UI labels remain.
+  All `R.string.preferences_default_*` references in `PreferencesUtil.java`, `Appearance.java`,
+  `LocaleUtil.java`, and `preferences.xml` are unchanged — resource names are identical.
+- **`PreferencesUtil.isManageWallpaperEnabled()` normalized.** Hardcoded `true` fallback replaced by
+  `Boolean.parseBoolean(context.getString(R.string.preferences_default_workspace_manage_wallpaper))`.
+- **`preferences.xml` gap filled.** `workspace_manage_wallpaper` SwitchPreference now declares
+  `android:defaultValue="@string/preferences_default_workspace_manage_wallpaper"`, consistent with
+  all other boolean preferences.
+- Color defaults (`preferences_default_general_selector_colour_pressed/focused`) remain in
+  `values/colors.xml`; `defaults.xml` carries a header comment pointing to them.
+- Zero behavior change. All existing preference values, keys, reset flow, and stored-value semantics
+  are unmodified.
+
+### Validation — 2026-07-30
+
+- TDD: `SettingsResourceContractTest.defaultsPlacedInDedicatedFile()` written red first (confirmed
+  `FileNotFoundException` for `defaults.xml`); turned green after `defaults.xml` creation,
+  `strings.xml` cleanup, `PreferencesUtil` and `preferences.xml` updates.
+- `UiModernizationContractTest.verticalDrawerIsDefaultResponsiveAndCacheFree()` updated to read
+  from `defaults.xml`; `SettingsResourceContractTest.booleanPreferencesUsePlatformSwitches()` and
+  `preferencesKeepAllKeysDefaultsStoredValuesAndSummaries()` updated to merge `defaults.xml` into the
+  strings map. Dead `booleanFallback` helper removed.
+- JVM: 187 tests across result files, 0 failures, 0 errors, 0 skipped. BUILD SUCCESSFUL.
+- Android-test compilation: BUILD SUCCESSFUL.
+- Lint: BUILD SUCCESSFUL with existing baseline.
+- `git diff --check`: passed.
+- `./tools/build_apk.sh`: passed. Debug APK: 950,314 bytes; SHA-256
+  `5c6d3dbb707f5a6f4a35579746c1ff798ba30f1b3c7096fc8ae8c6b35be7f4a4`.
+- API 24 and API 35 device runtime smoke remain unperformed.
+
 ## Inline debounced numeric settings — 2026-07-30
 
 - Replaced eight modal quantity sliders with inline `−` / `+` controls for workspace screen

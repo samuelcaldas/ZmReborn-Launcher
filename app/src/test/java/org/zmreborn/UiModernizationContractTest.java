@@ -24,12 +24,12 @@ public class UiModernizationContractTest {
 
     @Test
     public void verticalDrawerIsDefaultResponsiveAndCacheFree() throws Exception {
-        String strings = read("main/res/values/strings.xml");
+        String defaults = read("main/res/values/defaults.xml");
         String launcher = read("main/java/org/zmreborn/Launcher.java");
         String manifest = read("main/AndroidManifest.xml");
         String grid = read("main/java/org/zmreborn/ApplicationsGridView.java");
         String paging = read("main/java/org/zmreborn/ApplicationsPagingView.java");
-        assertTrue(strings.contains(
+        assertTrue(defaults.contains(
                 "name=\"preferences_default_apps_grid_type\" translatable=\"false\">1</string>"));
         assertTrue(grid.contains("super.setNumColumns(AUTO_FIT)"));
         assertTrue(grid.contains("R.dimen.drawer_cell_preferred_width"));
