@@ -1,5 +1,31 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Launcher settings persistence — 2026-07-29
+
+- `Launcher.sRestart`-backed preference changes recreate `Launcher` on return without killing the process.
+  An appearance change plus a `Launcher.sRestart`-backed setting coalesces into exactly one replacement.
+- Workspace row and column values persist in default `SharedPreferences`; rebuilt `CellLayout`
+  instances use distinct selected geometry.
+- No manifest, process configuration, or third-party dependency changes.
+
+### Validation — 2026-07-29
+
+- TDD red evidence: the valid pre-fix grid test left `Launcher` unreplaced on the stale-geometry
+  path; the valid coalescing test expected 1 replacement but got 2.
+- Focused API 35 greens: appearance, 1 test in 61.375 seconds; workspace grid, 1 test in
+  74.814 seconds.
+- Final API 35 `LauncherE2ETest`: 13 tests passed in 384.437 seconds. Drawer open/close smoke:
+  1 test passed in 26.65 seconds.
+- JVM: 167 tests, 0 failures, 0 errors, 0 skipped. Android-test assembly and Java compilation
+  passed. Lint passed with the existing baseline. `git diff --check` passed.
+- `./tools/build_apk.sh` passed. Debug APK: 798,946 bytes; SHA-256
+  `0d3cfa9810fe005c2474dc658d82d4cbfbbe5e7f9f67b5278fbdd06dd82cc519`.
+- API 35 cold launch succeeded after dismissing an unrelated Digital Wellbeing system ANR; the
+  `Launcher` hierarchy loaded. Filtered logcat had no launcher `FATAL`, launcher ANR,
+  verifier/missing class/method, or `UnsupportedOperationException`.
+- API 24 runtime remains unperformed because no local API 24 image exists. The full
+  instrumentation suite and manual force-stop preference-retention smoke remain unperformed.
+
 ## Docker emulator local noVNC interaction — 2026-07-29
 
 - Added Xvfb-backed Android Emulator display, internal loopback-only x11vnc bridge, and noVNC/websockify browser endpoint.
@@ -292,6 +318,16 @@
   passes with gestural navigation active. Filtered logcat shows no fatal, verifier,
   missing-method, or `UnsupportedOperationException` entries.
 - `./tools/build_apk.sh`, `:app:testDebugUnitTest`, `:app:lint`, and `git diff --check` pass.
+
+## [3.1.11-alpha-rc6]
+
+- Fixed `Launcher.sRestart`-backed settings persistence and application by recreating `Launcher`
+  instead of killing the process.
+- Workspace row and column changes rebuild workspace geometry.
+- Appearance and `Launcher.sRestart`-backed changes coalesce into one `Launcher` recreation.
+- Validation: 167 JVM tests; final 13 API 35 `LauncherE2ETest` tests; drawer smoke; lint;
+  Android-test assembly; build wrapper; clean filtered launcher logcat. API 24 and manual
+  force-stop smoke remain unperformed.
 
 ## [3.1.11-alpha-rc5]
 

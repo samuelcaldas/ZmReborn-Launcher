@@ -2,7 +2,7 @@
 
 ## Scope and evidence
 
-This document describes current working-tree behavior for ZM Reborn 3.1.11-alpha-rc4. Source and automated contracts prove implementation structure; they do not replace device smoke tests or screenshots.
+This document describes current working-tree behavior for ZM Reborn 3.1.11-alpha-rc6. Source and automated contracts prove implementation structure; they do not replace device smoke tests or screenshots.
 
 Project constraints:
 
