@@ -24,6 +24,39 @@
   Software-emulator ANR interrupted clean manual API 35 app-grid slider, keyboard/DPAD, forced-RTL,
   and TalkBack traversal; no result is claimed for those paths.
 
+## Vertical drawer UX: fast-scroll fix, auto-hide rail, pull-to-reveal search — 2026-07-30
+
+- **Fast-scroll re-selection fix.** Tapping a fast-scroll letter after manually scrolling the grid away
+  now navigates correctly. Root cause: `DrawerFastScrollView.selectIndex` short-circuited when
+  `index == mSelectedIndex`, never cleared after independent grid scroll. Fix: `ApplicationsDrawerView`
+  registers an `AbsListView.OnScrollListener` on the grid; `onGridScrollStateChanged` calls
+  `mFastScroll.clearSelection()` on `SCROLL_STATE_TOUCH_SCROLL` so every subsequent tap always fires.
+- **Fast-scroll auto-hide.** The alphabet rail is now hidden at rest and appears only while the grid is
+  scrolling, fading in (150 ms) on `TOUCH_SCROLL`/`FLING` and fading out (150 ms) 1 s after
+  `IDLE`. A `Handler` + `Runnable` in `ApplicationsDrawerView` drives the schedule;
+  `updateFastScroll()` no longer sets the rail `VISIBLE` directly — it only sets `mFastScrollEnabled`
+  and immediately hides the rail when conditions are not met.
+- **Pull-to-reveal search bar.** The search bar is hidden by default (height=0, `GONE`) on drawer open.
+  `ApplicationsDrawerView` overrides `onInterceptTouchEvent` to detect a downward swipe from the top
+  of the grid; `onTouchEvent` grows the container height proportionally. On release, a 150 ms
+  `ValueAnimator` snaps to fully revealed (`mSearchRevealed = true`) or collapses back. Active query
+  always pins the bar visible. Drawer close resets to hidden via `clearQueryForClose()`.
+- Adds `android:id="@+id/drawer_search_container"` to the search `FrameLayout` in both orientation
+  layouts. Overrides `performClick()` in `ApplicationsDrawerView` for `ClickableViewAccessibility`.
+  Updates `UiModernizationContractTest` assertions to reflect renamed `mFastScrollEnabled` field and
+  adds three new contract tests (fast-scroll re-selection, update-method visibility gate, pull-to-reveal
+  presence).
+
+### Validation — 2026-07-30
+
+- TDD: three contract tests written red first (confirmed failures at `UiModernizationContractTest.java`
+  lines 266, 278, 287); turned green after full implementation.
+- JVM: 192 tests, 0 failures, 0 errors.
+- Android-test compile: clean.
+- Lint: 0 new errors (1 `ClickableViewAccessibility` resolved by `performClick()` override).
+- APK: `app-debug.apk` SHA-256 `9ba8896d689578a361448aafb3f7e805ac19cf69086bbf5d4bf42e6bfc9c32c2`.
+- API 24/API 35 manual smoke: pending (same status as rc7).
+
 ## Unified preference defaults seed file — 2026-07-30
 
 - **New `values/defaults.xml`.** All 35 launcher preference default values now live in one dedicated

@@ -76,13 +76,13 @@ public class UiModernizationContractTest {
         assertTrue(landscape.contains("@+id/drawer_fast_scroll"));
         assertTrue(drawer.contains("updateFastScroll()"));
         assertTrue(drawer.contains("setOnSectionSelectedListener"));
-        assertTrue(drawer.contains("this.mGridView.setFastScrollVisible(showFastScroll)"));
+        assertTrue(drawer.contains("this.mGridView.setFastScrollVisible(this.mFastScrollEnabled)"));
         assertTrue(drawer.contains("this.mClosing || position < 0"));
         assertTrue(grid.contains("void setFastScrollVisible(boolean visible)"));
         assertTrue(grid.contains("onRtlPropertiesChanged(int layoutDirection)"));
         assertTrue(grid.contains("setNextFocusLeftId(railId)"));
         assertTrue(grid.contains("fastScrollInsetLeft"));
-        assertTrue(drawer.contains("updateFastScrollFocus(showFastScroll)"));
+        assertTrue(drawer.contains("updateFastScrollFocus(this.mFastScrollEnabled)"));
         assertTrue(drawer.contains("updateSearchFocus()"));
         assertTrue(drawer.contains("setDrawerControlsEnabled(false)"));
         assertTrue(grid.contains("setEnabled(this.mActionsEnabled && !this.mClosing)"));
@@ -256,6 +256,40 @@ public class UiModernizationContractTest {
         assertTrue(manifest.contains("android.media.action.IMAGE_CAPTURE"));
         assertTrue(manifest.contains("android:scheme=\"https\""));
         assertTrue(manifest.contains("android:host=\"com.android.contacts\""));
+    }
+
+    @Test
+    public void fastScrollClearsSelectionOnGridScroll() throws Exception {
+        String drawer = read("main/java/org/zmreborn/ApplicationsDrawerView.java");
+        assertTrue("ApplicationsDrawerView must call clearSelection() from a scroll listener",
+                drawer.contains("clearSelection()"));
+        assertTrue("ApplicationsDrawerView must register OnScrollListener on mGridView",
+                drawer.contains("setOnScrollListener"));
+        assertTrue("ApplicationsDrawerView must handle scroll-state changes",
+                drawer.contains("onGridScrollStateChanged"));
+    }
+
+    @Test
+    public void fastScrollNotShownDirectlyInUpdateMethod() throws Exception {
+        String drawer = read("main/java/org/zmreborn/ApplicationsDrawerView.java");
+        String updateFastScrollBody = sourceSection(drawer,
+                "    private void updateFastScroll()",
+                "    private void updateFastScrollFocus");
+        assertFalse("updateFastScroll must not call setVisibility(VISIBLE) directly",
+                updateFastScrollBody.contains("VISIBLE"));
+        assertTrue("updateFastScroll must set mFastScrollEnabled",
+                updateFastScrollBody.contains("mFastScrollEnabled"));
+    }
+
+    @Test
+    public void searchBarCollapsedByDefaultRevealedOnPull() throws Exception {
+        String drawer = read("main/java/org/zmreborn/ApplicationsDrawerView.java");
+        assertTrue("ApplicationsDrawerView must have collapseSearchBar method",
+                drawer.contains("collapseSearchBar()"));
+        assertTrue("ApplicationsDrawerView must store max height of search bar",
+                drawer.contains("mSearchBarMaxHeight"));
+        assertTrue("ApplicationsDrawerView must override onInterceptTouchEvent for pull-to-reveal",
+                drawer.contains("onInterceptTouchEvent"));
     }
 
     @Test

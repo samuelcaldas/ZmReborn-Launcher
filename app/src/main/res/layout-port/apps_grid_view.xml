@@ -12,6 +12,7 @@
     android:visibility="gone">
 
     <FrameLayout
+        android:id="@+id/drawer_search_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/drawer_grid_spacing">
