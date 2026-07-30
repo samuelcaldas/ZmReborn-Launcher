@@ -28,6 +28,8 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     public int mMode = 0;
     private boolean mResetMode;
     private ScreenIndicator mScreenIndicator;
+    private int mIndicatorType = ScreenIndicator.TYPE_DOTS;
+    private boolean mIndicatorEnabled = true;
     private ViewPager mViewPager;
     private int mBasePaddingBottom;
     private int mBasePaddingLeft;
@@ -70,7 +72,20 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
                 ApplicationsPagingView.this.onPagerViewportChanged();
             }
         });
-        this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.apps_paging_screen_indicator);
+    }
+
+    /**
+     * Configures the external ScreenIndicator provided by Launcher from DragLayer.
+     * Called after the paging view is inflated and after preference changes via loadIndicator().
+     *
+     * @param indicator  the ScreenIndicator instance from DragLayer
+     * @param enabled    false when workspace indicator preference is None
+     * @param type       ScreenIndicator.TYPE_DOTS or TYPE_SLIDER_BOTTOM
+     */
+    public void configureIndicator(ScreenIndicator indicator, boolean enabled, int type) {
+        this.mScreenIndicator = indicator;
+        this.mIndicatorEnabled = enabled;
+        this.mIndicatorType = type;
     }
 
     public void setNumColumns(int columns) {
@@ -262,18 +277,23 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     }
 
     private void initIndicator() {
-        if (this.mScreenIndicator != null) {
-            int pageCount = this.mViewPager.getPageCount();
-            this.mScreenIndicator.setItems(pageCount);
-            this.mScreenIndicator.setType(1);
-            this.mScreenIndicator.setAutoHide(false);
-            if (pageCount <= 0) {
-                this.mScreenIndicator.fullIndicate(0);
-                this.mViewPager.resetScroll();
-                return;
-            }
-            this.mScreenIndicator.fullIndicate(this.mViewPager.getCurrentPageIndex());
+        if (this.mScreenIndicator == null) {
+            return;
         }
+        int pageCount = this.mViewPager.getPageCount();
+        this.mScreenIndicator.setItems(pageCount);
+        if (!this.mIndicatorEnabled) {
+            this.mScreenIndicator.hide();
+            return;
+        }
+        this.mScreenIndicator.setType(this.mIndicatorType);
+        this.mScreenIndicator.setAutoHide(false);
+        if (pageCount <= 0) {
+            this.mScreenIndicator.fullIndicate(0);
+            this.mViewPager.resetScroll();
+            return;
+        }
+        this.mScreenIndicator.fullIndicate(this.mViewPager.getCurrentPageIndex());
     }
 
     public void open(boolean animated) {

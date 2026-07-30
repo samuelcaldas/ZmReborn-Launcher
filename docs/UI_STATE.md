@@ -59,6 +59,20 @@ Fresh installations default to vertical scrolling. Existing stored drawer choice
 
 Horizontal paging remains available for existing users and advanced compatibility. Paging cell constraints use `drawer_cell_min_width` and `drawer_cell_min_height` resources rather than raw pixels.
 
+### Paging drawer page indicator
+
+`apps_paging_screen_indicator` lives in `DragLayer` alongside `workspace_screen_indicator`, not inside `ApplicationsPagingView`. Both indicators share the same parent container with no extra padding offset, so their visual position (`Gravity.BOTTOM` + `navigation_strip_size + rail_inset`) resolves to the same pixel row.
+
+Indicator type follows the workspace page indicator preference (`workspace_screen_indicator`):
+
+- **None** — drawer indicator hidden;
+- **Slider** — drawer shows `TYPE_SLIDER_BOTTOM` bar, same as homescreen;
+- **Dots** — drawer shows `TYPE_DOTS`, same as homescreen.
+
+`Launcher.loadIndicator()` calls `ApplicationsPagingView.configureIndicator()` whenever the preference changes, so both indicators update together. The drawer indicator is hidden explicitly on drawer close because it lives in `DragLayer` and is not swept away with `ApplicationsPagingView`'s `INVISIBLE` state.
+
+The home/close `ImageButton` (`home_button`) is not shown when the paging drawer is active; the back gesture or navigation button closes the paging drawer. The home button remains for the vertical `ApplicationsDrawerView` only.
+
 ### State and motion
 
 Grid and paging implementations reset alpha, scale, translation, and animation state before opening or closing. Animated close hides the drawer only after exit animation completion and disables grid, search, clear, and fast-scroll input during that interval. Legacy drawing-cache enablement, no-op scroll workarounds, and explicit `System.gc()` calls are absent.

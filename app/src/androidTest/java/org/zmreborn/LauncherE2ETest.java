@@ -233,6 +233,75 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
         assertTrue(drawer.getTop() >= 0);
     }
 
+    public void testDrawerIndicatorLivesInDragLayer() {
+        Launcher launcher = getActivity();
+        getInstrumentation().waitForIdleSync();
+        View appsIndicator = launcher.findViewById(R.id.apps_paging_screen_indicator);
+        View workspaceIndicator = launcher.findViewById(R.id.workspace_screen_indicator);
+        assertNotNull("apps_paging_screen_indicator must be present in view hierarchy", appsIndicator);
+        assertNotNull("workspace_screen_indicator must be present in view hierarchy", workspaceIndicator);
+        assertEquals("Both indicators must share the same parent",
+                appsIndicator.getParent(), workspaceIndicator.getParent());
+    }
+
+    public void testHomeButtonInvisibleOnLaunchWithoutDrawerOpen() {
+        Launcher launcher = getActivity();
+        getInstrumentation().waitForIdleSync();
+        View homeButton = launcher.findViewById(R.id.home_button);
+        assertNotNull("home_button must be in view hierarchy", homeButton);
+        final int[] visibility = new int[1];
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                visibility[0] = homeButton.getVisibility();
+            }
+        });
+        assertFalse("Home button must not be visible when drawer is closed",
+                visibility[0] == View.VISIBLE);
+    }
+
+    public void testHomeButtonGuardedForPagingDrawerByReflection() throws Exception {
+        final Launcher launcher = getActivity();
+        getInstrumentation().waitForIdleSync();
+        final boolean[] isPaging = new boolean[1];
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                isPaging[0] = launcher.mApplicationsView instanceof ApplicationsPagingView;
+            }
+        });
+        if (!isPaging[0]) {
+            return;
+        }
+        final View homeButton = launcher.findViewById(R.id.home_button);
+        assertNotNull("home_button must be in view hierarchy", homeButton);
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                try {
+                    java.lang.reflect.Method open = Launcher.class.getDeclaredMethod(
+                            "openApplicationsGrid", boolean.class);
+                    open.setAccessible(true);
+                    open.invoke(launcher, false);
+                } catch (Exception exception) {
+                    throw new RuntimeException("openApplicationsGrid invocation failed", exception);
+                }
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        final int[] visibility = new int[1];
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                visibility[0] = homeButton.getVisibility();
+            }
+        });
+        assertFalse("Home button must not be visible when paging drawer opens",
+                visibility[0] == View.VISIBLE);
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                launcher.closeAllApplications();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+    }
+
     public void testLauncherContentConsumesSystemBarInsets() throws Exception {
         Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();

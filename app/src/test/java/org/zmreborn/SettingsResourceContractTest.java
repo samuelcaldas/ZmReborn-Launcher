@@ -361,6 +361,41 @@ public class SettingsResourceContractTest {
     }
 
     @Test
+    public void drawerIndicatorPlacedInDragLayer() throws Exception {
+        String portPaging = read("main/res/layout-port/apps_paging_view.xml");
+        assertFalse("Drawer indicator must not live inside paging view (port)",
+                portPaging.contains("apps_paging_screen_indicator"));
+
+        String landPaging = read("main/res/layout-land/apps_paging_view.xml");
+        assertFalse("Drawer indicator must not live inside paging view (land)",
+                landPaging.contains("apps_paging_screen_indicator"));
+
+        String portLauncher = read("main/res/layout-port/launcher.xml");
+        assertTrue("Drawer indicator must live in DragLayer (port)",
+                portLauncher.contains("apps_paging_screen_indicator"));
+        assertTrue("Workspace indicator must remain in DragLayer (port)",
+                portLauncher.contains("workspace_screen_indicator"));
+
+        String landLauncher = read("main/res/layout-land/launcher.xml");
+        assertTrue("Drawer indicator must live in DragLayer (land)",
+                landLauncher.contains("apps_paging_screen_indicator"));
+        assertTrue("Workspace indicator must remain in DragLayer (land)",
+                landLauncher.contains("workspace_screen_indicator"));
+
+        String pagingView = read("main/java/org/zmreborn/ApplicationsPagingView.java");
+        assertTrue("ApplicationsPagingView must expose configureIndicator",
+                pagingView.contains("configureIndicator("));
+        assertFalse("ApplicationsPagingView must not self-find indicator by resource ID",
+                pagingView.contains("R.id.apps_paging_screen_indicator"));
+
+        String launcher = read("main/java/org/zmreborn/Launcher.java");
+        assertTrue("Launcher must have resolveDrawerIndicatorType helper",
+                launcher.contains("resolveDrawerIndicatorType"));
+        assertTrue("Home button must be guarded for paging drawer",
+                launcher.contains("instanceof ApplicationsPagingView"));
+    }
+
+    @Test
     public void wallpaperAndWidgetSurfacesPreserveSelectionAndBinding() throws Exception {
         String wallpaper = read("main/res/layout/wallpaper_chooser.xml");
         assertTrue(wallpaper.contains("@color/zm_reborn_slate"));

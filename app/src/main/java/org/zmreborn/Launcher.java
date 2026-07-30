@@ -804,6 +804,12 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         }
         this.mApplicationsView = (ApplicationsView) appsGridStub.inflate();
         ApplicationsView applicationsView = this.mApplicationsView;
+        if (applicationsView instanceof ApplicationsPagingView) {
+            ScreenIndicator drawerIndicator =
+                    (ScreenIndicator) dragLayer.findViewById(R.id.apps_paging_screen_indicator);
+            ((ApplicationsPagingView) applicationsView).configureIndicator(
+                    drawerIndicator, false, ScreenIndicator.TYPE_DOTS);
+        }
         this.mApplicationsStateOverlay = (FrameLayout) dragLayer.findViewById(R.id.apps_state_overlay);
         this.mApplicationsStateMessage = (TextView) dragLayer.findViewById(R.id.apps_state_message);
         this.mApplicationsStateRetry = (Button) dragLayer.findViewById(R.id.apps_state_retry);
@@ -1092,6 +1098,35 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 this.mWorkspace.indicateCurrent();
             }
         }
+        if (this.mApplicationsView instanceof ApplicationsPagingView) {
+            int drawerType = resolveDrawerIndicatorType();
+            ScreenIndicator drawerIndicator =
+                    (ScreenIndicator) findViewById(R.id.apps_paging_screen_indicator);
+            if (drawerIndicator != null) {
+                ((ApplicationsPagingView) this.mApplicationsView).configureIndicator(
+                        drawerIndicator,
+                        drawerType != -1,
+                        drawerType == -1 ? ScreenIndicator.TYPE_DOTS : drawerType);
+            }
+        }
+    }
+
+    /** Returns the ScreenIndicator type matching the workspace indicator preference, or -1 for None. */
+    private int resolveDrawerIndicatorType() {
+        String pref = PreferencesUtil.getScreenIndicator(this);
+        String[] types = getResources().getStringArray(
+                R.array.preferences_values_workspace_screen_indicator_types);
+        for (int i = 0; i < types.length; i++) {
+            if (types[i].equals(pref)) {
+                switch (i) {
+                    case 0: return -1;
+                    case 1: return ScreenIndicator.TYPE_SLIDER_BOTTOM;
+                    case 2: return ScreenIndicator.TYPE_DOTS;
+                    default: break;
+                }
+            }
+        }
+        return ScreenIndicator.TYPE_SLIDER_BOTTOM;
     }
 
     /* access modifiers changed from: package-private */
@@ -3286,12 +3321,16 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             this.mWorkspace.invalidate();
             this.mApplicationsView.getImplementingView().bringToFront();
             this.mApplicationsView.open(animated && this.mAllowAppsGridAnimations);
-            if (animated && this.mAllowAppsGridAnimations) {
-                this.mHomeButton.setAnimation(AnimationUtils.loadAnimation(this, R.anim.home_button_fade_in));
+            if (!(this.mApplicationsView instanceof ApplicationsPagingView)) {
+                if (animated && this.mAllowAppsGridAnimations) {
+                    this.mHomeButton.setAnimation(
+                            AnimationUtils.loadAnimation(this, R.anim.home_button_fade_in));
+                }
+                this.mHomeButton.setContentDescription(
+                        getString(R.string.accessibility_close_drawer));
+                this.mHomeButton.setVisibility(View.VISIBLE);
+                this.mHomeButton.bringToFront();
             }
-            this.mHomeButton.setContentDescription(getString(R.string.accessibility_close_drawer));
-            this.mHomeButton.setVisibility(0);
-            this.mHomeButton.bringToFront();
             if (this.mScreenIndicator != null) {
                 this.mScreenIndicator.hide();
             }
@@ -3318,11 +3357,20 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 if (this.mScreenIndicator != null) {
                     this.mScreenIndicator.show();
                 }
-                if (animated && this.mAllowAppsGridAnimations) {
-                    this.mHomeButton.setAnimation(AnimationUtils.loadAnimation(this, R.anim.home_button_fade_out));
+                ScreenIndicator drawerIndicator =
+                        (ScreenIndicator) findViewById(R.id.apps_paging_screen_indicator);
+                if (drawerIndicator != null) {
+                    drawerIndicator.hide();
                 }
-                this.mHomeButton.setContentDescription(getString(R.string.accessibility_open_drawer));
-                this.mHomeButton.setVisibility(4);
+                if (!(this.mApplicationsView instanceof ApplicationsPagingView)) {
+                    if (animated && this.mAllowAppsGridAnimations) {
+                        this.mHomeButton.setAnimation(
+                                AnimationUtils.loadAnimation(this, R.anim.home_button_fade_out));
+                    }
+                    this.mHomeButton.setContentDescription(
+                            getString(R.string.accessibility_open_drawer));
+                    this.mHomeButton.setVisibility(View.INVISIBLE);
+                }
                 this.mApplicationsGridOpen = false;
                 if (this.mApplicationsStateOverlay != null) {
                     this.mApplicationsStateOverlay.setVisibility(View.GONE);

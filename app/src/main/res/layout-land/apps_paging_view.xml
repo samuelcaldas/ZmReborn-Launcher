@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <org.zmreborn.ApplicationsPagingView xmlns:android="http://schemas.android.com/apk/res/android" xmlns:launcher="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools" android:background="@color/zm_reborn_slate" android:visibility="invisible" android:scrollbars="none" android:layout_width="match_parent" android:layout_height="match_parent" android:paddingEnd="@dimen/navigation_strip_size" tools:ignore="RtlSymmetry">
     <org.zmreborn.ViewPager android:id="@+id/view_pager" android:scrollbars="none" android:fadingEdge="none" android:layout_width="match_parent" android:layout_height="match_parent"/>
-    <org.zmreborn.ScreenIndicator android:id="@+id/apps_paging_screen_indicator" android:visibility="gone" android:layout_width="match_parent" android:layout_height="wrap_content"/>
 </org.zmreborn.ApplicationsPagingView>

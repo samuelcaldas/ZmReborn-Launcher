@@ -2,6 +2,11 @@
 
 ## [3.1.11-alpha-rc7]
 
+- Syncs horizontal paging app-drawer page indicator type and position with the homescreen indicator.
+  Indicator type follows the workspace screen indicator preference (None / Slider / Dots). Drawer
+  indicator position aligns to the same visual row as the homescreen indicator by placing both in
+  DragLayer rather than nesting the drawer indicator inside ApplicationsPagingView. Home/close button
+  is suppressed for the paging drawer; back gesture or navigation button closes the drawer.
 - Replaces modal quantity sliders with accessible inline `−` / `+` controls and moves
   applications-grid transparency to an inline slider. Changes update immediately, persist through a
   250 ms trailing debounce, and flush before Settings yields to Launcher.
@@ -12,9 +17,10 @@
   spacing while the full edge-to-edge migration remains deferred.
 - Preserves Android 24–35 compatibility boundaries, existing preference keys, public resource
   contracts, reconstruction provenance, and zero third-party runtime dependencies.
-- Validation includes 169 JVM tests, Android-test compilation, lint, Docker-wrapper debug APK builds,
+- Validation includes 185 JVM tests, Android-test compilation, lint, Docker-wrapper debug APK builds,
   full API 35 numeric-settings instrumentation, focused Launcher recreation coverage, and changed-path
-  review. API 24 runtime and final API 24/API 35 horizontal-paging device smoke remain unperformed.
+  review. Instrumentation tests for drawer indicator type/position and home button guard remain
+  pending. API 24 runtime and final API 24/API 35 horizontal-paging device smoke remain unperformed.
   Software-emulator ANR interrupted clean manual API 35 app-grid slider, keyboard/DPAD, forced-RTL,
   and TalkBack traversal; no result is claimed for those paths.
 
@@ -59,6 +65,40 @@
   software-only emulator later raised an input ANR while framework code laid out the nested list, so
   clean app-grid slider, keyboard/DPAD, forced-RTL, and TalkBack traversal are not claimed.
 - API 24 runtime remains unperformed because no local API 24 device/image is available.
+
+## Drawer indicator sync and home button guard — 2026-07-30
+
+- **Indicator position aligned.** Moved `apps_paging_screen_indicator` from inside
+  `ApplicationsPagingView` to `DragLayer` in `launcher.xml` (portrait and landscape). Both
+  `workspace_screen_indicator` and `apps_paging_screen_indicator` share the same parent with no
+  extra padding, so both resolve to the same visual position via `Gravity.BOTTOM` +
+  `navigation_strip_size + rail_inset`.
+- **Indicator type synced.** `Launcher.resolveDrawerIndicatorType()` maps the workspace indicator
+  preference (`None` → hide, `Slider` → `TYPE_SLIDER_BOTTOM`, `Dots` → `TYPE_DOTS`).
+  `loadIndicator()` calls `ApplicationsPagingView.configureIndicator()` so both indicators update
+  together when the preference changes.
+- **Home button suppressed for paging drawer.** `openApplicationsGrid()` and `closeApplicationsGrid()`
+  guard home-button show/hide inside `!(mApplicationsView instanceof ApplicationsPagingView)`.
+  The paging drawer is dismissed by back gesture or navigation button.
+- **Explicit drawer indicator hide on close.** `closeApplicationsGrid()` calls
+  `drawerIndicator.hide()` because the indicator lives in `DragLayer` and is not hidden by the
+  paging view's `INVISIBLE` transition.
+- `ApplicationsPagingView.configureIndicator(indicator, enabled, type)` replaces the previous
+  `onFinishInflate` auto-find of `R.id.apps_paging_screen_indicator`. The indicator reference and
+  type are externally provided by Launcher.
+
+### Validation — 2026-07-30
+
+- TDD: `SettingsResourceContractTest.drawerIndicatorPlacedInDragLayer()` written red first; turned
+  green after XML and Java production changes.
+- JVM: 185 tests across result files, 0 failures, 0 errors, 0 skipped. BUILD SUCCESSFUL.
+- Android-test compilation: BUILD SUCCESSFUL.
+- Lint: BUILD SUCCESSFUL with existing baseline.
+- `git diff --check`: passed.
+- `./tools/build_apk.sh`: passed. Debug APK: 811,161 bytes; SHA-256
+  `f6d740a636ac932f19a3d7af53884a4e45e68ddbfb861d08a6608cd6db26d564`.
+- Instrumentation tests for runtime home-button guard and drawer indicator type/position remain
+  pending. API 24 and API 35 device runtime smoke remain unperformed.
 
 ## Horizontal paging grid visual refactor — 2026-07-30
 
