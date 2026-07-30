@@ -57,4 +57,38 @@ final class DrawerLayoutMetrics {
     int getAvailableHeight() {
         return availableHeight;
     }
+
+    int columnLeft(int columnIndex) {
+        validateColumnIndex(columnIndex);
+        return columnIndex * availableWidth / columns;
+    }
+
+    int columnRight(int columnIndex) {
+        validateColumnIndex(columnIndex);
+        return (columnIndex + 1) * availableWidth / columns;
+    }
+
+    int rowTop(int rowIndex) {
+        validateRowIndex(rowIndex);
+        return rowIndex * availableHeight / rows;
+    }
+
+    int rowBottom(int rowIndex) {
+        validateRowIndex(rowIndex);
+        return (rowIndex + 1) * availableHeight / rows;
+    }
+
+    private void validateColumnIndex(int columnIndex) {
+        if (columnIndex < 0 || columnIndex >= columns) {
+            throw new IllegalArgumentException(
+                    "Column index " + columnIndex + " out of range [0, " + columns + ")");
+        }
+    }
+
+    private void validateRowIndex(int rowIndex) {
+        if (rowIndex < 0 || rowIndex >= rows) {
+            throw new IllegalArgumentException(
+                    "Row index " + rowIndex + " out of range [0, " + rows + ")");
+        }
+    }
 }
