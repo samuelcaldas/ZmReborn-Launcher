@@ -16,10 +16,15 @@ public class ViewPager extends HorizontalScrollView {
     private int mCurrentPageIndex;
     private GestureDetector mGestureDetector;
     private OnPageScrollListener mOnPageScrollListener;
+    private OnViewportChangedListener mOnViewportChangedListener;
     private LinearLayout mPageViewHolder;
 
     public static abstract class OnPageScrollListener {
         public abstract void onScroll();
+    }
+
+    public interface OnViewportChangedListener {
+        void onViewportChanged(int width, int height);
     }
 
     public ViewPager(Context context, AttributeSet attrs, int defStyle) {
@@ -49,6 +54,10 @@ public class ViewPager extends HorizontalScrollView {
 
     public void setOnPageScrollListener(OnPageScrollListener onPageScrollListener) {
         this.mOnPageScrollListener = onPageScrollListener;
+    }
+
+    public void setOnViewportChangedListener(OnViewportChangedListener listener) {
+        this.mOnViewportChangedListener = listener;
     }
 
     protected void setPagingViews(ArrayList<View> items) {
@@ -94,11 +103,14 @@ public class ViewPager extends HorizontalScrollView {
     @Override
     protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
         super.onSizeChanged(width, height, oldWidth, oldHeight);
-        if (width <= 0 || width == oldWidth) {
+        if (width <= 0 || (width == oldWidth && height == oldHeight)) {
             return;
         }
         resizePages(width);
         alignCurrentPage();
+        if (this.mOnViewportChangedListener != null) {
+            this.mOnViewportChangedListener.onViewportChanged(width, height);
+        }
     }
 
     private void resizePages(int pageWidth) {
@@ -188,6 +200,10 @@ public class ViewPager extends HorizontalScrollView {
             int pageOffset = velocityX < 0.0f ? 1 : -1;
             return moveToPage(mCurrentPageIndex + pageOffset);
         }
+    }
+
+    boolean moveToPageForced(int requestedPage) {
+        return moveToPage(requestedPage);
     }
 
     private boolean moveToPage(int requestedPage) {

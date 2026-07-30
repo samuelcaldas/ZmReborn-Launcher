@@ -259,6 +259,17 @@ public class UiModernizationContractTest {
     }
 
     @Test
+    public void pagingViewRestoresPositionByItemOrdinalOnRebuild() throws Exception {
+        String paging = read("main/java/org/zmreborn/ApplicationsPagingView.java");
+        assertTrue("ApplicationsPagingView must use pageIndexForItemOrdinal for position restoration",
+                paging.contains("pageIndexForItemOrdinal"));
+        assertTrue("ApplicationsPagingView must capture the first visible ordinal before rebuild",
+                paging.contains("captureFirstVisibleOrdinal"));
+        assertTrue("ApplicationsPagingView must react to viewport changes",
+                paging.contains("onPagerViewportChanged"));
+    }
+
+    @Test
     public void pagingLayoutsUseDimensionForDockExclusionNotHardcodedDp() throws Exception {
         String portrait = read("main/res/layout-port/apps_paging_view.xml");
         String landscape = read("main/res/layout-land/apps_paging_view.xml");
