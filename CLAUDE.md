@@ -53,6 +53,38 @@ Run unit tests or a single test:
 - All new and modified work must meet the mandatory design, failure-handling, risk-analysis, and acceptance-evidence rules in [`docs/CODE_QUALITY.md`](docs/CODE_QUALITY.md). Apply SOLID, Clean Code, and Object Calisthenics without unrelated legacy churn; use patterns only for concrete problems, not speculative abstractions or needless layers.
 - Quality gates are required acceptance evidence that reduces defect risk, not a guarantee that no defects exist. Report only validation, coverage, and device evidence actually obtained.
 
+## Incremental Modernization
+
+Apply these checks to **every existing file a task touches**. Do not apply them to untouched files (no unrelated churn). Each applied check is part of the same atomic commit as the triggering change.
+
+### Touch-rule checklist
+
+1. **Docstrings.** Add a concise Javadoc comment to every `public` class, interface, and method in the file that currently lacks one. Cover: purpose, non-obvious parameters, return value, and thrown exceptions. One sentence for simple methods; multi-line for complex ones. Do not add Javadoc for private/package-private implementation details or generated `R` references.
+
+2. **File length.** If the file exceeds 200 lines after modifications, check whether it contains more than one coherent responsibility. When it does, extract the secondary responsibility into a focused companion class in the same package (or the correct subdirectory per rule 3). Move related tests with it. Confirm compilation and run relevant unit tests before committing.
+
+3. **Package placement.** Check whether the class belongs in an existing subdirectory or whether a new one is warranted. When it does, move it in the same commit: update every `import` statement in all source sets (`main`, `test`, `androidTest`), confirm `./gradlew :app:testDebugUnitTest --no-daemon` passes, and run lint. When a move would require touching many callers outside the current task scope, leave an inline `// TODO(move): belongs in <package>` comment instead.
+
+### Suggested subdirectory taxonomy
+
+| Subdirectory | Purpose | Representative classes |
+|---|---|---|
+| `compat/` *(exists)* | API compatibility bridges (API 24–35) | `AdaptiveIconCompat`, `BackGestureCompat`, `WindowInsetsCompat` |
+| `theme/` *(exists)* | Wallpaper palette and color extraction | `WallpaperColorExtractor` |
+| `drag/` | Drag-drop controllers and interfaces | `DragController`, `DragLayer`, `DragSource`, `DragScroller`, `DragCancellationState`, `DockDragTransaction`, `DropTarget`, `DropResultListener` |
+| `drawer/` | App drawer views, adapters, and layout math | `ApplicationsDrawerView`, `ApplicationsGridView`, `ApplicationsPagingView`, `ApplicationsPageView`, `ApplicationsAdapter`, `ApplicationsView`, `ApplicationsPagePartition`, `DrawerAlphabetIndex`, `DrawerDensityPolicy`, `DrawerFastScrollView`, `DrawerLayoutMetrics`, `DrawerScrollState`, `DrawerSearchFilter` |
+| `folder/` | Folder containers, icons, and data stores | `Folder`, `FolderIcon`, `FolderInfo`, `FolderLayoutMetrics`, `AppListFolderInfo`, `AppListFolderProjection`, `AppListFolderRecord`, `AppListFolderStore`, `LiveFolder`, `LiveFolderAdapter`, `LiveFolderIcon`, `LiveFolderInfo`, `UserFolder`, `UserFolderInfo` |
+| `widget/` | AppWidget host, views, and info objects | `LauncherAppWidgetHost`, `LauncherAppWidgetHostView`, `LauncherAppWidgetInfo`, `WidgetResizeFrame`, `Widget` |
+| `preferences/` | Settings screen and preference widgets | `Preferences`, `PreferencesUtil`, `DialogSeekBarPreference`, `DebouncedIntegerPreference`, `InlineSliderPreference`, `InlineStepperPreference`, `ColourPickerDialog`, `ColourPickerPanelView`, `ColourPickerPreference`, `ColourPickerView`, `SettingsPreference`, `SettingsSummaryBinder` |
+| `workspace/` | Desktop workspace and cell layout | `Workspace`, `CellLayout`, `DeleteZone` |
+| `indicator/` | Page indicators and signal rail | `ScreenIndicator`, `DotsIndicator`, `SignalRailView` |
+| `item/` | Launcher item data models | `ItemInfo`, `ApplicationItemInfo`, `ApplicationsGridItemInfo`, `FolderInfo`, `LiveFolderInfo`, `UserFolderInfo`, `LauncherAppWidgetInfo` |
+| `util/` | Stateless utilities and drawables | `Utilities`, `LocaleUtil`, `FastXmlSerializer`, `XmlUtils`, `FastBitmapDrawable`, `AlphaPatternDrawable`, `BubbleTextView`, `SelectorDrawable`, `NumberPicker`, `NumberPickerButton` |
+| `paging/` | Horizontal pager and page partitioning | `ViewPager`, `ApplicationsPagePartition` |
+| `search/` | Search bar and filter logic | `Search`, `DrawerSearchFilter` |
+
+The taxonomy is a guide. When a class has dependencies that would require a cascade of unrelated moves, defer and leave a `// TODO(move): belongs in <package>` comment instead.
+
 ## Architecture and Runtime Flow
 
 - `LauncherApplication` owns the shared `LauncherModel`; `Launcher` coordinates activity lifecycle and launcher views.
