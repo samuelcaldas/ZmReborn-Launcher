@@ -154,7 +154,7 @@ Settings styling includes:
 - primary outline and surface-variant fill for focused/selected rows;
 - framework-owned row click/focus behavior.
 
-Legacy row/column controls remain enabled only for horizontal paging. Vertical auto-fit mode disables fixed-column controls because runtime width determines column count. Drawer density is persisted through a vertical-only `ListPreference`; changing it restarts launcher so responsive geometry is reapplied consistently.
+Legacy row/column controls remain enabled only for horizontal paging. Vertical auto-fit mode disables fixed-column controls because runtime width determines column count. `Launcher.sRestart`-backed preference changes clear pending restart state and automatically recreate the `Launcher` activity on return. Appearance plus `Launcher.sRestart`-backed changes coalesce into one activity recreation. Workspace row and column values remain in default `SharedPreferences`; rebuilt `CellLayout` instances use the selected geometry. Drawer density is persisted through a vertical-only `ListPreference`.
 
 Legacy popup, sheet, and navigation redesign remain deferred; externally-owned remote UI is not claimed as themed.
 
@@ -183,7 +183,9 @@ API 35 instrumentation coverage includes:
 - `WallpaperPaletteE2ETest` — live palette reapplication plus controlled production receiver scheduling and cached-role refresh;
 - `ApplicationsDrawerE2ETest` — workspace rendering during drawer exit, close-animation action suppression through decor-root pointer dispatch, stale-close reopen protection, search query retention, immutable binding, unremembered refresh reset, and visible empty-adapter recovery that restores original items and closes the drawer;
 - `PredictiveBackE2ETest` — registered platform predictive-back callback object invocation/delivery, handler previews, and top/bottom gesture exclusions;
-- `LauncherE2ETest` — measured production widget-span clamping and pre-measure geometry rejection;
+- `LauncherE2ETest` — `Launcher.sRestart`-backed preference persistence, automatic and coalesced
+  appearance/`Launcher.sRestart`-backed `Launcher` recreation, workspace row/column geometry rebuild, measured
+  production widget-span clamping, and pre-measure geometry rejection;
 - `WidgetResizeInstrumentationTest` — provider-axis handle selection, 48dp handle geometry, valid
   and occupied candidates, fixed-provider behavior, outside cancellation, and accessibility-click
   cancellation without premature layout mutation;

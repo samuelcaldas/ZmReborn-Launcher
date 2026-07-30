@@ -1,15 +1,29 @@
 package org.zmreborn;
 
+import android.app.Activity;
+import android.app.AlertDialog;
+import android.app.Application;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.ProviderInfo;
 import android.content.res.Configuration;
 import android.graphics.Rect;
+import android.os.Bundle;
+import android.os.Process;
+import android.os.SystemClock;
+import android.preference.Preference;
 import android.preference.PreferenceManager;
+import android.preference.PreferenceScreen;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SeekBar;
 import java.lang.reflect.Field;
+import java.util.IdentityHashMap;
 import org.zmreborn.Launcher;
 
 public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> {
@@ -52,8 +66,11 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
         final String originalAppearance = preferences.getString(appearanceKey, null);
         final String targetAppearance = Appearance.DARK.equals(
                 Appearance.getSelectedAppearance(launcher)) ? Appearance.LIGHT : Appearance.DARK;
+        final boolean originalRestart = Launcher.sRestart;
         android.app.Instrumentation.ActivityMonitor settingsMonitor = null;
-        android.app.Instrumentation.ActivityMonitor launcherMonitor = null;
+        final ReplacementLauncherObserver recreationObserver =
+                new ReplacementLauncherObserver(launcher);
+        boolean recreationObserverRegistered = false;
         Launcher recreatedLauncher = null;
 
         try {
@@ -65,17 +82,20 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
             getInstrumentation().waitForIdleSync();
             assertTrue("Target appearance must persist", preferences.edit()
                     .putString(appearanceKey, targetAppearance).commit());
-            launcherMonitor = getInstrumentation().addMonitor(Launcher.class.getName(), null, false);
+            Launcher.sRestart = true;
+            launcher.getApplication().registerActivityLifecycleCallbacks(recreationObserver);
+            recreationObserverRegistered = true;
             settings.runOnUiThread(new Runnable() {
                 public void run() {
                     settings.finish();
                 }
             });
-            recreatedLauncher = (Launcher) getInstrumentation().waitForMonitorWithTimeout(
-                    launcherMonitor, 30000L);
+            recreatedLauncher = recreationObserver.awaitLauncher();
             assertNotNull("Appearance change must recreate Launcher", recreatedLauncher);
             assertNotSame("Appearance change must replace Launcher", launcher, recreatedLauncher);
             getInstrumentation().waitForIdleSync();
+            assertEquals("Appearance and restart changes must create exactly one replacement Launcher", 1,
+                    recreationObserver.getReplacementLauncherCreationCount());
             assertEquals("Target appearance must persist", targetAppearance,
                     preferences.getString(appearanceKey, null));
             int expectedNightMode = Appearance.DARK.equals(targetAppearance)
@@ -86,18 +106,112 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
             assertNotNull("Workspace must be inflated after appearance recreation",
                     recreatedLauncher.findViewById(R.id.workspace));
         } finally {
-            SharedPreferences.Editor editor = preferences.edit();
-            if (hadOriginalAppearance) {
-                editor.putString(appearanceKey, originalAppearance);
-            } else {
-                editor.remove(appearanceKey);
+            try {
+                SharedPreferences.Editor editor = preferences.edit();
+                if (hadOriginalAppearance) {
+                    editor.putString(appearanceKey, originalAppearance);
+                }
+                if (!hadOriginalAppearance) {
+                    editor.remove(appearanceKey);
+                }
+                assertTrue("Original appearance preference must be restored", editor.commit());
+            } finally {
+                Launcher.sRestart = originalRestart;
+                try {
+                    if (recreationObserverRegistered) {
+                        launcher.getApplication().unregisterActivityLifecycleCallbacks(recreationObserver);
+                    }
+                } finally {
+                    try {
+                        finishReplacementLauncher(recreationObserver.getLatestLauncher());
+                    } finally {
+                        if (settingsMonitor != null) {
+                            getInstrumentation().removeMonitor(settingsMonitor);
+                        }
+                    }
+                }
             }
-            assertTrue("Original appearance preference must be restored", editor.commit());
-            if (launcherMonitor != null) {
-                getInstrumentation().removeMonitor(launcherMonitor);
-            }
-            if (settingsMonitor != null) {
-                getInstrumentation().removeMonitor(settingsMonitor);
+        }
+    }
+
+    public void testWorkspaceGridSettingsPersistAcrossLauncherRecreation() {
+        final Launcher launcher = getActivity();
+        final SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(launcher);
+        final String rowsKey = launcher.getString(
+                R.string.preferences_key_workspace_content_grid_rows);
+        final String columnsKey = launcher.getString(
+                R.string.preferences_key_workspace_content_grid_columns);
+        final int defaultRows = Integer.parseInt(launcher.getString(
+                R.string.preferences_default_workspace_content_grid_rows));
+        final int defaultColumns = Integer.parseInt(launcher.getString(
+                R.string.preferences_default_workspace_content_grid_columns));
+        final boolean hadRows = preferences.contains(rowsKey);
+        final boolean hadColumns = preferences.contains(columnsKey);
+        final int originalRows = preferences.getInt(rowsKey, defaultRows);
+        final int originalColumns = preferences.getInt(columnsKey, defaultColumns);
+        final int targetRows = differentGridValue(originalRows);
+        final int targetColumns = differentGridValue(originalColumns, targetRows);
+        final boolean originalRestart = Launcher.sRestart;
+        final int originalProcessId = Process.myPid();
+        android.app.Instrumentation.ActivityMonitor settingsMonitor = null;
+        final ReplacementLauncherObserver recreationObserver =
+                new ReplacementLauncherObserver(launcher);
+        boolean recreationObserverRegistered = false;
+        Launcher recreatedLauncher = null;
+
+        try {
+            settingsMonitor = getInstrumentation().addMonitor(
+                    Preferences.class.getName(), null, false);
+            launcher.startActivity(new Intent(launcher, Preferences.class));
+            final Preferences settings = (Preferences) getInstrumentation().waitForMonitorWithTimeout(
+                    settingsMonitor, 30000L);
+            assertNotNull("Preferences activity must open", settings);
+            getInstrumentation().waitForIdleSync();
+            changeWorkspaceGridPreference(settings, columnsKey, targetColumns);
+            changeWorkspaceGridPreference(settings, rowsKey, targetRows);
+            assertEquals("Selected rows must persist before Launcher reload", targetRows,
+                    preferences.getInt(rowsKey, -1));
+            assertEquals("Selected columns must persist before Launcher reload", targetColumns,
+                    preferences.getInt(columnsKey, -1));
+            assertTrue("Grid changes must request Launcher restart", Launcher.sRestart);
+
+            launcher.getApplication().registerActivityLifecycleCallbacks(recreationObserver);
+            recreationObserverRegistered = true;
+            settings.runOnUiThread(new Runnable() {
+                public void run() {
+                    settings.finish();
+                }
+            });
+            recreatedLauncher = recreationObserver.awaitLauncher();
+            assertNotNull("Grid change must recreate Launcher", recreatedLauncher);
+            assertEquals("Grid reload must not terminate process", originalProcessId,
+                    Process.myPid());
+            getInstrumentation().waitForIdleSync();
+            assertEquals(targetRows, PreferencesUtil.getContentGridRows(recreatedLauncher));
+            assertEquals(targetColumns, PreferencesUtil.getContentGridColumns(recreatedLauncher));
+            assertWorkspaceGridGeometry(recreatedLauncher, targetRows, targetColumns);
+        } finally {
+            try {
+                restoreIntPreference(preferences, rowsKey, hadRows, originalRows);
+            } finally {
+                try {
+                    restoreIntPreference(preferences, columnsKey, hadColumns, originalColumns);
+                } finally {
+                    Launcher.sRestart = originalRestart;
+                    try {
+                        if (recreationObserverRegistered) {
+                            launcher.getApplication().unregisterActivityLifecycleCallbacks(recreationObserver);
+                        }
+                    } finally {
+                        try {
+                            finishReplacementLauncher(recreationObserver.getLatestLauncher());
+                        } finally {
+                            if (settingsMonitor != null) {
+                                getInstrumentation().removeMonitor(settingsMonitor);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -330,6 +444,210 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
         });
 
         assertFalse("Unmeasured CellLayout geometry must not be ready", geometryReady[0]);
+    }
+
+    private void changeWorkspaceGridPreference(final Preferences settings, String key,
+            final int targetValue) {
+        PreferenceScreen workspaceScreen = (PreferenceScreen) settings.getPreferenceScreen()
+                .getPreference(1);
+        if (workspaceScreen.getDialog() == null || !workspaceScreen.getDialog().isShowing()) {
+            clickPreference(settings.getListView(), workspaceScreen);
+        }
+        Dialog workspaceDialog = workspaceScreen.getDialog();
+        assertNotNull("Workspace preference screen must open", workspaceDialog);
+        ListView workspaceList = (ListView) workspaceDialog.findViewById(android.R.id.list);
+        assertNotNull("Workspace preference list must exist", workspaceList);
+        final DialogSeekBarPreference preference = (DialogSeekBarPreference) settings
+                .findPreference(key);
+        clickPreference(workspaceList, preference);
+        final AlertDialog seekDialog = (AlertDialog) preference.getDialog();
+        assertNotNull("Grid preference dialog must open", seekDialog);
+        final SeekBar seekBar = (SeekBar) seekDialog.findViewById(R.id.my_bar);
+        assertNotNull("Grid preference seek bar must exist", seekBar);
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                seekBar.setProgress(targetValue - preference.getMin());
+                preference.onClick(seekDialog, DialogInterface.BUTTON_POSITIVE);
+                seekDialog.dismiss();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        assertEquals("Grid preference object must retain selected value", targetValue,
+                preference.getValue());
+        assertEquals("Grid preference store must contain selected value", targetValue,
+                preference.getSharedPreferences().getInt(preference.getKey(), -1));
+    }
+
+    private void clickPreference(final ListView listView, final Preference preference) {
+        final ListAdapter adapter = listView.getAdapter();
+        final int position = preferencePosition(adapter, preference);
+        assertTrue("Preference must be present in visible hierarchy", position >= 0);
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                View row = adapter.getView(position, null, listView);
+                listView.performItemClick(row, position, adapter.getItemId(position));
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+    }
+
+    private static int preferencePosition(ListAdapter adapter, Preference preference) {
+        for (int position = 0; position < adapter.getCount(); position++) {
+            if (adapter.getItem(position) == preference) {
+                return position;
+            }
+        }
+        return -1;
+    }
+
+    private void finishReplacementLauncher(final Launcher launcher) {
+        if (launcher == null) {
+            return;
+        }
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                if (launcher.isFinishing() || launcher.isDestroyed()) {
+                    return;
+                }
+                launcher.finish();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+    }
+
+    private static final class ReplacementLauncherObserver
+            implements Application.ActivityLifecycleCallbacks {
+        private final Launcher originalLauncher;
+        private final IdentityHashMap<Launcher, Boolean> replacementLaunchers =
+                new IdentityHashMap<Launcher, Boolean>();
+        private Launcher latestReplacementLauncher;
+
+        ReplacementLauncherObserver(Launcher originalLauncher) {
+            this.originalLauncher = originalLauncher;
+        }
+
+        @Override
+        public void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+            if (!(activity instanceof Launcher) || activity == originalLauncher) {
+                return;
+            }
+            Launcher replacementLauncher = (Launcher) activity;
+            synchronized (this) {
+                if (replacementLaunchers.containsKey(replacementLauncher)) {
+                    return;
+                }
+                replacementLaunchers.put(replacementLauncher, Boolean.TRUE);
+                latestReplacementLauncher = replacementLauncher;
+                notifyAll();
+            }
+        }
+
+        @Override
+        public void onActivityStarted(Activity activity) {
+        }
+
+        @Override
+        public void onActivityResumed(Activity activity) {
+        }
+
+        @Override
+        public void onActivityPaused(Activity activity) {
+        }
+
+        @Override
+        public void onActivityStopped(Activity activity) {
+        }
+
+        @Override
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+        }
+
+        @Override
+        public void onActivityDestroyed(Activity activity) {
+        }
+
+        Launcher awaitLauncher() {
+            if (Thread.currentThread().isInterrupted()) {
+                return null;
+            }
+            long deadline = SystemClock.uptimeMillis() + 30000L;
+            synchronized (this) {
+                while (latestReplacementLauncher == null) {
+                    long remaining = deadline - SystemClock.uptimeMillis();
+                    if (remaining <= 0L) {
+                        return null;
+                    }
+                    try {
+                        wait(remaining);
+                    } catch (InterruptedException exception) {
+                        Thread.currentThread().interrupt();
+                        return null;
+                    }
+                }
+                return latestReplacementLauncher;
+            }
+        }
+
+        synchronized int getReplacementLauncherCreationCount() {
+            return replacementLaunchers.size();
+        }
+
+        synchronized Launcher getLatestLauncher() {
+            return latestReplacementLauncher;
+        }
+    }
+
+    private void assertWorkspaceGridGeometry(final Launcher launcher, final int rows,
+            final int columns) {
+        final CellLayout[] currentLayout = new CellLayout[1];
+        long deadline = SystemClock.uptimeMillis() + 30000L;
+        while (currentLayout[0] == null && SystemClock.uptimeMillis() < deadline) {
+            getInstrumentation().runOnMainSync(new Runnable() {
+                public void run() {
+                    int currentScreen = launcher.mWorkspace.getCurrentScreen();
+                    View child = launcher.mWorkspace.getChildAt(currentScreen);
+                    if (!(child instanceof CellLayout)) {
+                        return;
+                    }
+                    CellLayout layout = (CellLayout) child;
+                    if (!layout.isWidgetSizingGeometryReady()) {
+                        return;
+                    }
+                    currentLayout[0] = layout;
+                }
+            });
+            if (currentLayout[0] == null) {
+                SystemClock.sleep(100L);
+            }
+        }
+        assertNotNull("Recreated Launcher must bind a layout-ready current CellLayout",
+                currentLayout[0]);
+        assertEquals(columns, currentLayout[0].getCountX());
+        assertEquals(rows, currentLayout[0].getCountY());
+    }
+
+    private static int differentGridValue(int originalValue) {
+        return differentGridValue(originalValue, -1);
+    }
+
+    private static int differentGridValue(int originalValue, int excludedValue) {
+        for (int candidate = 3; candidate <= 8; candidate++) {
+            if (candidate != originalValue && candidate != excludedValue) {
+                return candidate;
+            }
+        }
+        throw new IllegalArgumentException("No distinct workspace grid value is available");
+    }
+
+    private static void restoreIntPreference(SharedPreferences preferences, String key,
+            boolean hadValue, int value) {
+        SharedPreferences.Editor editor = preferences.edit();
+        if (hadValue) {
+            editor.putInt(key, value);
+        } else {
+            editor.remove(key);
+        }
+        assertTrue("Original grid preference must be restored", editor.commit());
     }
 
     private static Rect readPrivateRect(Object target, String fieldName) throws Exception {

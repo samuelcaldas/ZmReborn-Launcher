@@ -641,11 +641,14 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     public void onResume() {
         super.onResume();
         if (!Appearance.fingerprint(this).equals(this.mAppearanceFingerprint)) {
+            sRestart = false;
             recreate();
             return;
         }
         if (sRestart) {
-            Preferences.alertRestart(this);
+            sRestart = false;
+            recreate();
+            return;
         }
         loadPreferences();
         boolean landscape = getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
