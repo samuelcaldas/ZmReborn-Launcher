@@ -33,6 +33,7 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
     private static final int FAST_SCROLL_HIDE_DELAY_MS = 1000;
     private static final int FAST_SCROLL_ANIM_DURATION_MS = 150;
     private static final int SEARCH_REVEAL_ANIM_DURATION_MS = 150;
+    private static final int CLOSE_DRAG_THRESHOLD_DP = 72;
 
     private ApplicationsGridView mGridView;
     private EditText mSearchInput;
@@ -67,6 +68,7 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
     private float mPullStartY;
     private int mPullCurrentHeight;
     private boolean mInterceptingPull;
+    private boolean mInterceptingClose;
 
     /** Creates drawer without XML attributes. */
     public ApplicationsDrawerView(Context context) {
@@ -424,7 +426,27 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        if (this.mSearchRevealed || this.mDestroyed) {
+        if (this.mDestroyed) {
+            return super.onInterceptTouchEvent(event);
+        }
+        if (this.mSearchRevealed) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_DOWN:
+                    this.mPullStartY = event.getY();
+                    this.mInterceptingClose = false;
+                    break;
+                case MotionEvent.ACTION_MOVE:
+                    float closeDy = event.getY() - this.mPullStartY;
+                    int closeSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+                    if (closeDy > closeSlop && isGridAtTop()) {
+                        this.mInterceptingClose = true;
+                        return true;
+                    }
+                    break;
+                case MotionEvent.ACTION_CANCEL:
+                    this.mInterceptingClose = false;
+                    break;
+            }
             return super.onInterceptTouchEvent(event);
         }
         switch (event.getActionMasked()) {
@@ -450,6 +472,26 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        if (this.mInterceptingClose) {
+            switch (event.getActionMasked()) {
+                case MotionEvent.ACTION_MOVE:
+                    return true;
+                case MotionEvent.ACTION_UP:
+                    float closeDy = event.getY() - this.mPullStartY;
+                    this.mInterceptingClose = false;
+                    performClick();
+                    if (closeDy >= closeDragThresholdPx()) {
+                        Launcher launcher = getLauncher();
+                        if (launcher != null) {
+                            launcher.closeAllApplications();
+                        }
+                    }
+                    return true;
+                case MotionEvent.ACTION_CANCEL:
+                    this.mInterceptingClose = false;
+                    return true;
+            }
+        }
         if (!this.mInterceptingPull) {
             return super.onTouchEvent(event);
         }
@@ -541,6 +583,10 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
             }
         });
         anim.start();
+    }
+
+    private int closeDragThresholdPx() {
+        return (int) (CLOSE_DRAG_THRESHOLD_DP * getResources().getDisplayMetrics().density);
     }
 
     // --- Lifecycle ---

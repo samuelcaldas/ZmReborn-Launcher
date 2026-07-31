@@ -3,13 +3,22 @@ package org.zmreborn;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Rect;
+import android.graphics.drawable.GradientDrawable;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
+import android.widget.TextView;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -17,9 +26,12 @@ import org.zmreborn.ViewPager;
 import org.zmreborn.theme.WallpaperColorExtractor;
 
 public class ApplicationsPagingView extends FrameLayout implements ApplicationsView, View.OnClickListener, View.OnLongClickListener, DragSource {
+    private static final int CLOSE_DRAG_THRESHOLD_DP = 72;
     private static int sColumns;
     private static int sRows;
     private ArrayList<ApplicationItemInfo> mApplicationItemInfos;
+    private ArrayList<ApplicationItemInfo> mSourceItems = new ArrayList<>();
+    private String mQuery = "";
     private boolean mActionsEnabled = true;
     private boolean mClosing;
     private DragController mDragController;
@@ -31,6 +43,13 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     private int mIndicatorType = ScreenIndicator.TYPE_DOTS;
     private boolean mIndicatorEnabled = true;
     private ViewPager mViewPager;
+    private FrameLayout mSearchContainer;
+    private EditText mSearchInput;
+    private ImageButton mClearSearch;
+    private TextView mNoResults;
+    private boolean mInterceptingClose;
+    private float mCloseStartX;
+    private float mCloseStartY;
     private int mBasePaddingBottom;
     private int mBasePaddingLeft;
     private int mBasePaddingRight;
@@ -72,6 +91,156 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
                 ApplicationsPagingView.this.onPagerViewportChanged();
             }
         });
+        this.mSearchContainer = (FrameLayout) findViewById(R.id.drawer_search_container);
+        this.mSearchInput = (EditText) findViewById(R.id.drawer_search_input);
+        this.mClearSearch = (ImageButton) findViewById(R.id.drawer_search_clear);
+        this.mNoResults = (TextView) findViewById(R.id.drawer_search_empty);
+        if (this.mSearchInput != null) {
+            bindSearch();
+        }
+    }
+
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent event) {
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                this.mCloseStartX = event.getX();
+                this.mCloseStartY = event.getY();
+                this.mInterceptingClose = false;
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float dx = Math.abs(event.getX() - this.mCloseStartX);
+                float dy = event.getY() - this.mCloseStartY;
+                int slop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
+                if (dy > slop && dy > dx) {
+                    this.mInterceptingClose = true;
+                    return true;
+                }
+                break;
+            case MotionEvent.ACTION_CANCEL:
+                this.mInterceptingClose = false;
+                break;
+        }
+        return super.onInterceptTouchEvent(event);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        if (!this.mInterceptingClose) {
+            return super.onTouchEvent(event);
+        }
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_MOVE:
+                return true;
+            case MotionEvent.ACTION_UP:
+                float dy = event.getY() - this.mCloseStartY;
+                this.mInterceptingClose = false;
+                performClick();
+                if (dy >= closeDragThresholdPx() && this.mLauncher != null) {
+                    this.mLauncher.closeAllApplications();
+                }
+                return true;
+            case MotionEvent.ACTION_CANCEL:
+                this.mInterceptingClose = false;
+                return true;
+        }
+        return super.onTouchEvent(event);
+    }
+
+    @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
+
+    private int closeDragThresholdPx() {
+        return (int) (CLOSE_DRAG_THRESHOLD_DP * getResources().getDisplayMetrics().density);
+    }
+
+    private void bindSearch() {
+        this.mSearchInput.addTextChangedListener(new TextWatcher() {
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+            public void afterTextChanged(Editable s) {
+                updateQuery(s.toString());
+            }
+        });
+        this.mClearSearch.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mSearchInput.setText("");
+            }
+        });
+    }
+
+    private void updateQuery(String query) {
+        this.mQuery = query;
+        boolean hasQuery = !DrawerSearchFilter.isEmptyQuery(query);
+        if (this.mClearSearch != null) {
+            this.mClearSearch.setVisibility(hasQuery ? VISIBLE : GONE);
+        }
+        ArrayList<ApplicationItemInfo> filtered = DrawerSearchFilter.filter(this.mSourceItems, query);
+        this.mApplicationItemInfos = filtered;
+        buildPages();
+        initIndicator();
+        if (this.mNoResults != null) {
+            this.mNoResults.setVisibility(hasQuery && filtered.isEmpty() ? VISIBLE : GONE);
+        }
+    }
+
+    private void clearSearchOnClose() {
+        if (DrawerSearchFilter.isEmptyQuery(this.mQuery)) {
+            return;
+        }
+        this.mQuery = "";
+        if (this.mSearchInput != null) {
+            this.mSearchInput.setText("");
+            this.mSearchInput.clearFocus();
+        }
+        if (this.mClearSearch != null) {
+            this.mClearSearch.setVisibility(GONE);
+        }
+        if (this.mNoResults != null) {
+            this.mNoResults.setVisibility(GONE);
+        }
+        this.mApplicationItemInfos = new ArrayList<>(this.mSourceItems);
+        buildPages();
+        initIndicator();
+        hideSearchKeyboard();
+    }
+
+    private void hideSearchKeyboard() {
+        if (this.mSearchInput == null) {
+            return;
+        }
+        InputMethodManager imm = (InputMethodManager)
+                getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        if (imm != null) {
+            imm.hideSoftInputFromWindow(getWindowToken(), 0);
+        }
+    }
+
+    private void applySearchPalette() {
+        if (this.mSearchInput == null) {
+            return;
+        }
+        int onSurface = WallpaperColorExtractor.getOnSurface(getContext());
+        this.mSearchInput.setTextColor(onSurface);
+        this.mSearchInput.setHintTextColor(WallpaperColorExtractor.getOutline(getContext()));
+        this.mSearchInput.setBackground(createSearchBackground());
+        if (this.mClearSearch != null) {
+            this.mClearSearch.setColorFilter(onSurface);
+        }
+        if (this.mNoResults != null) {
+            this.mNoResults.setTextColor(onSurface);
+        }
+    }
+
+    private GradientDrawable createSearchBackground() {
+        GradientDrawable background = new GradientDrawable();
+        background.setColor(WallpaperColorExtractor.getSurfaceVariant(getContext()));
+        background.setCornerRadius(getResources().getDimension(R.dimen.shape_corner_extra_large));
+        int strokeWidth = Math.max(1, Math.round(getResources().getDisplayMetrics().density));
+        background.setStroke(strokeWidth, WallpaperColorExtractor.getOutline(getContext()));
+        return background;
     }
 
     /**
@@ -134,6 +303,9 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         if (this.mScreenIndicator != null) {
             this.mScreenIndicator.refreshPalette();
         }
+        if (this.mSearchContainer != null) {
+            applySearchPalette();
+        }
         invalidate();
     }
 
@@ -152,8 +324,10 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         if (this.mDestroyed) {
             return;
         }
-        this.mApplicationItemInfos = applicationItemInfos == null
-                ? new ArrayList<ApplicationItemInfo>() : applicationItemInfos;
+        this.mSourceItems = applicationItemInfos == null
+                ? new ArrayList<ApplicationItemInfo>()
+                : new ArrayList<ApplicationItemInfo>(applicationItemInfos);
+        this.mApplicationItemInfos = DrawerSearchFilter.filter(this.mSourceItems, this.mQuery);
         buildPages();
         initIndicator();
     }
@@ -317,6 +491,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
             this.mResetMode = true;
             return false;
         }
+        clearSearchOnClose();
         this.mClosing = true;
         resetVisualState();
         if (!animated) {

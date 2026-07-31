@@ -15,6 +15,7 @@ import android.preference.Preference;
 import android.preference.PreferenceManager;
 import android.preference.PreferenceScreen;
 import android.test.ActivityInstrumentationTestCase2;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.ListAdapter;
@@ -724,6 +725,208 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
             editor.remove(key);
         }
         assertTrue("Original grid preference must be restored", editor.commit());
+    }
+
+    public void testPullDownClosesDrawerWhenSearchRevealed() throws Exception {
+        final Launcher launcher = getActivity();
+        getInstrumentation().waitForIdleSync();
+
+        final int[] drawerType = new int[1];
+        final boolean[] isPagingDrawer = new boolean[1];
+        final ApplicationsView[] view = new ApplicationsView[1];
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                drawerType[0] = PreferencesUtil.getAppsGridType(launcher);
+                view[0] = launcher.mApplicationsView;
+                isPagingDrawer[0] = view[0] instanceof ApplicationsPagingView;
+            }
+        });
+
+        if (isPagingDrawer[0]) {
+            return; // Vertical drawer test: skip when paging drawer is active
+        }
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                try {
+                    java.lang.reflect.Method open = Launcher.class.getDeclaredMethod(
+                            "openApplicationsGrid", Boolean.TYPE);
+                    open.setAccessible(true);
+                    open.invoke(launcher, false);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                try {
+                    ApplicationsDrawerView drawerView = (ApplicationsDrawerView) view[0];
+                    java.lang.reflect.Field f = ApplicationsDrawerView.class
+                            .getDeclaredField("mSearchRevealed");
+                    f.setAccessible(true);
+                    f.setBoolean(drawerView, true);
+                    java.lang.reflect.Field pullY = ApplicationsDrawerView.class
+                            .getDeclaredField("mPullStartY");
+                    pullY.setAccessible(true);
+                    pullY.setFloat(drawerView, 0f);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        final float thresholdPx = 72 * launcher.getResources().getDisplayMetrics().density;
+        final View targetView = (View) view[0];
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                long now = SystemClock.uptimeMillis();
+                MotionEvent down = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 200, 0, 0);
+                MotionEvent move = MotionEvent.obtain(now, now + 100, MotionEvent.ACTION_MOVE,
+                        200, thresholdPx + 20, 0);
+                MotionEvent up = MotionEvent.obtain(now, now + 200, MotionEvent.ACTION_UP,
+                        200, thresholdPx + 20, 0);
+                targetView.dispatchTouchEvent(down);
+                targetView.dispatchTouchEvent(move);
+                targetView.dispatchTouchEvent(up);
+                down.recycle();
+                move.recycle();
+                up.recycle();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        assertFalse("Drawer must close after pull-down past threshold when search is revealed",
+                launcher.isApplicationsGridLogicallyOpen());
+    }
+
+    public void testPullDownClosesPagingDrawer() throws Exception {
+        final Launcher launcher = getActivity();
+        getInstrumentation().waitForIdleSync();
+
+        final boolean[] isPagingDrawer = new boolean[1];
+        final ApplicationsView[] view = new ApplicationsView[1];
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                view[0] = launcher.mApplicationsView;
+                isPagingDrawer[0] = view[0] instanceof ApplicationsPagingView;
+            }
+        });
+
+        if (!isPagingDrawer[0]) {
+            return; // Paging drawer test: skip when vertical drawer is active
+        }
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                try {
+                    java.lang.reflect.Method open = Launcher.class.getDeclaredMethod(
+                            "openApplicationsGrid", Boolean.TYPE);
+                    open.setAccessible(true);
+                    open.invoke(launcher, false);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        final float thresholdPx = 72 * launcher.getResources().getDisplayMetrics().density;
+        final View targetView = (View) view[0];
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                long now = SystemClock.uptimeMillis();
+                MotionEvent down = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 200, 0, 0);
+                MotionEvent move = MotionEvent.obtain(now, now + 100, MotionEvent.ACTION_MOVE,
+                        200, thresholdPx + 20, 0);
+                MotionEvent up = MotionEvent.obtain(now, now + 200, MotionEvent.ACTION_UP,
+                        200, thresholdPx + 20, 0);
+                targetView.dispatchTouchEvent(down);
+                targetView.dispatchTouchEvent(move);
+                targetView.dispatchTouchEvent(up);
+                down.recycle();
+                move.recycle();
+                up.recycle();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        assertFalse("Paging drawer must close after pull-down past threshold",
+                launcher.isApplicationsGridLogicallyOpen());
+    }
+
+    public void testHorizontalSwipeDoesNotClosePagingDrawer() throws Exception {
+        final Launcher launcher = getActivity();
+        getInstrumentation().waitForIdleSync();
+
+        final boolean[] isPagingDrawer = new boolean[1];
+        final ApplicationsView[] view = new ApplicationsView[1];
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                view[0] = launcher.mApplicationsView;
+                isPagingDrawer[0] = view[0] instanceof ApplicationsPagingView;
+            }
+        });
+
+        if (!isPagingDrawer[0]) {
+            return; // Paging drawer test: skip when vertical drawer is active
+        }
+
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                try {
+                    java.lang.reflect.Method open = Launcher.class.getDeclaredMethod(
+                            "openApplicationsGrid", Boolean.TYPE);
+                    open.setAccessible(true);
+                    open.invoke(launcher, false);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        final View targetView = (View) view[0];
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                long now = SystemClock.uptimeMillis();
+                MotionEvent down = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 100, 300, 0);
+                MotionEvent move = MotionEvent.obtain(now, now + 100, MotionEvent.ACTION_MOVE,
+                        400, 305, 0); // Mostly horizontal
+                MotionEvent up = MotionEvent.obtain(now, now + 200, MotionEvent.ACTION_UP,
+                        400, 305, 0);
+                targetView.dispatchTouchEvent(down);
+                targetView.dispatchTouchEvent(move);
+                targetView.dispatchTouchEvent(up);
+                down.recycle();
+                move.recycle();
+                up.recycle();
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+
+        assertTrue("Paging drawer must stay open after horizontal swipe",
+                launcher.isApplicationsGridLogicallyOpen());
+
+        // Cleanup: close drawer
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
+                try {
+                    java.lang.reflect.Method close = Launcher.class.getDeclaredMethod(
+                            "closeApplicationsGrid", Boolean.TYPE);
+                    close.setAccessible(true);
+                    close.invoke(launcher, false);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     private static Rect readPrivateRect(Object target, String fieldName) throws Exception {

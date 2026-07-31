@@ -777,6 +777,35 @@ public class SettingsResourceContractTest {
         return content.toString();
     }
 
+    @Test
+    public void pullToCloseWiredInBothDrawerModes() throws Exception {
+        String drawerView = read("main/java/org/zmreborn/ApplicationsDrawerView.java");
+        String pagingView = read("main/java/org/zmreborn/ApplicationsPagingView.java");
+
+        assertTrue("Vertical drawer must call closeAllApplications on pull-close",
+                drawerView.contains("closeAllApplications"));
+        assertTrue("Vertical drawer must have CLOSE_DRAG_THRESHOLD_DP",
+                drawerView.contains("CLOSE_DRAG_THRESHOLD_DP"));
+        assertTrue("Paging drawer must override onInterceptTouchEvent",
+                pagingView.contains("onInterceptTouchEvent"));
+        assertTrue("Paging drawer must have CLOSE_DRAG_THRESHOLD_DP",
+                pagingView.contains("CLOSE_DRAG_THRESHOLD_DP"));
+    }
+
+    @Test
+    public void pagingDrawerHasSearchCapability() throws Exception {
+        String pagingView = read("main/java/org/zmreborn/ApplicationsPagingView.java");
+
+        assertTrue("Paging drawer must use DrawerSearchFilter",
+                pagingView.contains("DrawerSearchFilter"));
+        assertTrue("Paging drawer must have mSourceItems for full app list",
+                pagingView.contains("mSourceItems"));
+        assertTrue("Paging drawer must bind search input",
+                pagingView.contains("drawer_search_input"));
+        assertTrue("Paging drawer must clear search on close",
+                pagingView.contains("clearSearchOnClose"));
+    }
+
     private static File resourceFile(String relativePath) {
         File workingDirectory = new File(System.getProperty("user.dir"));
         File moduleResource = new File(workingDirectory, "src/" + relativePath);
