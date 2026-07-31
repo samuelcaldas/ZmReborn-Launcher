@@ -371,13 +371,13 @@ public class SettingsResourceContractTest {
                 landPaging.contains("apps_paging_screen_indicator"));
 
         String portLauncher = read("main/res/layout-port/launcher.xml");
-        assertTrue("Drawer indicator must live in DragLayer (port)",
+        assertFalse("Unified design: apps_paging_screen_indicator must not exist in DragLayer (port)",
                 portLauncher.contains("apps_paging_screen_indicator"));
         assertTrue("Workspace indicator must remain in DragLayer (port)",
                 portLauncher.contains("workspace_screen_indicator"));
 
         String landLauncher = read("main/res/layout-land/launcher.xml");
-        assertTrue("Drawer indicator must live in DragLayer (land)",
+        assertFalse("Unified design: apps_paging_screen_indicator must not exist in DragLayer (land)",
                 landLauncher.contains("apps_paging_screen_indicator"));
         assertTrue("Workspace indicator must remain in DragLayer (land)",
                 landLauncher.contains("workspace_screen_indicator"));
@@ -393,6 +393,8 @@ public class SettingsResourceContractTest {
                 launcher.contains("resolveDrawerIndicatorType"));
         assertTrue("Home button must be guarded for paging drawer",
                 launcher.contains("instanceof ApplicationsPagingView"));
+        assertFalse("Launcher must not reference removed apps_paging_screen_indicator ID",
+                launcher.contains("R.id.apps_paging_screen_indicator"));
     }
 
     @Test

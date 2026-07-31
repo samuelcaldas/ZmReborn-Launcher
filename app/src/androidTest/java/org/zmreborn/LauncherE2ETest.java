@@ -236,12 +236,9 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
     public void testDrawerIndicatorLivesInDragLayer() {
         Launcher launcher = getActivity();
         getInstrumentation().waitForIdleSync();
-        View appsIndicator = launcher.findViewById(R.id.apps_paging_screen_indicator);
-        View workspaceIndicator = launcher.findViewById(R.id.workspace_screen_indicator);
-        assertNotNull("apps_paging_screen_indicator must be present in view hierarchy", appsIndicator);
-        assertNotNull("workspace_screen_indicator must be present in view hierarchy", workspaceIndicator);
-        assertEquals("Both indicators must share the same parent",
-                appsIndicator.getParent(), workspaceIndicator.getParent());
+        View indicator = launcher.findViewById(R.id.workspace_screen_indicator);
+        assertNotNull("workspace_screen_indicator must be present in view hierarchy", indicator);
+        assertNotNull("Unified indicator must have a parent in DragLayer", indicator.getParent());
     }
 
     public void testHomeButtonInvisibleOnLaunchWithoutDrawerOpen() {

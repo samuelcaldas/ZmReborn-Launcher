@@ -129,7 +129,6 @@
     <public type="id" name="all_apps_view" id="2131099653" />
     <public type="id" name="all_apps" id="2131099654" />
     <public type="id" name="view_pager" id="2131099655" />
-    <public type="id" name="apps_paging_screen_indicator" id="2131099656" />
     <public type="id" name="colour_picker_view" id="2131099657" />
     <public type="id" name="old_colour_panel" id="2131099658" />
     <public type="id" name="new_colour_panel" id="2131099659" />

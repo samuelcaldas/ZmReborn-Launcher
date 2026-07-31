@@ -827,12 +827,6 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         }
         this.mApplicationsView = (ApplicationsView) appsGridStub.inflate();
         ApplicationsView applicationsView = this.mApplicationsView;
-        if (applicationsView instanceof ApplicationsPagingView) {
-            ScreenIndicator drawerIndicator =
-                    (ScreenIndicator) dragLayer.findViewById(R.id.apps_paging_screen_indicator);
-            ((ApplicationsPagingView) applicationsView).configureIndicator(
-                    drawerIndicator, false, ScreenIndicator.TYPE_DOTS);
-        }
         this.mApplicationsStateOverlay = (FrameLayout) dragLayer.findViewById(R.id.apps_state_overlay);
         this.mApplicationsStateMessage = (TextView) dragLayer.findViewById(R.id.apps_state_message);
         this.mApplicationsStateRetry = (Button) dragLayer.findViewById(R.id.apps_state_retry);
@@ -1086,6 +1080,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     private void loadIndicator() {
+        ScreenIndicator indicatorView = (ScreenIndicator) findViewById(R.id.workspace_screen_indicator);
         Resources resources = getResources();
         String screenIndicator = PreferencesUtil.getScreenIndicator(this);
         String[] screenIndicatorTypes = resources.getStringArray(R.array.preferences_values_workspace_screen_indicator_types);
@@ -1097,15 +1092,15 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                             this.mScreenIndicator = null;
                             break;
                         case 1:
-                            this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.workspace_screen_indicator);
+                            this.mScreenIndicator = indicatorView;
                             this.mScreenIndicator.setType(ScreenIndicator.TYPE_SLIDER_BOTTOM);
                             break;
                         case 2:
-                            this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.workspace_screen_indicator);
+                            this.mScreenIndicator = indicatorView;
                             this.mScreenIndicator.setType(ScreenIndicator.TYPE_DOTS);
                             break;
                         default:
-                            this.mScreenIndicator = (ScreenIndicator) findViewById(R.id.workspace_screen_indicator);
+                            this.mScreenIndicator = indicatorView;
                             this.mScreenIndicator.setType(ScreenIndicator.TYPE_SLIDER_BOTTOM);
                             break;
                     }
@@ -1121,16 +1116,12 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 this.mWorkspace.indicateCurrent();
             }
         }
-        if (this.mApplicationsView instanceof ApplicationsPagingView) {
+        if (this.mApplicationsView instanceof ApplicationsPagingView && indicatorView != null) {
             int drawerType = resolveDrawerIndicatorType();
-            ScreenIndicator drawerIndicator =
-                    (ScreenIndicator) findViewById(R.id.apps_paging_screen_indicator);
-            if (drawerIndicator != null) {
-                ((ApplicationsPagingView) this.mApplicationsView).configureIndicator(
-                        drawerIndicator,
-                        drawerType != -1,
-                        drawerType == -1 ? ScreenIndicator.TYPE_DOTS : drawerType);
-            }
+            ((ApplicationsPagingView) this.mApplicationsView).configureIndicator(
+                    indicatorView,
+                    drawerType != -1,
+                    drawerType == -1 ? ScreenIndicator.TYPE_DOTS : drawerType);
         }
     }
 
@@ -3531,7 +3522,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 this.mHomeButton.setVisibility(View.VISIBLE);
                 this.mHomeButton.bringToFront();
             }
-            if (this.mScreenIndicator != null) {
+            if (this.mApplicationsView instanceof ApplicationsPagingView) {
+                if (this.mScreenIndicator != null) {
+                    this.mScreenIndicator.bringToFront();
+                }
+            } else if (this.mScreenIndicator != null) {
                 this.mScreenIndicator.hide();
             }
             this.mApplicationsGridOpen = LOGD;
@@ -3555,12 +3550,9 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 this.mDesktopLocked = false;
                 this.mWorkspace.invalidate();
                 if (this.mScreenIndicator != null) {
-                    this.mScreenIndicator.show();
-                }
-                ScreenIndicator drawerIndicator =
-                        (ScreenIndicator) findViewById(R.id.apps_paging_screen_indicator);
-                if (drawerIndicator != null) {
-                    drawerIndicator.hide();
+                    this.mScreenIndicator.setAutoHide(true);
+                    this.mScreenIndicator.setItems(this.mWorkspace.getChildCount());
+                    this.mWorkspace.indicateCurrent();
                 }
                 if (!(this.mApplicationsView instanceof ApplicationsPagingView)) {
                     if (animated && this.mAllowAppsGridAnimations) {

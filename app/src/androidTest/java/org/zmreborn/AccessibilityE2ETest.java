@@ -124,7 +124,7 @@ public class AccessibilityE2ETest extends ActivityInstrumentationTestCase2<Launc
                     invokeApplicationsGridMethod(launcher, "openApplicationsGrid", false);
 
                     View drawer = applicationsView.getImplementingView();
-                    View indicator = drawer.findViewById(R.id.apps_paging_screen_indicator);
+                    View indicator = launcher.findViewById(R.id.workspace_screen_indicator);
                     View pager = drawer.findViewById(R.id.view_pager);
                     drawerView[0] = drawer;
                     indicatorView[0] = indicator;

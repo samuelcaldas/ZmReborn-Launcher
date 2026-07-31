@@ -98,7 +98,9 @@ public class PublicResourceContractTest {
         add(entries, "xml", 2131034112L, "default_workspace", "preferences");
         add(entries, "id", 2131099648L,
                 "vertical", "horizontal", "name", "icon", "description", "all_apps_view", "all_apps",
-                "view_pager", "apps_paging_screen_indicator", "colour_picker_view", "old_colour_panel",
+                "view_pager");
+        add(entries, "id", 2131099657L,
+                "colour_picker_view", "old_colour_panel",
                 "new_colour_panel", "dock_scroll_view", "dock_item_holder", "drag_layer", "workspace",
                 "cell1", "cell2", "cell3", "cell4", "cell5", "cell6", "cell7", "apps_grid_stub",
                 "apps_grid", "home_button", "dock_stub", "dock", "delete_zone", "workspace_screen_indicator",
