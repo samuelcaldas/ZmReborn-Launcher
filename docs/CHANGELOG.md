@@ -1,5 +1,18 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## [3.1.11-alpha-rc10]
+
+- Adds pull-down gesture to close the app grid in both vertical and horizontal paging modes.
+  Vertical drawer intercepts a second downward pull after the search bar is revealed; paging drawer
+  intercepts any downward-dominant pull. Both close when drag exceeds 72 dp.
+- Adds always-visible search bar at the top of the horizontal paging drawer, matching the vertical
+  drawer's appearance (Material You palette via WallpaperColorExtractor) and behavior
+  (DrawerSearchFilter, clear button, empty-state overlay). Search resets on drawer close.
+- Preserves Android 24–35 compatibility boundaries, public resource contracts, reconstruction
+  provenance, and zero third-party runtime dependencies.
+- Validation includes passing JVM suite, lint (0 errors), Docker-wrapper debug APK build (866 KB),
+  and `git diff --check`. Runtime smoke on device remains unperformed.
+
 ## [3.1.11-alpha-rc9]
 
 - Replaces 47 density-qualified PNG rasters and 9-patch backgrounds with VectorDrawable XML
