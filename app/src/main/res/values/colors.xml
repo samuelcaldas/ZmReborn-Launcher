@@ -9,8 +9,6 @@
     <color name="snag_callout_color">@color/m3_primary</color>
     <color name="gesture_color">@color/m3_primary</color>
     <color name="uncertain_gesture_color">@color/m3_outline</color>
-    <color name="preferences_default_general_selector_colour_pressed">@color/m3_primary</color>
-    <color name="preferences_default_general_selector_colour_focused">@color/m3_primary</color>
 
     <!-- API 24–30 light fallback roles. API 31+ overrides roles with system dynamic colors. -->
     <color name="m3_primary">#ff895b00</color>

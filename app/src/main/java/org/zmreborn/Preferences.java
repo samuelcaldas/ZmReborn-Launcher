@@ -34,7 +34,6 @@ public class Preferences extends PreferenceActivity {
         configureList();
         bindLanguagePreference();
         bindAppearancePreference();
-        bindGeneralPreferences();
         bindWorkspacePreferences();
         bindAppsGridPreferences();
         bindDockPreferences();
@@ -94,14 +93,6 @@ public class Preferences extends PreferenceActivity {
     private static void configureChildFocus(ListView list) {
         list.setItemsCanFocus(true);
         list.setDescendantFocusability(ViewGroup.FOCUS_AFTER_DESCENDANTS);
-    }
-
-    private void bindGeneralPreferences() {
-        Preference.OnPreferenceChangeListener restart = createRestartChangeListener();
-        findPreference(getString(R.string.preferences_key_general_selector_colour_pressed))
-                .setOnPreferenceChangeListener(restart);
-        findPreference(getString(R.string.preferences_key_general_selector_colour_focused))
-                .setOnPreferenceChangeListener(restart);
     }
 
     private void bindWorkspacePreferences() {

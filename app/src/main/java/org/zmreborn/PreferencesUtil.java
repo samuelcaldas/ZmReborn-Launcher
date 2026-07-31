@@ -76,14 +76,6 @@ public class PreferencesUtil {
         return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_workspace_screen_looping), Boolean.parseBoolean(context.getString(R.string.preferences_default_workspace_screen_looping)));
     }
 
-    static int getSelectorPressedColorHex(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_general_selector_colour_pressed), context.getResources().getColor(R.color.preferences_default_general_selector_colour_pressed));
-    }
-
-    static int getSelectorFocusedColorHex(Context context) {
-        return getSharedPreferences(context).getInt(context.getString(R.string.preferences_key_general_selector_colour_focused), context.getResources().getColor(R.color.preferences_default_general_selector_colour_focused));
-    }
-
     static int getActionBindingForHomeButton(Context context) {
         return Integer.parseInt(getSharedPreferences(context).getString(context.getString(R.string.preferences_key_action_home_button), context.getString(R.string.preferences_default_action_home_button)));
     }

@@ -38,8 +38,6 @@ public class SettingsResourceContractTest {
             {"preferences_key_general_sensor_orientation", "general_orientation_mode", "preferences_title_general_sensor_orientation", "@string/preferences_default_general_sensor_orientation", "preferences_summary_general_sensor_orientation"},
             {"preferences_key_application_language", "application_language", "preferences_title_application_language", "@string/preferences_default_application_language", "preferences_summary_application_language"},
             {"preferences_key_application_appearance", "application_appearance", "preferences_title_application_appearance", "@string/preferences_default_application_appearance", "preferences_summary_application_appearance"},
-            {"preferences_key_general_selector_colour_pressed", "general_selector_colour_pressed", "preferences_title_general_selector_colour_pressed", "@color/preferences_default_general_selector_colour_pressed", "preferences_summary_general_selector_colour_pressed"},
-            {"preferences_key_general_selector_colour_focused", "general_selector_colour_focused", "preferences_title_general_selector_colour_focused", "@color/preferences_default_general_selector_colour_focused", "preferences_summary_general_selector_colour_focused"},
             {"preferences_key_workspace_number_of_screens", "workspace_number_of_screens", "preferences_title_workspace_number_of_screens", "@string/preferences_default_workspace_number_of_screens", "preferences_summary_workspace_number_of_screens"},
             {"preferences_key_workspace_default_screen", "workspace_default_screen", "preferences_title_workspace_default_screen", "@string/preferences_default_workspace_default_screen", "preferences_summary_workspace_default_screen"},
             {"preferences_key_workspace_screen_indicator_type", "workspace_screen_indicator", "preferences_title_workspace_indicator_type", "@string/preferences_default_workspace_screen_indicator_type", "preferences_summary_workspace_screen_indicator_type"},
@@ -79,7 +77,7 @@ public class SettingsResourceContractTest {
         Element root = parse("main/res/xml/preferences.xml").getDocumentElement();
         Map<String, String> strings = values("main/res/values/strings.xml", "string");
         strings.putAll(values("main/res/values/defaults.xml", "string"));
-        assertEquals(38, countPreferences(root));
+        assertEquals(36, countPreferences(root));
         assertFalse("Preference dependencies must remain explicit in Java", containsDependency(root));
         assertEquals(PREFERENCE_CONTRACT.length, countPreferences(root));
         for (String[] contract : PREFERENCE_CONTRACT) {

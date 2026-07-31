@@ -133,8 +133,6 @@
     <string name="preferences_title_general_fullscreen">Tela cheia</string>
     <string name="preferences_title_general_sensor_orientation">Rotação pelo sensor</string>
     <string name="preferences_title_application_appearance">Tema</string>
-    <string name="preferences_title_general_selector_colour_pressed">Cor do seletor pressionado</string>
-    <string name="preferences_title_general_selector_colour_focused">Cor do seletor em foco</string>
     <string name="preferences_title_workspace_number_of_screens">Número de telas</string>
     <string name="preferences_title_workspace_default_screen">Tela padrão</string>
     <string name="preferences_title_workspace_indicator_type">Tipo de indicador</string>
@@ -171,8 +169,6 @@
     <string name="preferences_summary_application_appearance">Seguir modo claro ou escuro do sistema</string>
     <string name="preferences_summary_general_fullscreen">Executar em tela cheia</string>
     <string name="preferences_summary_general_sensor_orientation">Usar rotação pelo sensor</string>
-    <string name="preferences_summary_general_selector_colour_pressed">Definir cor do seletor pressionado</string>
-    <string name="preferences_summary_general_selector_colour_focused">Definir cor do seletor em foco</string>
     <string name="preferences_summary_workspace_number_of_screens">Definir número de telas disponíveis</string>
     <string name="preferences_summary_workspace_default_screen">Definir tela inicial padrão</string>
     <string name="preferences_summary_workspace_screen_indicator_type">Definir tipo de indicador de tela</string>

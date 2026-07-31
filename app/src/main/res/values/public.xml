@@ -31,7 +31,6 @@
     <public type="attr" name="max" id="2130771993" />
     <public type="drawable" name="applications_grid" id="2130837504" />
     <public type="drawable" name="bg_appwidget_error" id="2130837505" />
-    <public type="drawable" name="delete_handle_normal" id="2130837506" />
     <public type="drawable" name="delete_zone_selector" id="2130837507" />
     <public type="drawable" name="dock_bg_bar_grey" id="2130837508" />
     <public type="drawable" name="dock_bg_fade_to_black" id="2130837509" />
@@ -180,8 +179,6 @@
     <public type="color" name="snag_callout_color" id="2131165189" />
     <public type="color" name="gesture_color" id="2131165190" />
     <public type="color" name="uncertain_gesture_color" id="2131165191" />
-    <public type="color" name="preferences_default_general_selector_colour_pressed" id="2131165192" />
-    <public type="color" name="preferences_default_general_selector_colour_focused" id="2131165193" />
     <public type="color" name="bright_text_dark_focused" id="2131165194" />
     <public type="dimen" name="search_widget_inset" id="2131230720" />
     <public type="dimen" name="gesture_thumbnail_inset" id="2131230721" />
@@ -201,8 +198,6 @@
     <public type="string" name="preferences_key_system_settings" id="2131361792" />
     <public type="string" name="preferences_key_general_fullscreen" id="2131361793" />
     <public type="string" name="preferences_key_general_sensor_orientation" id="2131361794" />
-    <public type="string" name="preferences_key_general_selector_colour_pressed" id="2131361795" />
-    <public type="string" name="preferences_key_general_selector_colour_focused" id="2131361796" />
     <public type="string" name="preferences_key_workspace_number_of_screens" id="2131361797" />
     <public type="string" name="preferences_key_workspace_default_screen" id="2131361798" />
     <public type="string" name="preferences_key_workspace_screen_indicator_type" id="2131361799" />
@@ -341,8 +336,6 @@
     <public type="string" name="preferences_category_content_grid" id="2131361932" />
     <public type="string" name="preferences_title_general_fullscreen" id="2131361933" />
     <public type="string" name="preferences_title_general_sensor_orientation" id="2131361934" />
-    <public type="string" name="preferences_title_general_selector_colour_pressed" id="2131361935" />
-    <public type="string" name="preferences_title_general_selector_colour_focused" id="2131361936" />
     <public type="string" name="preferences_title_workspace_number_of_screens" id="2131361937" />
     <public type="string" name="preferences_title_workspace_default_screen" id="2131361938" />
     <public type="string" name="preferences_title_workspace_indicator_type" id="2131361939" />
@@ -376,8 +369,6 @@
     <public type="string" name="preferences_title_restart" id="2131361967" />
     <public type="string" name="preferences_summary_general_fullscreen" id="2131361968" />
     <public type="string" name="preferences_summary_general_sensor_orientation" id="2131361969" />
-    <public type="string" name="preferences_summary_general_selector_colour_pressed" id="2131361970" />
-    <public type="string" name="preferences_summary_general_selector_colour_focused" id="2131361971" />
     <public type="string" name="preferences_summary_workspace_number_of_screens" id="2131361972" />
     <public type="string" name="preferences_summary_workspace_default_screen" id="2131361973" />
     <public type="string" name="preferences_summary_workspace_screen_indicator_type" id="2131361974" />

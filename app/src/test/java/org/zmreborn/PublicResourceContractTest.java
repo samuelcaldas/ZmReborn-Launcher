@@ -65,7 +65,8 @@ public class PublicResourceContractTest {
                 "className", "packageName", "screen", "x", "y", "spanX", "spanY", "icon",
                 "title", "uri", "container", "orientation", "cells", "min", "max");
         add(entries, "drawable", 2130837504L,
-                "applications_grid", "bg_appwidget_error", "delete_handle_normal",
+                "applications_grid", "bg_appwidget_error");
+        add(entries, "drawable", 2130837507L,
                 "delete_zone_selector", "dock_bg_bar_grey", "dock_bg_fade_to_black",
                 "dock_bg_glow", "folder_background", "home_button_normal", "ic_launcher",
                 "ic_launcher_add_folder", "ic_launcher_application", "ic_launcher_appwidget",
@@ -107,9 +108,9 @@ public class PublicResourceContractTest {
                 "text_rows_span", "widget_columns_span", "widget_rows_span");
         add(entries, "color", 2131165184L,
                 "window_background", "grid_dark_background", "bubble_dark_background", "delete_color_filter",
-                "appwidget_error_color", "snag_callout_color", "gesture_color", "uncertain_gesture_color",
-                "preferences_default_general_selector_colour_pressed",
-                "preferences_default_general_selector_colour_focused", "bright_text_dark_focused");
+                "appwidget_error_color", "snag_callout_color", "gesture_color", "uncertain_gesture_color");
+        add(entries, "color", 2131165194L,
+                "bright_text_dark_focused");
         add(entries, "dimen", 2131230720L,
                 "search_widget_inset", "gesture_thumbnail_inset", "gesture_thumbnail_size", "cell_width",
                 "cell_height");
@@ -121,8 +122,9 @@ public class PublicResourceContractTest {
                 "wallpapers");
         add(entries, "string", 2131361792L,
                 "preferences_key_system_settings", "preferences_key_general_fullscreen",
-                "preferences_key_general_sensor_orientation", "preferences_key_general_selector_colour_pressed",
-                "preferences_key_general_selector_colour_focused", "preferences_key_workspace_number_of_screens",
+                "preferences_key_general_sensor_orientation");
+        add(entries, "string", 2131361797L,
+                "preferences_key_workspace_number_of_screens",
                 "preferences_key_workspace_default_screen", "preferences_key_workspace_screen_indicator_type",
                 "preferences_key_workspace_elastic_scrolling", "preferences_key_workspace_screen_looping",
                 "preferences_key_workspace_content_grid_rows", "preferences_key_workspace_content_grid_columns",
@@ -179,8 +181,9 @@ public class PublicResourceContractTest {
                 "preferences_screen_title_dock", "preferences_category_application", "preferences_category_screens",
                 "preferences_category_behaviour", "preferences_category_appearance", "preferences_category_wallpaper",
                 "preferences_category_content", "preferences_category_content_grid", "preferences_title_general_fullscreen",
-                "preferences_title_general_sensor_orientation", "preferences_title_general_selector_colour_pressed",
-                "preferences_title_general_selector_colour_focused", "preferences_title_workspace_number_of_screens",
+                "preferences_title_general_sensor_orientation");
+        add(entries, "string", 2131361937L,
+                "preferences_title_workspace_number_of_screens",
                 "preferences_title_workspace_default_screen", "preferences_title_workspace_indicator_type",
                 "preferences_title_workspace_elastic_scrolling", "preferences_title_workspace_screen_looping",
                 "preferences_title_workspace_content_grid_rows", "preferences_title_workspace_content_grid_columns",
@@ -194,8 +197,9 @@ public class PublicResourceContractTest {
                 "preferences_title_apps_grid_bg_alpha", "preferences_title_dock_background", "preferences_title_dock_reset_home",
                 "preferences_title_dock_reset_to", "preferences_title_dock_item_alignment", "preferences_title_dock_item_width",
                 "preferences_title_reset", "preferences_title_restart", "preferences_summary_general_fullscreen",
-                "preferences_summary_general_sensor_orientation", "preferences_summary_general_selector_colour_pressed",
-                "preferences_summary_general_selector_colour_focused", "preferences_summary_workspace_number_of_screens",
+                "preferences_summary_general_sensor_orientation");
+        add(entries, "string", 2131361972L,
+                "preferences_summary_workspace_number_of_screens",
                 "preferences_summary_workspace_default_screen", "preferences_summary_workspace_screen_indicator_type",
                 "preferences_summary_workspace_elastic_scrolling", "preferences_summary_workspace_screen_looping",
                 "preferences_summary_workspace_content_grid_rows", "preferences_summary_workspace_content_grid_columns",

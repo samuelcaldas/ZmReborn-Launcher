@@ -1,7 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Seed values for all launcher SharedPreferences. Change values here to adjust defaults.
-     Color defaults (preferences_default_general_selector_colour_pressed/focused) live in
-     values/colors.xml because string and color resources cannot share a file. -->
+<!-- Seed values for all launcher SharedPreferences. Change values here to adjust defaults. -->
 <resources>
     <string name="preferences_default_general_fullscreen" translatable="false">false</string>
     <string name="preferences_default_general_sensor_orientation" translatable="false">false</string>

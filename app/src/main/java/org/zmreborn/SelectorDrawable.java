@@ -10,6 +10,8 @@ import android.graphics.drawable.shapes.RectShape;
 import android.graphics.drawable.shapes.RoundRectShape;
 import android.graphics.drawable.shapes.Shape;
 
+// TODO(move): belongs in util/
+/** StateListDrawable that highlights pressed and focused states with Material You colors. */
 public final class SelectorDrawable extends StateListDrawable {
     private SelectorDrawable(int pressedColor, int focusedColor, boolean roundCorners) {
         SelectorShapeDrawable pressedSelectorShapeDrawable = new SelectorShapeDrawable(this, pressedColor, roundCorners, (SelectorShapeDrawable) null);
@@ -21,8 +23,11 @@ public final class SelectorDrawable extends StateListDrawable {
         addState(new int[]{-16842909}, transparentSelectorShapeDrawable);
     }
 
+    /** Creates a selector drawable using the current Material You palette. */
     static SelectorDrawable createSelector(Context context, boolean roundCorners) {
-        return new SelectorDrawable(PreferencesUtil.getSelectorPressedColorHex(context), PreferencesUtil.getSelectorFocusedColorHex(context), roundCorners);
+        int pressed = context.getResources().getColor(R.color.m3_primary);
+        int focused = context.getResources().getColor(R.color.m3_primary_container);
+        return new SelectorDrawable(pressed, focused, roundCorners);
     }
 
     private class SelectorShapeDrawable extends ShapeDrawable {

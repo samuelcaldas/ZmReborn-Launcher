@@ -147,6 +147,7 @@ public class UiTokenContractTest {
         values.put("m3_outline_variant", "#ffd5c4ac");
         values.put("m3_error", "#ffba1a1a");
         values.put("m3_on_error", "#ffffffff");
+        values.put("m3_error_container", "#ffffdad6");
         return values;
     }
 
@@ -164,6 +165,7 @@ public class UiTokenContractTest {
         values.put("m3_outline_variant", "#ff3a4550");
         values.put("m3_error", "#ffd95c4f");
         values.put("m3_on_error", "#ff1a0000");
+        values.put("m3_error_container", "#ff93000a");
         return values;
     }
 
@@ -207,8 +209,6 @@ public class UiTokenContractTest {
         values.put("snag_callout_color", "@color/m3_primary");
         values.put("gesture_color", "@color/m3_primary");
         values.put("uncertain_gesture_color", "@color/m3_outline");
-        values.put("preferences_default_general_selector_colour_pressed", "@color/m3_primary");
-        values.put("preferences_default_general_selector_colour_focused", "@color/m3_primary");
         return values;
     }
 

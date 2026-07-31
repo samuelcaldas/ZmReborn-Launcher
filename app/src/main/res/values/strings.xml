@@ -3,8 +3,6 @@
     <string name="preferences_key_system_settings" translatable="false">sys_settings</string>
     <string name="preferences_key_general_fullscreen" translatable="false">general_fullscreen</string>
     <string name="preferences_key_general_sensor_orientation" translatable="false">general_orientation_mode</string>
-    <string name="preferences_key_general_selector_colour_pressed" translatable="false">general_selector_colour_pressed</string>
-    <string name="preferences_key_general_selector_colour_focused" translatable="false">general_selector_colour_focused</string>
     <string name="preferences_key_workspace_number_of_screens" translatable="false">workspace_number_of_screens</string>
     <string name="preferences_key_workspace_default_screen" translatable="false">workspace_default_screen</string>
     <string name="preferences_key_workspace_screen_indicator_type" translatable="false">workspace_screen_indicator</string>
@@ -178,8 +176,6 @@
     <string name="preferences_title_general_fullscreen">Fullscreen</string>
     <string name="preferences_title_general_sensor_orientation">Sensor rotation</string>
     <string name="preferences_title_application_appearance">Theme</string>
-    <string name="preferences_title_general_selector_colour_pressed">Selector pressed colour</string>
-    <string name="preferences_title_general_selector_colour_focused">Selector focused colour</string>
     <string name="preferences_title_workspace_number_of_screens">Number of screens</string>
     <string name="preferences_title_workspace_default_screen">Default screen</string>
     <string name="preferences_title_workspace_indicator_type">Indicator type</string>
@@ -216,8 +212,6 @@
     <string name="preferences_summary_application_appearance">Follow system light or dark mode</string>
     <string name="preferences_summary_general_fullscreen">Run in fullscreen mode</string>
     <string name="preferences_summary_general_sensor_orientation">Use sensor-based rotation</string>
-    <string name="preferences_summary_general_selector_colour_pressed">Set the pressed selector colour</string>
-    <string name="preferences_summary_general_selector_colour_focused">Set the focused selector colour</string>
     <string name="preferences_summary_workspace_number_of_screens">Set the number of available screens</string>
     <string name="preferences_summary_workspace_default_screen">Set the default home screen</string>
     <string name="preferences_summary_workspace_screen_indicator_type">Set the screen indicator type</string>
