@@ -1,5 +1,20 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## [3.1.11-alpha-rc11]
+
+- Adds one **Blur backgrounds** preference that applies a Material You frosted-glass surface to dock
+  and active application drawer, including both vertical and horizontal paging implementations.
+- Uses best-effort blurred static-wallpaper pixels on API 31+ when `Workspace` already owns a readable
+  bitmap. API 24–30, live wallpapers, restricted access, invalid sources, cancellation, and allocation
+  failures use deterministic procedural frost without new permissions or runtime dependencies.
+- Preserves saved dock appearance and configured drawer transparency while blur is enabled, then restores
+  both when disabled. Wallpaper-aligned parallax reuses cached blur without regenerating during scrolling.
+- Cancels queued or active blur work during wallpaper replacement and launcher teardown, rejects stale
+  generations, and preserves bitmap ownership while installed drawables may still reference cached output.
+- Validation includes 204 passing JVM tests, Android-test assembly, lint, Docker-wrapper debug APK build,
+  8 focused API 35 instrumentation tests, clean filtered logcat, and `git diff --check`. API 24 runtime and
+  readable system-wallpaper integration on API 31–33 remain unperformed.
+
 ## [3.1.11-alpha-rc10]
 
 - Adds pull-down gesture to close the app grid in both vertical and horizontal paging modes.
