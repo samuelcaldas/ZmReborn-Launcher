@@ -1,12 +1,25 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## [3.1.11-alpha-rc8]
+
+- Synchronizes horizontal app-drawer page indicators with the homescreen preference and alignment,
+  while suppressing the redundant home control in paging mode.
+- Centralizes preference defaults in `defaults.xml`, including the workspace wallpaper-management
+  default, without changing existing keys or stored values.
+- Improves vertical drawer interaction with reliable fast-scroll reselection, an auto-hiding alphabet
+  rail, and pull-to-reveal search.
+- Restores movement and DeleteZone removal for resizable widgets while retaining resize handles. Adds
+  launcher-owned widget preview cards and exposes Widgets, Shortcuts, and Folders directly from the
+  empty-home long-press menu.
+- Preserves Android 24–35 compatibility boundaries, public resource contracts, reconstruction
+  provenance, and zero third-party runtime dependencies.
+- Validation includes passing JVM suites, Android-test compilation, lint, Docker-wrapper debug APK
+  builds, changed-path and API compatibility review, plus 16 focused API 35 widget/menu/resize
+  instrumentation tests. API 24 runtime and hands-on API 35 real-provider widget, persisted
+  move/delete/resize, abandoned-host-ID, and TalkBack smoke remain unperformed.
+
 ## [3.1.11-alpha-rc7]
 
-- Syncs horizontal paging app-drawer page indicator type and position with the homescreen indicator.
-  Indicator type follows the workspace screen indicator preference (None / Slider / Dots). Drawer
-  indicator position aligns to the same visual row as the homescreen indicator by placing both in
-  DragLayer rather than nesting the drawer indicator inside ApplicationsPagingView. Home/close button
-  is suppressed for the paging drawer; back gesture or navigation button closes the drawer.
 - Replaces modal quantity sliders with accessible inline `−` / `+` controls and moves
   applications-grid transparency to an inline slider. Changes update immediately, persist through a
   250 ms trailing debounce, and flush before Settings yields to Launcher.
