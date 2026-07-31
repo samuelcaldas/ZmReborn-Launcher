@@ -53,6 +53,10 @@ The long-press interface is visibly inconsistent:
 * Dividers, padding, typography, and touch-target dimensions do not match the settings interface or the home screen.
 * The interaction does not communicate whether the launcher is entering edit mode, opening a separate activity, or performing an immediate action.
 
+Implemented navigation now removes the nested Add step: empty-home long press directly lists **Widgets**, **Shortcuts**, **Folders**, **Wallpaper**, and **Preferences** in that order. The platform options-menu **Add** entry keeps the three add categories for compatibility. Legacy dialog surface styling remains separate deferred work.
+
+Widget selection now uses full-width preview cards framed as miniature workspace surfaces. Search appears first, followed by localized provider labels with preview-image/icon/fallback artwork and target-grid span detail when geometry is ready. Whole rows are focusable, clickable, and expose combined label/detail accessibility descriptions.
+
 ### Settings interface
 
 The settings screens contain the most obvious legacy UI elements:
@@ -317,16 +321,17 @@ The numeric “columns and rows” widget-size dialog should be removed.
 
 Android widgets are expected to support direct resize interaction using drag handles or corners when their provider allows resizing. ([Android Developers][5])
 
-The new interaction should be:
+Implemented edit interaction is:
 
 1. Long-press a widget.
-2. Display a subtle selection outline.
+2. Display the cell-snapped selection outline.
 3. Show resize handles only on supported axes.
-4. Drag an edge or corner.
-5. Snap the widget to valid workspace cells.
-6. Show its current span as temporary feedback, such as `2 × 3`.
-7. Commit the new size when released.
-8. Offer undo through a snackbar.
+4. Drag an edge or corner to resize against valid workspace cells.
+5. Commit the new size when released.
+6. Press and drag the selected widget body to enter the existing workspace move flow.
+7. Drop on a valid cell to move, or on DeleteZone to remove the model row, host ID, and database row.
+
+Snackbar undo remains deferred.
 
 The launcher must read:
 
@@ -561,12 +566,15 @@ The refactoring should not be considered complete until the following conditions
 
 ### Widgets
 
+* Empty-home long press exposes all five direct actions in stable order.
+* Widget chooser shows Search first and provider preview cards without pre-allocating a host ID.
 * Widgets initially occupy the correct span.
 * Resizable widgets expose edge or corner handles.
+* Selected widget body drag supports movement and DeleteZone removal.
 * Non-resizable widgets expose no invalid handles.
 * Resizing updates provider options.
 * Widgets never render outside the workspace viewport.
-* Cancelled widget placement releases its widget ID.
+* Cancelled bind or configuration releases its widget ID.
 
 ### Visual system
 

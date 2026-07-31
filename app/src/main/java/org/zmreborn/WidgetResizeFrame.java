@@ -8,15 +8,19 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 
 @SuppressLint("ViewConstructor")
+// TODO(move): belongs in org.zmreborn.widget after CellLayout APIs are isolated.
 final class WidgetResizeFrame extends FrameLayout {
     private static final int HANDLE_SIZE_DP = 48;
     private static final int HANDLE_RADIUS_DP = 8;
     private static final int OUTLINE_WIDTH_DP = 2;
 
     interface Callback {
+        void onWidgetDragRequested();
+
         void onWidgetResizeCancelled();
 
         void onWidgetResizeCommitted(CellLayout.ResizeCandidate candidate);
@@ -30,6 +34,7 @@ final class WidgetResizeFrame extends FrameLayout {
     private final int mMinimumSpanX;
     private final int mMinimumSpanY;
     private final int mHandleSize;
+    private final int mTouchSlopSquared;
     private final Rect mCandidateBounds = new Rect();
     private final int[] mCellLocation = new int[2];
     private final int[] mFrameLocation = new int[2];
@@ -42,6 +47,9 @@ final class WidgetResizeFrame extends FrameLayout {
     private CellLayout.ResizeCandidate mCandidate;
     private final CellLayout.ResizeCandidate mOriginalCandidate;
     private boolean mCandidateValid;
+    private boolean mTrackWidgetDrag;
+    private float mWidgetDragDownX;
+    private float mWidgetDragDownY;
     private boolean mFinished;
 
     WidgetResizeFrame(Context context, CellLayout cellLayout, View widgetView,
@@ -70,6 +78,8 @@ final class WidgetResizeFrame extends FrameLayout {
         this.mCandidate = this.mOriginalCandidate;
         this.mCandidateValid = true;
         this.mHandleSize = dimensionToPixels(HANDLE_SIZE_DP);
+        int touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
+        this.mTouchSlopSquared = touchSlop * touchSlop;
         configureDrawing();
         addSupportedHandles();
     }
@@ -272,19 +282,52 @@ final class WidgetResizeFrame extends FrameLayout {
         this.mCallback.onWidgetResizeCancelled();
     }
 
+    private void finishDragRequested() {
+        if (this.mFinished) {
+            return;
+        }
+        this.mFinished = true;
+        this.mCallback.onWidgetDragRequested();
+    }
+
+    private boolean isWidgetDragPastTouchSlop(MotionEvent event) {
+        float distanceX = event.getX() - this.mWidgetDragDownX;
+        float distanceY = event.getY() - this.mWidgetDragDownY;
+        return (distanceX * distanceX) + (distanceY * distanceY)
+                > this.mTouchSlopSquared;
+    }
+
+    /** Handles body drags and dismissal taps outside resize handles. */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         if (this.mFinished) {
             return true;
         }
-        if (event.getActionMasked() == MotionEvent.ACTION_UP) {
-            performClick();
-            finishCancelled();
+        switch (event.getActionMasked()) {
+            case MotionEvent.ACTION_DOWN:
+                this.mTrackWidgetDrag = false;
+                updateCandidateBounds();
+                if (this.mActiveHandle == null && this.mCandidateBounds.contains(
+                        Math.round(event.getX()), Math.round(event.getY()))) {
+                    this.mTrackWidgetDrag = true;
+                    this.mWidgetDragDownX = event.getX();
+                    this.mWidgetDragDownY = event.getY();
+                }
+                return true;
+            case MotionEvent.ACTION_MOVE:
+                if (this.mTrackWidgetDrag && isWidgetDragPastTouchSlop(event)) {
+                    finishDragRequested();
+                }
+                return true;
+            case MotionEvent.ACTION_UP:
+                performClick();
+                return true;
+            case MotionEvent.ACTION_CANCEL:
+                finishCancelled();
+                return true;
+            default:
+                return true;
         }
-        if (event.getActionMasked() == MotionEvent.ACTION_CANCEL) {
-            finishCancelled();
-        }
-        return true;
     }
 
     @Override

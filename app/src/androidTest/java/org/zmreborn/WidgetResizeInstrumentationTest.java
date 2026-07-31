@@ -4,6 +4,7 @@ import android.appwidget.AppWidgetProviderInfo;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 
 public class WidgetResizeInstrumentationTest
         extends ActivityInstrumentationTestCase2<Launcher> {
@@ -40,6 +41,8 @@ public class WidgetResizeInstrumentationTest
                 assertCandidate(fixture.callback.candidate, 0, 0, 2, 1);
                 assertFalse("Valid resize must not cancel",
                         fixture.callback.cancelled);
+                assertEquals("Handle interaction must not request drag", 0,
+                        fixture.callback.dragRequests);
                 assertPlacement(fixture.widget, 0, 0, 1, 1);
             }
         });
@@ -88,6 +91,27 @@ public class WidgetResizeInstrumentationTest
                         R.string.widget_resize_handle_top_left));
                 assertNotNull(findHandle(fixture.frame,
                         R.string.widget_resize_handle_bottom_right));
+            }
+        });
+    }
+
+    public void testWidgetBodyDragRequestsOnceWithoutResizeCallbacks() {
+        runOnMain(new Runnable() {
+            public void run() {
+                Fixture fixture = createFixture(
+                        AppWidgetProviderInfo.RESIZE_HORIZONTAL, false);
+                int touchSlop = ViewConfiguration.get(getActivity())
+                        .getScaledTouchSlop();
+
+                sendWidgetBodyDrag(fixture.frame, fixture.widget, touchSlop + 1);
+
+                assertEquals("Body drag must request drag once", 1,
+                        fixture.callback.dragRequests);
+                assertNull("Body drag must not commit resize",
+                        fixture.callback.candidate);
+                assertFalse("Body drag must not cancel resize",
+                        fixture.callback.cancelled);
+                assertPlacement(fixture.widget, 0, 0, 1, 1);
             }
         });
     }
@@ -184,6 +208,28 @@ public class WidgetResizeInstrumentationTest
         view.layout(0, 0, LAYOUT_WIDTH, LAYOUT_HEIGHT);
     }
 
+    private static void sendWidgetBodyDrag(WidgetResizeFrame frame, View widget,
+            int distance) {
+        int x = widget.getLeft() + (widget.getWidth() / 2);
+        int y = widget.getTop() + (widget.getHeight() / 2);
+        long eventTime = System.currentTimeMillis();
+        MotionEvent down = MotionEvent.obtain(eventTime, eventTime,
+                MotionEvent.ACTION_DOWN, x, y, 0);
+        MotionEvent move = MotionEvent.obtain(eventTime, eventTime + 1,
+                MotionEvent.ACTION_MOVE, x + distance, y, 0);
+        MotionEvent up = MotionEvent.obtain(eventTime, eventTime + 2,
+                MotionEvent.ACTION_UP, x + distance, y, 0);
+        try {
+            assertTrue(frame.onTouchEvent(down));
+            assertTrue(frame.onTouchEvent(move));
+            assertTrue(frame.onTouchEvent(up));
+        } finally {
+            down.recycle();
+            move.recycle();
+            up.recycle();
+        }
+    }
+
     private static void sendOutsideTap(WidgetResizeFrame frame) {
         long eventTime = System.currentTimeMillis();
         MotionEvent down = MotionEvent.obtain(eventTime, eventTime,
@@ -233,6 +279,11 @@ public class WidgetResizeInstrumentationTest
             implements WidgetResizeFrame.Callback {
         CellLayout.ResizeCandidate candidate;
         boolean cancelled;
+        int dragRequests;
+
+        public void onWidgetDragRequested() {
+            this.dragRequests++;
+        }
 
         public void onWidgetResizeCancelled() {
             this.cancelled = true;

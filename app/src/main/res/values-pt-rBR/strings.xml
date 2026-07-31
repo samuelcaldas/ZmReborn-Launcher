@@ -56,6 +56,12 @@
     <string name="group_add_shortcuts">Atalhos</string>
     <string name="group_add_folders">Pastas</string>
     <string name="group_add_widgets">Widgets</string>
+    <string name="widget_picker_title">Escolher um widget</string>
+    <string name="widget_picker_loading">Carregando prévias dos widgets…</string>
+    <string name="widget_picker_load_error">Não foi possível carregar as prévias dos widgets</string>
+    <string name="widget_picker_span">%1$d × %2$d</string>
+    <string name="widget_picker_minimum_size_dp">Mínimo de %1$d × %2$d dp</string>
+    <string name="widget_picker_accessibility_item">%1$s, %2$s</string>
     <string name="dialog_title_widget_span">Tamanho do widget</string>
     <string name="dialog_text_columns">Colunas</string>
     <string name="dialog_text_rows">Linhas</string>

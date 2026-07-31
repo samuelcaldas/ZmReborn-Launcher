@@ -31,6 +31,23 @@ Use `*E2ETest` only for a test that executes and verifies a user-visible workflo
 
 Each test must prove observable production behavior. A test may use a fake, stub, or mock to isolate a boundary, but it must drive real production logic and assert a meaningful outcome. Do not claim behavior with tests that only exercise test doubles, only assert a class/resource/view exists, or only assert implementation wiring without a behavioral result.
 
+### Focused widget scenarios
+
+Run these instrumentation classes when changing widget selection, placement, editing, or home-menu routing:
+
+```sh
+./gradlew :app:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=org.zmreborn.widget.WidgetPickerInstrumentationTest
+./gradlew :app:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=org.zmreborn.WidgetResizeInstrumentationTest
+./gradlew :app:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=org.zmreborn.LauncherMenuInstrumentationTest
+```
+
+`WidgetPickerInstrumentationTest` covers Search-first ordering, provider metadata, accessible preview cards, asynchronous loading, zero host-ID allocation before selection, bind-cancellation cleanup, and picker state restoration. `WidgetResizeInstrumentationTest` covers resize handles and body-drag callback separation; it is component evidence, not proof of real-provider movement or DeleteZone persistence. `LauncherMenuInstrumentationTest` protects direct home-menu order and retained options Add categories.
+
+API 24/API 35 device smoke must still select real providers, exercise bind approval and provider configuration, rotate during pending flows, move and delete a resizable widget, relaunch to verify persistence, and inspect host IDs/logcat for abandoned allocations or platform failures.
+
 ## Required validation sequence
 
 Run commands from the repository root after the targeted test passes. Apply the Android steps when the change has instrumentation or runtime scope.

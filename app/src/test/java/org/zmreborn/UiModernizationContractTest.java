@@ -226,7 +226,9 @@ public class UiModernizationContractTest {
         String commit = sourceSection(launcher,
                 "    private void commitWidgetResize(",
                 "    private void dismissWidgetResize(WidgetResizeSession session)");
-        assertTrue(launcher.contains("!showWidgetResize(pressedView)"));
+        assertTrue(launcher.contains(
+                "!showWidgetResize(pressedView, cellInfo)"));
+        assertTrue(launcher.contains("this.launcher.startWidgetDrag(this)"));
         assertTrue(launcher.contains(
                 "providerInfo.resizeMode == AppWidgetProviderInfo.RESIZE_NONE"));
         assertTrue(launcher.contains("new FrameLayout.LayoutParams(-1, -1)"));

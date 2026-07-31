@@ -24,6 +24,37 @@
   Software-emulator ANR interrupted clean manual API 35 app-grid slider, keyboard/DPAD, forced-RTL,
   and TalkBack traversal; no result is claimed for those paths.
 
+## Widget edit, preview picker, and direct add menu — 2026-07-30
+
+- Restores resizable-widget movement and DeleteZone removal through a second body-drag gesture while
+  retaining cell-snapped resize handles. The handoff reuses existing `Workspace`, `DragLayer`, and
+  `DeleteZone` behavior rather than adding another move or deletion path.
+- Empty-home long press now directly exposes Widgets, Shortcuts, Folders, Wallpaper, and Preferences.
+  The platform options-menu Add dialog retains its three add categories.
+- Replaces `ACTION_APPWIDGET_PICK` with launcher-owned, asynchronously loaded preview cards: Search
+  first, localized provider ordering, preview/icon/fallback artwork, accessible labels, and grid-span
+  detail calculated on the main thread. Opening or cancelling the picker allocates no widget host ID.
+- External selection allocates one host ID, tries `bindAppWidgetIdIfAllowed(...)`, falls back to
+  `ACTION_APPWIDGET_BIND`, and reuses existing provider configuration, placement, recreation, and
+  cleanup paths. Picker-open state restores only after desktop binding unlocks the workspace.
+- This intentionally diverges from immutable reconstructed source while preserving its widget-host,
+  database, workspace drag, and provenance boundaries.
+
+### Validation — 2026-07-30
+
+- Final focused API 35 instrumentation: 16 tests passed in 504.849 seconds across widget picker, menu,
+  and resize classes. Coverage includes accessible preview-card rendering/loading, Search-first ordering,
+  zero pre-selection allocation, bind cancellation cleanup, picker state restoration, direct menu order,
+  resize handles, and body-drag callback separation.
+- Full JVM suite: 189 tests passed with 0 failures, errors, or skips. Android-test assembly, lint, and
+  `git diff --check` passed. Final changed-path review reported no findings, and API compatibility review
+  found no confirmed minSdk 24–API 35 verifier boundary issues.
+- `./tools/build_apk.sh` passed. Debug APK: 959,873 bytes; SHA-256
+  `ed2e4eb24c7777ad91e7683842111a0c13c969969582e301b98309dc0f856074`.
+- API 24 smoke and hands-on API 35 real-provider bind/configuration, persisted move/delete/resize,
+  abandoned-host-ID inspection, and TalkBack traversal remain unperformed. No result is claimed for
+  those paths.
+
 ## Vertical drawer UX: fast-scroll fix, auto-hide rail, pull-to-reveal search — 2026-07-30
 
 - **Fast-scroll re-selection fix.** Tapping a fast-scroll letter after manually scrolling the grid away

@@ -133,11 +133,15 @@ Legacy popup, sheet, and navigation redesign remain deferred. Externally-owned r
 
 ## Widgets
 
-Widget add flow now tracks pending `AppWidgetHost` ID across activity results and saved-instance state.
+Empty-home long press now exposes **Widgets**, **Shortcuts**, **Folders**, **Wallpaper**, and **Preferences** directly. The platform options-menu **Add** action retains its compact Widgets/Shortcuts/Folders dialog.
+
+Widget selection uses a launcher-owned preview-card dialog rather than `ACTION_APPWIDGET_PICK`. Search is always first; installed providers follow in localized label order. Preview resolution uses provider preview image, provider icon, then launcher widget fallback. Provider metadata and drawables load on a cancellable background executor, while target-grid span calculation and view publication remain on the main thread. Opening, loading, dismissing, or rotating this dialog allocates no `AppWidgetHost` ID; picker-open state and target cell restore after desktop binding completes.
+
+External provider selection allocates one ID, tries `bindAppWidgetIdIfAllowed(...)`, and falls back to `ACTION_APPWIDGET_BIND` when user approval is required. Search selection reuses the launcher-owned Search widget path without allocating an ID.
 
 Implemented lifecycle behavior:
 
-- picker/configuration cancellation releases allocated ID, including null result intents;
+- bind/configuration cancellation releases allocated ID, including null result intents;
 - successful null configuration result can recover tracked ID;
 - stale or mismatched successful results are rejected without adopting an unrelated returned ID;
 - invalid provider results release ID;
@@ -150,7 +154,7 @@ Initial widget span comes from provider minimum dimensions only after target `Ce
 
 Widget provider options are updated from persisted span pixel dimensions during initial bind and rebind, also waiting for measured target-screen geometry when needed. Numeric `widget_span` resources remain for public/provenance compatibility but launcher logic no longer shows that dialog.
 
-Long-pressing a resizable provider widget opens a direct full-screen, cell-snapped resize overlay. Focusable 48dp handles appear only on axes supported by the provider. The overlay enforces provider minimum dimensions with documented fallbacks, grid bounds, and exact target-cell occupancy without moving neighboring items. Invalid placements show explicit unavailable text. Releasing a valid resize persists the new cell and span, then refreshes provider options using measured geometry. Back, outside touch, and lifecycle cancellation remove the overlay without mutating the widget.
+Long-pressing a resizable provider widget opens a direct full-screen, cell-snapped edit overlay. Focusable 48dp handles appear only on axes supported by the provider. Handle gestures enforce provider minimum dimensions with documented fallbacks, grid bounds, and exact target-cell occupancy without moving neighboring items. Invalid placements show explicit unavailable text. Releasing a valid resize persists the new cell and span, then refreshes provider options using measured geometry. After selection, a second press-and-drag on the widget body removes the overlay and hands the original workspace item to the existing `Workspace`/`DragLayer` flow, enabling movement and DeleteZone removal without a parallel deletion path. Back, outside touch, and lifecycle cancellation remove the overlay without mutating the widget.
 
 Automatic neighbor reflow and snackbar undo remain deferred.
 
@@ -237,9 +241,11 @@ Remaining runtime gaps:
   TalkBack descriptions remains unperformed after the software-emulator ANR;
 - instrumentation invokes the retained registered predictive-back callback object, but an actual
   SystemUI edge gesture is unverified;
-- hands-on widget picker/configuration with a real external provider, provider rendering after
-  orientation, real-provider resize validation on API 24 and API 35, and abandoned-ID inspection
-  remain unperformed;
+- hands-on external-provider selection, bind approval/configuration, provider rendering after
+  orientation, real-provider body move/DeleteZone removal and resize validation on API 24 and API 35,
+  and abandoned-ID inspection remain unperformed; focused API 35 instrumentation covers preview-card
+  loading, Search selection, zero pre-selection allocation, bind cancellation cleanup, picker state
+  restoration, resize-handle behavior, and body-drag handoff callback only;
 - automatic neighbor reflow, snackbar undo, and other explicitly deferred features have no runtime
   claim.
 

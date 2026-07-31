@@ -83,14 +83,16 @@ import org.zmreborn.LauncherSettings;
 import org.zmreborn.compat.BackGestureCompat;
 import org.zmreborn.compat.WindowInsetsCompat;
 import org.zmreborn.theme.WallpaperColorExtractor;
+import org.zmreborn.widget.WidgetPickerDialog;
+import org.zmreborn.widget.WidgetPickerEntry;
 
+/** Coordinates launcher activity interactions and workspace state. */
 public final class Launcher extends Activity implements View.OnClickListener, View.OnLongClickListener, DragController.DragListener {
     static final int APPWIDGET_HOST_ID = 1024;
     static final int DEFAULT_SCREEN = 2;
     private static final int DIALOG_ADD = 2;
     private static final int DIALOG_LAUNCHER = 1;
     static final int DIALOG_RENAME_FOLDER = 3;
-    static final String EXTRA_CUSTOM_WIDGET = "custom_widget";
     static final String EXTRA_SHORTCUT_DUPLICATE = "duplicate";
     static final boolean LOGD = true;
     static final String LOG_TAG = Launcher.class.getSimpleName();
@@ -115,11 +117,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private static final String PREFERENCES = "launcher.preferences";
     private static final boolean PROFILE_ROTATE = false;
     private static final boolean PROFILE_STARTUP = false;
+    private static final int REQUEST_BIND_APPWIDGET = 9;
     private static final int REQUEST_CREATE_APPWIDGET = 5;
     private static final int REQUEST_CREATE_LIVE_FOLDER = 4;
     private static final int REQUEST_CREATE_SHORTCUT = 1;
     private static final int REQUEST_PICK_APPLICATION = 6;
-    private static final int REQUEST_PICK_APPWIDGET = 9;
     private static final int REQUEST_PICK_LIVE_FOLDER = 8;
     private static final int REQUEST_PICK_SHORTCUT = 7;
     private static final String RUNTIME_STATE_ALL_APPS_FOLDER = "launcher.all_apps_folder";
@@ -139,10 +141,11 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private static final String RUNTIME_STATE_PENDING_APPWIDGET_INSERT_AT_FIRST =
             "launcher.pending_appwidget_insert_at_first";
     private static final String RUNTIME_STATE_PENDING_FOLDER_RENAME = "launcher.rename_folder";
+    private static final String RUNTIME_STATE_WIDGET_PICKER_OPEN =
+            "launcher.widget_picker_open";
     private static final String RUNTIME_STATE_PENDING_FOLDER_RENAME_ID = "launcher.rename_folder_id";
     private static final String RUNTIME_STATE_USER_FOLDERS = "launcher.user_folder";
     static final int SCREEN_COUNT = 5;
-    static final String SEARCH_WIDGET = "search_widget";
     static final int WALLPAPER_SCREEN_SPAN = 2;
     /* access modifiers changed from: private */
     public static final LauncherModel sLauncherModel = new LauncherModel();
@@ -198,6 +201,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     /* access modifiers changed from: private */
     public Dock mDock;
     private DragLayer mDragLayer;
+    private WidgetPickerDialog mWidgetPickerDialog;
     private WidgetResizeSession mWidgetResizeSession;
     /* access modifiers changed from: private */
     public FolderInfo mFolderInfo;
@@ -211,6 +215,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private final ContentObserver mObserver = new FavoritesChangeObserver();
     private boolean mPreviewsShowing = false;
     private boolean mRestoring;
+    private boolean mRestoreWidgetPickerWhenReady;
     private int mRotation;
     private int mPendingAppWidgetId = -1;
     private boolean mPendingAppWidgetPlacement;
@@ -582,7 +587,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     private boolean isAppWidgetRequest(int requestCode) {
-        return requestCode == REQUEST_PICK_APPWIDGET
+        return requestCode == REQUEST_BIND_APPWIDGET
                 || requestCode == REQUEST_CREATE_APPWIDGET;
     }
 
@@ -630,7 +635,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             case REQUEST_PICK_LIVE_FOLDER:
                 addLiveFolder(data);
                 return;
-            case REQUEST_PICK_APPWIDGET:
+            case REQUEST_BIND_APPWIDGET:
                 addAppWidget(data);
                 return;
             default:
@@ -778,11 +783,29 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             if (this.mPendingAppWidgetPlacement) {
                 resumePendingAppWidgetPlacement();
             }
+            restoreWidgetPicker(savedState);
             if (savedState.getBoolean(RUNTIME_STATE_PENDING_FOLDER_RENAME, false)) {
                 this.mFolderInfo = sLauncherModel.getFolderById(this, savedState.getLong(RUNTIME_STATE_PENDING_FOLDER_RENAME_ID));
                 this.mRestoring = LOGD;
             }
         }
+    }
+
+    private void restoreWidgetPicker(Bundle savedState) {
+        this.mRestoreWidgetPickerWhenReady = savedState.getBoolean(
+                RUNTIME_STATE_WIDGET_PICKER_OPEN, false);
+        restoreWidgetPickerWhenReady();
+    }
+
+    private void restoreWidgetPickerWhenReady() {
+        if (!this.mRestoreWidgetPickerWhenReady || this.mDesktopLocked) {
+            return;
+        }
+        this.mRestoreWidgetPickerWhenReady = false;
+        if (this.mPendingAppWidgetId != -1 || this.mAddItemCellInfo == null) {
+            return;
+        }
+        startAddWidgets();
     }
 
     private void setupViews() {
@@ -1498,6 +1521,10 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                         layout.getOccupiedCells());
             }
         }
+        outState.putBoolean(RUNTIME_STATE_WIDGET_PICKER_OPEN,
+                this.mRestoreWidgetPickerWhenReady
+                        || (this.mWidgetPickerDialog != null
+                        && this.mWidgetPickerDialog.isShowing()));
         if (this.mPendingAppWidgetId != -1) {
             outState.putInt(RUNTIME_STATE_PENDING_APPWIDGET_ID,
                     this.mPendingAppWidgetId);
@@ -1514,6 +1541,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     public void onDestroy() {
         this.mDestroyed = LOGD;
+        dismissWidgetPicker();
         dismissWidgetResize();
         removePendingAppWidgetPlacementListener();
         if (getChangingConfigurations() == 0) {
@@ -1873,22 +1901,22 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         int appWidgetId = data.getIntExtra(
                 AppWidgetManager.EXTRA_APPWIDGET_ID, -1);
         this.mPendingAppWidgetId = appWidgetId;
-        if (SEARCH_WIDGET.equals(data.getStringExtra(EXTRA_CUSTOM_WIDGET))) {
-            releasePendingAppWidgetId(data);
-            addSearch();
-            return;
-        }
         AppWidgetProviderInfo appWidget =
                 this.mAppWidgetManager.getAppWidgetInfo(appWidgetId);
         if (appWidget == null) {
             releasePendingAppWidgetId(data);
             return;
         }
-        if (appWidget.configure == null) {
-            onActivityResult(REQUEST_CREATE_APPWIDGET, RESULT_OK, data);
+        continueAddAppWidget(appWidget, appWidgetId, data);
+    }
+
+    private void continueAddAppWidget(AppWidgetProviderInfo appWidget,
+            int appWidgetId, Intent resultData) {
+        if (appWidget.configure != null) {
+            startAppWidgetConfiguration(appWidget, appWidgetId, resultData);
             return;
         }
-        startAppWidgetConfiguration(appWidget, appWidgetId, data);
+        onActivityResult(REQUEST_CREATE_APPWIDGET, RESULT_OK, resultData);
     }
 
     private void startAppWidgetConfiguration(
@@ -1896,22 +1924,72 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_CONFIGURE);
         intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
         intent.setComponent(appWidget.configure);
+        this.mWaitingForResult = LOGD;
         try {
             startActivityForResult(intent, REQUEST_CREATE_APPWIDGET);
         } catch (ActivityNotFoundException exception) {
             Log.e(LOG_TAG, "Unable to configure app widget " + appWidget.provider,
                     exception);
             releasePendingAppWidgetId(resultData);
+            this.mWaitingForResult = false;
         }
     }
 
-    private void startAppWidgetPicker(Intent pickIntent) {
+    private void addSelectedAppWidget(AppWidgetProviderInfo provider) {
+        validateSelectedAppWidget(provider);
+        int appWidgetId = this.mAppWidgetHost.allocateAppWidgetId();
+        this.mPendingAppWidgetId = appWidgetId;
+        Intent resultData = createAppWidgetResult(appWidgetId);
         try {
-            startActivityForResult(pickIntent, REQUEST_PICK_APPWIDGET);
-        } catch (ActivityNotFoundException exception) {
-            Log.e(LOG_TAG, "Unable to open app widget picker", exception);
-            releasePendingAppWidgetId(pickIntent);
+            if (this.mAppWidgetManager.bindAppWidgetIdIfAllowed(
+                    appWidgetId, provider.provider)) {
+                addAppWidget(resultData);
+                return;
+            }
+            startAppWidgetBinding(provider, resultData);
+        } catch (IllegalArgumentException exception) {
+            failSelectedAppWidget(provider, resultData, exception);
+        } catch (SecurityException exception) {
+            failSelectedAppWidget(provider, resultData, exception);
         }
+    }
+
+    private void validateSelectedAppWidget(AppWidgetProviderInfo provider) {
+        if (provider == null || provider.provider == null) {
+            throw new IllegalArgumentException("Selected widget requires provider component");
+        }
+        if (provider.minWidth < 0 || provider.minHeight < 0) {
+            throw new IllegalArgumentException(
+                    "Selected widget has invalid minimum dimensions: " + provider.provider);
+        }
+    }
+
+    private Intent createAppWidgetResult(int appWidgetId) {
+        Intent resultData = new Intent();
+        resultData.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
+        return resultData;
+    }
+
+    private void startAppWidgetBinding(AppWidgetProviderInfo provider,
+            Intent resultData) {
+        Intent intent = new Intent(AppWidgetManager.ACTION_APPWIDGET_BIND);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID,
+                this.mPendingAppWidgetId);
+        intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_PROVIDER,
+                provider.provider);
+        try {
+            startActivityForResult(intent, REQUEST_BIND_APPWIDGET);
+        } catch (ActivityNotFoundException exception) {
+            failSelectedAppWidget(provider, resultData, exception);
+        }
+    }
+
+    private void failSelectedAppWidget(AppWidgetProviderInfo provider,
+            Intent resultData, RuntimeException exception) {
+        Log.e(LOG_TAG, "Unable to bind app widget " + provider.provider,
+                exception);
+        releasePendingAppWidgetId(resultData);
+        this.mWaitingForResult = false;
     }
 
     private void releasePendingAppWidgetId(Intent resultData) {
@@ -2509,6 +2587,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             this.mApplicationsView.getImplementingView().requestFocus();
         }
         this.mDesktopLocked = false;
+        restoreWidgetPickerWhenReady();
         updateWorkspaceEmptyTip();
     }
 
@@ -2620,6 +2699,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         return this.mDesktopLocked;
     }
 
+    /** Starts a workspace action for the long-pressed view. */
     public boolean onLongClick(View view) {
         if (this.mDesktopLocked) {
             return false;
@@ -2639,14 +2719,14 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                     showLauncherDialog(cellInfo);
                 }
             } else if (!(cellInfo.cell instanceof Folder)
-                    && !showWidgetResize(pressedView)) {
+                    && !showWidgetResize(pressedView, cellInfo)) {
                 this.mWorkspace.startDrag(cellInfo);
             }
         }
         return LOGD;
     }
 
-    private boolean showWidgetResize(View view) {
+    private boolean showWidgetResize(View view, CellLayout.CellInfo cellInfo) {
         if (!(view instanceof LauncherAppWidgetHostView)
                 || !(view.getTag() instanceof LauncherAppWidgetInfo)
                 || !(view.getParent() instanceof CellLayout)) {
@@ -2665,7 +2745,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         }
         dismissWidgetResize();
         WidgetResizeSession session = new WidgetResizeSession(this, cellLayout,
-                (LauncherAppWidgetHostView) view, widgetInfo, providerInfo);
+                (LauncherAppWidgetHostView) view, cellInfo, widgetInfo, providerInfo);
         if (!session.frame.supportsResize()) {
             return false;
         }
@@ -2696,6 +2776,31 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         dismissWidgetResize(session);
     }
 
+    private void startWidgetDrag(WidgetResizeSession session) {
+        if (!isWidgetDragSessionValid(session)) {
+            dismissWidgetResize(session);
+            return;
+        }
+        dismissWidgetResize(session);
+        this.mWorkspace.startDrag(session.cellInfo);
+    }
+
+    private boolean isWidgetDragSessionValid(WidgetResizeSession session) {
+        if (session != this.mWidgetResizeSession || this.mWorkspace == null
+                || isWorkspaceLocked()) {
+            return false;
+        }
+        if (session.cellInfo == null || session.cellInfo.cell != session.widgetView) {
+            return false;
+        }
+        if (session.widgetView.getTag() != session.widgetInfo
+                || session.widgetView.getParent() != session.cellLayout) {
+            return false;
+        }
+        return session.widgetView.getMeasuredWidth() > 0
+                && session.widgetView.getMeasuredHeight() > 0;
+    }
+
     private void dismissWidgetResize(WidgetResizeSession session) {
         if (session == this.mWidgetResizeSession) {
             dismissWidgetResize();
@@ -2720,20 +2825,27 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
 
     private static final class WidgetResizeSession implements WidgetResizeFrame.Callback {
         final CellLayout cellLayout;
+        final CellLayout.CellInfo cellInfo;
         final WidgetResizeFrame frame;
         final LauncherAppWidgetInfo widgetInfo;
         final LauncherAppWidgetHostView widgetView;
         private final Launcher launcher;
 
         WidgetResizeSession(Launcher launcher, CellLayout cellLayout,
-                LauncherAppWidgetHostView widgetView, LauncherAppWidgetInfo widgetInfo,
-                AppWidgetProviderInfo providerInfo) {
+                LauncherAppWidgetHostView widgetView, CellLayout.CellInfo cellInfo,
+                LauncherAppWidgetInfo widgetInfo, AppWidgetProviderInfo providerInfo) {
             this.launcher = launcher;
             this.cellLayout = cellLayout;
+            this.cellInfo = cellInfo;
             this.widgetView = widgetView;
             this.widgetInfo = widgetInfo;
             this.frame = new WidgetResizeFrame(launcher, cellLayout, widgetView,
                     providerInfo, this);
+        }
+
+        /** Requests a workspace drag after a widget-body gesture. */
+        public void onWidgetDragRequested() {
+            this.launcher.startWidgetDrag(this);
         }
 
         public void onWidgetResizeCancelled() {
@@ -2820,6 +2932,102 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         this.mAddItemCellInfo = cellInfo;
         this.mWaitingForResult = LOGD;
         showDialog(1);
+    }
+
+    private void startAddWidgets() {
+        CellLayout targetLayout = requireWidgetPickerTarget();
+        dismissWidgetPicker();
+        this.mWaitingForResult = LOGD;
+        this.mWidgetPickerDialog = createWidgetPickerDialog();
+        this.mWidgetPickerDialog.show(this.mAppWidgetManager, targetLayout);
+    }
+
+    private CellLayout requireWidgetPickerTarget() {
+        if (this.mAddItemCellInfo == null) {
+            throw new IllegalStateException("Widget picker requires pending target cell");
+        }
+        CellLayout targetLayout = getCellLayoutForScreen(this.mAddItemCellInfo.screen);
+        if (targetLayout == null) {
+            throw new IllegalStateException("Widget picker target screen is unavailable");
+        }
+        return targetLayout;
+    }
+
+    private WidgetPickerDialog createWidgetPickerDialog() {
+        return new WidgetPickerDialog(this, new WidgetPickerDialog.Callback() {
+            public void onWidgetSelected(WidgetPickerDialog dialog,
+                    WidgetPickerEntry entry) {
+                Launcher.this.onWidgetPickerSelection(dialog, entry);
+            }
+
+            public void onWidgetPickerDismissed(WidgetPickerDialog dialog) {
+                Launcher.this.onWidgetPickerDismissed(dialog);
+            }
+        });
+    }
+
+    private void onWidgetPickerSelection(WidgetPickerDialog dialog,
+            WidgetPickerEntry entry) {
+        if (!canSelectWidget(dialog) || entry == null) {
+            return;
+        }
+        if (entry.isSearch()) {
+            this.mWaitingForResult = false;
+            addSearch();
+            return;
+        }
+        addSelectedAppWidget(entry.getProvider());
+    }
+
+    private void onWidgetPickerDismissed(WidgetPickerDialog dialog) {
+        if (!isActiveWidgetPicker(dialog)) {
+            return;
+        }
+        this.mWidgetPickerDialog = null;
+        if (this.mPendingAppWidgetId == -1 && !this.mPendingAppWidgetPlacement) {
+            this.mWaitingForResult = false;
+        }
+    }
+
+    private boolean canSelectWidget(WidgetPickerDialog dialog) {
+        return isActiveWidgetPicker(dialog) && this.mAddItemCellInfo != null
+                && !isWorkspaceLocked();
+    }
+
+    private boolean isActiveWidgetPicker(WidgetPickerDialog dialog) {
+        return dialog != null && dialog == this.mWidgetPickerDialog
+                && !this.mDestroyed;
+    }
+
+    private void dismissWidgetPicker() {
+        WidgetPickerDialog dialog = this.mWidgetPickerDialog;
+        this.mWidgetPickerDialog = null;
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
+    }
+
+    private void startAddShortcuts() {
+        pickShortcut(REQUEST_PICK_SHORTCUT, R.string.title_select_shortcut);
+    }
+
+    private void startAddFolders() {
+        Resources resources = getResources();
+        Bundle bundle = new Bundle();
+        ArrayList<String> shortcutNames = new ArrayList<>();
+        shortcutNames.add(resources.getString(R.string.group_folder));
+        bundle.putStringArrayList("android.intent.extra.shortcut.NAME", shortcutNames);
+        ArrayList<Intent.ShortcutIconResource> shortcutIcons = new ArrayList<>();
+        shortcutIcons.add(Intent.ShortcutIconResource.fromContext(this,
+                R.drawable.ic_launcher_folder));
+        bundle.putParcelableArrayList("android.intent.extra.shortcut.ICON_RESOURCE", shortcutIcons);
+        Intent pickIntent = new Intent("android.intent.action.PICK_ACTIVITY");
+        pickIntent.putExtra("android.intent.extra.INTENT",
+                new Intent("android.intent.action.CREATE_LIVE_FOLDER"));
+        pickIntent.putExtra("android.intent.extra.TITLE",
+                getText(R.string.title_select_live_folder));
+        pickIntent.putExtras(bundle);
+        startActivityForResult(pickIntent, REQUEST_PICK_LIVE_FOLDER);
     }
 
     /* access modifiers changed from: private */
@@ -2956,20 +3164,33 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             Launcher.this.dismissDialog(1);
         }
 
+        /** Dispatches the selected direct launcher action. */
         public void onClick(DialogInterface dialog, int which) {
+            if (which < 0 || which >= this.mHomeDialogAdapter.getCount()) {
+                throw new IllegalArgumentException("Invalid launcher dialog selection: " + which);
+            }
+            LauncherDialogAdapter.ListItem selectedItem =
+                    (LauncherDialogAdapter.ListItem) this.mHomeDialogAdapter.getItem(which);
             cleanup();
-            switch (which) {
-                case 0:
-                    Launcher.this.showAddDialog(Launcher.this.mAddItemCellInfo);
+            switch (selectedItem.mActionTag) {
+                case AddDialogAdapter.ITEM_WIDGETS:
+                    Launcher.this.startAddWidgets();
                     return;
-                case 1:
+                case AddDialogAdapter.ITEM_SHORTCUTS:
+                    Launcher.this.startAddShortcuts();
+                    return;
+                case AddDialogAdapter.ITEM_FOLDERS:
+                    Launcher.this.startAddFolders();
+                    return;
+                case LauncherDialogAdapter.ITEM_WALLPAPER:
                     Launcher.this.startWallpaperChooser();
                     return;
-                case 2:
+                case LauncherDialogAdapter.ITEM_PREFERENCES:
                     Launcher.this.startPreferences();
                     return;
                 default:
-                    return;
+                    throw new IllegalArgumentException(
+                            "Unknown launcher dialog action tag: " + selectedItem.mActionTag);
             }
         }
     }
@@ -3012,48 +3233,27 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             Launcher.this.dismissDialog(2);
         }
 
+        /** Dispatches the selected add action. */
         public void onClick(DialogInterface dialog, int which) {
-            Resources res = Launcher.this.getResources();
+            if (which < 0 || which >= this.mAdapter.getCount()) {
+                throw new IllegalArgumentException("Invalid add dialog selection: " + which);
+            }
+            AddDialogAdapter.ListItem selectedItem =
+                    (AddDialogAdapter.ListItem) this.mAdapter.getItem(which);
             cleanup();
-            switch (which) {
-                case 0:
-                    int appWidgetId = Launcher.this.mAppWidgetHost.allocateAppWidgetId();
-                    Launcher.this.mPendingAppWidgetId = appWidgetId;
-                    Intent pickIntent = new Intent(AppWidgetManager.ACTION_APPWIDGET_PICK);
-                    pickIntent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_ID, appWidgetId);
-                    ArrayList<AppWidgetProviderInfo> customInfo = new ArrayList<>();
-                    AppWidgetProviderInfo appWidgetProviderInfo = new AppWidgetProviderInfo();
-                    appWidgetProviderInfo.provider = new ComponentName(Launcher.this.getPackageName(), "XXX.YYY");
-                    appWidgetProviderInfo.label = Launcher.this.getString(R.string.group_search);
-                    appWidgetProviderInfo.icon = R.drawable.ic_search_widget;
-                    customInfo.add(appWidgetProviderInfo);
-                    pickIntent.putParcelableArrayListExtra("customInfo", customInfo);
-                    ArrayList<Bundle> customExtras = new ArrayList<>();
-                    Bundle bundle = new Bundle();
-                    bundle.putString(Launcher.EXTRA_CUSTOM_WIDGET, Launcher.SEARCH_WIDGET);
-                    customExtras.add(bundle);
-                    pickIntent.putParcelableArrayListExtra("customExtras", customExtras);
-                    Launcher.this.startAppWidgetPicker(pickIntent);
+            switch (selectedItem.mActionTag) {
+                case AddDialogAdapter.ITEM_WIDGETS:
+                    Launcher.this.startAddWidgets();
                     return;
-                case 1:
-                    Launcher.this.pickShortcut(7, R.string.title_select_shortcut);
+                case AddDialogAdapter.ITEM_SHORTCUTS:
+                    Launcher.this.startAddShortcuts();
                     return;
-                case 2:
-                    Bundle bundle2 = new Bundle();
-                    ArrayList<String> shortcutNames = new ArrayList<>();
-                    shortcutNames.add(res.getString(R.string.group_folder));
-                    bundle2.putStringArrayList("android.intent.extra.shortcut.NAME", shortcutNames);
-                    ArrayList<Intent.ShortcutIconResource> shortcutIcons = new ArrayList<>();
-                    shortcutIcons.add(Intent.ShortcutIconResource.fromContext(Launcher.this, R.drawable.ic_launcher_folder));
-                    bundle2.putParcelableArrayList("android.intent.extra.shortcut.ICON_RESOURCE", shortcutIcons);
-                    Intent pickIntent2 = new Intent("android.intent.action.PICK_ACTIVITY");
-                    pickIntent2.putExtra("android.intent.extra.INTENT", new Intent("android.intent.action.CREATE_LIVE_FOLDER"));
-                    pickIntent2.putExtra("android.intent.extra.TITLE", Launcher.this.getText(R.string.title_select_live_folder));
-                    pickIntent2.putExtras(bundle2);
-                    Launcher.this.startActivityForResult(pickIntent2, 8);
+                case AddDialogAdapter.ITEM_FOLDERS:
+                    Launcher.this.startAddFolders();
                     return;
                 default:
-                    return;
+                    throw new IllegalArgumentException(
+                            "Unknown add dialog action tag: " + selectedItem.mActionTag);
             }
         }
     }
