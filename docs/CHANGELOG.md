@@ -1,5 +1,18 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## [3.1.11-alpha-rc9]
+
+- Replaces 47 density-qualified PNG rasters and 9-patch backgrounds with VectorDrawable XML
+  drawables that reference `@color/m3_*` tokens, enabling automatic adaptation to light, dark,
+  and dynamic Material You palettes without any Java or layout changes.
+- Fixes two existing vectors (`ic_settings_decrease`, `ic_settings_increase`) that hardcoded
+  `@android:color/white` to use `@color/m3_on_primary` instead.
+- Preserves Android 24–35 compatibility boundaries, public resource contracts, reconstruction
+  provenance, and zero third-party runtime dependencies.
+- Validation includes passing JVM suite, lint (0 errors after baseline update), Docker-wrapper
+  debug APK build, and `git diff --check`. Runtime icon-adaptation smoke on device remains
+  unperformed.
+
 ## [3.1.11-alpha-rc8]
 
 - Synchronizes horizontal app-drawer page indicators with the homescreen preference and alignment,
