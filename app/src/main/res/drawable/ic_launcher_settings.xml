@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Design: settings (gear). evenOdd fill cuts the center circle from the outer ring. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/m3_on_surface_variant"
+        android:fillType="evenOdd"
+        android:pathData="M19.1,13C19.2,12.7 19.2,12.3 19.2,12c0,-0.3 0,-0.6-0.1,-0.9L21.2,9.5C21.4,9.3 21.4,9.1 21.3,8.9L19.4,5.6C19.2,5.3 19,5.3 18.8,5.3L16.4,6.3C15.9,5.9 15.3,5.6 14.8,5.4L14.4,2.8C14.3,2.6 14.1,2.4 13.9,2.4h-3.8C9.9,2.4 9.7,2.6 9.6,2.8L9.2,5.4C8.7,5.6 8.1,5.9 7.6,6.3L5.2,5.3C5,5.3 4.8,5.3 4.7,5.6L2.7,8.9C2.6,9.1 2.7,9.3 2.9,9.5L4.9,11.1C4.8,11.4 4.8,11.7 4.8,12c0,0.3 0,0.6 0.1,0.9L2.8,14.5C2.6,14.7 2.6,14.9 2.8,15.1L4.7,18.4C4.8,18.7 5,18.7 5.2,18.7L7.6,17.7C8.1,18.1 8.7,18.4 9.2,18.6L9.6,21.2C9.7,21.4 9.9,21.6 10.1,21.6h3.8c0.2,0 0.5,-0.2 0.5,-0.4L14.7,18.6C15.3,18.4 15.9,18.1 16.4,17.7L18.8,18.7C19,18.8 19.2,18.7 19.4,18.4L21.3,15.1C21.4,14.9 21.3,14.7 21.1,14.5L19.1,13zM12,8.4C10,8.4 8.4,10 8.4,12s1.6,3.6 3.6,3.6 3.6,-1.6 3.6,-3.6S14,8.4 12,8.4z" />
+</vector>

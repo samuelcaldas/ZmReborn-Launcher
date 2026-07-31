@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Material Design: edit (pencil) -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="@color/m3_on_surface_variant"
+        android:pathData="M3,17.25V21h3.75L17.81,9.94l-3.75,-3.75L3,17.25zM20.71,7.04C21.1,6.65 21.1,6.02 20.71,5.63l-2.34,-2.34C18.0,2.9 17.37,2.9 16.98,3.29L15.15,5.12l3.75,3.75L20.71,7.04z" />
+</vector>

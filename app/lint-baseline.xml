@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.5.2" type="baseline" client="gradle" dependencies="false" name="AGP (8.5.2)" variant="all" version="8.5.2">
+<issues format="6" by="lint 8.6.0" type="baseline" client="gradle" dependencies="false" name="AGP (8.6.0)" variant="all" version="8.6.0">
 
     <issue
         id="MissingPermission"
@@ -8,7 +8,7 @@
         errorLine2="                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Workspace.java"
-            line="1343"
+            line="1344"
             column="64"/>
     </issue>
 
@@ -19,7 +19,7 @@
         errorLine2="                            ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/ApplicationsGridView.java"
-            line="129"
+            line="170"
             column="29"/>
     </issue>
 
@@ -30,7 +30,7 @@
         errorLine2="                                                            ~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="60"
+            line="63"
             column="61"/>
     </issue>
 
@@ -41,7 +41,7 @@
         errorLine2="                                                                      ~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="61"
+            line="64"
             column="71"/>
     </issue>
 
@@ -52,7 +52,7 @@
         errorLine2="                                                                    ~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="62"
+            line="65"
             column="69"/>
     </issue>
 
@@ -63,7 +63,7 @@
         errorLine2="                                                                       ~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="63"
+            line="66"
             column="72"/>
     </issue>
 
@@ -74,7 +74,7 @@
         errorLine2="                                                                     ~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="64"
+            line="67"
             column="70"/>
     </issue>
 
@@ -85,7 +85,7 @@
         errorLine2="                                        ~~~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="420"
+            line="423"
             column="41"/>
     </issue>
 
@@ -129,7 +129,7 @@
         errorLine2="                                                     ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1212"
+            line="1580"
             column="54"/>
     </issue>
 
@@ -140,7 +140,7 @@
         errorLine2="                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1213"
+            line="1581"
             column="62"/>
     </issue>
 
@@ -151,7 +151,7 @@
         errorLine2="                                                           ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1214"
+            line="1582"
             column="60"/>
     </issue>
 
@@ -162,7 +162,7 @@
         errorLine2="                                                        ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1215"
+            line="1583"
             column="57"/>
     </issue>
 
@@ -173,7 +173,7 @@
         errorLine2="                                                              ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1216"
+            line="1584"
             column="63"/>
     </issue>
 
@@ -184,7 +184,7 @@
         errorLine2="                                                                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1217"
+            line="1585"
             column="110"/>
     </issue>
 
@@ -195,7 +195,7 @@
         errorLine2="                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1218"
+            line="1586"
             column="62"/>
     </issue>
 
@@ -206,7 +206,7 @@
         errorLine2="                                                                ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1219"
+            line="1587"
             column="65"/>
     </issue>
 
@@ -334,34 +334,12 @@
     <issue
         id="ResourceType"
         message="Expected resource of type dimen"
-        errorLine1="            int dimension = (int) context.getResources().getDimension(17104896);"
-        errorLine2="                                                                      ~~~~~~~~">
+        errorLine1="                (int) context.getResources().getDimension(17104896));"
+        errorLine2="                                                          ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Utilities.java"
-            line="38"
-            column="71"/>
-    </issue>
-
-    <issue
-        id="ResourceType"
-        message="Expected resource of type dimen"
-        errorLine1="            int dimension = (int) context.getResources().getDimension(17104896);"
-        errorLine2="                                                                      ~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/Utilities.java"
-            line="94"
-            column="71"/>
-    </issue>
-
-    <issue
-        id="ResourceType"
-        message="Expected resource of type dimen"
-        errorLine1="        int dimension = (int) context.getResources().getDimension(17104896);"
-        errorLine2="                                                                  ~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/Utilities.java"
-            line="135"
-            column="67"/>
+            line="41"
+            column="59"/>
     </issue>
 
     <issue
@@ -384,72 +362,6 @@
             file="src/main/res/layout-port/dockbar.xml"
             line="4"
             column="144"/>
-    </issue>
-
-    <issue
-        id="ApplySharedPref"
-        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
-        errorLine1="                    editor.commit();"
-        errorLine2="                           ~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/Preferences.java"
-            line="154"
-            column="28"/>
-    </issue>
-
-    <issue
-        id="ApplySharedPref"
-        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
-        errorLine1="                    editor.commit();"
-        errorLine2="                           ~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/Preferences.java"
-            line="162"
-            column="28"/>
-    </issue>
-
-    <issue
-        id="ApplySharedPref"
-        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
-        errorLine1="                    editor.commit();"
-        errorLine2="                           ~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/Preferences.java"
-            line="187"
-            column="28"/>
-    </issue>
-
-    <issue
-        id="ApplySharedPref"
-        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
-        errorLine1="                    editor.commit();"
-        errorLine2="                           ~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/Preferences.java"
-            line="195"
-            column="28"/>
-    </issue>
-
-    <issue
-        id="ApplySharedPref"
-        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
-        errorLine1="                    editor.commit();"
-        errorLine2="                           ~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/Preferences.java"
-            line="203"
-            column="28"/>
-    </issue>
-
-    <issue
-        id="ApplySharedPref"
-        message="Consider using `apply()` instead; `commit` writes its data to persistent storage immediately, whereas `apply` will handle it in the background"
-        errorLine1="                    editor.commit();"
-        errorLine2="                           ~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/Preferences.java"
-            line="211"
-            column="28"/>
     </issue>
 
     <issue
@@ -554,30 +466,30 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;application_boxed_grid&quot; in layout-land has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:textAppearance=&quot;@style/TextAppearance.ZmReborn.Label&quot; android:textColor=&quot;@color/bright_text_dark_focused&quot; android:ellipsize=&quot;end&quot; android:gravity=&quot;top|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/name&quot; android:paddingLeft=&quot;5dp&quot; android:paddingTop=&quot;5dp&quot; android:paddingRight=&quot;5dp&quot; android:paddingBottom=&quot;0dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;88dp&quot; android:maxLines=&quot;2&quot; android:singleLine=&quot;false&quot; android:drawablePadding=&quot;0dp&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;TextView"
+        errorLine2=" ~~~~~~~~">
         <location
             file="src/main/res/layout-land/application_boxed_grid.xml"
             line="2"
-            column="1"/>
+            column="2"/>
     </issue>
 
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;application_boxed_grid&quot; in layout-port has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:textAppearance=&quot;@style/TextAppearance.ZmReborn.Label&quot; android:textColor=&quot;@color/bright_text_dark_focused&quot; android:ellipsize=&quot;end&quot; android:gravity=&quot;top|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/name&quot; android:paddingLeft=&quot;2dp&quot; android:paddingTop=&quot;5dp&quot; android:paddingRight=&quot;2dp&quot; android:paddingBottom=&quot;5dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:minHeight=&quot;@dimen/label_min_height&quot; android:maxLines=&quot;2&quot; android:singleLine=&quot;false&quot; android:drawablePadding=&quot;0dp&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;TextView"
+        errorLine2=" ~~~~~~~~">
         <location
             file="src/main/res/layout-port/application_boxed_grid.xml"
             line="2"
-            column="1"/>
+            column="2"/>
     </issue>
 
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;application_boxed_page&quot; in layout-land has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:textAppearance=&quot;@style/TextAppearance.ZmReborn.Label&quot; android:textColor=&quot;@color/bright_text_dark_focused&quot; android:ellipsize=&quot;end&quot; android:gravity=&quot;top|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/name&quot; android:paddingLeft=&quot;5dp&quot; android:paddingTop=&quot;5dp&quot; android:paddingRight=&quot;5dp&quot; android:paddingBottom=&quot;0dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:maxLines=&quot;2&quot; android:singleLine=&quot;false&quot; android:drawablePadding=&quot;0dp&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;TextView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:textAppearance=&quot;@style/TextAppearance.ZmReborn.Label&quot; android:textColor=&quot;@color/bright_text_dark_focused&quot; android:ellipsize=&quot;end&quot; android:gravity=&quot;top|center_vertical|center_horizontal|center&quot; android:id=&quot;@+id/name&quot; android:paddingLeft=&quot;2dp&quot; android:paddingTop=&quot;5dp&quot; android:paddingRight=&quot;2dp&quot; android:paddingBottom=&quot;5dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;wrap_content&quot; android:minHeight=&quot;@dimen/label_min_height&quot; android:maxLines=&quot;2&quot; android:singleLine=&quot;false&quot; android:drawablePadding=&quot;0dp&quot;/>"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/application_boxed_page.xml"
             line="2"
@@ -598,30 +510,30 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;apps_grid_view&quot; in layout-land has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingEnd=&quot;40dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/all_apps_view&quot; android:nextFocusDown=&quot;@+id/all_apps_view&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;1dp&quot; android:numColumns=&quot;5&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;org.zmreborn.ApplicationsDrawerView"
+        errorLine2=" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/apps_grid_view.xml"
             line="2"
-            column="1"/>
+            column="2"/>
     </issue>
 
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;apps_grid_view&quot; in layout-port has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingTop=&quot;9dp&quot; android:paddingBottom=&quot;30dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/home_button&quot; android:nextFocusDown=&quot;@+id/dock&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;5dp&quot; android:numColumns=&quot;4&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;org.zmreborn.ApplicationsDrawerView"
+        errorLine2=" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/apps_grid_view.xml"
             line="2"
-            column="1"/>
+            column="2"/>
     </issue>
 
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;apps_page_view&quot; in layout-land has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingStart=&quot;3dp&quot; android:paddingEnd=&quot;30dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;#00000000&quot; android:paddingStart=&quot;3dp&quot; android:paddingEnd=&quot;3dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/apps_page_view.xml"
             line="2"
@@ -631,8 +543,8 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;apps_page_view&quot; in layout-port has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingLeft=&quot;3dp&quot; android:paddingRight=&quot;3dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
-        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;#00000000&quot; android:paddingLeft=&quot;3dp&quot; android:paddingRight=&quot;3dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
+        errorLine2="~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/apps_page_view.xml"
             line="2"
@@ -642,7 +554,7 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;apps_paging_view&quot; in layout-land has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.ApplicationsPagingView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; xmlns:tools=&quot;http://schemas.android.com/tools&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:visibility=&quot;invisible&quot; android:scrollbars=&quot;none&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:paddingRight=&quot;40dp&quot; tools:ignore=&quot;RtlSymmetry,RtlHardcoded&quot;>"
+        errorLine1="&lt;org.zmreborn.ApplicationsPagingView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; xmlns:tools=&quot;http://schemas.android.com/tools&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:visibility=&quot;invisible&quot; android:scrollbars=&quot;none&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:paddingEnd=&quot;@dimen/navigation_strip_size&quot; tools:ignore=&quot;RtlSymmetry&quot;>"
         errorLine2=" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-land/apps_paging_view.xml"
@@ -653,40 +565,12 @@
     <issue
         id="MissingDefaultResource"
         message="The layout &quot;apps_paging_view&quot; in layout-port has no declaration in the base `layout` folder; this can lead to crashes when the resource is queried in a configuration that does not match this qualifier"
-        errorLine1="&lt;org.zmreborn.ApplicationsPagingView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:visibility=&quot;invisible&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:paddingBottom=&quot;40dp&quot; android:nextFocusLeft=&quot;@+id/view_pager&quot; android:nextFocusRight=&quot;@+id/view_pager&quot; android:nextFocusUp=&quot;@+id/view_pager&quot; android:nextFocusDown=&quot;@+id/view_pager&quot;>"
+        errorLine1="&lt;org.zmreborn.ApplicationsPagingView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:visibility=&quot;invisible&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:paddingBottom=&quot;@dimen/navigation_strip_size&quot; android:nextFocusLeft=&quot;@+id/view_pager&quot; android:nextFocusRight=&quot;@+id/view_pager&quot; android:nextFocusUp=&quot;@+id/view_pager&quot; android:nextFocusDown=&quot;@+id/view_pager&quot;>"
         errorLine2=" ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/layout-port/apps_paging_view.xml"
             line="2"
             column="2"/>
-    </issue>
-
-    <issue
-        id="MissingDefaultResource"
-        message="The drawable &quot;delete_handle_normal&quot; in drawable-land-hdpi has no declaration in the base `drawable` folder or in a `drawable-`*density*`dpi` folder; this can lead to crashes when the drawable is queried in a configuration that does not match this qualifier">
-        <location
-            file="src/main/res/drawable-land-hdpi/delete_handle_normal.png"/>
-    </issue>
-
-    <issue
-        id="MissingDefaultResource"
-        message="The drawable &quot;delete_handle_normal&quot; in drawable-land-mdpi has no declaration in the base `drawable` folder or in a `drawable-`*density*`dpi` folder; this can lead to crashes when the drawable is queried in a configuration that does not match this qualifier">
-        <location
-            file="src/main/res/drawable-land-mdpi/delete_handle_normal.png"/>
-    </issue>
-
-    <issue
-        id="MissingDefaultResource"
-        message="The drawable &quot;delete_handle_normal&quot; in drawable-port-hdpi has no declaration in the base `drawable` folder or in a `drawable-`*density*`dpi` folder; this can lead to crashes when the drawable is queried in a configuration that does not match this qualifier">
-        <location
-            file="src/main/res/drawable-port-hdpi/delete_handle_normal.png"/>
-    </issue>
-
-    <issue
-        id="MissingDefaultResource"
-        message="The drawable &quot;delete_handle_normal&quot; in drawable-port-mdpi has no declaration in the base `drawable` folder or in a `drawable-`*density*`dpi` folder; this can lead to crashes when the drawable is queried in a configuration that does not match this qualifier">
-        <location
-            file="src/main/res/drawable-port-mdpi/delete_handle_normal.png"/>
     </issue>
 
     <issue
@@ -938,7 +822,7 @@
         errorLine2="               ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Preferences.java"
-            line="241"
+            line="476"
             column="16"/>
     </issue>
 
@@ -1004,7 +888,7 @@
         errorLine2="                                                                                                           ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1462"
+            line="1833"
             column="108"/>
     </issue>
 
@@ -1015,7 +899,7 @@
         errorLine2="                                                                       ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1666"
+            line="2140"
             column="72"/>
     </issue>
 
@@ -1026,7 +910,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2108"
+            line="2643"
             column="63"/>
     </issue>
 
@@ -1037,7 +921,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2115"
+            line="2650"
             column="63"/>
     </issue>
 
@@ -1048,7 +932,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2117"
+            line="2652"
             column="63"/>
     </issue>
 
@@ -1087,78 +971,12 @@
 
     <issue
         id="WrongConstant"
-        message="Must be one of: View.DRAWING_CACHE_QUALITY_LOW, View.DRAWING_CACHE_QUALITY_HIGH, View.DRAWING_CACHE_QUALITY_AUTO"
-        errorLine1="            textView.setDrawingCacheQuality(524288);"
-        errorLine2="                                            ~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/ApplicationsAdapter.java"
-            line="28"
-            column="45"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="        setVisibility(0);"
-        errorLine2="                      ~">
-        <location
-            file="src/main/java/org/zmreborn/ApplicationsGridView.java"
-            line="211"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="        setVisibility(4);"
-        errorLine2="                      ~">
-        <location
-            file="src/main/java/org/zmreborn/ApplicationsGridView.java"
-            line="226"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.DRAWING_CACHE_QUALITY_LOW, View.DRAWING_CACHE_QUALITY_HIGH, View.DRAWING_CACHE_QUALITY_AUTO"
-        errorLine1="        this.mViewPager.setDrawingCacheQuality(524288);"
-        errorLine2="                                               ~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/ApplicationsPagingView.java"
-            line="61"
-            column="48"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="        setVisibility(0);"
-        errorLine2="                      ~">
-        <location
-            file="src/main/java/org/zmreborn/ApplicationsPagingView.java"
-            line="255"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="        setVisibility(4);"
-        errorLine2="                      ~">
-        <location
-            file="src/main/java/org/zmreborn/ApplicationsPagingView.java"
-            line="270"
-            column="23"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
         message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
         errorLine1="                if (child.getVisibility() == 0 || child.getAnimation() != null) {"
         errorLine2="                                             ~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="130"
+            line="133"
             column="46"/>
     </issue>
 
@@ -1169,7 +987,7 @@
         errorLine2="                                                                               ~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="423"
+            line="426"
             column="80"/>
     </issue>
 
@@ -1180,7 +998,7 @@
         errorLine2="                                                                                                                                                  ~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="423"
+            line="426"
             column="147"/>
     </issue>
 
@@ -1191,7 +1009,7 @@
         errorLine2="                                         ~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="433"
+            line="436"
             column="42"/>
     </issue>
 
@@ -1422,7 +1240,7 @@
         errorLine2="                                    ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="248"
+            line="273"
             column="37"/>
     </issue>
 
@@ -1433,7 +1251,7 @@
         errorLine2="                                    ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="250"
+            line="275"
             column="37"/>
     </issue>
 
@@ -1444,7 +1262,7 @@
         errorLine2="                                                                                ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="511"
+            line="567"
             column="81"/>
     </issue>
 
@@ -1455,7 +1273,7 @@
         errorLine2="                                                                        ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="604"
+            line="681"
             column="73"/>
     </issue>
 
@@ -1466,7 +1284,7 @@
         errorLine2="                                                   ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="628"
+            line="706"
             column="52"/>
     </issue>
 
@@ -1477,7 +1295,7 @@
         errorLine2="                                                           ~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1116"
+            line="1460"
             column="60"/>
     </issue>
 
@@ -1488,7 +1306,7 @@
         errorLine2="                                                                                                           ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1462"
+            line="1833"
             column="108"/>
     </issue>
 
@@ -1499,7 +1317,7 @@
         errorLine2="                                                                             ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1491"
+            line="1862"
             column="78"/>
     </issue>
 
@@ -1510,7 +1328,7 @@
         errorLine2="                                          ~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1505"
+            line="1876"
             column="43"/>
     </issue>
 
@@ -1521,7 +1339,7 @@
         errorLine2="                                                                       ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1666"
+            line="2140"
             column="72"/>
     </issue>
 
@@ -1532,7 +1350,7 @@
         errorLine2="                                              ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1675"
+            line="2149"
             column="47"/>
     </issue>
 
@@ -1543,7 +1361,7 @@
         errorLine2="                                                                           ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1691"
+            line="2165"
             column="76"/>
     </issue>
 
@@ -1554,7 +1372,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2108"
+            line="2643"
             column="63"/>
     </issue>
 
@@ -1565,7 +1383,7 @@
         errorLine2="                        ~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2111"
+            line="2646"
             column="25"/>
     </issue>
 
@@ -1576,7 +1394,7 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2115"
+            line="2650"
             column="63"/>
     </issue>
 
@@ -1587,30 +1405,8 @@
         errorLine2="                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2117"
+            line="2652"
             column="63"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="            this.mHomeButton.setVisibility(0);"
-        errorLine2="                                           ~">
-        <location
-            file="src/main/java/org/zmreborn/Launcher.java"
-            line="2771"
-            column="44"/>
-    </issue>
-
-    <issue
-        id="WrongConstant"
-        message="Must be one of: View.VISIBLE, View.INVISIBLE, View.GONE"
-        errorLine1="                this.mHomeButton.setVisibility(4);"
-        errorLine2="                                               ~">
-        <location
-            file="src/main/java/org/zmreborn/Launcher.java"
-            line="2803"
-            column="48"/>
     </issue>
 
     <issue
@@ -1620,7 +1416,7 @@
         errorLine2="                                                                                                              ~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2815"
+            line="3590"
             column="111"/>
     </issue>
 
@@ -1642,7 +1438,7 @@
         errorLine2="                                                                          ~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/LauncherDialogAdapter.java"
-            line="37"
+            line="40"
             column="75"/>
     </issue>
 
@@ -1774,7 +1570,7 @@
         errorLine2="                                                                                             ~~">
         <location
             file="src/main/java/org/zmreborn/Utilities.java"
-            line="66"
+            line="99"
             column="94"/>
     </issue>
 
@@ -1873,7 +1669,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1702"
+            line="2176"
             column="13"/>
     </issue>
 
@@ -1917,7 +1713,7 @@
         errorLine2="                                                                                                                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"
-            line="29"
+            line="49"
             column="176"/>
     </issue>
 
@@ -1928,7 +1724,7 @@
         errorLine2="                                                           ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1061"
+            line="1404"
             column="60"/>
     </issue>
 
@@ -1939,7 +1735,7 @@
         errorLine2="                                                       ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1632"
+            line="2100"
             column="56"/>
     </issue>
 
@@ -1957,12 +1753,12 @@
     <issue
         id="DiscouragedApi"
         message="Use of this function is discouraged because resource reflection makes it harder to perform build optimizations and compile-time verification of code. It is much more efficient to retrieve resources by identifier (e.g. `R.foo.bar`) than by name (e.g. `getIdentifier(&quot;bar&quot;, &quot;foo&quot;, null)`)."
-        errorLine1="                    applicationItemInfo.icon = Utilities.createIconThumbnail(resources.getDrawable(resources.getIdentifier(resourceName, (String) null, (String) null)), context);"
-        errorLine2="                                                                                                             ~~~~~~~~~~~~~">
+        errorLine1="                    applicationItemInfo.icon = Utilities.normalizeApplicationIcon(resources.getDrawable(resources.getIdentifier(resourceName, (String) null, (String) null)), context);"
+        errorLine2="                                                                                                                  ~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/LauncherModel.java"
             line="753"
-            column="110"/>
+            column="115"/>
     </issue>
 
     <issue
@@ -2005,7 +1801,7 @@
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="106"
+            line="76"
             column="5"/>
     </issue>
 
@@ -2038,11 +1834,11 @@
         errorLine2="                                                                  ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="518"
+            line="574"
             column="67"/>
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1578"
+            line="2046"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -2054,43 +1850,11 @@
         errorLine2="                                                                  ~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="518"
+            line="574"
             column="67"/>
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="1589"
-            column="13"
-            message="The unsafe intent is launched here."/>
-    </issue>
-
-    <issue
-        id="UnsafeIntentLaunch"
-        message="This intent could be coming from an untrusted source. It is later launched by an unprotected component org.zmreborn.Launcher. You could either make the component org.zmreborn.Launcher protected; or sanitize this intent using androidx.core.content.IntentSanitizer."
-        errorLine1="    public void onActivityResult(int requestCode, int resultCode, Intent data) {"
-        errorLine2="                                                                  ~~~~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/Launcher.java"
-            line="518"
-            column="67"/>
-        <location
-            file="src/main/java/org/zmreborn/Launcher.java"
-            line="1578"
-            column="13"
-            message="The unsafe intent is launched here."/>
-    </issue>
-
-    <issue
-        id="UnsafeIntentLaunch"
-        message="This intent could be coming from an untrusted source. It is later launched by an unprotected component org.zmreborn.Launcher. You could either make the component org.zmreborn.Launcher protected; or sanitize this intent using androidx.core.content.IntentSanitizer."
-        errorLine1="    public void onActivityResult(int requestCode, int resultCode, Intent data) {"
-        errorLine2="                                                                  ~~~~~~~~~~~">
-        <location
-            file="src/main/java/org/zmreborn/Launcher.java"
-            line="518"
-            column="67"/>
-        <location
-            file="src/main/java/org/zmreborn/Launcher.java"
-            line="1589"
+            line="2057"
             column="13"
             message="The unsafe intent is launched here."/>
     </issue>
@@ -2102,7 +1866,7 @@
         errorLine2="                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="377"
+            line="380"
             column="80"/>
     </issue>
 
@@ -2113,7 +1877,7 @@
         errorLine2="                                                                               ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/java/org/zmreborn/CellLayout.java"
-            line="379"
+            line="382"
             column="80"/>
     </issue>
 
@@ -2157,7 +1921,7 @@
         errorLine2="                    ^">
         <location
             file="src/main/java/org/zmreborn/Launcher.java"
-            line="2865"
+            line="3669"
             column="21"/>
     </issue>
 
@@ -2207,28 +1971,6 @@
 
     <issue
         id="Overdraw"
-        message="Possible overdraw: Root element paints background `#00000000` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingStart=&quot;3dp&quot; android:paddingEnd=&quot;30dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
-        errorLine2="                                                                                                                                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/apps_page_view.xml"
-            line="2"
-            column="183"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
-        message="Possible overdraw: Root element paints background `#00000000` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
-        errorLine1="&lt;org.zmreborn.ApplicationsPageView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:orientation=&quot;vertical&quot; android:background=&quot;#00000000&quot; android:paddingLeft=&quot;3dp&quot; android:paddingRight=&quot;3dp&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot;/>"
-        errorLine2="                                                                                                                                                                                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-port/apps_page_view.xml"
-            line="2"
-            column="183"/>
-    </issue>
-
-    <issue
-        id="Overdraw"
         message="Possible overdraw: Root element paints background `@color/zm_reborn_slate` with a theme that also paints a background (inferred theme is `@android:style/Theme.Holo`)"
         errorLine1="    android:background=&quot;@color/zm_reborn_slate&quot;"
         errorLine2="    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
@@ -2251,20 +1993,9 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.color.m3_on_primary` appears to be unused"
-        errorLine1="    &lt;color name=&quot;m3_on_primary&quot;>#ff121a21&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="18"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.color.m3_primary_container` appears to be unused"
-        errorLine1="    &lt;color name=&quot;m3_primary_container&quot;>#ff3d2e00&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~">
+        message="The resource `R.color.m3_on_primary_container` appears to be unused"
+        errorLine1="    &lt;color name=&quot;m3_on_primary_container&quot;>#ff2b1a00&lt;/color>"
+        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/colors.xml"
             line="19"
@@ -2273,67 +2004,12 @@
 
     <issue
         id="UnusedResources"
-        message="The resource `R.color.m3_on_primary_container` appears to be unused"
-        errorLine1="    &lt;color name=&quot;m3_on_primary_container&quot;>#fff2b64a&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="20"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.color.m3_on_surface` appears to be unused"
-        errorLine1="    &lt;color name=&quot;m3_on_surface&quot;>#ffeaf0f3&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="22"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.color.m3_on_surface_variant` appears to be unused"
-        errorLine1="    &lt;color name=&quot;m3_on_surface_variant&quot;>#ffb8c2c8&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="24"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
         message="The resource `R.color.m3_on_error` appears to be unused"
-        errorLine1="    &lt;color name=&quot;m3_on_error&quot;>#ff1a0000&lt;/color>"
+        errorLine1="    &lt;color name=&quot;m3_on_error&quot;>#ffffffff&lt;/color>"
         errorLine2="           ~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/colors.xml"
-            line="28"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.dimen.drawer_cell_min_width` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;drawer_cell_min_width&quot;>48dp&lt;/dimen>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="14"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.dimen.drawer_cell_min_height` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;drawer_cell_min_height&quot;>64dp&lt;/dimen>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="15"
+            line="27"
             column="12"/>
     </issue>
 
@@ -2344,7 +2020,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="20"
+            line="25"
             column="12"/>
     </issue>
 
@@ -2355,7 +2031,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="22"
+            line="27"
             column="12"/>
     </issue>
 
@@ -2366,7 +2042,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="23"
+            line="28"
             column="12"/>
     </issue>
 
@@ -2377,7 +2053,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="25"
+            line="30"
             column="12"/>
     </issue>
 
@@ -2388,7 +2064,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="26"
+            line="31"
             column="12"/>
     </issue>
 
@@ -2399,29 +2075,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="27"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.dimen.shape_corner_large` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;shape_corner_large&quot;>12dp&lt;/dimen>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="28"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.dimen.shape_corner_extra_large` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;shape_corner_extra_large&quot;>16dp&lt;/dimen>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="29"
+            line="32"
             column="12"/>
     </issue>
 
@@ -2432,29 +2086,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="31"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.dimen.drawer_horizontal_padding` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;drawer_horizontal_padding&quot;>12dp&lt;/dimen>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="38"
-            column="12"/>
-    </issue>
-
-    <issue
-        id="UnusedResources"
-        message="The resource `R.dimen.drawer_vertical_padding` appears to be unused"
-        errorLine1="    &lt;dimen name=&quot;drawer_vertical_padding&quot;>8dp&lt;/dimen>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/dimens.xml"
-            line="39"
+            line="36"
             column="12"/>
     </issue>
 
@@ -2465,7 +2097,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="40"
+            line="48"
             column="12"/>
     </issue>
 
@@ -2476,7 +2108,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="41"
+            line="49"
             column="12"/>
     </issue>
 
@@ -2487,7 +2119,7 @@
         errorLine2="           ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/dimens.xml"
-            line="49"
+            line="57"
             column="12"/>
     </issue>
 
@@ -2531,7 +2163,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="103"
+            line="73"
             column="13"/>
     </issue>
 
@@ -2542,7 +2174,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="104"
+            line="74"
             column="13"/>
     </issue>
 
@@ -2553,7 +2185,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="107"
+            line="77"
             column="13"/>
     </issue>
 
@@ -2564,7 +2196,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="108"
+            line="78"
             column="13"/>
     </issue>
 
@@ -2575,7 +2207,7 @@
         errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/res/values/strings.xml"
-            line="161"
+            line="148"
             column="13"/>
     </issue>
 
@@ -2588,172 +2220,6 @@
             file="src/main/res/values/styles.xml"
             line="33"
             column="12"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-hdpi/ic_launcher_add_folder.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-mdpi/ic_launcher_add_folder.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-hdpi/ic_launcher_application.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-mdpi/ic_launcher_application.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-hdpi/ic_launcher_appwidget.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-mdpi/ic_launcher_appwidget.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-hdpi/ic_launcher_folder.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-mdpi/ic_launcher_folder.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-hdpi/ic_launcher_folder_open.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-mdpi/ic_launcher_folder_open.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-hdpi/ic_launcher_settings.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-mdpi/ic_launcher_settings.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-hdpi/ic_launcher_shortcut.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-mdpi/ic_launcher_shortcut.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-hdpi/ic_launcher_wallpaper.png"/>
-    </issue>
-
-    <issue
-        id="IconLauncherShape"
-        message="Launcher icons should not fill every pixel of their square region; see the design guide for details">
-        <location
-            file="src/main/res/drawable-mdpi/ic_launcher_wallpaper.png"/>
-    </issue>
-
-    <issue
-        id="IconDuplicatesConfig"
-        message="The `delete_handle_normal.png` icon has identical contents in the following configuration folders: drawable-land-hdpi, drawable-port-hdpi">
-        <location
-            file="src/main/res/drawable-port-hdpi/delete_handle_normal.png"/>
-        <location
-            file="src/main/res/drawable-land-hdpi/delete_handle_normal.png"/>
-    </issue>
-
-    <issue
-        id="IconDuplicatesConfig"
-        message="The `delete_handle_normal.png` icon has identical contents in the following configuration folders: drawable-land-mdpi, drawable-port-mdpi">
-        <location
-            file="src/main/res/drawable-port-mdpi/delete_handle_normal.png"/>
-        <location
-            file="src/main/res/drawable-land-mdpi/delete_handle_normal.png"/>
-    </issue>
-
-    <issue
-        id="IconDuplicatesConfig"
-        message="The `normal_application_background.9.png` icon has identical contents in the following configuration folders: drawable-hdpi, drawable-mdpi">
-        <location
-            file="src/main/res/drawable-mdpi/normal_application_background.9.png"/>
-        <location
-            file="src/main/res/drawable-hdpi/normal_application_background.9.png"/>
-    </issue>
-
-    <issue
-        id="IconDuplicatesConfig"
-        message="The `preview_bg.9.png` icon has identical contents in the following configuration folders: drawable-hdpi, drawable-mdpi">
-        <location
-            file="src/main/res/drawable-mdpi/preview_bg.9.png"/>
-        <location
-            file="src/main/res/drawable-hdpi/preview_bg.9.png"/>
-    </issue>
-
-    <issue
-        id="IconDuplicatesConfig"
-        message="The `preview_bg_focus.9.png` icon has identical contents in the following configuration folders: drawable-hdpi, drawable-mdpi">
-        <location
-            file="src/main/res/drawable-mdpi/preview_bg_focus.9.png"/>
-        <location
-            file="src/main/res/drawable-hdpi/preview_bg_focus.9.png"/>
-    </issue>
-
-    <issue
-        id="IconDuplicatesConfig"
-        message="The `preview_bg_press.9.png` icon has identical contents in the following configuration folders: drawable-hdpi, drawable-mdpi">
-        <location
-            file="src/main/res/drawable-mdpi/preview_bg_press.9.png"/>
-        <location
-            file="src/main/res/drawable-hdpi/preview_bg_press.9.png"/>
     </issue>
 
     <issue
@@ -3171,17 +2637,6 @@
             file="src/main/res/layout/application_list.xml"
             line="2"
             column="107"/>
-    </issue>
-
-    <issue
-        id="RtlSymmetry"
-        message="When you define `paddingEnd` you should probably also define `paddingStart` for right-to-left symmetry"
-        errorLine1="&lt;org.zmreborn.ApplicationsGridView xmlns:android=&quot;http://schemas.android.com/apk/res/android&quot; xmlns:launcher=&quot;http://schemas.android.com/apk/res-auto&quot; android:background=&quot;@color/zm_reborn_slate&quot; android:paddingEnd=&quot;40dp&quot; android:visibility=&quot;gone&quot; android:scrollbars=&quot;none&quot; android:nextFocusLeft=&quot;@+id/all_apps_view&quot; android:nextFocusRight=&quot;@+id/all_apps_view&quot; android:nextFocusUp=&quot;@+id/all_apps_view&quot; android:nextFocusDown=&quot;@+id/all_apps_view&quot; android:layout_width=&quot;match_parent&quot; android:layout_height=&quot;match_parent&quot; android:drawSelectorOnTop=&quot;false&quot; android:verticalSpacing=&quot;1dp&quot; android:numColumns=&quot;5&quot;/>"
-        errorLine2="                                                                                                                                                                                                   ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/layout-land/apps_grid_view.xml"
-            line="2"
-            column="196"/>
     </issue>
 
     <issue

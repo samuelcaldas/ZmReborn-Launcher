@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!-- Material Design: widgets (2×2 tile grid) -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="24dp"
     android:height="24dp"
     android:viewportWidth="24"
     android:viewportHeight="24">
     <path
-        android:fillColor="@color/m3_on_primary"
-        android:pathData="M19,13H13V19H11V13H5V11H11V5H13V11H19V13Z" />
+        android:fillColor="@color/m3_on_surface_variant"
+        android:pathData="M3,3v8h8V3H3zM13,3v8h8V3h-8zM3,13v8h8v-8H3zM13,13v8h8v-8h-8z" />
 </vector>
