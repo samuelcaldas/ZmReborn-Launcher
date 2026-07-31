@@ -38,6 +38,16 @@ Run unit tests or a single test:
 ./gradlew :app:testDebugUnitTest --tests 'org.zmreborn.FastXmlSerializerTest' --no-daemon
 ```
 
+## Reusable Automation
+
+When a task is procedural and will recur — the same steps, same validation, same command shape, done more than once — package it instead of repeating it ad hoc:
+
+- **Agent** (`.claude/agents/<name>.md`): a bounded, read-only or narrowly-scoped investigation/review run repeatedly (auditing a diff, checking a lifecycle concern, gating a validation step). Follow the frontmatter shape (`name`, `description`, `tools`, optional `model`) used by existing agents (e.g. `dirty-tree-guard.md`, `api-compatibility-auditor.md`). Add a row to `.claude/agents/README.md`'s table (mode, "use when"). New/changed agent definitions need a session restart to take effect.
+- **Skill** (`.claude/skills/<name>/SKILL.md`): a guided, invocable workflow with a fixed sequence of steps and an exact expected output (build, run, test-drive, generate). Use a keyword-rich `description` for matching. Document prerequisites, exact invocation, exact success output, gotchas, and a troubleshooting table, mirroring `run-build-apk/SKILL.md`. Bundle a `driver.sh`/`driver.py` when the steps are non-trivial (see `run-emulator-apk-test/`, `run-image-gen/`).
+- **Tool/script** (`tools/*.sh`, `tools/*.py`): a deterministic, self-contained command any agent or human can invoke directly, with fixed environment/context resolution and concise fixed-format output (see `tools/build_apk.sh`). Prefer this when the operation has no decision-making or investigation step — just execution.
+
+Choose the narrowest mechanism that fits: a one-shot deterministic command is a tool/script; a guided multi-step procedure with meaningful output is a skill; a repeated judgment/review task is an agent. Do not duplicate an existing agent, skill, or tool — extend it instead. Never bypass an existing wrapper (e.g. `tools/build_apk.sh`) by invoking the underlying command directly.
+
 ## Test-Driven Development
 
 - TDD is mandatory for every production change, including Java, resources, manifests, and runtime behavior. Follow red → green → refactor: first add or update the smallest targeted automated test and run it to confirm the intended failure; make the minimum production change; rerun that targeted test until it passes; then refactor only with tests green.
