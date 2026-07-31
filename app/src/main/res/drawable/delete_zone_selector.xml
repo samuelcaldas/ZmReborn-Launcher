@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <transition xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/delete_handle_normal"/>
-    <item android:drawable="@drawable/trashcan_hover"/>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/m3_surface_variant" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/m3_error_container" />
+        </shape>
+    </item>
 </transition>

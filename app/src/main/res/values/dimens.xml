@@ -48,6 +48,7 @@
     <dimen name="folder_spacing">8dp</dimen>
     <dimen name="dialog_spacing">16dp</dimen>
     <dimen name="navigation_strip_size">57dp</dimen>
+    <dimen name="delete_zone_height">72dp</dimen>
     <dimen name="rail_inset">4dp</dimen>
     <dimen name="label_min_height">44dp</dimen>
     <dimen name="text_size_category">12sp</dimen>

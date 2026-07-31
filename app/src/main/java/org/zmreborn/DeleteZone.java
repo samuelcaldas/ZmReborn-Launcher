@@ -215,7 +215,7 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
             animationSet.setInterpolator(new AccelerateInterpolator());
             animationSet.addAnimation(new AlphaAnimation(0.0f, 1.0f));
             if (this.mOrientation == 1) {
-                animationSet.addAnimation(new TranslateAnimation(0, 0.0f, 0, 0.0f, 1, 1.0f, 1, 0.0f));
+                animationSet.addAnimation(new TranslateAnimation(0, 0.0f, 0, 0.0f, 1, -1.0f, 1, 0.0f));
             } else {
                 animationSet.addAnimation(new TranslateAnimation(1, 1.0f, 1, 0.0f, 0, 0.0f, 0, 0.0f));
             }
@@ -223,7 +223,7 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
         }
         if (this.mHandleInAnimation == null) {
             if (this.mOrientation == 1) {
-                this.mHandleInAnimation = new TranslateAnimation(0, 0.0f, 0, 0.0f, 1, 1.0f, 1, 0.0f);
+                this.mHandleInAnimation = new TranslateAnimation(0, 0.0f, 0, 0.0f, 1, -1.0f, 1, 0.0f);
             } else {
                 this.mHandleInAnimation = new TranslateAnimation(1, 1.0f, 1, 0.0f, 0, 0.0f, 0, 0.0f);
             }
@@ -235,7 +235,7 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
             animationSet2.setInterpolator(new AccelerateInterpolator());
             animationSet2.addAnimation(new AlphaAnimation(1.0f, 0.0f));
             if (this.mOrientation == 1) {
-                animationSet2.addAnimation(new FastTranslateAnimation(0, 0.0f, 0, 0.0f, 1, 0.0f, 1, 1.0f));
+                animationSet2.addAnimation(new FastTranslateAnimation(0, 0.0f, 0, 0.0f, 1, 0.0f, 1, -1.0f));
             } else {
                 animationSet2.addAnimation(new FastTranslateAnimation(1, 0.0f, 1, 1.0f, 0, 0.0f, 0, 0.0f));
             }
@@ -243,7 +243,7 @@ public class DeleteZone extends ImageView implements DropTarget, DragController.
         }
         if (this.mHandleOutAnimation == null) {
             if (this.mOrientation == 1) {
-                this.mHandleOutAnimation = new FastTranslateAnimation(0, 0.0f, 0, 0.0f, 1, 0.0f, 1, 1.0f);
+                this.mHandleOutAnimation = new FastTranslateAnimation(0, 0.0f, 0, 0.0f, 1, 0.0f, 1, -1.0f);
             } else {
                 this.mHandleOutAnimation = new FastTranslateAnimation(1, 0.0f, 1, 1.0f, 0, 0.0f, 0, 0.0f);
             }

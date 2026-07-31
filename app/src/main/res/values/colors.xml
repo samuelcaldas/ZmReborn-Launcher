@@ -25,6 +25,7 @@
     <color name="m3_outline_variant">#ffd5c4ac</color>
     <color name="m3_error">#ffba1a1a</color>
     <color name="m3_on_error">#ffffffff</color>
+    <color name="m3_error_container">#ffffdad6</color>
 
     <!-- Compatibility names retain their public resource identity, not fixed dark values. -->
     <color name="zm_reborn_slate">@color/m3_surface</color>
