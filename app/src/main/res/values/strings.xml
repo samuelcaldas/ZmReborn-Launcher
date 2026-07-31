@@ -43,6 +43,7 @@
     <string name="preferences_key_application" translatable="false">application</string>
     <string name="preferences_key_application_language" translatable="false">application_language</string>
     <string name="preferences_key_application_appearance" translatable="false">application_appearance</string>
+    <string name="preferences_key_blur_backgrounds" translatable="false">blur_backgrounds</string>
     <string name="application_name">ZM Reborn</string>
     <string name="preferences_application_version_format">%1$s %2$s</string>
     <string name="application_copyright">Copyright © 2026 Samuel Caldas</string>
@@ -176,6 +177,7 @@
     <string name="preferences_title_general_fullscreen">Fullscreen</string>
     <string name="preferences_title_general_sensor_orientation">Sensor rotation</string>
     <string name="preferences_title_application_appearance">Theme</string>
+    <string name="preferences_title_blur_backgrounds">Blur backgrounds</string>
     <string name="preferences_title_workspace_number_of_screens">Number of screens</string>
     <string name="preferences_title_workspace_default_screen">Default screen</string>
     <string name="preferences_title_workspace_indicator_type">Indicator type</string>
@@ -210,6 +212,7 @@
     <string name="preferences_title_restart">Restart now</string>
     <string name="preferences_summary_application_language">Select application display language. Requires restart.</string>
     <string name="preferences_summary_application_appearance">Follow system light or dark mode</string>
+    <string name="preferences_summary_blur_backgrounds">Blur wallpaper behind the dock and application drawer</string>
     <string name="preferences_summary_general_fullscreen">Run in fullscreen mode</string>
     <string name="preferences_summary_general_sensor_orientation">Use sensor-based rotation</string>
     <string name="preferences_summary_workspace_number_of_screens">Set the number of available screens</string>

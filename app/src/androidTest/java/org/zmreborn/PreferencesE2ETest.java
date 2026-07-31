@@ -14,6 +14,7 @@ import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
+import android.preference.SwitchPreference;
 import android.test.ActivityInstrumentationTestCase2;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -38,9 +39,39 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
     public void testAllSettingsRemainReachable() {
         Preferences preferences = getActivity();
         getInstrumentation().waitForIdleSync();
-        assertEquals(38, countLeafPreferences(preferences.getPreferenceScreen()));
+        assertEquals(37, countLeafPreferences(preferences.getPreferenceScreen()));
         assertNotNull(preferences.findPreference(preferences.getString(R.string.preferences_key_application)));
         assertNotNull(preferences.findPreference(preferences.getString(R.string.preferences_key_reset)));
+    }
+
+    public void testBlurBackgroundPreferencePersistsToggle() throws Throwable {
+        final Preferences preferences = getActivity();
+        final SharedPreferences sharedPreferences = android.preference.PreferenceManager
+                .getDefaultSharedPreferences(preferences);
+        final String key = preferences.getString(R.string.preferences_key_blur_backgrounds);
+        final boolean hadOriginalValue = sharedPreferences.contains(key);
+        final boolean originalValue = sharedPreferences.getBoolean(key, false);
+        final SwitchPreference blurPreference = (SwitchPreference) preferences.findPreference(key);
+        assertNotNull("Blur backgrounds preference must exist", blurPreference);
+
+        try {
+            final boolean toggledValue = !originalValue;
+            runTestOnUiThread(new Runnable() {
+                public void run() {
+                    blurPreference.setChecked(toggledValue);
+                }
+            });
+            assertEquals("Blur backgrounds toggle must persist", toggledValue,
+                    sharedPreferences.getBoolean(key, originalValue));
+        } finally {
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            if (hadOriginalValue) {
+                editor.putBoolean(key, originalValue);
+            } else {
+                editor.remove(key);
+            }
+            assertTrue("Blur backgrounds preference must restore", editor.commit());
+        }
     }
 
     public void testPreferenceScreenOpensFromTouch() {

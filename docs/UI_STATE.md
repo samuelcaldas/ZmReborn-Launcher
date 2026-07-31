@@ -112,6 +112,26 @@ API 26 class references are isolated in `compat/AdaptiveIconCompat.Api26`, behin
 
 `LocaleUtil` composes the selected night mode with the locale configuration, changing only `Configuration.UI_MODE_NIGHT_MASK` and preserving every non-night configuration bit. Changed theme selection follows explicit recreation paths in both `Launcher` and Settings, so locale and appearance configuration apply together.
 
+### Frosted backgrounds
+
+**Preferences → General → Appearance → Blur backgrounds** controls dock and active application drawer
+with one switch. Enabled state temporarily overrides dock background rendering but never changes saved dock
+mode. Disabling restores that mode plus configured application-grid transparency.
+
+All supported versions render a Material-derived translucent gradient with deterministic fixed-seed grain.
+API 24–30 always use this procedural frost. Live wallpaper, platform-restricted wallpaper access, invalid
+wallpaper geometry, and generation/allocation failures also use frost without requesting storage or media
+permissions.
+
+On API 31+ only, readable static wallpaper bitmap already owned by `Workspace` can provide actual blurred
+pixels. `WallpaperBackdropRenderer` downsamples full wallpaper to one eighth linear size, applies three
+sliding-window ARGB box-blur passes on shared wallpaper refresh executor, and caches result by source bitmap
+identity. Drawables upscale and crop cached result using same workspace wallpaper X/Y offset as normal
+wallpaper rendering. Workspace scrolling invalidates dock and drawer surfaces for parallax alignment but does
+not regenerate blur. Wallpaper replacement and launcher teardown invalidate generation token, cancel queued
+work, and interrupt active pixel processing. Cache invalidation drops ownership without recycling a bitmap
+that an installed backdrop can still draw; stale never-installed render results are recycled immediately.
+
 ### Role resources and cache
 
 Semantic M3 role resources have light and night variants; platform Settings and dialogs use matching platform themes.
@@ -195,7 +215,7 @@ API 35 light/night Launcher and Settings themes opt out of forced edge-to-edge e
 Focused JVM/resource/source coverage includes:
 
 - `CellLayoutSpanTest` — span ceiling, gaps, clamping, overflow, invalid geometry;
-- `WallpaperColorExtractorTest` — HSV role contracts and production fallback opacity;
+- `WallpaperColorExtractorTest`, `ArgbBoxBlurTest`, `WallpaperBackdropRendererTest`, `WallpaperBackdropAlignmentTest`, and `WallpaperBlurGenerationTest` — HSV role contracts, deterministic and interruptible multi-pass ARGB blur, downsample geometry, invalid-input rejection, workspace offset alignment, and stale-generation rejection;
 - `DrawerSearchFilterTest`, `DrawerScrollStateTest`, `DrawerDensityPolicyTest`, and `ApplicationsAdapterContractTest` — normalized ranking, immutable filtering, stable restoration/fallback, responsive density breakpoints, and deterministic profile-sensitive IDs;
 - `SettingsResourceContractTest` and `SystemBarResourceContractTest` — switch semantics, eight inline steppers, inline transparency slider, 250 ms debounce, reset/storage contracts, settings geometry, semantic control colors, logical padding, API 35 theme opt-outs, and preserved public/widget source contracts;
 - `UiModernizationContractTest` — blank home, resolved dock handlers, integrated immutable drawer search, responsive/close-safe drawer, explicit icon bounds, dedicated wallpaper executor, and receiver dispatch;
@@ -205,6 +225,7 @@ API 35 instrumentation coverage includes:
 
 - `ApplicationIconE2ETest` — deterministic null fallback plus API 26+ adaptive-icon identity, explicit compound bounds, and layer-safe treatments;
 - `WallpaperPaletteE2ETest` — live palette reapplication plus controlled production receiver scheduling and cached-role refresh;
+- `BlurBackgroundInstrumentationTest`, `WallpaperBackdropRendererInstrumentationTest`, and `WallpaperBlurLifecycleInstrumentationTest` — procedural frost on dock plus vertical/paging drawers, disabled-state dock/alpha restoration, unchanged saved dock preference, actual bitmap diffusion/ownership, safe cache invalidation, and queued executor cancellation;
 - `ApplicationsDrawerE2ETest` — workspace rendering during drawer exit, close-animation action suppression through decor-root pointer dispatch, stale-close reopen protection, search query retention, immutable binding, unremembered refresh reset, and visible empty-adapter recovery that restores original items and closes the drawer;
 - `PredictiveBackE2ETest` — registered platform predictive-back callback object invocation/delivery, handler previews, and top/bottom gesture exclusions;
 - `LauncherE2ETest` — `Launcher.sRestart`-backed preference persistence, automatic and coalesced
@@ -226,7 +247,10 @@ Fresh API 35 evidence is recorded in `docs/CHANGELOG.md`. Full `PreferencesE2ETe
 row recycling, and nested focus. Focused `LauncherE2ETest` coverage also passed workspace persistence,
 activity recreation, and rebuilt grid geometry. Filtered full-suite logcat contained no matching
 launcher fatal exception, launcher ANR, verifier/missing class or method failure, or
-`UnsupportedOperationException`.
+`UnsupportedOperationException`. Fresh blur coverage passed 8 focused API 35 tests across both drawer
+implementations, renderer pixels, bitmap/cache ownership, executor cancellation, settings reachability, and
+preference persistence. API 24 runtime and readable system-wallpaper blur integration on API 31–33 remain
+unperformed; API 35 normally exercises procedural fallback because wallpaper pixels are restricted.
 
 Manual API 35 screenshots confirmed Settings root system-bar spacing and rendered Workspace rows with
 all four inline steppers. Software-only emulator load later produced an input ANR while Android framework

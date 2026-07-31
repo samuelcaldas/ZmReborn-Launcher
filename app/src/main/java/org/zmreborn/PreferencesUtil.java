@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+/** Resolves persisted launcher preferences and their resource-backed defaults. */
+// TODO(move): belongs in org.zmreborn.preferences after callers migrate.
 public class PreferencesUtil {
     private static SharedPreferences sSharedPreferences;
 
@@ -44,6 +46,13 @@ public class PreferencesUtil {
 
     static boolean isFullscreenEnabled(Context context) {
         return getSharedPreferences(context).getBoolean(context.getString(R.string.preferences_key_general_fullscreen), Boolean.parseBoolean(context.getString(R.string.preferences_default_general_fullscreen)));
+    }
+
+    static boolean isBlurBackgroundsEnabled(Context context) {
+        return getSharedPreferences(context).getBoolean(
+                context.getString(R.string.preferences_key_blur_backgrounds),
+                Boolean.parseBoolean(context.getString(
+                        R.string.preferences_default_blur_backgrounds)));
     }
 
     static void setFullscreenEnabled(Context context, boolean fullscreen) {

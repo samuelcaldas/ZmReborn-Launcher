@@ -13,6 +13,33 @@
 - Validation includes passing JVM suite, lint (0 errors), Docker-wrapper debug APK build (866 KB),
   and `git diff --check`. Runtime smoke on device remains unperformed.
 
+## Global frosted backgrounds — 2026-07-31
+
+- Adds one **Preferences → General → Appearance → Blur backgrounds** switch for dock plus active
+  application drawer. Enabling it overrides dock appearance without changing saved dock mode;
+  disabling restores that mode and configured drawer transparency.
+- Adds deterministic Material You frost using a translucent vertical tint and fixed-seed tiled grain.
+  API 24–30, live wallpapers, denied wallpaper access, and blur-generation failures use this procedural
+  fallback without requesting storage or media permissions.
+- On API 31+ when `Workspace` already owns a readable static-wallpaper bitmap, generates a cached
+  one-eighth-scale, three-pass ARGB box blur on wallpaper refresh executor. Dock and both drawer roots
+  sample cached bitmap with existing workspace wallpaper offset, including parallax during page swipes;
+  scrolling never recomputes blur.
+- Adds JVM coverage for blur kernel, geometry, invalid inputs, interruption, and settings resource contract.
+  Cached bitmaps already installed in a backdrop remain drawable until normal garbage collection; stale
+  never-installed outputs are recycled. Wallpaper replacement and teardown cancel queued work, interrupt
+  active pixel processing, and reject stale generation results.
+- Final static validation passed 204 JVM tests with zero failures/errors/skips, Android-test assembly,
+  lint, and `git diff --check`. Docker wrapper built a 732,938-byte debug APK with SHA-256
+  `b8fb57c239b002b078ece1218012b4fe098e2bd6d01e5ee65c5743fa627e582c`.
+- Final API 35 instrumentation passed 8 focused tests: dock plus vertical/paging frost, disabled-state
+  restoration, renderer bitmap diffusion/ownership, cache and executor cancellation lifecycle, settings
+  reachability, and toggle persistence. Filtered logcat contained no matching launcher fatal exception,
+  ANR, verifier/missing-class/method failure, or `UnsupportedOperationException`.
+- API 24 runtime remains unperformed because no local API 24 image is available. API 35 normally uses
+  procedural fallback because static wallpaper pixels are restricted; actual renderer execution is covered
+  with a controlled bitmap, but readable system-wallpaper blur integration on API 31–33 remains unperformed.
+
 ## [3.1.11-alpha-rc9]
 
 - Replaces 47 density-qualified PNG rasters and 9-patch backgrounds with VectorDrawable XML

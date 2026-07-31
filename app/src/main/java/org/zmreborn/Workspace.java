@@ -5,12 +5,15 @@ import android.app.WallpaperManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.RectF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -32,6 +35,7 @@ import java.util.ArrayList;
 import org.zmreborn.CellLayout;
 import org.zmreborn.compat.GestureExclusionCompat;
 
+/** Renders launcher screens and coordinates workspace scrolling, wallpaper, and drag state. */
 public class Workspace extends ViewGroup implements DropTarget, DragSource, DragScroller, GestureDetector.OnGestureListener, ScaleGestureDetector.OnScaleGestureListener, GestureDetector.OnDoubleTapListener {
     private static final int ACTION_OPEN_APPLICATIONS = 2;
     private static final int INVALID_SCREEN = -1;
@@ -90,6 +94,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     private int mTouchState;
     private CellLayout.CellInfo mVacantCache;
     private VelocityTracker mVelocityTracker;
+    private final WorkspaceBlurController mBlurController;
     private boolean mWallpaperDraw;
     private BitmapDrawable mWallpaperDrawable;
     private boolean mWallpaperLoaded;
@@ -108,6 +113,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
 
     public Workspace(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
+        this.mBlurController = new WorkspaceBlurController(this);
         this.mFirstLayout = true;
         this.mNextScreen = INVALID_SCREEN;
         this.mTargetCell = null;
@@ -381,6 +387,16 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         this.mLauncher.getScreenIndicator().fullIndicate(this.mScreenCurrent);
     }
 
+    @Override
+    public void scrollTo(int x, int y) {
+        int previousX = getScrollX();
+        int previousY = getScrollY();
+        super.scrollTo(x, y);
+        if (this.mLauncher != null && (previousX != x || previousY != y)) {
+            this.mLauncher.invalidateBackgroundEffects();
+        }
+    }
+
     public void computeScroll() {
         if (this.mScroller.computeScrollOffset()) {
             scrollTo(this.mScroller.getCurrX(), this.mScroller.getCurrY());
@@ -425,22 +441,10 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     public void dispatchDraw(Canvas canvas) {
         long currentTime;
         if (!this.mLiveWallpaperSupport && this.mWallpaperDrawable != null) {
-            float x = ((float) getScrollX()) * this.mWallpaperOffset;
-            if (((float) this.mWallpaperWidth) + x < ((float) (getRight() - getLeft()))) {
-                x = (float) ((getRight() - getLeft()) - this.mWallpaperWidth);
-            }
-            if (getScrollX() < 0) {
-                x = (float) getScrollX();
-            }
-            if (getScrollX() > getChildAt(getChildCount() + INVALID_SCREEN).getRight() - (getRight() - getLeft())) {
-                x = (float) ((getScrollX() - this.mWallpaperWidth) + (getRight() - getLeft()));
-            }
-            if (!this.mWallpaperScroll || getChildCount() == 1) {
-                x = (float) ((getScrollX() - (this.mWallpaperWidth / 2)) + (getRight() / 2));
-            }
+            float x = calculateWallpaperX();
             int y = this.mWallpaperYOffset;
             if (x > 0.0f || y > 0) {
-                canvas.drawColor(-16777216);
+                canvas.drawColor(Color.BLACK);
             }
             canvas.drawBitmap(this.mWallpaperDrawable.getBitmap(), x, (float) y, this.mPaint);
         }
@@ -488,6 +492,55 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         }
         if (0 != 0) {
             canvas.restore();
+        }
+    }
+
+    void drawWallpaperBackdrop(Canvas canvas, Rect bounds, View target, Bitmap bitmap,
+            Paint paint) {
+        if (!canDrawWallpaperBackdrop(target, bitmap)) {
+            return;
+        }
+        Bitmap source = this.mWallpaperDrawable.getBitmap();
+        float x = WallpaperBackdropAlignment.offset(calculateWallpaperX(),
+                target.getX(), getX());
+        float y = WallpaperBackdropAlignment.offset(this.mWallpaperYOffset,
+                target.getY(), getY());
+        canvas.save();
+        canvas.clipRect(bounds);
+        drawBackdropGap(canvas, bounds, x, y);
+        canvas.translate(x, y);
+        canvas.scale((float) source.getWidth() / bitmap.getWidth(),
+                (float) source.getHeight() / bitmap.getHeight());
+        canvas.drawBitmap(bitmap, 0.0f, 0.0f, paint);
+        canvas.restore();
+    }
+
+    private float calculateWallpaperX() {
+        float x = ((float) getScrollX()) * this.mWallpaperOffset;
+        if (((float) this.mWallpaperWidth) + x < getWidth()) {
+            x = (float) (getWidth() - this.mWallpaperWidth);
+        }
+        if (getScrollX() < 0) {
+            x = (float) getScrollX();
+        }
+        if (getScrollX() > getChildAt(getChildCount() + INVALID_SCREEN).getRight() - getWidth()) {
+            x = (float) ((getScrollX() - this.mWallpaperWidth) + getWidth());
+        }
+        if (!this.mWallpaperScroll || getChildCount() == 1) {
+            x = (float) ((getScrollX() - (this.mWallpaperWidth / 2)) + (getRight() / 2));
+        }
+        return x;
+    }
+
+    private boolean canDrawWallpaperBackdrop(View target, Bitmap bitmap) {
+        return target != null && bitmap != null && !bitmap.isRecycled()
+                && this.mWallpaperDrawable != null && getChildCount() > 0
+                && this.mWallpaperWidth > 0;
+    }
+
+    private void drawBackdropGap(Canvas canvas, Rect bounds, float x, float y) {
+        if (x > bounds.left || y > bounds.top) {
+            canvas.drawColor(Color.BLACK);
         }
     }
 
@@ -1333,6 +1386,14 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
         }
     }
 
+    void applyFrostedBackgrounds(View dock, View drawer, int drawerAlpha) {
+        this.mBlurController.apply(dock, drawer, drawerAlpha);
+    }
+
+    void destroyBackgroundEffects() {
+        this.mBlurController.destroy();
+    }
+
     public void setWallpaper(boolean fromIntentReceiver) {
         if (this.mWallpaperManager.getWallpaperInfo() != null || !this.mWallpaperDraw) {
             this.mWallpaperLoaded = false;
@@ -1355,6 +1416,7 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
             }
         }
         this.mLauncher.setWindowBackground(this.mLiveWallpaperSupport);
+        this.mBlurController.refresh();
         invalidate();
         requestLayout();
     }
@@ -1372,6 +1434,27 @@ public class Workspace extends ViewGroup implements DropTarget, DragSource, Drag
     public void setScrollWallpaper(boolean scrollWallpaper) {
         this.mWallpaperScroll = scrollWallpaper;
         postInvalidate();
+        this.mLauncher.invalidateBackgroundEffects();
+    }
+
+    Bitmap getBlurWallpaperSource() {
+        if (Build.VERSION.SDK_INT < 31
+                || !PreferencesUtil.isBlurBackgroundsEnabled(getContext())) {
+            return null;
+        }
+        if (this.mLiveWallpaperSupport || this.mWallpaperDrawable == null) {
+            return null;
+        }
+        Bitmap wallpaper = this.mWallpaperDrawable.getBitmap();
+        return wallpaper == null || wallpaper.isRecycled() ? null : wallpaper;
+    }
+
+    boolean usesLiveWallpaper() {
+        return this.mLiveWallpaperSupport;
+    }
+
+    void applyBackgroundEffectsFromBlur() {
+        this.mLauncher.applyBackgroundEffects();
     }
 
     public void setElasticScrolling(boolean enabled) {

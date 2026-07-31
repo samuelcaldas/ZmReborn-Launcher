@@ -22,6 +22,7 @@ public class SettingsResourceContractTest {
     private static final String[][] BOOLEAN_PREFERENCE_CONTRACT = {
             {"preferences_key_general_fullscreen", "false"},
             {"preferences_key_general_sensor_orientation", "false"},
+            {"preferences_key_blur_backgrounds", "false"},
             {"preferences_key_workspace_elastic_scrolling", "true"},
             {"preferences_key_workspace_screen_looping", "true"},
             {"preferences_key_workspace_content_grid_auto_fit", "false"},
@@ -38,6 +39,7 @@ public class SettingsResourceContractTest {
             {"preferences_key_general_sensor_orientation", "general_orientation_mode", "preferences_title_general_sensor_orientation", "@string/preferences_default_general_sensor_orientation", "preferences_summary_general_sensor_orientation"},
             {"preferences_key_application_language", "application_language", "preferences_title_application_language", "@string/preferences_default_application_language", "preferences_summary_application_language"},
             {"preferences_key_application_appearance", "application_appearance", "preferences_title_application_appearance", "@string/preferences_default_application_appearance", "preferences_summary_application_appearance"},
+            {"preferences_key_blur_backgrounds", "blur_backgrounds", "preferences_title_blur_backgrounds", "@string/preferences_default_blur_backgrounds", "preferences_summary_blur_backgrounds"},
             {"preferences_key_workspace_number_of_screens", "workspace_number_of_screens", "preferences_title_workspace_number_of_screens", "@string/preferences_default_workspace_number_of_screens", "preferences_summary_workspace_number_of_screens"},
             {"preferences_key_workspace_default_screen", "workspace_default_screen", "preferences_title_workspace_default_screen", "@string/preferences_default_workspace_default_screen", "preferences_summary_workspace_default_screen"},
             {"preferences_key_workspace_screen_indicator_type", "workspace_screen_indicator", "preferences_title_workspace_indicator_type", "@string/preferences_default_workspace_screen_indicator_type", "preferences_summary_workspace_screen_indicator_type"},
@@ -77,7 +79,7 @@ public class SettingsResourceContractTest {
         Element root = parse("main/res/xml/preferences.xml").getDocumentElement();
         Map<String, String> strings = values("main/res/values/strings.xml", "string");
         strings.putAll(values("main/res/values/defaults.xml", "string"));
-        assertEquals(36, countPreferences(root));
+        assertEquals(37, countPreferences(root));
         assertFalse("Preference dependencies must remain explicit in Java", containsDependency(root));
         assertEquals(PREFERENCE_CONTRACT.length, countPreferences(root));
         for (String[] contract : PREFERENCE_CONTRACT) {
@@ -116,6 +118,13 @@ public class SettingsResourceContractTest {
             assertBooleanDefault(preference, strings, contract[0], contract[1]);
         }
         assertEquals(0, root.getElementsByTagName("CheckBoxPreference").getLength());
+        Element blur = findPreference(root, "preferences_key_blur_backgrounds");
+        Element appearanceCategory = (Element) blur.getParentNode();
+        assertEquals("@string/preferences_category_appearance",
+                appearanceCategory.getAttribute("android:title"));
+        Element generalScreen = (Element) appearanceCategory.getParentNode();
+        assertEquals("@string/preferences_screen_title_general",
+                generalScreen.getAttribute("android:title"));
 
         Element styles = parse("main/res/values/styles.xml").getDocumentElement();
         Element settingsTheme = findNamedElement(styles, "style", "SettingsTheme");
@@ -402,6 +411,7 @@ public class SettingsResourceContractTest {
         String[] expectedDefaults = {
             "preferences_default_general_fullscreen",
             "preferences_default_general_sensor_orientation",
+            "preferences_default_blur_backgrounds",
             "preferences_default_workspace_number_of_screens",
             "preferences_default_workspace_default_screen",
             "preferences_default_workspace_elastic_scrolling",
@@ -438,7 +448,7 @@ public class SettingsResourceContractTest {
         };
         Map<String, String> defaults = values("main/res/values/defaults.xml", "string");
         Map<String, String> strings = values("main/res/values/strings.xml", "string");
-        assertEquals("defaults.xml must contain exactly 35 entries",
+        assertEquals("defaults.xml must contain exactly 36 entries",
                 expectedDefaults.length, defaults.size());
         for (String name : expectedDefaults) {
             assertTrue("defaults.xml must contain " + name, defaults.containsKey(name));

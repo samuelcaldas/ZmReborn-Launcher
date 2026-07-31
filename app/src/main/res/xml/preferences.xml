@@ -6,6 +6,7 @@
         <ListPreference android:entries="@array/preferences_entries_application_languages" android:title="@string/preferences_title_application_language" android:key="@string/preferences_key_application_language" android:summary="@string/preferences_summary_application_language" android:defaultValue="@string/preferences_default_application_language" android:entryValues="@array/preferences_values_application_languages"/>
         <PreferenceCategory android:title="@string/preferences_category_appearance">
             <ListPreference android:entries="@array/preferences_entries_application_appearances" android:title="@string/preferences_title_application_appearance" android:key="@string/preferences_key_application_appearance" android:summary="@string/preferences_summary_application_appearance" android:defaultValue="@string/preferences_default_application_appearance" android:entryValues="@array/preferences_values_application_appearances"/>
+            <SwitchPreference android:title="@string/preferences_title_blur_backgrounds" android:key="@string/preferences_key_blur_backgrounds" android:summary="@string/preferences_summary_blur_backgrounds" android:defaultValue="@string/preferences_default_blur_backgrounds"/>
         </PreferenceCategory>
     </PreferenceScreen>
     <PreferenceScreen android:title="@string/preferences_screen_title_workspace">

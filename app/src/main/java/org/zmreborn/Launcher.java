@@ -76,8 +76,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import org.zmreborn.CellLayout;
 import org.zmreborn.LauncherSettings;
 import org.zmreborn.compat.BackGestureCompat;
@@ -154,7 +155,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     static boolean sRestartLoaders = false;
     private static int sScreen = 2;
     static volatile boolean sSuppressWallpaperRefreshForTests;
-    private static final Executor sWallpaperRefreshExecutor = Executors.newSingleThreadExecutor();
+    private static final ExecutorService sWallpaperRefreshExecutor = Executors.newSingleThreadExecutor();
     private static WallpaperIntentReceiver sWallpaperReceiver;
     /* access modifiers changed from: private */
     public CellLayout.CellInfo mAddItemCellInfo;
@@ -427,7 +428,14 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     static void runAfterWallpaperRefreshesForTests(Runnable runnable) {
-        sWallpaperRefreshExecutor.execute(runnable);
+        executeWallpaperRefresh(runnable);
+    }
+
+    static Future<?> executeWallpaperRefresh(Runnable runnable) {
+        if (runnable == null) {
+            throw new IllegalArgumentException("Wallpaper refresh task must not be null");
+        }
+        return sWallpaperRefreshExecutor.submit(runnable);
     }
 
     private void startLoaders() {
@@ -669,7 +677,6 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 applicationsPagingView.setNumColumns(PreferencesUtil.getAppsGridHorizontalPagingContentColumnsLandscape(this));
             }
         }
-        this.mApplicationsView.setBackgroundAlpha(PreferencesUtil.getAppsGridBackgroundAlpha(this));
         this.mWorkspace.setWallpaper(false);
         if (this.mRestoring) {
             startLoaders();
@@ -908,7 +915,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         this.mWorkspace.setScrollWallpaper(PreferencesUtil.isScrollWallpaperEnabled(this));
         loadIndicator();
         loadDockWidths();
-        loadDockBackground();
+        applyBackgroundEffects();
         this.mWorkspace.updateSystemGestureExclusionRects();
     }
 
@@ -931,6 +938,30 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             }
         }
         dock.invalidate();
+    }
+
+    void applyBackgroundEffects() {
+        if (this.mDestroyed || this.mWorkspace == null || this.mDock == null
+                || this.mApplicationsView == null) {
+            return;
+        }
+        int drawerAlpha = PreferencesUtil.getAppsGridBackgroundAlpha(this);
+        this.mApplicationsView.setBackgroundAlpha(drawerAlpha);
+        if (!PreferencesUtil.isBlurBackgroundsEnabled(this)) {
+            loadDockBackground();
+            return;
+        }
+        View drawer = this.mApplicationsView.getImplementingView();
+        this.mWorkspace.applyFrostedBackgrounds(this.mDock, drawer, drawerAlpha);
+    }
+
+    void invalidateBackgroundEffects() {
+        if (this.mDock != null) {
+            this.mDock.invalidate();
+        }
+        if (this.mApplicationsView != null) {
+            this.mApplicationsView.getImplementingView().invalidate();
+        }
     }
 
     private void loadDockBackground() {
@@ -1061,10 +1092,8 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         if (this.mDestroyed || this.mApplicationsView == null || this.mDock == null) {
             return;
         }
-        this.mApplicationsView.setBackgroundAlpha(
-                PreferencesUtil.getAppsGridBackgroundAlpha(this));
         this.mApplicationsView.refreshPalette();
-        loadDockBackground();
+        applyBackgroundEffects();
         if (this.mScreenIndicator != null) {
             this.mScreenIndicator.refreshPalette();
         }
@@ -1541,6 +1570,9 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         onBackCancelled();
         BackGestureCompat.unregisterBackHandler(this, this.mBackGestureRegistration);
         this.mBackGestureRegistration = null;
+        if (this.mWorkspace != null) {
+            this.mWorkspace.destroyBackgroundEffects();
+        }
         super.onDestroy();
         try {
             this.mAppWidgetHost.stopListening();

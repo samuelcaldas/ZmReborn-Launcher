@@ -85,6 +85,8 @@ ZM Reborn supports System default, English, and Brazilian Portuguese (`pt-BR`). 
 
 Choose **Preferences → General → Theme** for Follow system, Light, or Dark. The persisted `application_appearance` selection is composed with the locale configuration by `LocaleUtil`, changing only night-mode bits and preserving all other configuration bits. Launcher and Settings use recreation paths to apply a changed selection.
 
+**Preferences → General → Appearance → Blur backgrounds** applies one frosted-glass style to dock and active app drawer. API 31+ uses best-effort static-wallpaper blur when `Workspace` already has readable pixels; API 24–30, live wallpaper, and restricted wallpaper access use deterministic Material-tinted frost without new permissions. Disabling restores saved dock style and drawer transparency.
+
 Language resources are packaged with the base app so in-app switching also works for Android App Bundle installs. Supported languages are currently left-to-right; RTL layout support remains deferred.
 
 ## Verification and compatibility

@@ -3,6 +3,7 @@
 <resources>
     <string name="preferences_default_general_fullscreen" translatable="false">false</string>
     <string name="preferences_default_general_sensor_orientation" translatable="false">false</string>
+    <string name="preferences_default_blur_backgrounds" translatable="false">false</string>
     <string name="preferences_default_workspace_number_of_screens" translatable="false">3</string>
     <string name="preferences_default_workspace_default_screen" translatable="false">2</string>
     <string name="preferences_default_workspace_elastic_scrolling" translatable="false">true</string>
