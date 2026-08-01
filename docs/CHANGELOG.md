@@ -12,7 +12,10 @@
 - JDK 17 validation passed 204 JVM tests, Android-test assembly, lint, required Docker-wrapper APK build, and
   `git diff --check`. API 35 passed 16 focused paging, focus, drawer-pull, and Preferences recreation tests.
   A full API 35 suite attempt reached test 81 of 122 without a reported failure before its 15-minute local
-  timeout. Hosted API 24 follow-up execution remains pending.
+  timeout.
+- Hosted API 24 follow-up completed all 122 tests with 121 passes and one remaining Preferences touch failure.
+  Root-list touch now targets the adapter-resolved visible row directly instead of relying on decor routing;
+  focused API 35 validation passes, while another hosted API 24 execution remains pending.
 
 ## Hosted API 24 CI hardening — 2026-07-31
 

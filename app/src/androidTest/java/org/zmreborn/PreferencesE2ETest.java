@@ -7,7 +7,6 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.preference.ListPreference;
@@ -78,31 +77,34 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
         final Preferences preferences = getActivity();
         getInstrumentation().waitForIdleSync();
         final PreferenceScreen generalScreen = (PreferenceScreen) preferences.getPreferenceScreen().getPreference(0);
-        final android.widget.ListView listView = preferences.getListView();
-        final View decorView = preferences.getWindow().getDecorView();
+        final ListView listView = preferences.getListView();
+        final ListAdapter adapter = listView.getAdapter();
+        final int position = preferencePosition(adapter, generalScreen);
+        assertTrue("General preference screen must exist in root list", position >= 0);
         final boolean[] dispatched = new boolean[2];
         final Throwable[] dispatchFailure = new Throwable[1];
 
         getInstrumentation().runOnMainSync(new Runnable() {
             public void run() {
+                listView.setSelection(position);
+            }
+        });
+        getInstrumentation().waitForIdleSync();
+        getInstrumentation().runOnMainSync(new Runnable() {
+            public void run() {
                 try {
-                    View generalRow = listView.getChildAt(0);
+                    int childIndex = position - listView.getFirstVisiblePosition();
+                    View generalRow = listView.getChildAt(childIndex);
                     if (generalRow == null) {
                         throw new IllegalStateException("General preference screen row is not visible");
                     }
-                    Rect visibleBounds = new Rect();
-                    if (!generalRow.getGlobalVisibleRect(visibleBounds)) {
-                        throw new IllegalStateException("General preference screen row has no visible bounds");
-                    }
-                    int[] decorLocation = new int[2];
-                    decorView.getLocationOnScreen(decorLocation);
-                    float centerX = visibleBounds.centerX() - decorLocation[0];
-                    float centerY = visibleBounds.centerY() - decorLocation[1];
+                    float centerX = generalRow.getLeft() + (generalRow.getWidth() / 2.0f);
+                    float centerY = generalRow.getTop() + (generalRow.getHeight() / 2.0f);
                     long downTime = SystemClock.uptimeMillis();
-                    dispatched[0] = dispatchTouchEvent(decorView, downTime, downTime,
+                    dispatched[0] = dispatchTouchEvent(listView, downTime, downTime,
                             MotionEvent.ACTION_DOWN, centerX, centerY);
-                    dispatched[1] = dispatchTouchEvent(decorView, downTime,
-                            SystemClock.uptimeMillis(), MotionEvent.ACTION_UP, centerX, centerY);
+                    dispatched[1] = dispatchTouchEvent(listView, downTime, downTime + 10L,
+                            MotionEvent.ACTION_UP, centerX, centerY);
                 } catch (Throwable throwable) {
                     dispatchFailure[0] = throwable;
                 }
@@ -115,9 +117,10 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
         }
         assertTrue("General row must accept pointer down", dispatched[0]);
         assertTrue("General row must accept pointer up", dispatched[1]);
-        assertNotNull("General preference screen must create a dialog", generalScreen.getDialog());
-        assertTrue("General preference screen must open from touch", generalScreen.getDialog().isShowing());
-        generalScreen.getDialog().dismiss();
+        Dialog dialog = awaitPreferenceDialog(generalScreen, 5000L);
+        assertNotNull("General preference screen must create a dialog", dialog);
+        assertTrue("General preference screen must open from touch", dialog.isShowing());
+        dialog.dismiss();
     }
 
     public void testApplicationRowShowsRebrandedIdentityWithoutLink() {
@@ -730,6 +733,19 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
                 }
             }
         }
+    }
+
+    private Dialog awaitPreferenceDialog(PreferenceScreen screen, long timeoutMillis) {
+        long deadline = SystemClock.uptimeMillis() + timeoutMillis;
+        while (SystemClock.uptimeMillis() < deadline) {
+            getInstrumentation().waitForIdleSync();
+            Dialog dialog = screen.getDialog();
+            if (dialog != null && dialog.isShowing()) {
+                return dialog;
+            }
+            SystemClock.sleep(25L);
+        }
+        return null;
     }
 
     private ListView openPreferenceScreen(final Preferences preferences,
