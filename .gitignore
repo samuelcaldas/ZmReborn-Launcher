@@ -90,3 +90,6 @@ lint/tmp/
 # Playwright MCP
 .playwright-mcp/
 *.png
+
+# Local CI emulator diagnostics
+/e2e-diagnostics/

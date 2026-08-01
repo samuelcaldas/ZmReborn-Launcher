@@ -48,6 +48,36 @@ Run these instrumentation classes when changing widget selection, placement, edi
 
 API 24/API 35 device smoke must still select real providers, exercise bind approval and provider configuration, rotate during pending flows, move and delete a resizable widget, relaunch to verify persistence, and inspect host IDs/logcat for abandoned allocations or platform failures.
 
+## Hosted API 24 CI execution
+
+GitHub Actions invokes `./tools/run_ci_emulator_tests.sh` as one command inside
+`reactivecircus/android-emulator-runner`. Keep shell control flow in that checked-in Bash process;
+the action executes separate `script:` lines in separate shells, so multiline YAML scripts lose strict
+mode, variables, and compound-command state.
+
+Driver requires built debug and Android-test APKs plus an active ADB target. It validates inputs before
+installation, bounds every ADB command with `timeout --foreground`, and requires both a successful ADB
+status and `INSTRUMENTATION_CODE: -1`. Crash and failure markers still fail execution when
+`am instrument` exits zero. To restrict a diagnostic run to one class or method, set a selector before
+invocation:
+
+```sh
+INSTRUMENTATION_TEST_CLASS='org.zmreborn.DrawerFastScrollE2ETest' \
+  ./tools/run_ci_emulator_tests.sh
+
+INSTRUMENTATION_TEST_CLASS='org.zmreborn.DrawerFastScrollE2ETest#testVerticalDrawerFastScrollNavigatesAlphabeticalSections' \
+  ./tools/run_ci_emulator_tests.sh
+```
+
+On primary failure, driver captures bounded logcat, window/activity/process/package state, UI hierarchy,
+and screenshot before emulator teardown, while preserving primary exit status. Run state and command
+output are written under `e2e-diagnostics/`; workflow uploads that directory as `e2e-diagnostics` even
+when tests fail. `bash tools/test_ci_workflow_contract.sh` protects single-process execution,
+timeout/result checks, pre-teardown diagnostics, and artifact wiring.
+
+Hosted API 24 results are runtime compatibility evidence. API 35 local instrumentation is separate
+runtime evidence; Android-test assembly only proves source compilation and packaging.
+
 ## Required validation sequence
 
 Run commands from the repository root after the targeted test passes. Apply the Android steps when the change has instrumentation or runtime scope.

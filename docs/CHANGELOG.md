@@ -1,5 +1,20 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Hosted API 24 CI hardening — 2026-07-31
+
+- Replaces newline-dependent emulator-runner commands with one checked-in Bash driver so strict mode,
+  variables, instrumentation result handling, smoke assertions, and failure status remain in one process.
+- Bounds every ADB operation, rejects instrumentation crash/failure markers even when ADB exits zero, and
+  captures logcat, window/activity/process/package state, UI hierarchy, and screenshot before emulator
+  teardown. Workflow always uploads `e2e-diagnostics/` without masking primary failure.
+- Makes vertical-drawer fast-scroll E2E state deterministic by snapshotting drawer/blur preferences,
+  waiting for the asynchronous application load before installing a 52-item A–Z fixture, dispatching real
+  grid and rail touch input, checking Z navigation and delayed auto-hide, and reusing one shared icon.
+- Static validation passed CI workflow contract, Bash syntax, 204 JVM tests, Android-test assembly, lint,
+  Docker-wrapper debug APK build, and `git diff --check`. API 35 runtime passed focused fast-scroll E2E
+  in normal and forced-RTL layouts, two Preferences smoke tests, exact Launcher focus/workspace smoke, and
+  filtered fatal/verifier/API-error logcat checks. Hosted API 24 execution remains pending.
+
 ## [3.1.11-alpha-rc11]
 
 - Adds one **Blur backgrounds** preference that applies a Material You frosted-glass surface to dock

@@ -16,6 +16,9 @@ jobs:
     - name: Checkout Code
       uses: actions/checkout@v4
 
+    - name: Verify CI Workflow Contract
+      run: bash tools/test_ci_workflow_contract.sh
+
     - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
@@ -103,57 +106,12 @@ jobs:
         disable-animations: true
         emulator-boot-timeout: 600
         emulator-options: -no-window -no-audio -no-boot-anim -no-snapshot -gpu swiftshader_indirect
-        script: |
-          set -e
-          echo "Checking emulator connection..."
-          adb devices
-
-          echo "Installing production APK..."
-          adb install -r app/build/outputs/apk/debug/app-debug.apk
-
-          echo "Installing androidTest APK..."
-          adb install -r app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
-
-          echo "Running Instrumentation Tests (full suite)..."
-          adb shell am instrument -w -r "${APP_ID}.test/android.test.InstrumentationTestRunner"
-
-          echo "Running adb E2E smoke verification..."
-          adb shell am force-stop "${APP_ID}"
-          adb shell am start -W -n "${APP_ID}/.Launcher"
-          sleep 3
-
-          echo "Verifying focused window is Launcher..."
-          focused=$(adb shell dumpsys window | grep -E 'mCurrentFocus|mFocusedApp')
-          echo "Focused: $focused"
-
-          echo "Dumping and verifying UI hierarchy..."
-          adb shell uiautomator dump /sdcard/window_dump.xml
-          adb pull /sdcard/window_dump.xml .
-
-          if grep -q "${APP_ID}:id/workspace" window_dump.xml; then
-            echo "SUCCESS: workspace found in UI hierarchy!"
-          else
-            echo "FAILURE: workspace not found in UI hierarchy!"
-            cat window_dump.xml
-            exit 1
-          fi
-
-    - name: Collect diagnostics on failure
-      if: failure()
-      run: |
-        echo "Collecting adb logcat output..."
-        adb logcat -d -v threadtime > logcat.log || true
-        echo "Dumping window status..."
-        adb shell dumpsys window > window.log || true
-        echo "Checking process list..."
-        adb shell ps > ps.log || true
+        script: ./tools/run_ci_emulator_tests.sh
 
     - name: Upload Diagnostics
       uses: actions/upload-artifact@v4
       if: always()
       with:
         name: e2e-diagnostics
-        path: |
-          *.log
-          *.xml
-        if-no-files-found: ignore
+        path: e2e-diagnostics
+        if-no-files-found: warn

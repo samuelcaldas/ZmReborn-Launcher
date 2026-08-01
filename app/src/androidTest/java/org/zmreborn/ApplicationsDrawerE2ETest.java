@@ -17,6 +17,7 @@ import android.widget.TextView;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
+/** Verifies user-visible drawer workflows against the real Launcher activity. */
 public class ApplicationsDrawerE2ETest extends ActivityInstrumentationTestCase2<Launcher> {
 
     public ApplicationsDrawerE2ETest() {
@@ -304,102 +305,6 @@ public class ApplicationsDrawerE2ETest extends ActivityInstrumentationTestCase2<
         }
     }
 
-    public void testVerticalDrawerFastScrollNavigatesAlphabeticalSections() throws Throwable {
-        final Launcher launcher = getActivity();
-        awaitVerticalDrawerData(launcher);
-        final ApplicationsDrawerView drawer = (ApplicationsDrawerView)
-                launcher.mApplicationsView;
-        final ArrayList<ApplicationItemInfo> originalApplications = new ArrayList<ApplicationItemInfo>();
-        final ArrayList<ApplicationItemInfo> alphabeticalApplications =
-                createAlphabeticalDrawerApplications(launcher);
-
-        try {
-            getInstrumentation().runOnMainSync(new Runnable() {
-                public void run() {
-                    originalApplications.addAll(adapterItems(drawer.getGridView().getAdapter()));
-                    drawer.open(false);
-                    drawer.setApplications(alphabeticalApplications);
-                }
-            });
-            getInstrumentation().waitForIdleSync();
-            getInstrumentation().runOnMainSync(new Runnable() {
-                public void run() {
-                    DrawerFastScrollView fastScroll = drawer.getFastScrollView();
-                    ImageButton clearSearch = (ImageButton) drawer.findViewById(
-                            R.id.drawer_search_clear);
-                    assertEquals("Fast scroll must be visible for multiple sections", View.VISIBLE,
-                            fastScroll.getVisibility());
-                    assertEquals("Grid DPAD-right must reach visible fast scroll",
-                            R.id.drawer_fast_scroll,
-                            drawer.getGridView().getNextFocusRightId());
-                    int minimumTouchTarget = Math.round(48.0f
-                            * launcher.getResources().getDisplayMetrics().density);
-                    assertTrue("LTR grid must reserve rail space at physical right",
-                            drawer.getGridView().getPaddingRight() >= minimumTouchTarget);
-                    drawer.setLayoutDirection(View.LAYOUT_DIRECTION_RTL);
-                    assertEquals("RTL grid DPAD-left must reach fast scroll",
-                            R.id.drawer_fast_scroll,
-                            drawer.getGridView().getNextFocusLeftId());
-                    assertEquals("RTL grid DPAD-right must stay in grid",
-                            R.id.apps_grid_content,
-                            drawer.getGridView().getNextFocusRightId());
-                    assertEquals("RTL rail DPAD-right must return to grid",
-                            R.id.apps_grid_content,
-                            fastScroll.getNextFocusRightId());
-                    assertEquals("RTL clear action must return right to search input",
-                            R.id.drawer_search_input,
-                            clearSearch.getNextFocusRightId());
-                    assertTrue("RTL grid must reserve rail space at physical left",
-                            drawer.getGridView().getPaddingLeft() >= minimumTouchTarget);
-                    drawer.setLayoutDirection(View.LAYOUT_DIRECTION_LTR);
-                    assertEquals("LTR grid DPAD-right must restore fast scroll",
-                            R.id.drawer_fast_scroll,
-                            drawer.getGridView().getNextFocusRightId());
-                    assertEquals("LTR clear action must return left to search input",
-                            R.id.drawer_search_input,
-                            clearSearch.getNextFocusLeftId());
-                    assertTrue("Fast scroll must retain a 48dp horizontal touch target",
-                            fastScroll.getWidth() >= minimumTouchTarget);
-                    assertTrue("Fast scroll must select the Z section",
-                            fastScroll.selectSection("Z"));
-                }
-            });
-            getInstrumentation().waitForIdleSync();
-            getInstrumentation().runOnMainSync(new Runnable() {
-                public void run() {
-                    assertTrue("Selecting Z must move the grid away from top",
-                            drawer.getGridView().getFirstVisiblePosition() > 0);
-                    drawer.getGridView().setSelection(0);
-                    assertTrue("Drawer close must begin", drawer.close(true));
-                    assertFalse("Closing grid input must be suppressed", drawer
-                            .getGridView().isEnabled());
-                    assertFalse("Closing rail input must be suppressed", drawer
-                            .getFastScrollView().selectSection("Z"));
-                    assertEquals("Closing rail input must not change grid position", 0,
-                            drawer.getGridView().getFirstVisiblePosition());
-                    drawer.open(false);
-                    assertTrue("Reopened grid must accept input", drawer
-                            .getGridView().isEnabled());
-                    assertTrue("Reopened fast scroll must accept input", drawer
-                            .getFastScrollView().isEnabled());
-                    ((EditText) drawer.findViewById(R.id.drawer_search_input)).setText("Alpha");
-                    assertEquals("Fast scroll must hide while search reorders results", View.GONE,
-                            drawer.getFastScrollView().getVisibility());
-                    assertEquals("Grid DPAD-right must skip hidden fast scroll",
-                            R.id.apps_grid_content,
-                            drawer.getGridView().getNextFocusRightId());
-                }
-            });
-        } finally {
-            getInstrumentation().runOnMainSync(new Runnable() {
-                public void run() {
-                    drawer.setApplications(originalApplications);
-                    drawer.close(false);
-                }
-            });
-        }
-    }
-
     public void testDrawerReopenIgnoresSupersededCloseAnimation() throws Throwable {
         final Launcher launcher = getActivity();
         final ApplicationsDrawerView drawer = (ApplicationsDrawerView)
@@ -628,21 +533,6 @@ public class ApplicationsDrawerE2ETest extends ActivityInstrumentationTestCase2<
             application.title = "Refresh drawer application " + index;
             application.icon = launcher.getPackageManager().getDefaultActivityIcon();
             applications.add(application);
-        }
-        return applications;
-    }
-
-    private static ArrayList<ApplicationItemInfo> createAlphabeticalDrawerApplications(
-            Launcher launcher) {
-        ArrayList<ApplicationItemInfo> applications = new ArrayList<ApplicationItemInfo>();
-        for (char letter = 'A'; letter <= 'Z'; letter++) {
-            for (int index = 0; index < 4; index++) {
-                ApplicationItemInfo application = new ApplicationItemInfo();
-                application.title = letter + " alphabetical application " + index;
-                application.componentName = "fast.scroll." + letter + "." + index;
-                application.icon = launcher.getPackageManager().getDefaultActivityIcon();
-                applications.add(application);
-            }
         }
         return applications;
     }

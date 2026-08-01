@@ -66,8 +66,8 @@ $EXEC adb shell uiautomator dump /data/local/tmp/u.xml && \
 | App drawer button (dock) | `464 1820` |
 | Long-press homescreen | `swipe 540 900 540 900 2000` |
 | Preferences root — Workspace row | `540 252` |
-| Preferences root — Applications grid | `540 420` (**crashes** on RC2) |
-| Preferences root — Action bindings | `540 588` (**crashes** on RC2) |
+| Preferences root — Applications grid | `540 420` |
+| Preferences root — Action bindings | `540 588` |
 | Preferences root — Dock | `540 756` |
 | Long-press menu — Add | `540 792` |
 | Long-press menu — Wallpaper | `540 961` |
@@ -80,22 +80,6 @@ $EXEC adb root
 $EXEC adb shell am start -n org.zmreborn/.Preferences
 ```
 
-## Crash recovery
-
-Navigating to **Applications grid** or **Action bindings** crashes the launcher
-(`NullPointerException` in `android.preference.ListPreference.findIndexOfValue` — a null
-entry in an `entryValues` array). The crash kills the launcher process and shows
-"Select a Home app". Restore ZM Reborn:
-
-```bash
-# Tap ZM Reborn row, then Always
-$EXEC adb shell input tap 540 1448
-sleep 1
-$EXEC adb shell input tap 943 1765
-```
-
-Or just run `cmd_restore_launcher` inside the driver (UI-dump-aware).
-
 ## Gotchas
 
 - `--allow-hidden-intents` flag does **not** exist on API 35 `am start`. Use `adb root` instead.
@@ -103,5 +87,4 @@ Or just run `cmd_restore_launcher` inside the driver (UI-dump-aware).
 - The emulator needs ≥7.4 GB for the userdata partition. Use `--tmpfs /root/.android:exec,size=9g` to serve this from RAM (requires ~9 GB free RAM).
 - `disk.dataPartition.size` in `config.ini` is ignored — emulator enforces a 7372 MB minimum regardless of that flag.
 - `cmd package set-home-activity org.zmreborn/.Launcher` reports success but does not survive a force-stop. Use the UI chooser instead.
-- Applications grid crashes only on sub-screen render, not on root preferences. Navigate root safely; skip Applications grid and Action bindings until the NPE is fixed.
 - Swipe up from dock area triggers gesture navigation, not the app drawer. Tap the 4-square icon at `464 1820`.
