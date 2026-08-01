@@ -15,7 +15,9 @@
   timeout.
 - Hosted API 24 follow-up completed all 122 tests with 121 passes and one remaining Preferences touch failure.
   Root-list touch now targets the adapter-resolved visible row directly instead of relying on decor routing;
-  focused API 35 validation passes, while another hosted API 24 execution remains pending.
+  focused API 35 validation passes.
+- Final GitHub Actions run `30684680835` succeeded in `build` and `e2e-emulator`: instrumentation reported
+  `OK (122 tests)` and `INSTRUMENTATION_CODE: -1`; driver status passed/0, so Launcher smoke completed.
 
 ## Hosted API 24 CI hardening — 2026-07-31
 
@@ -30,7 +32,7 @@
 - Static validation passed CI workflow contract, Bash syntax, 204 JVM tests, Android-test assembly, lint,
   Docker-wrapper debug APK build, and `git diff --check`. API 35 runtime passed focused fast-scroll E2E
   in normal and forced-RTL layouts, two Preferences smoke tests, exact Launcher focus/workspace smoke, and
-  filtered fatal/verifier/API-error logcat checks. Hosted API 24 execution remains pending.
+  filtered fatal/verifier/API-error logcat checks. Final hosted API 24 evidence appears in the entry above.
 
 ## [3.1.11-alpha-rc11]
 
