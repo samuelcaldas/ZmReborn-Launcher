@@ -785,11 +785,15 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
         getInstrumentation().runOnMainSync(new Runnable() {
             public void run() {
                 long now = SystemClock.uptimeMillis();
-                MotionEvent down = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 200, 0, 0);
-                MotionEvent move = MotionEvent.obtain(now, now + 100, MotionEvent.ACTION_MOVE,
-                        200, thresholdPx + 20, 0);
-                MotionEvent up = MotionEvent.obtain(now, now + 200, MotionEvent.ACTION_UP,
-                        200, thresholdPx + 20, 0);
+                float x = targetView.getWidth() / 2.0f;
+                float startY = targetView.getPaddingTop() + 1.0f;
+                float endY = startY + thresholdPx + 20.0f;
+                MotionEvent down = MotionEvent.obtain(
+                        now, now, MotionEvent.ACTION_DOWN, x, startY, 0);
+                MotionEvent move = MotionEvent.obtain(
+                        now, now + 100, MotionEvent.ACTION_MOVE, x, endY, 0);
+                MotionEvent up = MotionEvent.obtain(
+                        now, now + 200, MotionEvent.ACTION_UP, x, endY, 0);
                 targetView.dispatchTouchEvent(down);
                 targetView.dispatchTouchEvent(move);
                 targetView.dispatchTouchEvent(up);
@@ -841,11 +845,15 @@ public class LauncherE2ETest extends ActivityInstrumentationTestCase2<Launcher> 
         getInstrumentation().runOnMainSync(new Runnable() {
             public void run() {
                 long now = SystemClock.uptimeMillis();
-                MotionEvent down = MotionEvent.obtain(now, now, MotionEvent.ACTION_DOWN, 200, 0, 0);
-                MotionEvent move = MotionEvent.obtain(now, now + 100, MotionEvent.ACTION_MOVE,
-                        200, thresholdPx + 20, 0);
-                MotionEvent up = MotionEvent.obtain(now, now + 200, MotionEvent.ACTION_UP,
-                        200, thresholdPx + 20, 0);
+                float x = targetView.getWidth() / 2.0f;
+                float startY = targetView.getPaddingTop() + 1.0f;
+                float endY = startY + thresholdPx + 20.0f;
+                MotionEvent down = MotionEvent.obtain(
+                        now, now, MotionEvent.ACTION_DOWN, x, startY, 0);
+                MotionEvent move = MotionEvent.obtain(
+                        now, now + 100, MotionEvent.ACTION_MOVE, x, endY, 0);
+                MotionEvent up = MotionEvent.obtain(
+                        now, now + 200, MotionEvent.ACTION_UP, x, endY, 0);
                 targetView.dispatchTouchEvent(down);
                 targetView.dispatchTouchEvent(move);
                 targetView.dispatchTouchEvent(up);

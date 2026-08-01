@@ -1,5 +1,19 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Hosted API 24 instrumentation repairs — 2026-08-01
+
+- Fixes ten failures exposed by the first bounded API 24 run without weakening production contracts:
+  paging geometry now derives test viewports from density-aware minimum cell dimensions; focus traversal is
+  correctly scoped as instrumentation through `Launcher.dispatchKeyEvent` instead of unsupported cross-UID
+  input injection; drawer pulls begin inside padded content; Preferences waits for distinct lifecycle instances.
+- Makes focusability and recreation checks independent of asynchronous application loading, test order, and
+  stale `ActivityMonitor` matches. Lifecycle observers unregister in cleanup paths, original preferences and
+  requested orientation remain restorable, and focus checks exercise Launcher activity dispatch explicitly.
+- JDK 17 validation passed 204 JVM tests, Android-test assembly, lint, required Docker-wrapper APK build, and
+  `git diff --check`. API 35 passed 16 focused paging, focus, drawer-pull, and Preferences recreation tests.
+  A full API 35 suite attempt reached test 81 of 122 without a reported failure before its 15-minute local
+  timeout. Hosted API 24 follow-up execution remains pending.
+
 ## Hosted API 24 CI hardening — 2026-07-31
 
 - Replaces newline-dependent emulator-runner commands with one checked-in Bash driver so strict mode,

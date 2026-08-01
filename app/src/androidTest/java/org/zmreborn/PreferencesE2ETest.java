@@ -608,8 +608,9 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
         final ListPreference appearancePreference = (ListPreference) preferences.findPreference(
                 appearanceKey);
         assertNotNull("Appearance preference must exist", appearancePreference);
-        android.app.Instrumentation.ActivityMonitor monitor = getInstrumentation().addMonitor(
-                Preferences.class.getName(), null, false);
+        ReplacementPreferencesObserver observer =
+                new ReplacementPreferencesObserver(preferences);
+        preferences.getApplication().registerActivityLifecycleCallbacks(observer);
         Preferences recreatedPreferences = null;
         final boolean[] listenerResult = new boolean[1];
 
@@ -625,8 +626,7 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
                 }
             });
             assertFalse("Appearance listener must handle persistence", listenerResult[0]);
-            recreatedPreferences = (Preferences) getInstrumentation().waitForMonitorWithTimeout(
-                    monitor, ACTIVITY_RECREATION_TIMEOUT_MILLIS);
+            recreatedPreferences = observer.awaitPreferences();
             assertNotNull("Appearance change must recreate Preferences", recreatedPreferences);
             assertNotSame("Appearance change must replace Preferences", preferences,
                     recreatedPreferences);
@@ -645,14 +645,17 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
             assertEquals("Recreated appearance summary must match selected entry",
                     recreatedAppearancePreference.getEntry(), recreatedAppearancePreference.getSummary());
         } finally {
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            if (hadOriginalAppearance) {
-                editor.putString(appearanceKey, originalAppearance);
-            } else {
-                editor.remove(appearanceKey);
+            try {
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                if (hadOriginalAppearance) {
+                    editor.putString(appearanceKey, originalAppearance);
+                } else {
+                    editor.remove(appearanceKey);
+                }
+                assertTrue("Original appearance preference must be restored", editor.commit());
+            } finally {
+                preferences.getApplication().unregisterActivityLifecycleCallbacks(observer);
             }
-            assertTrue("Original appearance preference must be restored", editor.commit());
-            getInstrumentation().removeMonitor(monitor);
         }
     }
 
@@ -678,8 +681,9 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
                 : ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         assertTrue("Device must start in a supported orientation", initiallyLandscape
                 || initialDeviceOrientation == android.content.res.Configuration.ORIENTATION_PORTRAIT);
-        android.app.Instrumentation.ActivityMonitor monitor = getInstrumentation().addMonitor(
-                Preferences.class.getName(), null, false);
+        ReplacementPreferencesObserver observer =
+                new ReplacementPreferencesObserver(preferences);
+        preferences.getApplication().registerActivityLifecycleCallbacks(observer);
         Preferences recreatedPreferences = null;
 
         try {
@@ -690,8 +694,7 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
                     preferences.setRequestedOrientation(rotatedRequestedOrientation);
                 }
             });
-            recreatedPreferences = (Preferences) getInstrumentation().waitForMonitorWithTimeout(
-                    monitor, ACTIVITY_RECREATION_TIMEOUT_MILLIS);
+            recreatedPreferences = observer.awaitPreferences();
             assertNotNull("Rotation must recreate Preferences", recreatedPreferences);
             assertNotSame("Rotation must replace Preferences", preferences, recreatedPreferences);
             getInstrumentation().waitForIdleSync();
@@ -709,17 +712,22 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
             assertEquals("Recreated language summary must match selected entry",
                     recreatedLanguagePreference.getEntry(), recreatedLanguagePreference.getSummary());
         } finally {
-            getInstrumentation().removeMonitor(monitor);
-            SharedPreferences.Editor editor = sharedPrefs.edit();
-            if (hadOriginalValue) {
-                editor.putString(testKey, originalValue);
-            } else {
-                editor.remove(testKey);
-            }
-            assertTrue("Original language preference must be restored", editor.commit());
-            if (recreatedPreferences != null) {
-                restoreOrientation(recreatedPreferences, restoredRequestedOrientation,
-                        initialDeviceOrientation, originalRequestedOrientation);
+            try {
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+                if (hadOriginalValue) {
+                    editor.putString(testKey, originalValue);
+                } else {
+                    editor.remove(testKey);
+                }
+                assertTrue("Original language preference must be restored", editor.commit());
+            } finally {
+                try {
+                    restoreOrientationState(observer, recreatedPreferences,
+                            restoredRequestedOrientation, initialDeviceOrientation,
+                            originalRequestedOrientation);
+                } finally {
+                    preferences.getApplication().unregisterActivityLifecycleCallbacks(observer);
+                }
             }
         }
     }
@@ -926,18 +934,36 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
         assertTrue(editor.commit());
     }
 
+    private void restoreOrientationState(ReplacementPreferencesObserver observer,
+            Preferences preferences, int requestedOrientation,
+            int expectedConfigurationOrientation, int originalRequestedOrientation) {
+        Preferences restorationTarget = preferences != null
+                ? preferences : observer.latestPreferencesOrOriginal();
+        if (restorationTarget.isDestroyed()) {
+            restorationTarget = observer.awaitActiveReplacement();
+        }
+        assertNotNull("Orientation cleanup requires an active Preferences", restorationTarget);
+        int currentOrientation = restorationTarget.getResources().getConfiguration().orientation;
+        if (currentOrientation == expectedConfigurationOrientation) {
+            restoreRequestedOrientation(restorationTarget, originalRequestedOrientation);
+            return;
+        }
+        restoreOrientation(restorationTarget, requestedOrientation,
+                expectedConfigurationOrientation, originalRequestedOrientation);
+    }
+
     private void restoreOrientation(final Preferences preferences, final int requestedOrientation,
             int expectedConfigurationOrientation, final int originalRequestedOrientation) {
-        android.app.Instrumentation.ActivityMonitor monitor = getInstrumentation().addMonitor(
-                Preferences.class.getName(), null, false);
+        ReplacementPreferencesObserver observer =
+                new ReplacementPreferencesObserver(preferences);
+        preferences.getApplication().registerActivityLifecycleCallbacks(observer);
         try {
             getInstrumentation().runOnMainSync(new Runnable() {
                 public void run() {
                     preferences.setRequestedOrientation(requestedOrientation);
                 }
             });
-            Preferences restored = (Preferences) getInstrumentation().waitForMonitorWithTimeout(
-                    monitor, ACTIVITY_RECREATION_TIMEOUT_MILLIS);
+            Preferences restored = observer.awaitPreferences();
             assertNotNull("Restoring orientation must recreate Preferences", restored);
             getInstrumentation().waitForIdleSync();
             assertEquals("Preferences must return to initial orientation",
@@ -945,7 +971,7 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
                     restored.getResources().getConfiguration().orientation);
             restoreRequestedOrientation(restored, originalRequestedOrientation);
         } finally {
-            getInstrumentation().removeMonitor(monitor);
+            preferences.getApplication().unregisterActivityLifecycleCallbacks(observer);
         }
     }
 
@@ -957,6 +983,92 @@ public class PreferencesE2ETest extends ActivityInstrumentationTestCase2<Prefere
             }
         });
         getInstrumentation().waitForIdleSync();
+    }
+
+    private static final class ReplacementPreferencesObserver
+            implements Application.ActivityLifecycleCallbacks {
+        private final Preferences originalPreferences;
+        private Preferences replacementPreferences;
+
+        ReplacementPreferencesObserver(Preferences originalPreferences) {
+            this.originalPreferences = originalPreferences;
+        }
+
+        public synchronized void onActivityCreated(Activity activity, Bundle savedInstanceState) {
+            if (!(activity instanceof Preferences) || activity == this.originalPreferences) {
+                return;
+            }
+            this.replacementPreferences = (Preferences) activity;
+            notifyAll();
+        }
+
+        public void onActivityStarted(Activity activity) {
+        }
+
+        public void onActivityResumed(Activity activity) {
+        }
+
+        public void onActivityPaused(Activity activity) {
+        }
+
+        public void onActivityStopped(Activity activity) {
+        }
+
+        public void onActivitySaveInstanceState(Activity activity, Bundle outState) {
+        }
+
+        public void onActivityDestroyed(Activity activity) {
+        }
+
+        synchronized Preferences awaitPreferences() {
+            long deadline = SystemClock.uptimeMillis()
+                    + ACTIVITY_RECREATION_TIMEOUT_MILLIS;
+            while (this.replacementPreferences == null) {
+                long remaining = deadline - SystemClock.uptimeMillis();
+                if (remaining <= 0L) {
+                    return null;
+                }
+                try {
+                    wait(remaining);
+                } catch (InterruptedException exception) {
+                    Thread.currentThread().interrupt();
+                    return null;
+                }
+            }
+            return this.replacementPreferences;
+        }
+
+        synchronized Preferences latestPreferencesOrOriginal() {
+            if (this.replacementPreferences != null) {
+                return this.replacementPreferences;
+            }
+            return this.originalPreferences;
+        }
+
+        synchronized Preferences awaitActiveReplacement() {
+            long deadline = SystemClock.uptimeMillis()
+                    + ACTIVITY_RECREATION_TIMEOUT_MILLIS;
+            boolean interrupted = Thread.interrupted();
+            try {
+                while (this.replacementPreferences == null
+                        || this.replacementPreferences.isDestroyed()) {
+                    long remaining = deadline - SystemClock.uptimeMillis();
+                    if (remaining <= 0L) {
+                        return null;
+                    }
+                    try {
+                        wait(remaining);
+                    } catch (InterruptedException exception) {
+                        interrupted = true;
+                    }
+                }
+                return this.replacementPreferences;
+            } finally {
+                if (interrupted) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
     }
 
     private static final class PausedActivityObserver

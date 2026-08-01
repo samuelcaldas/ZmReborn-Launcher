@@ -6,9 +6,11 @@ import android.view.ViewGroup;
 import java.util.ArrayList;
 import java.util.List;
 
+/** Verifies paging drawer child population and measured grid geometry. */
 public class ApplicationsPagingViewInstrumentationTest
         extends ActivityInstrumentationTestCase2<Launcher> {
 
+    /** Creates instrumentation coverage for the Launcher paging drawer. */
     public ApplicationsPagingViewInstrumentationTest() {
         super(Launcher.class);
     }
@@ -20,6 +22,7 @@ public class ApplicationsPagingViewInstrumentationTest
         getInstrumentation().waitForIdleSync();
     }
 
+    /** Verifies every partitioned application renders exactly once. */
     public void testAllInjectedAppsAppearAsChildrenAcrossPages() throws Throwable {
         final int totalApps = 13;
         final int rows = 2;
@@ -38,8 +41,8 @@ public class ApplicationsPagingViewInstrumentationTest
                     List<ApplicationItemInfo> pageApps = apps.subList(start, end);
                     ApplicationsPageView pageView = new ApplicationsPageView(getActivity());
                     pageView.populatePage(false, rows, columns, pageApps, null, null);
-                    int width = 301;
-                    int height = 400;
+                    int width = pageWidth(columns);
+                    int height = pageHeight(rows);
                     pageView.measure(
                             View.MeasureSpec.makeMeasureSpec(width, View.MeasureSpec.EXACTLY),
                             View.MeasureSpec.makeMeasureSpec(height, View.MeasureSpec.EXACTLY));
@@ -55,11 +58,12 @@ public class ApplicationsPagingViewInstrumentationTest
                 totalApps, pageChildrenHolder[0].size());
     }
 
+    /** Verifies measured cells cover an uneven viewport without trailing gaps. */
     public void testCellsAreContiguousAcrossFullWidth() throws Throwable {
         final int columns = 3;
         final int rows = 2;
-        final int width = 301;
-        final int height = 400;
+        final int width = pageWidth(columns) + 1;
+        final int height = pageHeight(rows);
         final int[] trailingGapHolder = new int[1];
 
         runTestOnUiThread(new Runnable() {
@@ -86,12 +90,13 @@ public class ApplicationsPagingViewInstrumentationTest
                 0, trailingGapHolder[0]);
     }
 
+    /** Verifies partial final pages preserve the leading grid slot. */
     public void testPartialFinalPageFirstCellStartsAtLeadingSlot() throws Throwable {
         final int columns = 3;
         final int rows = 2;
         final int capacity = rows * columns;
-        final int width = 300;
-        final int height = 400;
+        final int width = pageWidth(columns);
+        final int height = pageHeight(rows);
         final int[] secondPageFirstChildLeftHolder = new int[1];
         final int[] firstPageFirstChildLeftHolder = new int[1];
 
@@ -123,11 +128,12 @@ public class ApplicationsPagingViewInstrumentationTest
                 firstPageFirstChildLeftHolder[0], secondPageFirstChildLeftHolder[0]);
     }
 
+    /** Verifies full-capacity page children remain inside measured bounds. */
     public void testPageViewGroupChildrenFillMeasuredDimensions() throws Throwable {
         final int rows = 4;
         final int columns = 4;
-        final int width = 480;
-        final int height = 640;
+        final int width = pageWidth(columns);
+        final int height = pageHeight(rows);
         final boolean[] allChildrenInBoundsHolder = new boolean[1];
         final int[] childCountHolder = new int[1];
 
@@ -156,6 +162,18 @@ public class ApplicationsPagingViewInstrumentationTest
         assertEquals("Full-capacity page must have exact child count",
                 rows * columns, childCountHolder[0]);
         assertTrue("All children must be within page bounds", allChildrenInBoundsHolder[0]);
+    }
+
+    private int pageWidth(int columns) {
+        int minimumWidth = getActivity().getResources().getDimensionPixelSize(
+                R.dimen.drawer_cell_min_width);
+        return columns * minimumWidth;
+    }
+
+    private int pageHeight(int rows) {
+        int minimumHeight = getActivity().getResources().getDimensionPixelSize(
+                R.dimen.drawer_cell_min_height);
+        return rows * minimumHeight;
     }
 
     private static List<ApplicationItemInfo> makeApplicationItemInfos(int count) {
