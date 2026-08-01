@@ -1,5 +1,42 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
+## Hosted API 24 CI driver deadline and ANR-polling hardening — 2026-08-01
+
+- Reserves `timeout --kill-after` grace inside the smoke-phase deadline: `remaining_smoke_seconds`
+  now subtracts a fixed `SMOKE_KILL_GRACE_SECONDS` and fails closed once the deadline enters that
+  grace window, instead of letting a bounded command's kill-after grace push total elapsed time past
+  the shared deadline. Added `smoke_sleep`, a deadline-aware replacement for every raw `sleep` call
+  in the smoke phase, so no wait can itself run past the deadline unbounded.
+- Fixes a real hang found only by live-emulator evidence: both `am start` calls used blocking `-W`,
+  and `dismiss_foreign_anr` was invoked only between the two starts, never before or during either
+  one. A foreign ANR already focused when the first blocking start ran could stall it indefinitely
+  up to its own bounded timeout, surfacing as an uncontrolled `124` exit. Both `am start` calls are
+  now non-blocking, and `dismiss_foreign_anr` runs at the top of every iteration of both
+  `verify_launcher_focus` and `wait_for_workspace_hierarchy`'s polling loops, so an ANR present at
+  the start or appearing mid-poll is cleared continuously rather than checked once.
+- Raises `SMOKE_TIMEOUT_SECONDS` from 60 to 180: the nested dismiss-inside-poll-loop design can
+  legitimately need more real wall-clock time than 60s, independent of any logic defect, and the
+  hosted job timeout has ample headroom for it.
+- Extends `tools/test_ci_emulator_driver.sh` with behavioral (not merely static-substring) coverage:
+  a fake `sleep` that can advance `SECONDS` so deadline-cap logic is actually exercised, a distinct
+  failed-keyevent status propagation case, and real pass/reject-path assertions against
+  `verify_launcher_focus`/`wait_for_workspace_hierarchy` — including a case reproducing a foreign ANR
+  that blocks the poll itself rather than one merely present beforehand.
+- Live validation against the local Docker `zeam-runtime` container (`-accel off`, software-emulated,
+  no KVM) progressed from an uncontrolled `124` hang, to a clean `driver_status=1`
+  ("Launcher smoke deadline expired") even at the 180s budget. Diagnostics from that run show
+  `dumpsys window` itself hitting Android's internal `SERVICE 'window' DUMP TIMEOUT (10000ms)`,
+  `mFocusedApp` correctly resolved to the Launcher activity while `mCurrentFocus` never committed,
+  and the emulator guest reporting load average 15–21 while the host container reports load 1.01 on
+  16 cores — the QEMU software-emulated CPU is saturated, not the host. This is judged a genuine
+  environmental limitation of this local non-accelerated sandbox, not a remaining driver defect;
+  hosted GitHub Actions runners use hardware-accelerated (KVM) emulators and are the authoritative
+  check for this fix, per the project's distinction between hosted, local-emulator, and
+  static/behavioral evidence.
+- Static validation passed: `bash -n` on all three shell files, `bash tools/test_ci_emulator_driver.sh`,
+  `bash tools/test_ci_workflow_contract.sh`, `git diff --check`. Hosted API 24 confirmation is pending
+  the next GitHub Actions run.
+
 ## Hosted API 24 instrumentation repairs — 2026-08-01
 
 - Fixes ten failures exposed by the first bounded API 24 run without weakening production contracts:
@@ -16,8 +53,12 @@
 - Hosted API 24 follow-up completed all 122 tests with 121 passes and one remaining Preferences touch failure.
   Root-list touch now targets the adapter-resolved visible row directly instead of relying on decor routing;
   focused API 35 validation passes.
-- Final GitHub Actions run `30684680835` succeeded in `build` and `e2e-emulator`: instrumentation reported
+- GitHub Actions run `30684680835` succeeded in `build` and `e2e-emulator`: instrumentation reported
   `OK (122 tests)` and `INSTRUMENTATION_CODE: -1`; driver status passed/0, so Launcher smoke completed.
+- A documentation-only rerun completed all 122 tests but exposed a foreign Launcher3 ANR dialog covering
+  the post-test workspace hierarchy. Driver now dismisses only focused foreign platform ANRs, relaunches
+  Launcher, requires exact current-window focus, and retries workspace discovery; its own ANR still fails.
+  Focused API 35 driver validation passed after clearing a foreign Nexus Launcher ANR.
 
 ## Hosted API 24 CI hardening — 2026-07-31
 

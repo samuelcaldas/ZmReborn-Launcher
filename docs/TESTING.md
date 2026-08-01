@@ -69,11 +69,15 @@ INSTRUMENTATION_TEST_CLASS='org.zmreborn.DrawerFastScrollE2ETest#testVerticalDra
   ./tools/run_ci_emulator_tests.sh
 ```
 
+After instrumentation, driver launches Launcher, clears a focused foreign platform ANR dialog through
+its focused action, relaunches Launcher, waits for exact current-window focus, and polls UI hierarchy for
+the workspace. A focused `org.zmreborn` ANR remains a hard failure; driver never dismisses it.
+
 On primary failure, driver captures bounded logcat, window/activity/process/package state, UI hierarchy,
 and screenshot before emulator teardown, while preserving primary exit status. Run state and command
 output are written under `e2e-diagnostics/`; workflow uploads that directory as `e2e-diagnostics` even
 when tests fail. `bash tools/test_ci_workflow_contract.sh` protects single-process execution,
-timeout/result checks, pre-teardown diagnostics, and artifact wiring.
+timeout/result checks, foreign-ANR handling, pre-teardown diagnostics, and artifact wiring.
 
 Hosted API 24 results are runtime compatibility evidence. API 35 local instrumentation is separate
 runtime evidence; Android-test assembly only proves source compilation and packaging.
