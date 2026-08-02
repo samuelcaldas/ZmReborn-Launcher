@@ -71,6 +71,20 @@ public class CellLayoutSpanTest {
     }
 
     @Test
+    public void widgetMinimumDimensionsConvertDpToPixelsBeforeSpanCalculation() {
+        assertArrayEquals("41dp at density 2.0 is 82px, past the 80px cell boundary",
+                new int[]{2, 1}, CellLayout.calculateClampedSpansFromDp(
+                        41, 40, 2.0f, 80, 80, 0, 0, 4, 4));
+    }
+
+    @Test
+    public void widgetMinimumDimensionsAtExactCellBoundaryStayWithinOneCell() {
+        assertArrayEquals("40dp at density 2.0 is exactly 80px, one full cell",
+                new int[]{1, 1}, CellLayout.calculateClampedSpansFromDp(
+                        40, 40, 2.0f, 80, 80, 0, 0, 4, 4));
+    }
+
+    @Test
     public void spanToPixelsIncludesOnlyInternalGaps() {
         assertEquals(260, CellLayout.calculateSpanPixels(3, 80, 10));
     }

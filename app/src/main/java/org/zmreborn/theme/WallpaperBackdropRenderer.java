@@ -16,18 +16,22 @@ public final class WallpaperBackdropRenderer {
      * Returns a downsampled, blurred wallpaper bitmap.
      *
      * @throws IllegalArgumentException when wallpaper is null, recycled, or has invalid geometry
+     * @throws IllegalStateException when a hardware wallpaper cannot be copied for pixel access
      * @throws CancellationException when current wallpaper worker is interrupted
      */
     public static Bitmap render(Bitmap wallpaper) {
         validateWallpaper(wallpaper);
-        BlurCancellation.throwIfInterrupted();
-        int width = downsampleDimension(wallpaper.getWidth());
-        int height = downsampleDimension(wallpaper.getHeight());
-        Bitmap downsampled = Bitmap.createScaledBitmap(wallpaper, width, height, true);
+        Bitmap readableWallpaper = createReadableWallpaper(wallpaper);
+        Bitmap downsampled = null;
         try {
+            BlurCancellation.throwIfInterrupted();
+            int width = downsampleDimension(readableWallpaper.getWidth());
+            int height = downsampleDimension(readableWallpaper.getHeight());
+            downsampled = Bitmap.createScaledBitmap(readableWallpaper, width, height, true);
             return renderDownsampled(downsampled, width, height);
         } finally {
-            recycleDownsampledCopy(wallpaper, downsampled);
+            recycleDownsampledCopy(readableWallpaper, downsampled);
+            recycleReadableCopy(wallpaper, readableWallpaper);
         }
     }
 
@@ -68,9 +72,27 @@ public final class WallpaperBackdropRenderer {
         downsampleDimension(wallpaper.getHeight());
     }
 
+    private static Bitmap createReadableWallpaper(Bitmap wallpaper) {
+        Bitmap.Config config = wallpaper.getConfig();
+        if (config == null || !"HARDWARE".equals(config.name())) {
+            return wallpaper;
+        }
+        Bitmap readableWallpaper = wallpaper.copy(Bitmap.Config.ARGB_8888, false);
+        if (readableWallpaper == null) {
+            throw new IllegalStateException("Unable to copy hardware wallpaper for pixel access");
+        }
+        return readableWallpaper;
+    }
+
     private static void recycleDownsampledCopy(Bitmap wallpaper, Bitmap downsampled) {
-        if (downsampled != wallpaper && !downsampled.isRecycled()) {
+        if (downsampled != null && downsampled != wallpaper && !downsampled.isRecycled()) {
             downsampled.recycle();
+        }
+    }
+
+    private static void recycleReadableCopy(Bitmap wallpaper, Bitmap readableWallpaper) {
+        if (readableWallpaper != wallpaper && !readableWallpaper.isRecycled()) {
+            readableWallpaper.recycle();
         }
     }
 }

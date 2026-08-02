@@ -524,6 +524,26 @@ public class CellLayout extends ViewGroup {
                 this.mWidthGap, this.mHeightGap, getAvailableColumns(), getAvailableRows());
     }
 
+    /**
+     * Resolves cell spans for a widget's dp-denominated minimum size, converting to pixels
+     * against this layout's density before span calculation.
+     */
+    public int[] rectToCellFromDp(int widthDp, int heightDp) {
+        float density = getResources().getDisplayMetrics().density;
+        return calculateClampedSpansFromDp(widthDp, heightDp, density, this.mCellWidth,
+                this.mCellHeight, this.mWidthGap, this.mHeightGap,
+                getAvailableColumns(), getAvailableRows());
+    }
+
+    static int[] calculateClampedSpansFromDp(int widthDp, int heightDp, float density,
+            int cellWidth, int cellHeight, int widthGap, int heightGap,
+            int availableColumns, int availableRows) {
+        int widthPx = Math.round(widthDp * density);
+        int heightPx = Math.round(heightDp * density);
+        return calculateClampedSpans(widthPx, heightPx, cellWidth, cellHeight,
+                widthGap, heightGap, availableColumns, availableRows);
+    }
+
     int[] spanToPixels(int spanX, int spanY) {
         return new int[]{calculateSpanPixels(spanX, this.mCellWidth, this.mWidthGap),
                 calculateSpanPixels(spanY, this.mCellHeight, this.mHeightGap)};

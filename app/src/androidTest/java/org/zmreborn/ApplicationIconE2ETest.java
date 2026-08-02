@@ -59,6 +59,24 @@ public class ApplicationIconE2ETest extends ActivityInstrumentationTestCase2<Lau
         });
     }
 
+    public void testDockAdaptiveIconIsRasterizedWithinTouchTarget() {
+        if (Build.VERSION.SDK_INT < 26) {
+            return;
+        }
+        Drawable icon = Api26.createAdaptiveIcon();
+        Drawable dockIcon = Utilities.createDockIconThumbnail(icon, getActivity());
+        int maximum = getActivity().getResources().getDimensionPixelSize(
+                R.dimen.minimum_touch_target);
+
+        assertNotSame("Dock adaptive icon must be rasterized", icon, dockIcon);
+        assertTrue("Dock icon width must be positive and within touch target",
+                dockIcon.getIntrinsicWidth() > 0 && dockIcon.getIntrinsicWidth() <= maximum);
+        assertTrue("Dock icon height must be positive and within touch target",
+                dockIcon.getIntrinsicHeight() > 0 && dockIcon.getIntrinsicHeight() <= maximum);
+        assertEquals("Model icon width must remain untouched", 0, icon.getBounds().width());
+        assertEquals("Model icon height must remain untouched", 0, icon.getBounds().height());
+    }
+
     private Drawable bindAndAssertVisible(Drawable icon) {
         TextView textView = new TextView(getActivity());
         Utilities.setCompoundApplicationIcon(textView, icon, getActivity());

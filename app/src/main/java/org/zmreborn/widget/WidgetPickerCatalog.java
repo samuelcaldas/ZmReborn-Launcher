@@ -148,7 +148,7 @@ public final class WidgetPickerCatalog {
             return entry;
         }
         AppWidgetProviderInfo provider = entry.getProvider();
-        int[] span = targetLayout.rectToCell(
+        int[] span = targetLayout.rectToCellFromDp(
                 provider.minWidth, provider.minHeight);
         return entry.withDetail(formatSpan(context, span[0], span[1]));
     }

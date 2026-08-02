@@ -1244,7 +1244,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     /* access modifiers changed from: package-private */
     public View createApplicationsGridItemView(ApplicationsGridItemInfo applicationsGridItemInfo) {
         TextView textView = (TextView) this.mInflater.inflate(R.layout.application, (ViewGroup) this.mWorkspace.getChildAt(this.mWorkspace.getCurrentScreen()), false);
-        textView.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, Utilities.createIconThumbnail(applicationsGridItemInfo.icon, this), (Drawable) null, (Drawable) null);
+        textView.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, Utilities.createIconThumbnail(applicationsGridItemInfo.resolveIcon(this), this), (Drawable) null, (Drawable) null);
         if (PreferencesUtil.isShowShortcutTitlesEnabled(this)) {
             textView.setText(applicationsGridItemInfo.title);
         }
@@ -1351,7 +1351,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             return;
         }
         removePendingAppWidgetPlacementListener();
-        int[] spans = targetLayout.rectToCell(
+        int[] spans = targetLayout.rectToCellFromDp(
                 appWidgetInfo.minWidth, appWidgetInfo.minHeight);
         realAddWidget(appWidgetInfo, cellInfo, spans, appWidgetId,
                 this.mPendingAppWidgetInsertAtFirst);
@@ -3435,7 +3435,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     /* access modifiers changed from: package-private */
     public View createSmallApplicationsGridItem(int layoutResId, ViewGroup parent, ApplicationsGridItemInfo applicationsGridItemInfo) {
         ImageView imageView = (ImageView) this.mInflater.inflate(layoutResId, parent, false);
-        imageView.setImageDrawable(Utilities.createDockIconThumbnail(applicationsGridItemInfo.icon, this));
+        imageView.setImageDrawable(Utilities.createDockIconThumbnail(applicationsGridItemInfo.resolveIcon(this), this));
         imageView.setContentDescription(applicationsGridItemInfo.title);
         imageView.setTag(applicationsGridItemInfo);
         imageView.setOnClickListener(this);

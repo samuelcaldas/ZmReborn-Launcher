@@ -104,7 +104,7 @@ final class WidgetResizeFrame extends FrameLayout {
                 providerInfo.minWidth);
         int height = preferredResizeDimension(providerInfo.minResizeHeight,
                 providerInfo.minHeight);
-        return this.mCellLayout.rectToCell(width, height);
+        return this.mCellLayout.rectToCellFromDp(width, height);
     }
 
     private int preferredResizeDimension(int resizeDimension, int minimumDimension) {

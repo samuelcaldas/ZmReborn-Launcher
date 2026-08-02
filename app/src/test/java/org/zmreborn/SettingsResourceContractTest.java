@@ -176,6 +176,22 @@ public class SettingsResourceContractTest {
     }
 
     @Test
+    public void screenIndicatorPreferenceLivesUnderGeneralAppearance() throws Exception {
+        Element root = parse("main/res/xml/preferences.xml").getDocumentElement();
+        Element indicator = findPreference(root,
+                "preferences_key_workspace_screen_indicator_type");
+        Element appearance = (Element) indicator.getParentNode();
+        Element general = (Element) appearance.getParentNode();
+
+        assertEquals("PreferenceCategory", appearance.getTagName());
+        assertEquals("@string/preferences_category_appearance",
+                appearance.getAttribute("android:title"));
+        assertEquals("PreferenceScreen", general.getTagName());
+        assertEquals("@string/preferences_screen_title_general",
+                general.getAttribute("android:title"));
+    }
+
+    @Test
     public void preferenceRangesAndDynamicRangesRemainBounded() throws Exception {
         Element root = parse("main/res/xml/preferences.xml").getDocumentElement();
         assertRange(root, "preferences_key_workspace_number_of_screens", "1", "7");

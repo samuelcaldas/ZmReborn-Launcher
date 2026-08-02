@@ -2,7 +2,7 @@
 
 ## Scope and evidence
 
-This document describes current working-tree behavior for ZM Reborn 3.1.11-alpha-rc7. Source and automated contracts prove implementation structure; they do not replace device smoke tests or screenshots.
+This document describes current working-tree behavior for ZM Reborn 3.1.11-alpha-rc11. Source and automated contracts prove implementation structure; they do not replace device smoke tests or screenshots.
 
 Project constraints:
 
@@ -26,7 +26,10 @@ Project constraints:
 - suppresses accessibility page announcements when only one page exists;
 - reveals and auto-hides only for multiple pages;
 - places dot indicators at bottom above dock/navigation spacing;
+- renders at or above the paging drawer elevation, so its dots or rail remain visible over the drawer backdrop;
 - retains bottom Signal Rail compatibility.
+
+**Preferences → General → Appearance → Screen indicator** controls both workspace and paging-drawer indicators.
 
 ### First-run dock
 
@@ -40,7 +43,7 @@ Fresh dock bootstrap resolves installed default handlers through implicit intent
 
 Unresolved or duplicate components are skipped. Bootstrap does not add an application-drawer item. Legacy `dirty` bootstrap markers are deleted without recreating that item, so user removal is not reversed on later launches.
 
-Dock background choices now map to cached wallpaper surface roles, except explicit transparent and legacy grey-bar choices. Dock icons no longer use reflection rendering.
+Dock background choices now map to cached wallpaper surface roles, except explicit transparent and legacy grey-bar choices. Dock icons no longer use reflection rendering. Adaptive icons remain live in workspace and drawer paths, while the dock-specific thumbnail path rasterizes them at the bounded platform icon size so they cannot exceed the fixed dock strip.
 
 ## Application drawer
 
@@ -104,6 +107,10 @@ Suggestions and profile-aware icon caching are not implemented.
 
 API 26 class references are isolated in `compat/AdaptiveIconCompat.Api26`, behind an SDK gate.
 
+### Home context menu
+
+Workspace long-press dialog rows resolve `m3_on_surface` from current light/night resources. Text therefore remains readable after theme changes instead of retaining a light-theme-only color.
+
 ## Appearance and wallpaper-derived palette
 
 ### Appearance selection
@@ -123,10 +130,12 @@ API 24–30 always use this procedural frost. Live wallpaper, platform-restricte
 wallpaper geometry, and generation/allocation failures also use frost without requesting storage or media
 permissions.
 
-On API 31+ only, readable static wallpaper bitmap already owned by `Workspace` can provide actual blurred
-pixels. `WallpaperBackdropRenderer` downsamples full wallpaper to one eighth linear size, applies three
-sliding-window ARGB box-blur passes on shared wallpaper refresh executor, and caches result by source bitmap
-identity. Drawables upscale and crop cached result using same workspace wallpaper X/Y offset as normal
+On API 31+ only, a static wallpaper bitmap already owned by `Workspace` can provide actual blurred
+pixels. `WallpaperBackdropRenderer` copies `Bitmap.Config.HARDWARE` sources to renderer-owned
+`ARGB_8888` storage before scaling or pixel access, while retaining the caller-owned source. Copy,
+allocation, or access failure uses existing procedural frost fallback. Renderer downsamples full wallpaper
+to one eighth linear size, applies three sliding-window ARGB box-blur passes on shared wallpaper refresh
+executor, and caches result by source bitmap identity. Drawables upscale and crop cached result using same workspace wallpaper X/Y offset as normal
 wallpaper rendering. Workspace scrolling invalidates dock and drawer surfaces for parallax alignment but does
 not regenerate blur. Wallpaper replacement and launcher teardown invalidate generation token, cancel queued
 work, and interrupt active pixel processing. Cache invalidation drops ownership without recycling a bitmap
@@ -170,7 +179,7 @@ Implemented lifecycle behavior:
 - deferred placement state and insertion behavior survive activity recreation;
 - delayed placement remains bound to the original target screen rather than the later current page.
 
-Initial widget span comes from provider minimum dimensions only after target `CellLayout` geometry has completed layout. Horizontal and vertical spans use their own cell size and signed gap, clamp to available grid bounds, and avoid off-by-one or overflow errors.
+Initial widget span comes from provider minimum dimensions only after target `CellLayout` geometry has completed layout. Android reports those provider dimensions in dp; `CellLayout.rectToCellFromDp()` converts them through current display density before comparing against pixel-denominated cell and gap geometry. Placement, preview-card span labels, and resize minimums share this conversion. Horizontal and vertical spans use their own cell size and signed gap, clamp to available grid bounds, and avoid off-by-one or overflow errors.
 
 Widget provider options are updated from persisted span pixel dimensions during initial bind and rebind, also waiting for measured target-screen geometry when needed. Numeric `widget_span` resources remain for public/provenance compatibility but launcher logic no longer shows that dialog.
 
@@ -214,7 +223,7 @@ API 35 light/night Launcher and Settings themes opt out of forced edge-to-edge e
 
 Focused JVM/resource/source coverage includes:
 
-- `CellLayoutSpanTest` — span ceiling, gaps, clamping, overflow, invalid geometry;
+- `CellLayoutSpanTest` — span ceiling, gaps, clamping, overflow, invalid geometry, and dp-to-pixel widget minimum conversion;
 - `WallpaperColorExtractorTest`, `ArgbBoxBlurTest`, `WallpaperBackdropRendererTest`, `WallpaperBackdropAlignmentTest`, and `WallpaperBlurGenerationTest` — HSV role contracts, deterministic and interruptible multi-pass ARGB blur, downsample geometry, invalid-input rejection, workspace offset alignment, and stale-generation rejection;
 - `DrawerSearchFilterTest`, `DrawerScrollStateTest`, `DrawerDensityPolicyTest`, and `ApplicationsAdapterContractTest` — normalized ranking, immutable filtering, stable restoration/fallback, responsive density breakpoints, and deterministic profile-sensitive IDs;
 - `SettingsResourceContractTest` and `SystemBarResourceContractTest` — switch semantics, eight inline steppers, inline transparency slider, 250 ms debounce, reset/storage contracts, settings geometry, semantic control colors, logical padding, API 35 theme opt-outs, and preserved public/widget source contracts;
@@ -223,9 +232,10 @@ Focused JVM/resource/source coverage includes:
 
 API 35 instrumentation coverage includes:
 
-- `ApplicationIconE2ETest` — deterministic null fallback plus API 26+ adaptive-icon identity, explicit compound bounds, and layer-safe treatments;
+- `ApplicationIconE2ETest` and `ApplicationsGridIconThemeInstrumentationTest` — deterministic null fallback, API 26+ adaptive-icon identity outside the dock, bounded dock rasterization, explicit compound bounds, layer-safe treatments, and light/night drawer-icon re-resolution;
+- `ScreenIndicatorZOrderInstrumentationTest` — paging indicator elevation remains above the open drawer backdrop;
 - `WallpaperPaletteE2ETest` — live palette reapplication plus controlled production receiver scheduling and cached-role refresh;
-- `BlurBackgroundInstrumentationTest`, `WallpaperBackdropRendererInstrumentationTest`, and `WallpaperBlurLifecycleInstrumentationTest` — procedural frost on dock plus vertical/paging drawers, disabled-state dock/alpha restoration, unchanged saved dock preference, actual bitmap diffusion/ownership, safe cache invalidation, and queued executor cancellation;
+- `BlurBackgroundInstrumentationTest`, `WallpaperBackdropRendererInstrumentationTest`, and `WallpaperBlurLifecycleInstrumentationTest` — procedural frost on dock plus vertical/paging drawers, disabled-state dock/alpha restoration, unchanged saved dock preference, ARGB and hardware-bitmap rendering, source ownership, safe cache invalidation, and queued executor cancellation;
 - `ApplicationsDrawerE2ETest` — workspace rendering during drawer exit, close-animation action suppression through decor-root pointer dispatch, stale-close reopen protection, search query retention, immutable binding, unremembered refresh reset, and visible empty-adapter recovery that restores original items and closes the drawer;
 - `PredictiveBackE2ETest` — registered platform predictive-back callback object invocation/delivery, handler previews, and top/bottom gesture exclusions;
 - `LauncherE2ETest` — `Launcher.sRestart`-backed preference persistence, automatic and coalesced
@@ -242,15 +252,14 @@ Latest fresh build and runtime evidence is recorded in `docs/CHANGELOG.md`. API 
 
 ## Runtime evidence and remaining validation
 
-Fresh API 35 evidence is recorded in `docs/CHANGELOG.md`. Full `PreferencesE2ETest` coverage passed
-21 tests, including real inline controls, debounce, lifecycle persistence, alias transactions, reset,
-row recycling, and nested focus. Focused `LauncherE2ETest` coverage also passed workspace persistence,
-activity recreation, and rebuilt grid geometry. Filtered full-suite logcat contained no matching
-launcher fatal exception, launcher ANR, verifier/missing class or method failure, or
-`UnsupportedOperationException`. Fresh blur coverage passed 8 focused API 35 tests across both drawer
-implementations, renderer pixels, bitmap/cache ownership, executor cancellation, settings reachability, and
-preference persistence. API 24 runtime and readable system-wallpaper blur integration on API 31–33 remain
-unperformed; API 35 normally exercises procedural fallback because wallpaper pixels are restricted.
+Fresh API 35 evidence is recorded in `docs/CHANGELOG.md`. Latest focused coverage passed 8
+indicator/icon/selector/menu tests, 7 blur rendering/lifecycle tests, and 1 Preferences reachability test.
+Hardware wallpaper input was exercised with a controlled `Bitmap.Config.HARDWARE` source; renderer copied
+it to `ARGB_8888`, produced blurred output, and retained caller ownership. Filtered logcat contained no
+matching launcher fatal exception, launcher ANR, verifier/missing class or method failure, or
+`UnsupportedOperationException`. API 24 runtime and readable system-wallpaper blur integration through
+`WallpaperManager` on API 31–33 remain unperformed; API 35 normally exercises procedural fallback because
+wallpaper pixels are restricted.
 
 Manual API 35 screenshots confirmed Settings root system-bar spacing and rendered Workspace rows with
 all four inline steppers. Software-only emulator load later produced an input ANR while Android framework

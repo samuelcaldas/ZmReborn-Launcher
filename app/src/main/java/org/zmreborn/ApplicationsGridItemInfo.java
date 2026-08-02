@@ -2,19 +2,23 @@ package org.zmreborn;
 
 import android.content.ContentValues;
 import android.content.Context;
-import android.content.res.Resources;
 import android.graphics.drawable.Drawable;
 import org.zmreborn.LauncherSettings;
 
 public class ApplicationsGridItemInfo extends ItemInfo {
-    Drawable icon;
     CharSequence title;
 
     ApplicationsGridItemInfo(Context context) {
-        Resources resources = context.getResources();
         this.itemType = 6;
-        this.icon = resources.getDrawable(R.drawable.applications_grid);
-        this.title = resources.getString(R.string.group_applications);
+        this.title = context.getResources().getString(R.string.group_applications);
+    }
+
+    /**
+     * Resolves the drawer-open icon against {@code context}'s current resources so the icon
+     * reflects the theme active at render time, rather than a color cached at construction.
+     */
+    Drawable resolveIcon(Context context) {
+        return context.getResources().getDrawable(R.drawable.applications_grid);
     }
 
     /* access modifiers changed from: package-private */

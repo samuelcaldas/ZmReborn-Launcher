@@ -37,6 +37,7 @@
     <dimen name="elevation_dock">4dp</dimen>
     <dimen name="elevation_folder">6dp</dimen>
     <dimen name="elevation_drawer_header">2dp</dimen>
+    <dimen name="elevation_screen_indicator">4dp</dimen>
     <dimen name="rail_thickness">2dp</dimen>
     <dimen name="rail_active_thickness">3dp</dimen>
     <dimen name="screen_indicator_dots_height">20dp</dimen>

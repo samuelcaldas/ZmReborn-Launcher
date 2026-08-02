@@ -107,7 +107,7 @@ public class UiModernizationContractTest {
         assertTrue(utilities.contains("R.drawable.ic_launcher_application"));
         assertTrue(utilities.contains("AdaptiveIconCompat.isAdaptiveIcon"));
         assertTrue(utilities.contains("return resolvedIcon"));
-        assertTrue(utilities.contains("return normalizeApplicationIcon(icon, context)"));
+        assertTrue(utilities.contains("return rasterizeDrawableCopy(normalizedIcon)"));
         assertTrue(utilities.contains("boundIcon.setBounds(0, 0, sIconWidth, sIconHeight)"));
         assertTrue(utilities.contains("view.setCompoundDrawables(null, boundIcon, null, null)"));
         assertTrue(utilities.contains("copyDrawable(resolvedIcon, context)"));
@@ -250,6 +250,26 @@ public class UiModernizationContractTest {
         assertTrue(strings.contains("name=\"widget_resize_handle_bottom_right\""));
         assertTrue(portugueseStrings.contains("name=\"widget_resize_handle_bottom_right\""));
         assertFalse(launcher.contains("R.layout.widget_span"));
+    }
+
+    @Test
+    public void dockDrawerOpenButtonUsesOneUiStyleOblongSelector() throws Exception {
+        String dock = read("main/java/org/zmreborn/Dock.java");
+        String selector = read("main/java/org/zmreborn/SelectorDrawable.java");
+        assertTrue("Dock must give the drawer-open button (itemType 6) an oblong pill selector "
+                        + "instead of the shared rounded-rect dock selector",
+                dock.contains("itemInfo.itemType == 6")
+                        && dock.contains("SelectorDrawable.createOblongSelector(getContext())"));
+        assertTrue("SelectorDrawable must expose a fully-rounded oblong/pill selector factory",
+                selector.contains("static SelectorDrawable createOblongSelector(Context context)"));
+    }
+
+    @Test
+    public void dialogListItemUsesThemeAwareTextColor() throws Exception {
+        String dialogListItem = read("main/res/layout/dialog_list_item.xml");
+        assertTrue("dialog_list_item.xml must set a theme-aware android:textColor "
+                        + "so long-press menu text is readable in dark mode",
+                dialogListItem.contains("android:textColor=\"@color/m3_on_surface\""));
     }
 
     private static void assertDefaultHandlerQueries(String manifest) {

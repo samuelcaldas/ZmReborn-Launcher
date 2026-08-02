@@ -161,7 +161,12 @@ final class Utilities {
     }
 
     static Drawable createDockIconThumbnail(Drawable icon, Context context) {
-        return normalizeApplicationIcon(icon, context);
+        Drawable normalizedIcon = normalizeApplicationIcon(icon, context);
+        if (!AdaptiveIconCompat.isAdaptiveIcon(normalizedIcon)) {
+            return normalizedIcon;
+        }
+        ensureIconSize(context);
+        return rasterizeDrawableCopy(normalizedIcon);
     }
 
     static boolean canUninstallApplication(Context context, ApplicationItemInfo applicationItemInfo) {

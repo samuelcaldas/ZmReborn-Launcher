@@ -191,7 +191,9 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
                 view = this.mLauncher.createSmallApplicationsGridItem(R.layout.small_application, this, (ApplicationsGridItemInfo) itemInfo);
                 break;
         }
-        Drawable selectorDrawable = SelectorDrawable.createSelector(getContext(), true);
+        Drawable selectorDrawable = itemInfo.itemType == 6
+                ? SelectorDrawable.createOblongSelector(getContext())
+                : SelectorDrawable.createSelector(getContext(), true);
         ImageView imageView = (ImageView) view;
         imageView.setMinimumHeight(this.mCellHeight);
         imageView.setMinimumWidth(this.mCellWidth);
