@@ -1,6 +1,6 @@
 # Zeam Launcher 3.1.10 — Reconstruction Progress Log
 
-## Launcher visual and runtime fixes — 2026-08-02
+## [3.1.11-alpha-rc12]
 
 - Keeps the shared workspace/paging screen indicator above the paging-drawer backdrop and relocates its unchanged persisted preference to **General → Appearance**.
 - Uses current Material surface text color for workspace long-press dialog rows. Drawer-open dock icons now resolve against the active light/night context and use a fully rounded OneUI-style selector.
@@ -8,7 +8,7 @@
 - Rasterizes only adaptive icons entering the dock thumbnail path at bounded platform icon size; workspace and drawer paths retain live adaptive drawables and masks.
 - Copies `Bitmap.Config.HARDWARE` wallpaper sources into renderer-owned `ARGB_8888` storage before scaling and pixel access. Copy/allocation failures retain existing Material frost fallback, and caller-owned wallpaper bitmaps are never recycled.
 - TDD evidence includes widget dp/px compiler RED then GREEN, adaptive dock-icon runtime RED then GREEN, and hardware wallpaper runtime RED (`unable to getPixels(), pixel access is not supported on Config#HARDWARE bitmaps`) then GREEN. Selector rendering review additionally confirmed filled-center/transparent-corner pill output without a production change.
-- Final static validation passed 209 JVM tests, Android-test assembly, lint, Docker-wrapper debug APK build, and `git diff --check`. Debug APK: 884,195 bytes; SHA-256 `18023efe20eaa7d373da4bcc1bda353863d7a61c1d76eb712fa3121554691f12`.
+- Final static validation passed 209 JVM tests, Android-test assembly, lint, Docker-wrapper debug APK build, and `git diff --check`. Debug APK: 727,214 bytes; SHA-256 `400831627a9a169f16b77af807f01fd8493870a546b419f452c2993ef7b49eef`.
 - API 35 passed 8 focused indicator/icon/selector/menu tests, 7 focused blur rendering/lifecycle tests, and 1 Preferences reachability test. Launcher launch, drawer opening through instrumentation, Preferences activity coverage, and filtered logcat showed no launcher fatal exception, ANR, verifier/missing-class/method failure, or `UnsupportedOperationException`.
 - Fresh API 24 runtime remains unperformed because no local API 24 emulator image is available. Two existing layout-readiness methods in `LauncherE2ETest` remained flaky on the long-running software emulator because `CellLayout`/dock views stayed unmeasured; widget dp conversion is therefore claimed from deterministic JVM coverage, not real-provider placement. Hands-on real-provider widget insertion and visual theme/blur inspection remain pending.
 
