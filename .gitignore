@@ -93,3 +93,4 @@ lint/tmp/
 
 # Local CI emulator diagnostics
 /e2e-diagnostics/
+/.android-emulator-artifacts/

@@ -28,11 +28,10 @@ public class WidgetInsertionE2ETest
                 getInstrumentation().getContext());
         ExternalWidgetFixture.requireProvider(manager, provider);
         final int[] existingIds = launcher.getAppWidgetHost().getAppWidgetIds();
-        boolean grantedBindAuthority = false;
+        final WidgetBindAuthority.Grant grant = WidgetBindAuthority.ensure(
+                getInstrumentation(), launcher, provider);
 
         try {
-            grantedBindAuthority = WidgetBindAuthority.ensure(getInstrumentation(), launcher,
-                    provider);
             final WidgetPickerDialog[] picker = new WidgetPickerDialog[]{
                     LauncherWidgetPickerTestAccess.openFromAddDialog(
                             getInstrumentation(), launcher)};
@@ -53,9 +52,7 @@ public class WidgetInsertionE2ETest
                     }
                 });
             } finally {
-                if (grantedBindAuthority) {
-                    WidgetBindAuthority.revoke(getInstrumentation(), launcher);
-                }
+                grant.revoke();
             }
         }
     }

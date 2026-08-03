@@ -2,14 +2,36 @@
 set -Eeuo pipefail
 
 readonly SDK="${ANDROID_SDK_ROOT:-/opt/android-sdk}"
+readonly API_LEVEL="${API_LEVEL:-35}"
 readonly AVD_NAME="${AVD_NAME:-zeam_avd}"
 readonly SYSTEM_IMAGE="${SYSTEM_IMAGE:-system-images;android-35;google_apis;x86_64}"
 readonly DEVICE="${EMULATOR_DEVICE:-pixel_3a}"
+readonly REQUIRE_KVM="${REQUIRE_KVM:-0}"
 
 X_SERVER_PID=""
 VNC_SERVER_PID=""
 NOVNC_SERVER_PID=""
 EMULATOR_PID=""
+
+validate_runtime_configuration() {
+    [[ "${API_LEVEL}" =~ ^[1-9][0-9]*$ ]] || {
+        printf 'Invalid API_LEVEL: %s\n' "${API_LEVEL}" >&2
+        exit 1
+    }
+    [[ "${SYSTEM_IMAGE}" == "system-images;android-${API_LEVEL};"* ]] || {
+        printf 'SYSTEM_IMAGE does not match API_LEVEL %s: %s\n' \
+            "${API_LEVEL}" "${SYSTEM_IMAGE}" >&2
+        exit 1
+    }
+    [[ "${REQUIRE_KVM}" == 0 || "${REQUIRE_KVM}" == 1 ]] || {
+        printf 'REQUIRE_KVM must be 0 or 1: %s\n' "${REQUIRE_KVM}" >&2
+        exit 1
+    }
+}
+
+kvm_available() {
+    [[ -c /dev/kvm && -r /dev/kvm && -w /dev/kvm ]]
+}
 
 create_avd() {
     if "${SDK}/cmdline-tools/latest/bin/avdmanager" list avd 2>/dev/null | grep -q "Name: ${AVD_NAME}"; then
@@ -17,7 +39,7 @@ create_avd() {
         return
     fi
     printf 'Creating AVD %s...\n' "${AVD_NAME}"
-    echo "no" | "${SDK}/cmdline-tools/latest/bin/avdmanager" create avd \
+    printf 'no\n' | "${SDK}/cmdline-tools/latest/bin/avdmanager" create avd \
         --name "${AVD_NAME}" --package "${SYSTEM_IMAGE}" --device "${DEVICE}" --force
 }
 
@@ -74,7 +96,11 @@ start_novnc_server() {
 
 start_emulator() {
     local -a acceleration=(-accel on)
-    if [[ ! -e /dev/kvm ]]; then
+    if ! kvm_available; then
+        if [[ "${REQUIRE_KVM}" == 1 ]]; then
+            printf 'KVM is required but /dev/kvm is unavailable or unusable\n' >&2
+            exit 1
+        fi
         printf 'KVM unavailable, falling back to software acceleration\n' >&2
         acceleration=(-accel off)
     fi
@@ -112,6 +138,7 @@ handle_signal() {
 
 main() {
     trap handle_signal INT TERM
+    validate_runtime_configuration
     mkdir -p "${ANDROID_AVD_HOME:-/root/.android/avd}"
     create_avd
     configure_avd

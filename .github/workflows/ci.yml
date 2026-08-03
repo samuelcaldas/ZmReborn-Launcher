@@ -71,6 +71,7 @@ jobs:
     timeout-minutes: 30
     env:
       APP_ID: org.zmreborn
+      EXPECTED_API_LEVEL: 24
 
     steps:
     - name: Checkout Code

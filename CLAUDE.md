@@ -29,7 +29,7 @@ adb install -r app/build/outputs/apk/debug/app-debug.apk
 adb shell monkey -p org.zmreborn -c android.intent.category.LAUNCHER 1
 ```
 
-For Docker emulator runtime testing, follow [`README.md#docker-emulator-testing`](README.md#docker-emulator-testing). The API 35 image is built from `tools/Dockerfile.emulator`, uses `--device /dev/kvm`, and exposes ADB on port 5555.
+For Docker emulator runtime testing, follow [`README.md#docker-emulator-testing`](README.md#docker-emulator-testing). One parameterized `tools/Dockerfile.emulator` builds API 35 and Android 16/API 36 images. Automated runs require Docker daemon-host KVM exposure; API-qualified defaults isolate containers, AVDs, ports, and diagnostics.
 
 Run unit tests or a single test:
 
@@ -52,7 +52,7 @@ Choose the narrowest mechanism that fits: a one-shot deterministic command is a 
 
 - TDD is mandatory for every production change, including Java, resources, manifests, and runtime behavior. Follow red → green → refactor: first add or update the smallest targeted automated test and run it to confirm the intended failure; make the minimum production change; rerun that targeted test until it passes; then refactor only with tests green.
 - A defect fix must begin with a regression test that reproduces the reported failure. Confirm its initial failure before implementing the fix.
-- After the targeted test is green, run relevant full JVM tests, instrumentation-test compilation, lint, and the debug build. Android-test compilation is static evidence only; it is not device-runtime evidence. Execute relevant instrumentation tests and required API 24/API 35 smoke coverage for runtime behavior.
+- After the targeted test is green, run relevant full JVM tests, instrumentation-test compilation, lint, and the debug build. Android-test compilation is static evidence only; it is not device-runtime evidence. Execute relevant instrumentation tests and required API 24/API 35/API 36 smoke coverage for runtime behavior.
 - Place tests precisely: `app/src/test/java/` is the JVM test source set; within it, use package directory `app/src/test/java/org/zmreborn/` for pure Java, resource/source contracts, and deterministic compatibility guard clauses, and package directory `app/src/test/java/org/zmreborn/compat/` only for JVM-safe compatibility contracts that neither instantiate nor call unmocked Android framework paths. The latter is not a separate source set. Use instrumentation source set `app/src/androidTest/java/`, with package directory `app/src/androidTest/java/org/zmreborn/`, for real Android Views, resources, layouts, input, lifecycle, and API-specific behavior. See [`docs/TESTING.md`](docs/TESTING.md) for workflow and commands.
 - Reserve `E2ETest` names for tests that execute and verify user-visible workflows. Name component or integration checks `InstrumentationTest`.
 - Tests must verify observable production behavior. Do not claim behavior with tests that only exercise test doubles or only assert an item's existence.
@@ -102,7 +102,7 @@ The taxonomy is a guide. When a class has dependencies that would require a casc
 - `LauncherProvider` owns the SQLite favorites/workspace database and its initial seeding.
 - `Workspace` and `CellLayout` render the desktop; `DragLayer` and drag-drop interfaces route item movement.
 - The app drawer uses grid and paging implementations; preferences and receivers trigger model/UI reloads.
-- Widget, dynamic-receiver, and wallpaper compatibility bridges preserve behavior from API 24 through API 35.
+- Widget, dynamic-receiver, and wallpaper compatibility bridges preserve build and verifier safety from API 24 through API 35; API 36 Docker execution validates current target-35 APK runtime behavior without introducing API 36 production references.
 - Manifest `<queries>` package visibility plus launcher, provider, and receiver registrations are runtime-critical.
 
 ## Constraints
@@ -118,6 +118,6 @@ The taxonomy is a guide. When a class has dependencies that would require a casc
 - Run relevant build, lint, and `git diff --check` validation after changes.
 - Every new feature must add or update automated unit tests covering its expected behavior.
 - Every fixed defect must add or update an automated regression test covering the failure path.
-- Runtime-facing changes also require relevant instrumentation tests and API 24/API 35 manual smoke coverage.
-- For runtime changes, smoke-test API 24 and API 35: install/launch, app drawer, Preferences, and filtered logcat for fatal exceptions, verifier failures, missing methods, and `UnsupportedOperationException`.
+- Runtime-facing changes also require relevant instrumentation tests and API 24/API 35/API 36 smoke coverage.
+- For runtime changes, smoke-test API 24, API 35, and API 36: install/launch, app drawer, Preferences, and filtered logcat for fatal exceptions, verifier failures, missing methods, and `UnsupportedOperationException`. API 35/API 36 Docker automation requires daemon-side KVM; report missing KVM as blocker and never count software fallback as automated evidence.
 - Update `docs/CHANGELOG.md` for reconstruction, build, compatibility, or emulator-validation changes; keep README build and compatibility instructions current.

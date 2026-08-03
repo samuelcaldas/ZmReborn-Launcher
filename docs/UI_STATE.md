@@ -242,7 +242,7 @@ API 35 instrumentation coverage includes:
 - `LauncherE2ETest` — `Launcher.sRestart`-backed preference persistence, automatic and coalesced
   appearance/`Launcher.sRestart`-backed `Launcher` recreation, workspace row/column geometry rebuild, measured
   production widget-span clamping, and pre-measure geometry rejection;
-- `WidgetPickerInstrumentationTest` — real `ACTION_DOWN`/`ACTION_UP` dispatch through production provider rows, callback delivery, picker dismissal, provider metadata, asynchronous loading, zero pre-selection allocation, bind cancellation, denied-configuration cleanup, failed bind-authority verification rollback, and picker state restoration;
+- `WidgetPickerInstrumentationTest` — real `ACTION_DOWN`/`ACTION_UP` dispatch through production provider rows, callback delivery, picker dismissal, provider metadata, asynchronous loading, zero pre-selection allocation, bind cancellation, denied-configuration cleanup, failed bind-authority verification rollback, same-user grant-token cleanup exactly once, and picker state restoration;
 - `WidgetInsertionE2ETest` — instrumentation-only external provider/configuration components driving pointer input through the production Add dialog and provider picker, then verifying one newly allocated exact-provider ID, durable configuration-only marker visibility, host-view insertion, cell/span placement, one persisted favorites row, pending-state clearing, and host/view/model/database cleanup;
 - `WidgetInsertionCleanupInstrumentationTest` — pending-placement listener/state cancellation before a newly allocated test host ID is deleted;
 - `WidgetResizeInstrumentationTest` — provider-axis handle selection, 48dp handle geometry, valid
@@ -252,30 +252,20 @@ API 35 instrumentation coverage includes:
 - accessibility coverage for the production horizontal pager and indicator page-count semantics;
 - existing launcher, drawer, focus, inset, Settings, localization, and public-resource tests.
 
-Latest fresh build and runtime evidence is recorded in `docs/CHANGELOG.md`. API 24 and API 35 runtime coverage remain distinct from compilation and JVM results.
+Latest fresh build and runtime evidence is recorded in `docs/CHANGELOG.md`. Shared Docker tooling supports exact API 35 and Android 16/API 36 runtime selection, full instrumentation, Launcher focus/workspace smoke, and filtered logcat gates. API 24, API 35, and API 36 runtime coverage remain distinct from image availability, Android-test compilation, JVM, and debug-build results.
 
 ## Runtime evidence and remaining validation
 
-Fresh API 35 evidence is recorded in `docs/CHANGELOG.md`. Latest focused widget coverage passed all 10 picker tests, 1 external-provider insertion E2E, 1 pending-placement cleanup instrumentation test, all 7 resize tests, and both launcher-menu tests. Launcher inflation, drawer open/close, and Preferences reachability smoke tests also passed. App-widget host state matched before and after insertion cleanup, and filtered logcat contained no matching launcher fatal exception, launcher ANR, verifier/missing class or method failure, `UnsupportedOperationException`, or app-widget service failure.
+On 2026-08-03, selector-unset native Docker/KVM full-suite runs passed on API 35 and exact Android 16/API 36. Each run passed 133 instrumentation tests with `INSTRUMENTATION_CODE: -1`, exact Launcher focus/workspace smoke, and clean bounded filtered logcat. These runs include external-widget insertion E2E after its numeric-user bind fixture began capturing the exact user-bound grant operation for paired cleanup. This is runtime evidence; emulator-image availability, Android-test compilation, JVM results, and debug builds remain separate static or build evidence.
 
-Earlier focused coverage passed 8 indicator/icon/selector/menu tests, 7 blur rendering/lifecycle tests, and 1 Preferences reachability test. Hardware wallpaper input was exercised with a controlled `Bitmap.Config.HARDWARE` source; renderer copied it to `ARGB_8888`, produced blurred output, and retained caller ownership. API 24 runtime and readable system-wallpaper blur integration through `WallpaperManager` on API 31–33 remain unperformed; API 35 normally exercises procedural fallback because wallpaper pixels are restricted.
-
-Manual API 35 screenshots confirmed Settings root system-bar spacing and rendered Workspace rows with
-all four inline steppers. Software-only emulator load later produced an input ANR while Android framework
-code laid out the nested preference list, so this attempt does not claim clean hands-on app-grid slider,
-keyboard/DPAD, or complete Settings traversal. Automated instrumentation remains separate evidence and
-does not convert this interrupted manual check into a pass.
+Hardware wallpaper input was exercised with a controlled `Bitmap.Config.HARDWARE` source; renderer copied it to `ARGB_8888`, produced blurred output, and retained caller ownership. API 35 normally exercises procedural fallback because wallpaper pixels are restricted.
 
 Remaining runtime gaps:
 
-- API 24 smoke is unperformed because no API 24 device or local emulator image is available;
-- clean manual API 35 traversal of app-grid transparency, keyboard/DPAD activation, forced RTL, and
-  TalkBack descriptions remains unperformed after the software-emulator ANR;
-- instrumentation invokes the retained registered predictive-back callback object, but an actual
-  SystemUI edge gesture is unverified;
-- instrumentation-only external-provider selection, configuration, insertion, persistence-row verification, and abandoned-ID inspection pass on API 35; Launcher recreation restoration, real configuration cancellation, hands-on third-party bind approval/configuration, provider rendering after orientation, and real-provider body move/DeleteZone removal and resize validation remain unperformed;
-- Android 16 reproduction-device validation remains unperformed because no Android 16 device or emulator image was available for this fix;
-- automatic neighbor reflow, snackbar undo, and other explicitly deferred features have no runtime
-  claim.
+- API 24 local smoke is unavailable because no API 24 device or local emulator image is available;
+- hands-on real third-party widget bind approval and configuration, orientation and relaunch persistence, body movement, DeleteZone deletion, and resize validation remain unperformed;
+- instrumentation invokes the retained registered predictive-back callback object, but an actual SystemUI edge gesture is unverified;
+- manual accessibility and RTL checks remain unperformed;
+- automatic neighbor reflow, snackbar undo, and other explicitly deferred features have no runtime claim.
 
 No unperformed device result is implied by this document.

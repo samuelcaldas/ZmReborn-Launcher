@@ -17,53 +17,63 @@ public final class WidgetBindAuthority {
     }
 
     /** Grants bind authority only when launcher cannot already bind fixture provider. */
-    public static boolean ensure(final Instrumentation instrumentation,
+    public static Grant ensure(final Instrumentation instrumentation,
             final Launcher launcher, final ComponentName provider) {
         validate(instrumentation, launcher, provider);
-        return ensure(new Operations() {
-            public boolean canBind() {
-                return WidgetBindAuthority.canBind(
-                        instrumentation, launcher, provider);
-            }
-
-            public void grant() {
-                runShell(instrumentation.getUiAutomation(),
-                        grantCommand(launcher));
-            }
-
-            public void revoke() {
-                WidgetBindAuthority.revoke(instrumentation, launcher);
-            }
-        }, "Widget bind authority was not granted for " + provider);
+        UiAutomation automation = instrumentation.getUiAutomation();
+        String userId = currentUserId(automation);
+        Operations operations = operations(instrumentation, launcher, provider, automation,
+                userId);
+        return ensureGrant(operations, "Widget bind authority was not granted for " + provider);
     }
 
-    static boolean ensure(Operations operations, String failureMessage) {
-        if (operations == null || failureMessage == null
-                || failureMessage.length() == 0) {
-            throw new IllegalArgumentException(
-                    "Widget bind authority operations require failure context");
-        }
+    static Grant ensure(Operations operations, String failureMessage) {
+        return ensureGrant(operations, failureMessage);
+    }
+
+    static Grant ensureGrant(Operations operations, String failureMessage) {
+        validateOperations(operations, failureMessage);
         if (operations.canBind()) {
-            return false;
+            return new Grant(null);
         }
         try {
             operations.grant();
-            if (!operations.canBind()) {
-                throw new AssertionError(failureMessage);
-            }
-            return true;
+            verifyGranted(operations, failureMessage);
+            return new Grant(operations);
         } catch (RuntimeException | Error failure) {
             rollback(operations, failure);
             throw failure;
         }
     }
 
-    /** Revokes authority granted by {@link #ensure(Instrumentation, Launcher, ComponentName)}. */
-    public static void revoke(Instrumentation instrumentation, Launcher launcher) {
-        if (instrumentation == null || launcher == null) {
-            throw new IllegalArgumentException("Widget bind revocation requires instrumentation and launcher");
+    private static Operations operations(final Instrumentation instrumentation,
+            final Launcher launcher, final ComponentName provider,
+            final UiAutomation automation, final String userId) {
+        return new Operations() {
+            public boolean canBind() {
+                return WidgetBindAuthority.canBind(instrumentation, launcher, provider);
+            }
+            public void grant() {
+                runShell(automation, grantCommand(launcher, userId));
+            }
+            public void revoke() {
+                runShell(automation, revokeCommand(launcher, userId));
+            }
+        };
+    }
+
+    private static void validateOperations(Operations operations, String failureMessage) {
+        if (operations == null || failureMessage == null
+                || failureMessage.trim().length() == 0) {
+            throw new IllegalArgumentException(
+                    "Widget bind authority operations require failure context");
         }
-        runShell(instrumentation.getUiAutomation(), revokeCommand(launcher));
+    }
+
+    private static void verifyGranted(Operations operations, String failureMessage) {
+        if (!operations.canBind()) {
+            throw new AssertionError(failureMessage);
+        }
     }
 
     private static void rollback(Operations operations, Throwable failure) {
@@ -74,14 +84,46 @@ public final class WidgetBindAuthority {
         }
     }
 
-    private static String grantCommand(Launcher launcher) {
-        return "appwidget grantbind --package "
-                + launcher.getPackageName() + " --user current";
+    /** Represents authority provisioned by this utility. */
+    public static final class Grant {
+        private final Operations operations;
+        private boolean revoked;
+
+        private Grant(Operations operations) {
+            this.operations = operations;
+        }
+
+        /** Revokes authority provisioned for this grant exactly once. */
+        public void revoke() {
+            if (operations == null || revoked) {
+                return;
+            }
+            revoked = true;
+            operations.revoke();
+        }
     }
 
-    private static String revokeCommand(Launcher launcher) {
-        return "appwidget revokebind --package "
-                + launcher.getPackageName() + " --user current";
+    private static String grantCommand(Launcher launcher, String userId) {
+        return "appwidget grantbind --package " + launcher.getPackageName()
+                + " --user " + userId;
+    }
+
+    private static String revokeCommand(Launcher launcher, String userId) {
+        return "appwidget revokebind --package " + launcher.getPackageName()
+                + " --user " + userId;
+    }
+
+    private static String currentUserId(UiAutomation automation) {
+        String userId = runShell(automation, "am get-current-user").trim();
+        if (!userId.matches("[0-9]+")) {
+            throw new IllegalStateException("Current user ID is not decimal: " + userId);
+        }
+        try {
+            return Integer.toString(Integer.parseInt(userId));
+        } catch (NumberFormatException exception) {
+            throw new IllegalStateException("Current user ID exceeds integer range: " + userId,
+                    exception);
+        }
     }
 
     private static void validate(Instrumentation instrumentation, Launcher launcher,
@@ -108,7 +150,7 @@ public final class WidgetBindAuthority {
         return allowed[0];
     }
 
-    private static void runShell(UiAutomation automation, String command) {
+    private static String runShell(UiAutomation automation, String command) {
         if (automation == null || command == null || command.length() == 0) {
             throw new IllegalArgumentException("Widget bind shell command requires automation and command");
         }
@@ -118,6 +160,7 @@ public final class WidgetBindAuthority {
         }
         String output = readShellOutput(descriptor);
         rejectShellFailure(command, output);
+        return output;
     }
 
     private static String readShellOutput(ParcelFileDescriptor descriptor) {

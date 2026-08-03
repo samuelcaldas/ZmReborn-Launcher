@@ -8,11 +8,14 @@ readonly GRADLE_CACHE_VOLUME="${GRADLE_CACHE_VOLUME:-zeam-gradle-cache}"
 readonly ANDROID_USER_HOME_VOLUME="${ANDROID_USER_HOME_VOLUME:-zeam-android-user-home}"
 readonly JAVA_HOME_IN_CONTAINER="${JAVA_HOME_IN_CONTAINER:-/usr/lib/jvm/java-17-openjdk-amd64}"
 readonly APK_RELATIVE_PATH="app/build/outputs/apk/debug/app-debug.apk"
-readonly APK_PATH="${ROOT_DIR}/${APK_RELATIVE_PATH}"
+readonly TEST_APK_RELATIVE_PATH="app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk"
 readonly BUILD_LOG="$(mktemp)"
+BUILD_ANDROID_TEST=0
+WORKSPACE_PROBE=""
 
 cleanup() {
     rm -f -- "${BUILD_LOG}"
+    [[ -z "${WORKSPACE_PROBE}" ]] || rm -f -- "${WORKSPACE_PROBE}"
 }
 
 fail() {
@@ -22,10 +25,11 @@ fail() {
 
 usage() {
     printf '%s\n' \
-        'Usage: ./tools/build_apk.sh' \
+        'Usage: ./tools/build_apk.sh [--with-android-test]' \
         '' \
         'Builds the debug APK inside Docker.' \
-        'Success output contains only APK path, byte size, and SHA-256.' \
+        '--with-android-test also builds the matching instrumentation APK.' \
+        'Success output contains artifact paths, byte sizes, and SHA-256 values.' \
         'Optional environment overrides: DOCKER_CONTEXT, DOCKER_IMAGE,' \
         'GRADLE_CACHE_VOLUME, ANDROID_USER_HOME_VOLUME, JAVA_HOME_IN_CONTAINER.'
 }
@@ -37,6 +41,10 @@ validate_arguments() {
     if [[ $# -eq 1 && "$1" == "--help" ]]; then
         usage
         exit 0
+    fi
+    if [[ $# -eq 1 && "$1" == "--with-android-test" ]]; then
+        BUILD_ANDROID_TEST=1
+        return
     fi
     fail "unsupported arguments; use --help"
 }
@@ -98,34 +106,65 @@ fail_with_log() {
     exit 1
 }
 
+run_workspace_probe() {
+    local image_id="$1" relative_probe="$2"
+    docker_cli --context "${DOCKER_CONTEXT}" run --rm --pull=never --user root \
+        -e "PROBE_PATH=/workspace/${relative_probe}" -v "${ROOT_DIR}:/workspace" \
+        --entrypoint /bin/bash "${image_id}" \
+        -ec 'grep -qx client "$PROBE_PATH" && printf "daemon\n" > "$PROBE_PATH"' \
+        >"${BUILD_LOG}" 2>&1
+}
+
+verify_workspace_mount() {
+    local image_id="$1" relative_probe
+    mkdir -p "${ROOT_DIR}/app/build"
+    WORKSPACE_PROBE="$(mktemp "${ROOT_DIR}/app/build/.docker-workspace-probe.XXXXXX")"
+    relative_probe="${WORKSPACE_PROBE#${ROOT_DIR}/}"
+    printf 'client\n' > "${WORKSPACE_PROBE}"
+    : > "${BUILD_LOG}"
+    run_workspace_probe "${image_id}" "${relative_probe}" \
+        && grep -qx daemon "${WORKSPACE_PROBE}" && return
+    fail_with_log "Docker daemon does not share current workspace"
+}
+
+run_gradle_container() {
+    local image_id="$1"
+    shift
+    docker_cli --context "${DOCKER_CONTEXT}" run --rm --pull=never --user root \
+        -e HOME=/root -e GRADLE_USER_HOME=/root/.gradle \
+        -e JAVA_HOME="${JAVA_HOME_IN_CONTAINER}" -e TZ=America/Sao_Paulo \
+        -v "${ROOT_DIR}:/workspace" -v "${GRADLE_CACHE_VOLUME}:/root/.gradle" \
+        -v "${ANDROID_USER_HOME_VOLUME}:/root/.android" -w /workspace \
+        "${image_id}" ./gradlew --quiet "$@" --no-daemon --console=plain \
+        >"${BUILD_LOG}" 2>&1
+}
+
 run_build() {
     local image_id="$1"
-    if docker_cli --context "${DOCKER_CONTEXT}" run --rm --pull=never \
-        --user root \
-        -e HOME=/root \
-        -e GRADLE_USER_HOME=/root/.gradle \
-        -e JAVA_HOME="${JAVA_HOME_IN_CONTAINER}" \
-        -e TZ=America/Sao_Paulo \
-        -v "${ROOT_DIR}:/workspace" \
-        -v "${GRADLE_CACHE_VOLUME}:/root/.gradle" \
-        -v "${ANDROID_USER_HOME_VOLUME}:/root/.android" \
-        -w /workspace \
-        "${image_id}" \
-        ./gradlew --quiet :app:assembleDebug --no-daemon --console=plain \
-        >"${BUILD_LOG}" 2>&1; then
-        return
-    fi
+    local -a tasks=(:app:assembleDebug)
+    [[ "${BUILD_ANDROID_TEST}" -ne 1 ]] || tasks+=(:app:assembleDebugAndroidTest)
+    run_gradle_container "${image_id}" "${tasks[@]}" && return
     fail_with_log "Gradle debug APK task failed"
 }
 
 print_artifact() {
-    [[ -f "${APK_PATH}" ]] || fail "build completed without ${APK_RELATIVE_PATH}"
+    local label="$1"
+    local relative_path="$2"
+    local artifact_path="${ROOT_DIR}/${relative_path}"
+    [[ -f "${artifact_path}" ]] || fail "build completed without ${relative_path}"
     local artifact_hash
     local artifact_size
-    read -r artifact_hash _ < <(sha256sum "${APK_PATH}")
-    artifact_size="$(stat -c '%s' "${APK_PATH}")"
-    printf 'APK: %s\nBytes: %s\nSHA-256: %s\n' \
-        "${APK_RELATIVE_PATH}" "${artifact_size}" "${artifact_hash}"
+    read -r artifact_hash _ < <(sha256sum "${artifact_path}")
+    artifact_size="$(stat -c '%s' "${artifact_path}")"
+    printf '%s: %s\nBytes: %s\nSHA-256: %s\n' \
+        "${label}" "${relative_path}" "${artifact_size}" "${artifact_hash}"
+}
+
+print_artifacts() {
+    print_artifact APK "${APK_RELATIVE_PATH}"
+    if [[ "${BUILD_ANDROID_TEST}" -eq 1 ]]; then
+        print_artifact 'AndroidTest APK' "${TEST_APK_RELATIVE_PATH}"
+    fi
 }
 
 main() {
@@ -138,8 +177,9 @@ main() {
     validate_repository
     validate_docker
     image_id="$(resolve_docker_image)"
+    verify_workspace_mount "${image_id}"
     run_build "${image_id}"
-    print_artifact
+    print_artifacts
 }
 
 main "$@"

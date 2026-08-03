@@ -85,6 +85,38 @@ public class WidgetPickerInstrumentationTest
         assertEquals(1, revocations[0]);
     }
 
+    /** Verifies newly granted bind authority revokes through its paired token once. */
+    public void testBindAuthorityGrantRevokesNewAuthorityOnce() {
+        final int[] probes = new int[1];
+        final int[] grants = new int[1];
+        final int[] revocations = new int[1];
+        WidgetBindAuthority.Operations operations =
+                new WidgetBindAuthority.Operations() {
+            public boolean canBind() {
+                probes[0]++;
+                return probes[0] == 2;
+            }
+
+            public void grant() {
+                grants[0]++;
+            }
+
+            public void revoke() {
+                revocations[0]++;
+            }
+        };
+
+        WidgetBindAuthority.Grant grant = WidgetBindAuthority.ensureGrant(operations,
+                "Expected widget bind authority");
+
+        assertEquals(2, probes[0]);
+        assertEquals(1, grants[0]);
+        assertEquals(0, revocations[0]);
+        grant.revoke();
+        grant.revoke();
+        assertEquals(1, revocations[0]);
+    }
+
     /** Verifies catalog inspection never allocates host widget IDs. */
     public void testCatalogLoadingDoesNotAllocateWidgetId() {
         Launcher launcher = getActivity();
