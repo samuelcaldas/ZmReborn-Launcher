@@ -39,14 +39,18 @@ Run these instrumentation classes when changing widget selection, placement, edi
 ./gradlew :app:connectedDebugAndroidTest \
   -Pandroid.testInstrumentationRunnerArguments.class=org.zmreborn.widget.WidgetPickerInstrumentationTest
 ./gradlew :app:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=org.zmreborn.WidgetInsertionE2ETest
+./gradlew :app:connectedDebugAndroidTest \
+  -Pandroid.testInstrumentationRunnerArguments.class=org.zmreborn.WidgetInsertionCleanupInstrumentationTest
+./gradlew :app:connectedDebugAndroidTest \
   -Pandroid.testInstrumentationRunnerArguments.class=org.zmreborn.WidgetResizeInstrumentationTest
 ./gradlew :app:connectedDebugAndroidTest \
   -Pandroid.testInstrumentationRunnerArguments.class=org.zmreborn.LauncherMenuInstrumentationTest
 ```
 
-`WidgetPickerInstrumentationTest` covers Search-first ordering, provider metadata, accessible preview cards, asynchronous loading, zero host-ID allocation before selection, bind-cancellation cleanup, and picker state restoration. `WidgetResizeInstrumentationTest` covers resize handles and body-drag callback separation; it is component evidence, not proof of real-provider movement or DeleteZone persistence. `LauncherMenuInstrumentationTest` protects direct home-menu order and retained options Add categories.
+`WidgetPickerInstrumentationTest` covers Search-first ordering, provider metadata, accessible preview cards, asynchronous loading, real pointer-event selection, zero host-ID allocation before selection, bind-cancellation cleanup, denied configuration-activity cleanup, failed bind-authority verification rollback, and picker state restoration. `WidgetInsertionE2ETest` uses instrumentation-APK-only external provider/configuration components to dispatch pointer input through the visible production Add dialog and provider card, require one newly allocated exact-provider ID, verify a durable configuration-only `RemoteViews` marker, host-view insertion, placement, persistence, pending-state cleanup, and test cleanup. It probes bind authority with a disposable host ID and revokes only authority granted by the test, including failed post-grant verification. `WidgetInsertionCleanupInstrumentationTest` proves cleanup cancels pending placement and removes its layout listener before deleting a newly allocated host ID. `WidgetResizeInstrumentationTest` covers resize handles and body-drag callback separation; it is component evidence, not proof of real-provider movement or DeleteZone persistence. `LauncherMenuInstrumentationTest` protects direct home-menu order and retained options Add categories.
 
-API 24/API 35 device smoke must still select real providers, exercise bind approval and provider configuration, rotate during pending flows, move and delete a resizable widget, relaunch to verify persistence, and inspect host IDs/logcat for abandoned allocations or platform failures.
+The deterministic test provider proves launcher-owned insertion without shipping fixture components in the production APK. API 24/API 35 hands-on smoke must still select third-party providers, exercise user-facing bind approval, rotate during pending flows, move and delete a resizable widget, relaunch to verify persistence, and inspect host IDs/logcat for abandoned allocations or platform failures.
 
 ## Hosted API 24 CI execution
 

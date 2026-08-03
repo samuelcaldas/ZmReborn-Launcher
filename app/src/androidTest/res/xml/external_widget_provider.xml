@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="1dp"
+    android:minHeight="1dp"
+    android:minResizeWidth="1dp"
+    android:minResizeHeight="1dp"
+    android:initialLayout="@layout/external_widget_remote_views"
+    android:configure="org.zmreborn.widget.ExternalWidgetConfigurationActivity"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen" />

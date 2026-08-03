@@ -1950,7 +1950,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         this.mWaitingForResult = LOGD;
         try {
             startActivityForResult(intent, REQUEST_CREATE_APPWIDGET);
-        } catch (ActivityNotFoundException exception) {
+        } catch (ActivityNotFoundException | SecurityException exception) {
             Log.e(LOG_TAG, "Unable to configure app widget " + appWidget.provider,
                     exception);
             releasePendingAppWidgetId(resultData);
@@ -2994,6 +2994,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         if (!canSelectWidget(dialog) || entry == null) {
             return;
         }
+        dismissWidgetPicker();
         if (entry.isSearch()) {
             this.mWaitingForResult = false;
             addSearch();

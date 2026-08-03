@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <application android:label="External Widget Fixture">
+        <receiver
+            android:name="org.zmreborn.widget.ExternalWidgetProvider"
+            android:exported="true"
+            android:label="External Widget Fixture">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                android:name="android.appwidget.provider"
+                android:resource="@xml/external_widget_provider" />
+        </receiver>
+        <activity
+            android:name="org.zmreborn.widget.ExternalWidgetConfigurationActivity"
+            android:exported="true" />
+        <activity
+            android:name="org.zmreborn.widget.DeniedWidgetConfigurationActivity"
+            android:exported="false" />
+    </application>
+</manifest>

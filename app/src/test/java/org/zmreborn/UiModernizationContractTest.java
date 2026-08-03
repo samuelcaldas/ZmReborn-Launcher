@@ -23,6 +23,14 @@ public class UiModernizationContractTest {
     }
 
     @Test
+    public void widgetProviderQueryKeepsExternalProvidersVisible() throws Exception {
+        String manifest = read("main/AndroidManifest.xml");
+
+        assertTrue("Widget providers require APPWIDGET_UPDATE package visibility",
+                manifest.contains("android.appwidget.action.APPWIDGET_UPDATE"));
+    }
+
+    @Test
     public void verticalDrawerIsDefaultResponsiveAndCacheFree() throws Exception {
         String defaults = read("main/res/values/defaults.xml");
         String launcher = read("main/java/org/zmreborn/Launcher.java");

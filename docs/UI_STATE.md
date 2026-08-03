@@ -164,13 +164,14 @@ Legacy popup, sheet, and navigation redesign remain deferred. Externally-owned r
 
 Empty-home long press now exposes **Widgets**, **Shortcuts**, **Folders**, **Wallpaper**, and **Preferences** directly. The platform options-menu **Add** action retains its compact Widgets/Shortcuts/Folders dialog.
 
-Widget selection uses a launcher-owned preview-card dialog rather than `ACTION_APPWIDGET_PICK`. Search is always first; installed providers follow in localized label order. Preview resolution uses provider preview image, provider icon, then launcher widget fallback. Provider metadata and drawables load on a cancellable background executor, while target-grid span calculation and view publication remain on the main thread. Opening, loading, dismissing, or rotating this dialog allocates no `AppWidgetHost` ID; picker-open state and target cell restore after desktop binding completes.
+Widget selection uses a launcher-owned preview-card dialog rather than `ACTION_APPWIDGET_PICK`. Search is always first; installed providers follow in localized label order. Manifest package visibility includes `android.appwidget.action.APPWIDGET_UPDATE`, so receiver-only third-party providers remain enumerable on modern Android. Preview resolution uses provider preview image, provider icon, then launcher widget fallback. Provider metadata and drawables load on a cancellable background executor, while target-grid span calculation and view publication remain on the main thread. `ListView` owns row activation for pointer, keyboard, and accessibility input; provider-card roots do not consume clicks independently. Opening, loading, dismissing, or rotating this dialog allocates no `AppWidgetHost` ID; picker-open state and target cell restore after desktop binding completes.
 
-External provider selection allocates one ID, tries `bindAppWidgetIdIfAllowed(...)`, and falls back to `ACTION_APPWIDGET_BIND` when user approval is required. Search selection reuses the launcher-owned Search widget path without allocating an ID.
+External provider selection dismisses and clears launcher ownership of the picker before allocating an ID, trying `bindAppWidgetIdIfAllowed(...)`, or falling back to `ACTION_APPWIDGET_BIND` when user approval is required. Search selection also closes the picker first, then reuses the launcher-owned Search widget path without allocating an ID.
 
 Implemented lifecycle behavior:
 
 - bind/configuration cancellation releases allocated ID, including null result intents;
+- missing, disabled, non-exported, or permission-protected configuration activities release allocated ID and clear pending/waiting state instead of crashing Launcher;
 - successful null configuration result can recover tracked ID;
 - stale or mismatched successful results are rejected without adopting an unrelated returned ID;
 - invalid provider results release ID;
@@ -241,6 +242,9 @@ API 35 instrumentation coverage includes:
 - `LauncherE2ETest` — `Launcher.sRestart`-backed preference persistence, automatic and coalesced
   appearance/`Launcher.sRestart`-backed `Launcher` recreation, workspace row/column geometry rebuild, measured
   production widget-span clamping, and pre-measure geometry rejection;
+- `WidgetPickerInstrumentationTest` — real `ACTION_DOWN`/`ACTION_UP` dispatch through production provider rows, callback delivery, picker dismissal, provider metadata, asynchronous loading, zero pre-selection allocation, bind cancellation, denied-configuration cleanup, failed bind-authority verification rollback, and picker state restoration;
+- `WidgetInsertionE2ETest` — instrumentation-only external provider/configuration components driving pointer input through the production Add dialog and provider picker, then verifying one newly allocated exact-provider ID, durable configuration-only marker visibility, host-view insertion, cell/span placement, one persisted favorites row, pending-state clearing, and host/view/model/database cleanup;
+- `WidgetInsertionCleanupInstrumentationTest` — pending-placement listener/state cancellation before a newly allocated test host ID is deleted;
 - `WidgetResizeInstrumentationTest` — provider-axis handle selection, 48dp handle geometry, valid
   and occupied candidates, fixed-provider behavior, outside cancellation, and accessibility-click
   cancellation without premature layout mutation;
@@ -252,14 +256,9 @@ Latest fresh build and runtime evidence is recorded in `docs/CHANGELOG.md`. API 
 
 ## Runtime evidence and remaining validation
 
-Fresh API 35 evidence is recorded in `docs/CHANGELOG.md`. Latest focused coverage passed 8
-indicator/icon/selector/menu tests, 7 blur rendering/lifecycle tests, and 1 Preferences reachability test.
-Hardware wallpaper input was exercised with a controlled `Bitmap.Config.HARDWARE` source; renderer copied
-it to `ARGB_8888`, produced blurred output, and retained caller ownership. Filtered logcat contained no
-matching launcher fatal exception, launcher ANR, verifier/missing class or method failure, or
-`UnsupportedOperationException`. API 24 runtime and readable system-wallpaper blur integration through
-`WallpaperManager` on API 31–33 remain unperformed; API 35 normally exercises procedural fallback because
-wallpaper pixels are restricted.
+Fresh API 35 evidence is recorded in `docs/CHANGELOG.md`. Latest focused widget coverage passed all 10 picker tests, 1 external-provider insertion E2E, 1 pending-placement cleanup instrumentation test, all 7 resize tests, and both launcher-menu tests. Launcher inflation, drawer open/close, and Preferences reachability smoke tests also passed. App-widget host state matched before and after insertion cleanup, and filtered logcat contained no matching launcher fatal exception, launcher ANR, verifier/missing class or method failure, `UnsupportedOperationException`, or app-widget service failure.
+
+Earlier focused coverage passed 8 indicator/icon/selector/menu tests, 7 blur rendering/lifecycle tests, and 1 Preferences reachability test. Hardware wallpaper input was exercised with a controlled `Bitmap.Config.HARDWARE` source; renderer copied it to `ARGB_8888`, produced blurred output, and retained caller ownership. API 24 runtime and readable system-wallpaper blur integration through `WallpaperManager` on API 31–33 remain unperformed; API 35 normally exercises procedural fallback because wallpaper pixels are restricted.
 
 Manual API 35 screenshots confirmed Settings root system-bar spacing and rendered Workspace rows with
 all four inline steppers. Software-only emulator load later produced an input ANR while Android framework
@@ -274,11 +273,8 @@ Remaining runtime gaps:
   TalkBack descriptions remains unperformed after the software-emulator ANR;
 - instrumentation invokes the retained registered predictive-back callback object, but an actual
   SystemUI edge gesture is unverified;
-- hands-on external-provider selection, bind approval/configuration, provider rendering after
-  orientation, real-provider body move/DeleteZone removal and resize validation on API 24 and API 35,
-  and abandoned-ID inspection remain unperformed; focused API 35 instrumentation covers preview-card
-  loading, Search selection, zero pre-selection allocation, bind cancellation cleanup, picker state
-  restoration, resize-handle behavior, and body-drag handoff callback only;
+- instrumentation-only external-provider selection, configuration, insertion, persistence-row verification, and abandoned-ID inspection pass on API 35; Launcher recreation restoration, real configuration cancellation, hands-on third-party bind approval/configuration, provider rendering after orientation, and real-provider body move/DeleteZone removal and resize validation remain unperformed;
+- Android 16 reproduction-device validation remains unperformed because no Android 16 device or emulator image was available for this fix;
 - automatic neighbor reflow, snackbar undo, and other explicitly deferred features have no runtime
   claim.
 
