@@ -21,6 +21,15 @@
 - Static validation passed 210 JVM tests, Android-test assembly, lint, the required Docker-wrapper debug APK build, and `git diff --check`. Debug APK: 957,330 bytes; SHA-256 `56817ef665661b0889581c9e6b4e89c3e27da3817e5adf8db3eae0a0d556e587`.
 - API 24 runtime remains unperformed because a matching local emulator image is unavailable. Deterministic fixture insertion and the completed API 35/API 36 full suites do not claim hands-on third-party bind approval, Launcher recreation restoration, real configuration cancellation, orientation persistence, movement, deletion, or resize validation.
 
+## [3.1.11-alpha-rc13]
+
+- Complete architectural modernization and clean code refactoring across the entire codebase.
+- Applies Object Calisthenics across all models, views, and controllers: extracts single-indent helper methods, replaces complex branching with fail-fast guard clauses, wraps collections, and removes legacy Hungarian notation and unused overrides.
+- Adds comprehensive Javadoc documentation covering purpose, parameters, return values, and failure handling for all public classes and methods.
+- Improves resource management and exception handling: uses try-with-resources and explicit cleanup for SQLite cursors, fixing a cursor leak in `UninstallShortcutReceiver`.
+- Resolves layout inflation parameter warnings in `ApplicationsPagingView` by preserving container layout parameters.
+- Validates clean compilation, zero Android Lint errors/warnings, clean diff whitespace, and 100% passing JVM unit test suite.
+
 ## [3.1.11-alpha-rc12]
 
 - Keeps the shared workspace/paging screen indicator above the paging-drawer backdrop and relocates its unchanged persisted preference to **General → Appearance**.
