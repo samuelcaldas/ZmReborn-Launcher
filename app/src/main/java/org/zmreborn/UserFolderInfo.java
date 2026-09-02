@@ -4,24 +4,34 @@ import android.content.ContentValues;
 import java.util.ArrayList;
 import org.zmreborn.LauncherSettings;
 
+/**
+ * Data model for a user-created folder containing desktop or dock application items.
+ */
 class UserFolderInfo extends FolderInfo {
-    ArrayList<ApplicationItemInfo> contents = new ArrayList<>();
+    final ArrayList<ApplicationItemInfo> contents = new ArrayList<>();
 
     UserFolderInfo() {
-        this.itemType = 2;
+        this.itemType = LauncherSettings.Favorites.ITEM_TYPE_USER_FOLDER;
     }
 
+    /**
+     * Appends an application item to this folder's contents.
+     */
     public void add(ApplicationItemInfo item) {
-        this.contents.add(item);
+        if (item != null) {
+            this.contents.add(item);
+        }
     }
 
-    /* access modifiers changed from: package-private */
-    public void onAddToDatabase(ContentValues values) {
+    @Override
+    void onAddToDatabase(ContentValues values) {
         super.onAddToDatabase(values);
-        values.put(LauncherSettings.BaseLauncherColumns.TITLE, this.title.toString());
+        String titleStr = this.title != null ? this.title.toString() : "";
+        values.put(LauncherSettings.BaseLauncherColumns.TITLE, titleStr);
     }
 
+    @Override
     public String toString() {
-        return this.title.toString();
+        return this.title != null ? this.title.toString() : "";
     }
 }

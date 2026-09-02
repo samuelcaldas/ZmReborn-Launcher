@@ -28,47 +28,47 @@ import android.widget.TextView;
 import java.util.ArrayList;
 import org.zmreborn.theme.WallpaperColorExtractor;
 
-/** Vertical app drawer: search bar, alphabet fast-scroll rail, and applications grid. */
+/**
+ * Vertical app drawer containing a collapsible search bar, alphabet fast-scroll rail, and applications grid.
+ */
 public class ApplicationsDrawerView extends LinearLayout implements ApplicationsView {
     private static final int FAST_SCROLL_HIDE_DELAY_MS = 1000;
     private static final int FAST_SCROLL_ANIM_DURATION_MS = 150;
     private static final int SEARCH_REVEAL_ANIM_DURATION_MS = 150;
     private static final int CLOSE_DRAG_THRESHOLD_DP = 72;
 
-    private ApplicationsGridView mGridView;
-    private EditText mSearchInput;
-    private ImageButton mClearSearch;
-    private TextView mNoResults;
-    private DrawerFastScrollView mFastScroll;
-    private FrameLayout mSearchContainer;
-    private ArrayList<ApplicationItemInfo> mSourceItems = new ArrayList<>();
-    private ArrayList<ApplicationItemInfo> mDisplayedItems = new ArrayList<>();
-    private DrawerScrollState mSearchOriginState = DrawerScrollState.empty();
-    private String mQuery = "";
-    private boolean mDestroyed;
-    private boolean mClosing;
-    private boolean mSearchControlsEnabled = true;
-    private int mSubmissionGeneration;
-    private int mCloseGeneration;
-    private int mBackgroundAlpha = 255;
-    private int mBasePaddingLeft;
-    private int mBasePaddingTop;
-    private int mBasePaddingRight;
-    private int mBasePaddingBottom;
+    private ApplicationsGridView gridView;
+    private EditText searchInput;
+    private ImageButton clearSearch;
+    private TextView noResults;
+    private DrawerFastScrollView fastScroll;
+    private FrameLayout searchContainer;
+    private ArrayList<ApplicationItemInfo> sourceItems = new ArrayList<>();
+    private ArrayList<ApplicationItemInfo> displayedItems = new ArrayList<>();
+    private DrawerScrollState searchOriginState = DrawerScrollState.empty();
+    private String query = "";
+    private boolean destroyed;
+    private boolean closing;
+    private boolean searchControlsEnabled = true;
+    private int submissionGeneration;
+    private int closeGeneration;
+    private int backgroundAlpha = 255;
+    private int basePaddingLeft;
+    private int basePaddingTop;
+    private int basePaddingRight;
+    private int basePaddingBottom;
 
-    // Fast-scroll auto-hide state (Fix 2)
-    private boolean mFastScrollEnabled;
-    private boolean mFastScrollVisible;
-    private Handler mFastScrollHandler;
-    private Runnable mFastScrollHideRunnable;
+    private boolean fastScrollEnabled;
+    private boolean fastScrollVisible;
+    private Handler fastScrollHandler;
+    private Runnable fastScrollHideRunnable;
 
-    // Pull-to-reveal search bar state (Fix 3)
-    private int mSearchBarMaxHeight;
-    private boolean mSearchRevealed;
-    private float mPullStartY;
-    private int mPullCurrentHeight;
-    private boolean mInterceptingPull;
-    private boolean mInterceptingClose;
+    private int searchBarMaxHeight;
+    private boolean searchRevealed;
+    private float pullStartY;
+    private int pullCurrentHeight;
+    private boolean interceptingPull;
+    private boolean interceptingClose;
 
     /** Creates drawer without XML attributes. */
     public ApplicationsDrawerView(Context context) {
@@ -101,39 +101,43 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
     }
 
     private void bindViews() {
-        this.mGridView = (ApplicationsGridView) findViewById(R.id.apps_grid_content);
-        this.mSearchInput = (EditText) findViewById(R.id.drawer_search_input);
-        this.mClearSearch = (ImageButton) findViewById(R.id.drawer_search_clear);
-        this.mNoResults = (TextView) findViewById(R.id.drawer_search_empty);
-        this.mFastScroll = (DrawerFastScrollView) findViewById(R.id.drawer_fast_scroll);
-        this.mSearchContainer = (FrameLayout) findViewById(R.id.drawer_search_container);
-        if (this.mGridView == null || this.mSearchInput == null
-                || this.mClearSearch == null || this.mNoResults == null
-                || this.mFastScroll == null || this.mSearchContainer == null) {
+        this.gridView = (ApplicationsGridView) findViewById(R.id.apps_grid_content);
+        this.searchInput = (EditText) findViewById(R.id.drawer_search_input);
+        this.clearSearch = (ImageButton) findViewById(R.id.drawer_search_clear);
+        this.noResults = (TextView) findViewById(R.id.drawer_search_empty);
+        this.fastScroll = (DrawerFastScrollView) findViewById(R.id.drawer_fast_scroll);
+        this.searchContainer = (FrameLayout) findViewById(R.id.drawer_search_container);
+        if (this.gridView == null || this.searchInput == null
+                || this.clearSearch == null || this.noResults == null
+                || this.fastScroll == null || this.searchContainer == null) {
             throw new IllegalStateException("Applications drawer layout is incomplete");
         }
     }
 
     private void captureBasePadding() {
-        this.mBasePaddingLeft = getPaddingLeft();
-        this.mBasePaddingTop = getPaddingTop();
-        this.mBasePaddingRight = getPaddingRight();
-        this.mBasePaddingBottom = getPaddingBottom();
+        this.basePaddingLeft = getPaddingLeft();
+        this.basePaddingTop = getPaddingTop();
+        this.basePaddingRight = getPaddingRight();
+        this.basePaddingBottom = getPaddingBottom();
     }
 
     private void bindSearch() {
-        this.mSearchInput.addTextChangedListener(new TextWatcher() {
+        this.searchInput.addTextChangedListener(new TextWatcher() {
+            @Override
             public void beforeTextChanged(CharSequence value, int start, int count, int after) {
             }
 
+            @Override
             public void onTextChanged(CharSequence value, int start, int before, int count) {
                 updateQuery(value);
             }
 
+            @Override
             public void afterTextChanged(Editable value) {
             }
         });
-        this.mClearSearch.setOnClickListener(new OnClickListener() {
+        this.clearSearch.setOnClickListener(new OnClickListener() {
+            @Override
             public void onClick(View view) {
                 clearSearch();
             }
@@ -141,68 +145,68 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
     }
 
     private void bindFastScroll() {
-        this.mFastScroll.setOnSectionSelectedListener(
+        this.fastScroll.setOnSectionSelectedListener(
                 new DrawerFastScrollView.OnSectionSelectedListener() {
+            @Override
             public void onSectionSelected(int position) {
                 scrollToFastScrollPosition(position);
             }
         });
-        // Fix 1 + Fix 2: clear selection and manage auto-hide on scroll state changes.
-        this.mGridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+        this.gridView.setOnScrollListener(new AbsListView.OnScrollListener() {
+            @Override
             public void onScrollStateChanged(AbsListView view, int scrollState) {
                 onGridScrollStateChanged(scrollState);
             }
 
+            @Override
             public void onScroll(AbsListView view, int first, int visible, int total) {
             }
         });
     }
 
     private void initFastScrollHandler() {
-        this.mFastScrollHandler = new Handler(Looper.getMainLooper());
-        this.mFastScrollHideRunnable = new Runnable() {
+        this.fastScrollHandler = new Handler(Looper.getMainLooper());
+        this.fastScrollHideRunnable = new Runnable() {
+            @Override
             public void run() {
                 hideFastScrollAnimated();
             }
         };
     }
 
-    /**
-     * Handles grid scroll state: clears rail selection so repeat taps always fire (Fix 1),
-     * shows the fast-scroll rail during motion and schedules auto-hide at idle (Fix 2).
-     */
     private void onGridScrollStateChanged(int scrollState) {
         if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_TOUCH_SCROLL
                 || scrollState == AbsListView.OnScrollListener.SCROLL_STATE_FLING) {
-            this.mFastScrollHandler.removeCallbacks(this.mFastScrollHideRunnable);
-            this.mFastScroll.clearSelection();
-            if (this.mFastScrollEnabled && !this.mFastScrollVisible) {
-                this.mFastScrollVisible = true;
-                this.mFastScroll.setVisibility(VISIBLE);
-                this.mFastScroll.setAlpha(0.0f);
-                this.mFastScroll.animate()
+            this.fastScrollHandler.removeCallbacks(this.fastScrollHideRunnable);
+            this.fastScroll.clearSelection();
+            if (this.fastScrollEnabled && !this.fastScrollVisible) {
+                this.fastScrollVisible = true;
+                this.fastScroll.setVisibility(VISIBLE);
+                this.fastScroll.setAlpha(0.0f);
+                this.fastScroll.animate()
                         .alpha(1.0f)
                         .setDuration(FAST_SCROLL_ANIM_DURATION_MS)
                         .start();
             }
         } else if (scrollState == AbsListView.OnScrollListener.SCROLL_STATE_IDLE) {
-            this.mFastScrollHandler.postDelayed(
-                    this.mFastScrollHideRunnable, FAST_SCROLL_HIDE_DELAY_MS);
+            this.fastScrollHandler.postDelayed(
+                    this.fastScrollHideRunnable, FAST_SCROLL_HIDE_DELAY_MS);
         }
     }
 
     private void hideFastScrollAnimated() {
-        if (!this.mFastScrollVisible) {
+        if (!this.fastScrollVisible) {
             return;
         }
-        this.mFastScrollVisible = false;
-        this.mFastScroll.animate()
+        this.fastScrollVisible = false;
+        this.fastScroll.animate()
                 .alpha(0.0f)
                 .setDuration(FAST_SCROLL_ANIM_DURATION_MS)
                 .withEndAction(new Runnable() {
+                    @Override
                     public void run() {
-                        if (!mFastScrollVisible) {
-                            mFastScroll.setVisibility(GONE);
+                        if (!fastScrollVisible) {
+                            fastScroll.setVisibility(GONE);
                         }
                     }
                 })
@@ -210,213 +214,202 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
     }
 
     private void hideFastScrollImmediately() {
-        if (this.mFastScrollHandler != null) {
-            this.mFastScrollHandler.removeCallbacks(this.mFastScrollHideRunnable);
+        if (this.fastScrollHandler != null) {
+            this.fastScrollHandler.removeCallbacks(this.fastScrollHideRunnable);
         }
-        this.mFastScrollVisible = false;
-        this.mFastScroll.animate().cancel();
-        this.mFastScroll.setAlpha(1.0f);
-        this.mFastScroll.setVisibility(GONE);
+        this.fastScrollVisible = false;
+        this.fastScroll.animate().cancel();
+        this.fastScroll.setAlpha(1.0f);
+        this.fastScroll.setVisibility(GONE);
     }
 
     private void scrollToFastScrollPosition(int position) {
-        if (this.mDestroyed || this.mClosing || position < 0) {
+        if (this.destroyed || this.closing || position < 0) {
             return;
         }
-        this.mGridView.setSelectionFromTop(
-                position, this.mGridView.getPaddingTop());
+        this.gridView.setSelectionFromTop(position, this.gridView.getPaddingTop());
     }
 
-    private void updateQuery(CharSequence query) {
-        if (this.mDestroyed) {
+    private void updateQuery(CharSequence queryText) {
+        if (this.destroyed) {
             return;
         }
-        boolean wasEmpty = DrawerSearchFilter.isEmptyQuery(this.mQuery);
-        boolean isEmpty = DrawerSearchFilter.isEmptyQuery(query);
+        boolean wasEmpty = DrawerSearchFilter.isEmptyQuery(this.query);
+        boolean isEmpty = DrawerSearchFilter.isEmptyQuery(queryText);
         if (wasEmpty && !isEmpty) {
-            this.mSearchOriginState = captureScrollState();
+            this.searchOriginState = captureScrollState();
         }
         DrawerScrollState restoreState = isEmpty
-                ? this.mSearchOriginState : captureScrollState();
-        this.mQuery = query == null ? "" : query.toString();
+                ? this.searchOriginState : captureScrollState();
+        this.query = queryText == null ? "" : queryText.toString();
         submitFilteredItems(restoreState);
         if (isEmpty) {
-            this.mSearchOriginState = DrawerScrollState.empty();
+            this.searchOriginState = DrawerScrollState.empty();
         }
         updateSearchControls();
     }
 
     private void submitFilteredItems(DrawerScrollState restoreState) {
-        this.mSubmissionGeneration++;
-        this.mDisplayedItems = DrawerSearchFilter.filter(
-                this.mSourceItems, this.mQuery);
-        this.mGridView.setApplications(this.mDisplayedItems);
+        this.submissionGeneration++;
+        this.displayedItems = DrawerSearchFilter.filter(this.sourceItems, this.query);
+        this.gridView.setApplications(this.displayedItems);
         updateNoResultsState();
         updateFastScroll();
         restoreScrollState(restoreState);
     }
 
     private DrawerScrollState captureScrollState() {
-        if (this.mGridView.getAdapter() == null) {
+        if (this.gridView.getAdapter() == null) {
             return DrawerScrollState.empty();
         }
-        int count = this.mGridView.getAdapter().getCount();
+        int count = this.gridView.getAdapter().getCount();
         if (count == 0) {
             return DrawerScrollState.empty();
         }
-        int position = this.mGridView.getFirstVisiblePosition();
+        int position = this.gridView.getFirstVisiblePosition();
         if (position < 0 || position >= count) {
             return DrawerScrollState.empty();
         }
-        Object item = this.mGridView.getItemAtPosition(position);
+        Object item = this.gridView.getItemAtPosition(position);
         if (!(item instanceof ApplicationItemInfo)) {
             return DrawerScrollState.empty();
         }
-        View firstChild = this.mGridView.getChildAt(0);
+        View firstChild = this.gridView.getChildAt(0);
         int offset = firstChild == null ? 0
-                : firstChild.getTop() - this.mGridView.getPaddingTop();
-        return DrawerScrollState.capture(
-                (ApplicationItemInfo) item, position, offset);
+                : firstChild.getTop() - this.gridView.getPaddingTop();
+        return DrawerScrollState.capture((ApplicationItemInfo) item, position, offset);
     }
 
     private void restoreScrollState(final DrawerScrollState state) {
-        final int position = state.resolvePosition(this.mDisplayedItems);
+        final int position = state.resolvePosition(this.displayedItems);
         if (position < 0) {
             return;
         }
-        final int generation = this.mSubmissionGeneration;
-        this.mGridView.post(new Runnable() {
+        final int generation = this.submissionGeneration;
+        this.gridView.post(new Runnable() {
+            @Override
             public void run() {
-                if (mDestroyed || generation != mSubmissionGeneration) {
+                if (destroyed || generation != submissionGeneration) {
                     return;
                 }
-                int top = mGridView.getPaddingTop() + state.getTopOffset();
-                mGridView.setSelectionFromTop(position, top);
+                int top = gridView.getPaddingTop() + state.getTopOffset();
+                gridView.setSelectionFromTop(position, top);
             }
         });
     }
 
     private void updateNoResultsState() {
-        boolean noResults = !DrawerSearchFilter.isEmptyQuery(this.mQuery)
-                && !this.mSourceItems.isEmpty() && this.mDisplayedItems.isEmpty();
-        this.mGridView.setVisibility(noResults ? GONE : VISIBLE);
-        this.mNoResults.setVisibility(noResults ? VISIBLE : GONE);
+        boolean noRes = !DrawerSearchFilter.isEmptyQuery(this.query)
+                && !this.sourceItems.isEmpty() && this.displayedItems.isEmpty();
+        this.gridView.setVisibility(noRes ? GONE : VISIBLE);
+        this.noResults.setVisibility(noRes ? VISIBLE : GONE);
     }
 
-    /** Updates fast-scroll availability; hides rail immediately when conditions no longer hold. */
     private void updateFastScroll() {
-        DrawerAlphabetIndex index = DrawerAlphabetIndex.from(this.mDisplayedItems);
-        this.mFastScrollEnabled = DrawerSearchFilter.isEmptyQuery(this.mQuery)
+        DrawerAlphabetIndex index = DrawerAlphabetIndex.from(this.displayedItems);
+        this.fastScrollEnabled = DrawerSearchFilter.isEmptyQuery(this.query)
                 && index.hasMultipleSections();
-        this.mFastScroll.setIndex(index);
-        if (!this.mFastScrollEnabled) {
+        this.fastScroll.setIndex(index);
+        if (!this.fastScrollEnabled) {
             hideFastScrollImmediately();
         }
-        this.mGridView.setFastScrollVisible(this.mFastScrollEnabled);
-        updateFastScrollFocus(this.mFastScrollEnabled);
+        this.gridView.setFastScrollVisible(this.fastScrollEnabled);
+        updateFastScrollFocus(this.fastScrollEnabled);
     }
 
     private void updateFastScrollFocus(boolean visible) {
         int gridId = R.id.apps_grid_content;
         int railId = visible ? R.id.drawer_fast_scroll : gridId;
         if (getLayoutDirection() == LAYOUT_DIRECTION_RTL) {
-            this.mFastScroll.setNextFocusLeftId(railId);
-            this.mFastScroll.setNextFocusRightId(gridId);
+            this.fastScroll.setNextFocusLeftId(railId);
+            this.fastScroll.setNextFocusRightId(gridId);
             return;
         }
-        this.mFastScroll.setNextFocusLeftId(gridId);
-        this.mFastScroll.setNextFocusRightId(railId);
+        this.fastScroll.setNextFocusLeftId(gridId);
+        this.fastScroll.setNextFocusRightId(railId);
     }
 
     @Override
     public void onRtlPropertiesChanged(int layoutDirection) {
         super.onRtlPropertiesChanged(layoutDirection);
-        if (this.mGridView == null || this.mFastScroll == null) {
+        if (this.gridView == null || this.fastScroll == null) {
             return;
         }
-        this.mGridView.setFastScrollVisible(this.mFastScrollEnabled);
-        updateFastScrollFocus(this.mFastScrollEnabled);
+        this.gridView.setFastScrollVisible(this.fastScrollEnabled);
+        updateFastScrollFocus(this.fastScrollEnabled);
         updateSearchFocus();
     }
 
     private void updateSearchFocus() {
         if (getLayoutDirection() == LAYOUT_DIRECTION_RTL) {
-            this.mClearSearch.setNextFocusLeftId(R.id.drawer_search_clear);
-            this.mClearSearch.setNextFocusRightId(R.id.drawer_search_input);
+            this.clearSearch.setNextFocusLeftId(R.id.drawer_search_clear);
+            this.clearSearch.setNextFocusRightId(R.id.drawer_search_input);
             return;
         }
-        this.mClearSearch.setNextFocusLeftId(R.id.drawer_search_input);
-        this.mClearSearch.setNextFocusRightId(R.id.drawer_search_clear);
+        this.clearSearch.setNextFocusLeftId(R.id.drawer_search_input);
+        this.clearSearch.setNextFocusRightId(R.id.drawer_search_clear);
     }
 
     private void updateSearchControls() {
-        boolean hasQuery = !DrawerSearchFilter.isEmptyQuery(this.mQuery);
-        this.mClearSearch.setVisibility(hasQuery ? VISIBLE : GONE);
-        if (hasQuery && !this.mSearchRevealed) {
+        boolean hasQuery = !DrawerSearchFilter.isEmptyQuery(this.query);
+        this.clearSearch.setVisibility(hasQuery ? VISIBLE : GONE);
+        if (hasQuery && !this.searchRevealed) {
             revealSearchBarImmediate();
         }
     }
 
     private void clearSearch() {
-        this.mSearchInput.setText("");
-        this.mSearchInput.requestFocus();
+        this.searchInput.setText("");
+        this.searchInput.requestFocus();
     }
 
     private void applyDensity() {
-        this.mGridView.setPreferredColumnWidth(
+        this.gridView.setPreferredColumnWidth(
                 DrawerDensityPolicy.getPreferredColumnWidth(getContext()));
     }
 
-    // --- Pull-to-reveal search bar (Fix 3) ---
-
-    /** Collapses search bar to zero height and marks it as not revealed. */
     private void collapseSearchBar() {
-        if (this.mSearchContainer == null) {
+        if (this.searchContainer == null) {
             return;
         }
         ViewGroup.MarginLayoutParams params =
-                (ViewGroup.MarginLayoutParams) this.mSearchContainer.getLayoutParams();
+                (ViewGroup.MarginLayoutParams) this.searchContainer.getLayoutParams();
         params.height = 0;
-        this.mSearchContainer.setLayoutParams(params);
-        this.mSearchContainer.setVisibility(GONE);
-        this.mSearchRevealed = false;
+        this.searchContainer.setLayoutParams(params);
+        this.searchContainer.setVisibility(GONE);
+        this.searchRevealed = false;
     }
 
-    /** Shows search bar at full height without animation. */
     private void revealSearchBarImmediate() {
-        if (this.mSearchContainer == null) {
+        if (this.searchContainer == null) {
             return;
         }
-        ViewGroup.LayoutParams params = this.mSearchContainer.getLayoutParams();
+        ViewGroup.LayoutParams params = this.searchContainer.getLayoutParams();
         params.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-        this.mSearchContainer.setLayoutParams(params);
-        this.mSearchContainer.setVisibility(VISIBLE);
-        this.mSearchRevealed = true;
+        this.searchContainer.setLayoutParams(params);
+        this.searchContainer.setVisibility(VISIBLE);
+        this.searchRevealed = true;
     }
 
-    /**
-     * Returns the measured height of the search container, measuring on demand.
-     * Safe to call only while the drawer is visible and has been laid out.
-     */
     private int getSearchBarMaxHeight() {
-        if (this.mSearchBarMaxHeight == 0 && this.mSearchContainer != null
+        if (this.searchBarMaxHeight == 0 && this.searchContainer != null
                 && getMeasuredWidth() > 0) {
-            this.mSearchContainer.setVisibility(VISIBLE);
-            this.mSearchContainer.measure(
+            this.searchContainer.setVisibility(VISIBLE);
+            this.searchContainer.measure(
                     MeasureSpec.makeMeasureSpec(getMeasuredWidth(), MeasureSpec.AT_MOST),
                     MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-            this.mSearchBarMaxHeight = this.mSearchContainer.getMeasuredHeight();
-            this.mSearchContainer.setVisibility(GONE);
+            this.searchBarMaxHeight = this.searchContainer.getMeasuredHeight();
+            this.searchContainer.setVisibility(GONE);
         }
-        return this.mSearchBarMaxHeight;
+        return this.searchBarMaxHeight;
     }
 
     private boolean isGridAtTop() {
-        if (this.mGridView.getFirstVisiblePosition() != 0) {
+        if (this.gridView.getFirstVisiblePosition() != 0) {
             return false;
         }
-        View firstChild = this.mGridView.getChildAt(0);
-        return firstChild == null || firstChild.getTop() >= this.mGridView.getPaddingTop();
+        View firstChild = this.gridView.getChildAt(0);
+        return firstChild == null || firstChild.getTop() >= this.gridView.getPaddingTop();
     }
 
     @Override
@@ -426,45 +419,45 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return super.onInterceptTouchEvent(event);
         }
-        if (this.mSearchRevealed) {
+        if (this.searchRevealed) {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_DOWN:
-                    this.mPullStartY = event.getY();
-                    this.mInterceptingClose = false;
+                    this.pullStartY = event.getY();
+                    this.interceptingClose = false;
                     break;
                 case MotionEvent.ACTION_MOVE:
-                    float closeDy = event.getY() - this.mPullStartY;
+                    float closeDy = event.getY() - this.pullStartY;
                     int closeSlop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
                     if (closeDy > closeSlop && isGridAtTop()) {
-                        this.mInterceptingClose = true;
+                        this.interceptingClose = true;
                         return true;
                     }
                     break;
                 case MotionEvent.ACTION_CANCEL:
-                    this.mInterceptingClose = false;
+                    this.interceptingClose = false;
                     break;
             }
             return super.onInterceptTouchEvent(event);
         }
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                this.mPullStartY = event.getY();
-                this.mInterceptingPull = false;
+                this.pullStartY = event.getY();
+                this.interceptingPull = false;
                 break;
             case MotionEvent.ACTION_MOVE:
-                float dy = event.getY() - this.mPullStartY;
+                float dy = event.getY() - this.pullStartY;
                 int slop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
                 if (dy > slop && isGridAtTop()) {
-                    this.mInterceptingPull = true;
-                    this.mPullCurrentHeight = 0;
+                    this.interceptingPull = true;
+                    this.pullCurrentHeight = 0;
                     return true;
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
-                this.mInterceptingPull = false;
+                this.interceptingPull = false;
                 break;
         }
         return super.onInterceptTouchEvent(event);
@@ -472,13 +465,13 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (this.mInterceptingClose) {
+        if (this.interceptingClose) {
             switch (event.getActionMasked()) {
                 case MotionEvent.ACTION_MOVE:
                     return true;
                 case MotionEvent.ACTION_UP:
-                    float closeDy = event.getY() - this.mPullStartY;
-                    this.mInterceptingClose = false;
+                    float closeDy = event.getY() - this.pullStartY;
+                    this.interceptingClose = false;
                     performClick();
                     if (closeDy >= closeDragThresholdPx()) {
                         Launcher launcher = getLauncher();
@@ -488,26 +481,26 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
                     }
                     return true;
                 case MotionEvent.ACTION_CANCEL:
-                    this.mInterceptingClose = false;
+                    this.interceptingClose = false;
                     return true;
             }
         }
-        if (!this.mInterceptingPull) {
+        if (!this.interceptingPull) {
             return super.onTouchEvent(event);
         }
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_MOVE:
-                float dy = event.getY() - this.mPullStartY;
+                float dy = event.getY() - this.pullStartY;
                 applyPullReveal(Math.max(0f, dy));
                 return true;
             case MotionEvent.ACTION_UP:
                 finishPullReveal();
-                this.mInterceptingPull = false;
+                this.interceptingPull = false;
                 performClick();
                 return true;
             case MotionEvent.ACTION_CANCEL:
-                snapSearchBarToHidden(this.mPullCurrentHeight);
-                this.mInterceptingPull = false;
+                snapSearchBarToHidden(this.pullCurrentHeight);
+                this.interceptingPull = false;
                 return true;
         }
         return super.onTouchEvent(event);
@@ -519,21 +512,21 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
             return;
         }
         int newHeight = Math.min((int) dragDistance, maxH);
-        this.mPullCurrentHeight = newHeight;
-        if (newHeight > 0 && this.mSearchContainer.getVisibility() != VISIBLE) {
-            this.mSearchContainer.setVisibility(VISIBLE);
+        this.pullCurrentHeight = newHeight;
+        if (newHeight > 0 && this.searchContainer.getVisibility() != VISIBLE) {
+            this.searchContainer.setVisibility(VISIBLE);
         }
-        ViewGroup.LayoutParams params = this.mSearchContainer.getLayoutParams();
+        ViewGroup.LayoutParams params = this.searchContainer.getLayoutParams();
         params.height = newHeight;
-        this.mSearchContainer.setLayoutParams(params);
+        this.searchContainer.setLayoutParams(params);
     }
 
     private void finishPullReveal() {
         int maxH = getSearchBarMaxHeight();
-        if (this.mPullCurrentHeight > maxH / 2) {
-            snapSearchBarToRevealed(this.mPullCurrentHeight);
+        if (this.pullCurrentHeight > maxH / 2) {
+            snapSearchBarToRevealed(this.pullCurrentHeight);
         } else {
-            snapSearchBarToHidden(this.mPullCurrentHeight);
+            snapSearchBarToHidden(this.pullCurrentHeight);
         }
     }
 
@@ -542,21 +535,22 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
         ValueAnimator anim = ValueAnimator.ofInt(fromHeight, maxH);
         anim.setDuration(SEARCH_REVEAL_ANIM_DURATION_MS);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
             public void onAnimationUpdate(ValueAnimator va) {
-                ViewGroup.LayoutParams p = mSearchContainer.getLayoutParams();
+                ViewGroup.LayoutParams p = searchContainer.getLayoutParams();
                 p.height = (int) va.getAnimatedValue();
-                mSearchContainer.setLayoutParams(p);
+                searchContainer.setLayoutParams(p);
             }
         });
         anim.addListener(new AnimatorListenerAdapter() {
             @Override
             public void onAnimationEnd(Animator animation) {
-                ViewGroup.LayoutParams p = mSearchContainer.getLayoutParams();
+                ViewGroup.LayoutParams p = searchContainer.getLayoutParams();
                 p.height = ViewGroup.LayoutParams.WRAP_CONTENT;
-                mSearchContainer.setLayoutParams(p);
-                mSearchContainer.setVisibility(VISIBLE);
-                mSearchRevealed = true;
-                mSearchInput.requestFocus();
+                searchContainer.setLayoutParams(p);
+                searchContainer.setVisibility(VISIBLE);
+                searchRevealed = true;
+                searchInput.requestFocus();
             }
         });
         anim.start();
@@ -570,10 +564,11 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
         ValueAnimator anim = ValueAnimator.ofInt(fromHeight, 0);
         anim.setDuration(SEARCH_REVEAL_ANIM_DURATION_MS);
         anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
             public void onAnimationUpdate(ValueAnimator va) {
-                ViewGroup.LayoutParams p = mSearchContainer.getLayoutParams();
+                ViewGroup.LayoutParams p = searchContainer.getLayoutParams();
                 p.height = (int) va.getAnimatedValue();
-                mSearchContainer.setLayoutParams(p);
+                searchContainer.setLayoutParams(p);
             }
         });
         anim.addListener(new AnimatorListenerAdapter() {
@@ -589,68 +584,65 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
         return (int) (CLOSE_DRAG_THRESHOLD_DP * getResources().getDisplayMetrics().density);
     }
 
-    // --- Lifecycle ---
-
     @Override
     public void setApplications(ArrayList<ApplicationItemInfo> applicationItemInfos) {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
-        DrawerScrollState restoreState = DrawerSearchFilter.isEmptyQuery(this.mQuery)
+        DrawerScrollState restoreState = DrawerSearchFilter.isEmptyQuery(this.query)
                 && !PreferencesUtil.rememberApplicationsPosition(getContext())
                 ? DrawerScrollState.empty() : captureScrollState();
-        this.mSourceItems = applicationItemInfos == null
+        this.sourceItems = applicationItemInfos == null
                 ? new ArrayList<ApplicationItemInfo>()
-                : new ArrayList<ApplicationItemInfo>(applicationItemInfos);
+                : new ArrayList<>(applicationItemInfos);
         submitFilteredItems(restoreState);
     }
 
     @Override
     public void open(boolean animated) {
-        this.mClosing = false;
-        this.mCloseGeneration++;
-        this.mFastScroll.clearSelection();
+        this.closing = false;
+        this.closeGeneration++;
+        this.fastScroll.clearSelection();
         hideFastScrollImmediately();
-        if (this.mSearchRevealed && DrawerSearchFilter.isEmptyQuery(this.mQuery)) {
+        if (this.searchRevealed && DrawerSearchFilter.isEmptyQuery(this.query)) {
             collapseSearchBar();
         }
-        setDrawerControlsEnabled(this.mSearchControlsEnabled);
+        setDrawerControlsEnabled(this.searchControlsEnabled);
         resetVisualState();
-        this.mGridView.prepareOpen();
+        this.gridView.prepareOpen();
         setVisibility(VISIBLE);
         if (animated) {
-            startAnimation(AnimationUtils.loadAnimation(
-                    getContext(), R.anim.apps_scale_in));
+            startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.apps_scale_in));
         }
         invalidate();
     }
 
     @Override
     public boolean close(boolean animated) {
-        if (!this.mGridView.prepareClose()) {
+        if (!this.gridView.prepareClose()) {
             return false;
         }
-        this.mClosing = true;
-        this.mFastScroll.clearSelection();
+        this.closing = true;
+        this.fastScroll.clearSelection();
         hideFastScrollImmediately();
         setDrawerControlsEnabled(false);
-        int closeGeneration = ++this.mCloseGeneration;
+        int generation = ++this.closeGeneration;
         clearQueryForClose();
         hideKeyboard();
         resetVisualState();
         if (!animated) {
-            finishClose(closeGeneration);
+            finishClose(generation);
             return true;
         }
-        startAnimation(createCloseAnimation(closeGeneration));
+        startAnimation(createCloseAnimation(generation));
         return true;
     }
 
     private void clearQueryForClose() {
-        if (!DrawerSearchFilter.isEmptyQuery(this.mQuery)) {
-            this.mSearchInput.setText("");
+        if (!DrawerSearchFilter.isEmptyQuery(this.query)) {
+            this.searchInput.setText("");
         }
-        this.mSearchInput.clearFocus();
+        this.searchInput.clearFocus();
         collapseSearchBar();
     }
 
@@ -662,27 +654,29 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
         }
     }
 
-    private void finishClose(int closeGeneration) {
-        if (closeGeneration != this.mCloseGeneration) {
+    private void finishClose(int generation) {
+        if (generation != this.closeGeneration) {
             return;
         }
         setVisibility(INVISIBLE);
-        this.mGridView.finishClose();
+        this.gridView.finishClose();
         resetVisualState();
     }
 
-    private Animation createCloseAnimation(final int closeGeneration) {
-        Animation animation = AnimationUtils.loadAnimation(
-                getContext(), R.anim.apps_scale_out);
+    private Animation createCloseAnimation(final int generation) {
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.apps_scale_out);
         animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
             public void onAnimationStart(Animation ignored) {
             }
 
+            @Override
             public void onAnimationRepeat(Animation ignored) {
             }
 
+            @Override
             public void onAnimationEnd(Animation ignored) {
-                finishClose(closeGeneration);
+                finishClose(generation);
             }
         });
         return animation;
@@ -700,57 +694,57 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
     @Override
     public void setLoading() {
         setSearchEnabled(false);
-        this.mGridView.setLoading();
+        this.gridView.setLoading();
     }
 
     @Override
     public void setEmpty() {
         setSearchEnabled(false);
-        this.mGridView.setEmpty();
+        this.gridView.setEmpty();
     }
 
     @Override
     public void setError() {
         setSearchEnabled(false);
-        this.mGridView.setError();
+        this.gridView.setError();
     }
 
     @Override
     public void clearState() {
         setSearchEnabled(true);
-        this.mGridView.clearState();
+        this.gridView.clearState();
     }
 
     private void setSearchEnabled(boolean enabled) {
-        this.mSearchControlsEnabled = enabled;
-        if (!this.mClosing) {
+        this.searchControlsEnabled = enabled;
+        if (!this.closing) {
             setDrawerControlsEnabled(enabled);
         }
     }
 
     private void setDrawerControlsEnabled(boolean enabled) {
-        this.mSearchInput.setEnabled(enabled);
-        this.mClearSearch.setEnabled(enabled);
-        this.mFastScroll.setEnabled(enabled);
+        this.searchInput.setEnabled(enabled);
+        this.clearSearch.setEnabled(enabled);
+        this.fastScroll.setEnabled(enabled);
     }
 
     @Override
     public void onDestroy() {
-        this.mDestroyed = true;
-        this.mSubmissionGeneration++;
-        this.mCloseGeneration++;
-        if (this.mFastScrollHandler != null) {
-            this.mFastScrollHandler.removeCallbacks(this.mFastScrollHideRunnable);
+        this.destroyed = true;
+        this.submissionGeneration++;
+        this.closeGeneration++;
+        if (this.fastScrollHandler != null) {
+            this.fastScrollHandler.removeCallbacks(this.fastScrollHideRunnable);
         }
-        this.mGridView.onDestroy();
-        this.mFastScroll.setOnSectionSelectedListener(null);
-        this.mSourceItems.clear();
-        this.mDisplayedItems.clear();
+        this.gridView.onDestroy();
+        this.fastScroll.setOnSectionSelectedListener(null);
+        this.sourceItems.clear();
+        this.displayedItems.clear();
     }
 
     @Override
     public void setBackgroundAlpha(int alpha) {
-        this.mBackgroundAlpha = alpha;
+        this.backgroundAlpha = alpha;
         int surface = WallpaperColorExtractor.getSurface(getContext());
         int background = Color.argb(alpha, Color.red(surface),
                 Color.green(surface), Color.blue(surface));
@@ -760,19 +754,19 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
 
     @Override
     public void refreshPalette() {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
-        setBackgroundAlpha(this.mBackgroundAlpha);
-        this.mGridView.refreshPalette();
-        this.mFastScroll.refreshPalette();
+        setBackgroundAlpha(this.backgroundAlpha);
+        this.gridView.refreshPalette();
+        this.fastScroll.refreshPalette();
         int onSurface = WallpaperColorExtractor.getOnSurface(getContext());
-        this.mSearchInput.setTextColor(onSurface);
-        this.mSearchInput.setHintTextColor(
+        this.searchInput.setTextColor(onSurface);
+        this.searchInput.setHintTextColor(
                 WallpaperColorExtractor.getOutline(getContext()));
-        this.mNoResults.setTextColor(onSurface);
-        this.mClearSearch.setColorFilter(onSurface);
-        this.mSearchInput.setBackground(createSearchBackground());
+        this.noResults.setTextColor(onSurface);
+        this.clearSearch.setColorFilter(onSurface);
+        this.searchInput.setBackground(createSearchBackground());
     }
 
     private GradientDrawable createSearchBackground() {
@@ -793,54 +787,54 @@ public class ApplicationsDrawerView extends LinearLayout implements Applications
     }
 
     ApplicationsGridView getGridView() {
-        return this.mGridView;
+        return this.gridView;
     }
 
     DrawerFastScrollView getFastScrollView() {
-        return this.mFastScroll;
+        return this.fastScroll;
     }
 
     @Override
     public Launcher getLauncher() {
-        return this.mGridView.getLauncher();
+        return this.gridView.getLauncher();
     }
 
     @Override
     public void setDragController(DragController dragController) {
-        this.mGridView.setDragController(dragController);
+        this.gridView.setDragController(dragController);
     }
 
     @Override
     public void setLauncher(Launcher launcher) {
-        this.mGridView.setLauncher(launcher);
+        this.gridView.setLauncher(launcher);
     }
 
     @Override
     public int getMode() {
-        return this.mGridView.getMode();
+        return this.gridView.getMode();
     }
 
     @Override
     public void setMode(int mode) {
-        this.mGridView.setMode(mode);
+        this.gridView.setMode(mode);
     }
 
     @Override
     public void setNumColumns(int columns) {
-        this.mGridView.setNumColumns(columns);
+        this.gridView.setNumColumns(columns);
     }
 
     @Override
     public void setSystemBarInsets(int left, int top, int right, int bottom) {
-        setPadding(this.mBasePaddingLeft + Math.max(0, left),
-                this.mBasePaddingTop + Math.max(0, top),
-                this.mBasePaddingRight + Math.max(0, right),
-                this.mBasePaddingBottom + Math.max(0, bottom));
+        setPadding(this.basePaddingLeft + Math.max(0, left),
+                this.basePaddingTop + Math.max(0, top),
+                this.basePaddingRight + Math.max(0, right),
+                this.basePaddingBottom + Math.max(0, bottom));
         requestLayout();
     }
 
     @Override
     public void setSystemGestureInsets(Rect insets) {
-        this.mGridView.setSystemGestureInsets(insets);
+        this.gridView.setSystemGestureInsets(insets);
     }
 }

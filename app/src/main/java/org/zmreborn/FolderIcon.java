@@ -2,74 +2,87 @@ package org.zmreborn;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+/**
+ * Desktop and dock icon representing a user folder of grouped shortcuts.
+ */
 public class FolderIcon extends BubbleTextView implements DropTarget {
-    private Drawable mCloseIcon;
-    private UserFolderInfo mInfo;
-    private Launcher mLauncher;
-    private Drawable mOpenIcon;
+    private Drawable closeIcon;
+    private UserFolderInfo info;
+    private Launcher launcher;
+    private Drawable openIcon;
 
+    /**
+     * Constructs a FolderIcon with context and XML attributes.
+     */
     public FolderIcon(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
+    /**
+     * Constructs a FolderIcon with context.
+     */
     public FolderIcon(Context context) {
         super(context);
     }
 
     static FolderIcon fromXml(int resId, Launcher launcher, ViewGroup group, UserFolderInfo folderInfo) {
-        Resources resources = launcher.getResources();
         FolderIcon icon = (FolderIcon) LayoutInflater.from(launcher).inflate(resId, group, false);
-        Drawable drawableOpen = resources.getDrawable(R.drawable.ic_launcher_folder_open);
-        Drawable drawableClosed = resources.getDrawable(R.drawable.ic_launcher_folder);
-        icon.mCloseIcon = Utilities.createIconThumbnail(drawableClosed, launcher);
-        icon.mOpenIcon = drawableOpen;
-        icon.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, drawableClosed, (Drawable) null, (Drawable) null);
+        Drawable drawableOpen = launcher.getDrawable(R.drawable.ic_launcher_folder_open);
+        Drawable drawableClosed = launcher.getDrawable(R.drawable.ic_launcher_folder);
+        icon.closeIcon = Utilities.createIconThumbnail(drawableClosed, launcher);
+        icon.openIcon = drawableOpen;
+        icon.setCompoundDrawablesWithIntrinsicBounds(null, drawableClosed, null, null);
         if (PreferencesUtil.isShowShortcutTitlesEnabled(launcher)) {
             icon.setText(folderInfo.title);
         }
         int itemCount = folderInfo.contents.size();
-        String description = launcher.getResources().getString(R.string.accessibility_folder_with_items, folderInfo.title, itemCount);
+        String description = launcher.getResources().getString(
+                R.string.accessibility_folder_with_items, folderInfo.title, itemCount);
         icon.setContentDescription(description);
         icon.setTag(folderInfo);
         icon.setOnClickListener(launcher);
-        icon.mInfo = folderInfo;
-        icon.mLauncher = launcher;
+        icon.info = folderInfo;
+        icon.launcher = launcher;
         return icon;
     }
 
+    @Override
     public boolean acceptDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
+        if (!(dragInfo instanceof ItemInfo) || this.info == null) {
+            return false;
+        }
         ItemInfo itemInfo = (ItemInfo) dragInfo;
         int itemType = itemInfo.itemType;
-        if ((itemType == 0 || itemType == 1) && itemInfo.container != this.mInfo.f3id) {
-            return true;
-        }
-        return false;
+        return (itemType == 0 || itemType == 1) && itemInfo.container != this.info.id;
     }
 
-    public Rect estimateDropLocation(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo, Rect recycle) {
-        return null;
-    }
-
+    @Override
     public void onDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
-        ApplicationItemInfo item = (ApplicationItemInfo) dragInfo;
-        this.mInfo.add(item);
-        LauncherModel.addOrMoveItemInDatabase(this.mLauncher, item, this.mInfo.f3id, 0, 0, 0);
+        if (dragInfo instanceof ApplicationItemInfo && this.info != null) {
+            ApplicationItemInfo item = (ApplicationItemInfo) dragInfo;
+            this.info.add(item);
+            if (this.launcher != null) {
+                LauncherModel.addOrMoveItemInDatabase(this.launcher, item, this.info.id, 0, 0, 0);
+            }
+        }
     }
 
+    @Override
     public void onDragEnter(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
-        setCompoundDrawablesWithIntrinsicBounds((Drawable) null, this.mOpenIcon, (Drawable) null, (Drawable) null);
+        setCompoundDrawablesWithIntrinsicBounds(null, this.openIcon, null, null);
     }
 
+    @Override
     public void onDragOver(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
     }
 
+    @Override
     public void onDragExit(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
-        setCompoundDrawablesWithIntrinsicBounds((Drawable) null, this.mCloseIcon, (Drawable) null, (Drawable) null);
+        setCompoundDrawablesWithIntrinsicBounds(null, this.closeIcon, null, null);
     }
 }

@@ -7,23 +7,46 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
+/**
+ * Projects flat application lists and drawer folders into a combined item list where assigned applications are nested inside folder tiles.
+ */
 final class AppListFolderProjection {
     private AppListFolderProjection() {
     }
 
+    /**
+     * Projects folders and application items into a combined ordered list.
+     *
+     * @param folders list of configured drawer folders
+     * @param applications list of installed applications
+     * @return combined list with folder tiles preceding unassigned applications
+     */
     static ArrayList<ApplicationItemInfo> project(List<AppListFolderRecord> folders,
             List<ApplicationItemInfo> applications) {
-        HashMap<String, ApplicationItemInfo> byComponent = indexApplications(applications);
+        if (folders == null || folders.isEmpty()) {
+            return applications != null ? new ArrayList<>(applications) : new ArrayList<ApplicationItemInfo>();
+        }
+        if (applications == null || applications.isEmpty()) {
+            ArrayList<ApplicationItemInfo> emptyResult = new ArrayList<>();
+            for (AppListFolderRecord folder : folders) {
+                emptyResult.add(new AppListFolderInfo(folder.getId(), folder.getTitle(), Collections.<ApplicationItemInfo>emptyList()));
+            }
+            return emptyResult;
+        }
+
+        Map<String, ApplicationItemInfo> byComponent = indexApplications(applications);
         ArrayList<AppListFolderRecord> orderedFolders = new ArrayList<>(folders);
         Collections.sort(orderedFolders, new Comparator<AppListFolderRecord>() {
+            @Override
             public int compare(AppListFolderRecord left, AppListFolderRecord right) {
                 int titleOrder = left.getTitle().compareToIgnoreCase(right.getTitle());
                 if (titleOrder != 0) {
                     return titleOrder;
                 }
-                return left.getPosition() - right.getPosition();
+                return Integer.compare(left.getPosition(), right.getPosition());
             }
         });
         Set<String> assignedComponents = new HashSet<>();
@@ -48,9 +71,9 @@ final class AppListFolderProjection {
         return result;
     }
 
-    private static HashMap<String, ApplicationItemInfo> indexApplications(
+    private static Map<String, ApplicationItemInfo> indexApplications(
             List<ApplicationItemInfo> applications) {
-        HashMap<String, ApplicationItemInfo> byComponent = new HashMap<>();
+        Map<String, ApplicationItemInfo> byComponent = new HashMap<>();
         for (ApplicationItemInfo application : applications) {
             byComponent.put(componentNameOf(application), application);
         }
@@ -58,6 +81,9 @@ final class AppListFolderProjection {
     }
 
     static String componentNameOf(ApplicationItemInfo application) {
+        if (application == null) {
+            return "";
+        }
         if (application.componentName != null) {
             return application.componentName;
         }

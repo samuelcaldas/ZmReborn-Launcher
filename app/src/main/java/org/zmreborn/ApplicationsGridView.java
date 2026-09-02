@@ -13,40 +13,53 @@ import android.widget.ListAdapter;
 import java.util.ArrayList;
 import org.zmreborn.theme.WallpaperColorExtractor;
 
-public class ApplicationsGridView extends GridView implements ApplicationsView, AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, DragSource {
-    private DragController mDragController;
-    private Launcher mLauncher;
-    private boolean mActionsEnabled = true;
-    private boolean mClosing;
-    private boolean mDestroyed;
-    public int mMode;
-    private boolean mResetMode;
-    private int mBasePaddingBottom;
-    private int mBasePaddingLeft;
-    private int mBasePaddingRight;
-    private int mBasePaddingTop;
-    private int mFastScrollInsetEnd;
-    private boolean mFastScrollVisible;
-    private int mSystemBarInsetBottom;
-    private int mSystemBarInsetLeft;
-    private int mSystemBarInsetRight;
-    private int mSystemBarInsetTop;
-    private Rect mSystemGestureInsets;
+/**
+ * Grid view displaying applications within the app drawer.
+ */
+public class ApplicationsGridView extends GridView implements ApplicationsView,
+        AdapterView.OnItemClickListener, AdapterView.OnItemLongClickListener, DragSource {
+    private DragController dragController;
+    private Launcher launcher;
+    private boolean actionsEnabled = true;
+    private boolean closing;
+    private boolean destroyed;
+    public int mode;
+    private boolean resetMode;
+    private int basePaddingBottom;
+    private int basePaddingLeft;
+    private int basePaddingRight;
+    private int basePaddingTop;
+    private int fastScrollInsetEnd;
+    private boolean fastScrollVisible;
+    private int systemBarInsetBottom;
+    private int systemBarInsetLeft;
+    private int systemBarInsetRight;
+    private int systemBarInsetTop;
+    private Rect systemGestureInsets;
 
+    /**
+     * Constructs an applications grid view with context.
+     */
     public ApplicationsGridView(Context context) {
         super(context);
-        this.mMode = 0;
+        this.mode = 0;
         configureResponsiveColumns();
     }
 
+    /**
+     * Constructs an applications grid view with context and attributes.
+     */
     public ApplicationsGridView(Context context, AttributeSet attrs) {
         this(context, attrs, 16842865);
     }
 
+    /**
+     * Constructs an applications grid view with context, attributes, and default style.
+     */
     public ApplicationsGridView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        this.mMode = 0;
-        this.mResetMode = true;
+        this.mode = 0;
+        this.resetMode = true;
         setSelector(SelectorDrawable.createSelector(context, true));
         setTextFilterEnabled(false);
         setScrollingCacheEnabled(false);
@@ -70,17 +83,18 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
         requestLayout();
     }
 
+    @Override
     public void setSystemBarInsets(int left, int top, int right, int bottom) {
-        this.mSystemBarInsetLeft = Math.max(0, left);
-        this.mSystemBarInsetTop = Math.max(0, top);
-        this.mSystemBarInsetRight = Math.max(0, right);
-        this.mSystemBarInsetBottom = Math.max(0, bottom);
+        this.systemBarInsetLeft = Math.max(0, left);
+        this.systemBarInsetTop = Math.max(0, top);
+        this.systemBarInsetRight = Math.max(0, right);
+        this.systemBarInsetBottom = Math.max(0, bottom);
         updatePadding();
     }
 
     void setFastScrollVisible(boolean visible) {
-        this.mFastScrollVisible = visible;
-        this.mFastScrollInsetEnd = visible ? getResources().getDimensionPixelSize(
+        this.fastScrollVisible = visible;
+        this.fastScrollInsetEnd = visible ? getResources().getDimensionPixelSize(
                 R.dimen.drawer_fast_scroll_width) : 0;
         updateFastScrollFocus();
         updatePadding();
@@ -95,7 +109,7 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
 
     private void updateFastScrollFocus() {
         int gridId = R.id.apps_grid_content;
-        int railId = this.mFastScrollVisible ? R.id.drawer_fast_scroll : gridId;
+        int railId = this.fastScrollVisible ? R.id.drawer_fast_scroll : gridId;
         if (isLayoutDirectionRtl()) {
             setNextFocusLeftId(railId);
             setNextFocusRightId(gridId);
@@ -110,19 +124,21 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
     }
 
     private void updatePadding() {
-        int fastScrollInsetLeft = isLayoutDirectionRtl() ? this.mFastScrollInsetEnd : 0;
-        int fastScrollInsetRight = isLayoutDirectionRtl() ? 0 : this.mFastScrollInsetEnd;
-        setPadding(this.mBasePaddingLeft + this.mSystemBarInsetLeft + fastScrollInsetLeft,
-                this.mBasePaddingTop + this.mSystemBarInsetTop,
-                this.mBasePaddingRight + this.mSystemBarInsetRight + fastScrollInsetRight,
-                this.mBasePaddingBottom + this.mSystemBarInsetBottom);
+        int fastScrollInsetLeft = isLayoutDirectionRtl() ? this.fastScrollInsetEnd : 0;
+        int fastScrollInsetRight = isLayoutDirectionRtl() ? 0 : this.fastScrollInsetEnd;
+        setPadding(this.basePaddingLeft + this.systemBarInsetLeft + fastScrollInsetLeft,
+                this.basePaddingTop + this.systemBarInsetTop,
+                this.basePaddingRight + this.systemBarInsetRight + fastScrollInsetRight,
+                this.basePaddingBottom + this.systemBarInsetBottom);
         requestLayout();
     }
 
+    @Override
     public void setSystemGestureInsets(Rect insets) {
-        this.mSystemGestureInsets = insets;
+        this.systemGestureInsets = insets;
     }
 
+    @Override
     public void setBackgroundAlpha(int alpha) {
         int surface = WallpaperColorExtractor.getSurface(getContext());
         int background = Color.argb(alpha, Color.red(surface), Color.green(surface),
@@ -134,7 +150,7 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
 
     @Override
     public void refreshPalette() {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
         ApplicationsAdapter applicationsAdapter = (ApplicationsAdapter) getAdapter();
@@ -147,9 +163,10 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
         invalidate();
     }
 
-    public void setMode(int mode) {
-        if (this.mMode == mode) {
-            if (mode != MODE_DEFAULT) {
+    @Override
+    public void setMode(int newMode) {
+        if (this.mode == newMode) {
+            if (newMode != MODE_DEFAULT) {
                 setMode(MODE_DEFAULT);
             }
             return;
@@ -157,100 +174,101 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
         Context context = getContext();
         ApplicationsAdapter applicationsAdapter = (ApplicationsAdapter) getAdapter();
         if (applicationsAdapter == null) {
-            this.mMode = mode;
+            this.mode = newMode;
             return;
         }
-        switch (mode) {
-            case 0:
-                setSelector(SelectorDrawable.createSelector(context, true));
-                applicationsAdapter.setUninstalling(false);
-                applicationsAdapter.notifyDataSetChanged();
-                break;
-            case 1:
-                setSelector(17170445);
-                applicationsAdapter.setUninstalling(true);
-                applicationsAdapter.notifyDataSetChanged();
-                break;
+        if (newMode == MODE_DEFAULT) {
+            setSelector(SelectorDrawable.createSelector(context, true));
+            applicationsAdapter.setUninstalling(false);
+            applicationsAdapter.notifyDataSetChanged();
+        } else if (newMode == MODE_UNINSTALL) {
+            setSelector(17170445);
+            applicationsAdapter.setUninstalling(true);
+            applicationsAdapter.notifyDataSetChanged();
         }
-        this.mMode = mode;
+        this.mode = newMode;
     }
 
-    /* access modifiers changed from: protected */
-    public void onFinishInflate() {
+    @Override
+    protected void onFinishInflate() {
         super.onFinishInflate();
-        this.mBasePaddingLeft = getPaddingLeft();
-        this.mBasePaddingTop = getPaddingTop();
-        this.mBasePaddingRight = getPaddingRight();
-        this.mBasePaddingBottom = getPaddingBottom();
+        this.basePaddingLeft = getPaddingLeft();
+        this.basePaddingTop = getPaddingTop();
+        this.basePaddingRight = getPaddingRight();
+        this.basePaddingBottom = getPaddingBottom();
         setOnItemClickListener(this);
         setOnItemLongClickListener(this);
     }
 
+    @Override
     public void onItemClick(AdapterView parent, View v, int position, long id) {
-        if (!this.mActionsEnabled || this.mClosing) {
+        if (!this.actionsEnabled || this.closing) {
             return;
         }
-        ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) parent.getItemAtPosition(position);
-        if (applicationItemInfo instanceof AppListFolderInfo) {
-            if (this.mMode == 0) {
-                this.mLauncher.openAppListFolder((AppListFolderInfo) applicationItemInfo);
+        ApplicationItemInfo item = (ApplicationItemInfo) parent.getItemAtPosition(position);
+        if (item instanceof AppListFolderInfo) {
+            if (this.mode == MODE_DEFAULT && this.launcher != null) {
+                this.launcher.openAppListFolder((AppListFolderInfo) item);
             }
             return;
         }
-        switch (this.mMode) {
-            case 0:
-                this.mResetMode = true;
-                this.mLauncher.startActivitySafely(applicationItemInfo.intent);
-                return;
-            case 1:
-                if (Utilities.canUninstallApplication(getContext(), applicationItemInfo)) {
-                    this.mResetMode = false;
-                    this.mLauncher.uninstallApplication(applicationItemInfo);
-                    return;
-                }
-                return;
-            default:
-                return;
+        if (this.mode == MODE_DEFAULT && this.launcher != null) {
+            this.resetMode = true;
+            this.launcher.startActivitySafely(item.intent);
+            return;
+        }
+        if (this.mode == MODE_UNINSTALL && Utilities.canUninstallApplication(getContext(), item) && this.launcher != null) {
+            this.resetMode = false;
+            this.launcher.uninstallApplication(item);
         }
     }
 
+    @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
-        if (!this.mActionsEnabled || this.mClosing
-                || this.mMode != 0 || !view.isInTouchMode()) {
+        if (!this.actionsEnabled || this.closing || this.mode != MODE_DEFAULT || !view.isInTouchMode()) {
             return false;
         }
-        ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) parent.getItemAtPosition(position);
-        if (applicationItemInfo instanceof AppListFolderInfo) {
-            this.mLauncher.showAppListFolderActions((AppListFolderInfo) applicationItemInfo);
+        ApplicationItemInfo item = (ApplicationItemInfo) parent.getItemAtPosition(position);
+        if (item instanceof AppListFolderInfo) {
+            if (this.launcher != null) {
+                this.launcher.showAppListFolderActions((AppListFolderInfo) item);
+            }
             return true;
         }
-        this.mDragController.startDrag(view, this, new ApplicationItemInfo(applicationItemInfo), 1);
-        this.mLauncher.closeAllApplications();
+        if (this.dragController != null) {
+            this.dragController.startDrag(view, this, new ApplicationItemInfo(item), DragController.DRAG_ACTION_COPY);
+        }
+        if (this.launcher != null) {
+            this.launcher.closeAllApplications();
+        }
         return true;
     }
 
-    public void setDragController(DragController dragController) {
-        this.mDragController = dragController;
+    @Override
+    public void setDragController(DragController controller) {
+        this.dragController = controller;
     }
 
+    @Override
     public void onDropCompleted(View target, boolean success) {
     }
 
-    public void setLauncher(Launcher launcher) {
-        this.mLauncher = launcher;
+    @Override
+    public void setLauncher(Launcher launcherInstance) {
+        this.launcher = launcherInstance;
     }
 
+    @Override
     public void open(boolean animated) {
         prepareOpen();
         if (animated) {
-            startAnimation(AnimationUtils.loadAnimation(
-                    getContext(), R.anim.apps_scale_in));
+            startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.apps_scale_in));
         }
         invalidate();
     }
 
     void prepareOpen() {
-        this.mClosing = false;
+        this.closing = false;
         updateInputEnabled();
         resetVisualState();
         if (!PreferencesUtil.rememberApplicationsPosition(getContext())) {
@@ -259,6 +277,7 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
         setVisibility(VISIBLE);
     }
 
+    @Override
     public boolean close(boolean animated) {
         if (!prepareClose()) {
             return false;
@@ -272,14 +291,14 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
     }
 
     boolean prepareClose() {
-        if (this.mMode != MODE_DEFAULT) {
-            if (this.mResetMode) {
+        if (this.mode != MODE_DEFAULT) {
+            if (this.resetMode) {
                 setMode(MODE_DEFAULT);
             }
-            this.mResetMode = true;
+            this.resetMode = true;
             return false;
         }
-        this.mClosing = true;
+        this.closing = true;
         updateInputEnabled();
         resetVisualState();
         return true;
@@ -290,87 +309,93 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
         resetVisualState();
     }
 
+    @Override
     public void setLoading() {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
-        this.mActionsEnabled = false;
+        this.actionsEnabled = false;
         updateInputEnabled();
-        if (this.mLauncher != null) {
-            this.mLauncher.onApplicationsLoading();
+        if (this.launcher != null) {
+            this.launcher.onApplicationsLoading();
         }
     }
 
+    @Override
     public void setApplications(ArrayList<ApplicationItemInfo> applicationItemInfos) {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
-        ArrayList<ApplicationItemInfo> items = applicationItemInfos;
-        if (items == null) {
-            items = new ArrayList<>();
-        }
+        ArrayList<ApplicationItemInfo> items = applicationItemInfos == null
+                ? new ArrayList<ApplicationItemInfo>() : applicationItemInfos;
         ApplicationsAdapter applicationsAdapter = new ApplicationsAdapter(getContext(), items);
-        applicationsAdapter.setUninstalling(this.mMode == MODE_UNINSTALL);
+        applicationsAdapter.setUninstalling(this.mode == MODE_UNINSTALL);
         setAdapter(applicationsAdapter);
         resetPositionIfNeeded();
     }
 
+    @Override
     public void setEmpty() {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
-        this.mActionsEnabled = false;
+        this.actionsEnabled = false;
         updateInputEnabled();
-        if (this.mLauncher != null) {
-            this.mLauncher.onApplicationsEmpty();
+        if (this.launcher != null) {
+            this.launcher.onApplicationsEmpty();
         }
     }
 
+    @Override
     public void setError() {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
-        this.mActionsEnabled = false;
+        this.actionsEnabled = false;
         updateInputEnabled();
-        if (this.mLauncher != null) {
-            this.mLauncher.onApplicationsError();
+        if (this.launcher != null) {
+            this.launcher.onApplicationsError();
         }
     }
 
+    @Override
     public void clearState() {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
-        this.mActionsEnabled = true;
+        this.actionsEnabled = true;
         updateInputEnabled();
-        if (this.mLauncher != null) {
-            this.mLauncher.onApplicationsReady();
+        if (this.launcher != null) {
+            this.launcher.onApplicationsReady();
         }
     }
 
     private void updateInputEnabled() {
-        setEnabled(this.mActionsEnabled && !this.mClosing);
+        setEnabled(this.actionsEnabled && !this.closing);
     }
 
+    @Override
     public void onDestroy() {
-        this.mDestroyed = true;
-        this.mActionsEnabled = false;
+        this.destroyed = true;
+        this.actionsEnabled = false;
         setEnabled(false);
         clearTextFilter();
         setAdapter((ListAdapter) null);
     }
 
+    @Override
     public View getImplementingView() {
         return this;
     }
 
+    @Override
     public Launcher getLauncher() {
-        return this.mLauncher;
+        return this.launcher;
     }
 
     @Override
     public int getMode() {
-        return this.mMode;
+        return this.mode;
     }
 
     private void resetPositionIfNeeded() {
@@ -389,15 +414,17 @@ public class ApplicationsGridView extends GridView implements ApplicationsView, 
     }
 
     private Animation createCloseAnimation() {
-        Animation animation = AnimationUtils.loadAnimation(
-                getContext(), R.anim.apps_scale_out);
+        Animation animation = AnimationUtils.loadAnimation(getContext(), R.anim.apps_scale_out);
         animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
             public void onAnimationStart(Animation ignored) {
             }
 
+            @Override
             public void onAnimationRepeat(Animation ignored) {
             }
 
+            @Override
             public void onAnimationEnd(Animation ignored) {
                 finishClose();
             }

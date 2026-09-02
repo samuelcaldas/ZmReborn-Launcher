@@ -187,13 +187,13 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private Button mApplicationsStateClose;
     private AlertDialog mAppListFolderDialog;
     private AppListFolderPaletteBinder mAppListFolderPaletteBinder;
-    private final BroadcastReceiver mApplicationsReceiver = new ApplicationsIntentReceiver(this, (ApplicationsIntentReceiver) null);
+    private final BroadcastReceiver mApplicationsReceiver = new ApplicationsIntentReceiver();
     /* access modifiers changed from: private */
     public ApplicationsView mApplicationsView;
     private DesktopBinder mBinder;
     private boolean mBootstrap = false;
     private final int[] mCellCoordinates = new int[2];
-    private final BroadcastReceiver mCloseSystemDialogsReceiver = new CloseSystemDialogsIntentReceiver(this, (CloseSystemDialogsIntentReceiver) null);
+    private final BroadcastReceiver mCloseSystemDialogsReceiver = new CloseSystemDialogsIntentReceiver();
     private SpannableStringBuilder mDefaultKeySsb = null;
     /* access modifiers changed from: private */
     public boolean mDesktopLocked = LOGD;
@@ -319,7 +319,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     private void checkForLocaleChange() {
-        LocaleConfiguration localeConfiguration = new LocaleConfiguration((LocaleConfiguration) null);
+        LocaleConfiguration localeConfiguration = new LocaleConfiguration();
         readConfiguration(this, localeConfiguration);
         Configuration configuration = getResources().getConfiguration();
         String previousLocale = localeConfiguration.locale;
@@ -342,13 +342,9 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         public int mcc;
         public int mnc;
 
-        private LocaleConfiguration() {
+        LocaleConfiguration() {
             this.mcc = -1;
             this.mnc = -1;
-        }
-
-        /* synthetic */ LocaleConfiguration(LocaleConfiguration localeConfiguration) {
-            this();
         }
     }
 
@@ -1516,7 +1512,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             int count = folders.size();
             long[] ids = new long[count];
             for (int i = 0; i < count; i++) {
-                ids[i] = folders.get(i).getInfo().f3id;
+                ids[i] = folders.get(i).getInfo().id;
             }
             outState.putLongArray(RUNTIME_STATE_USER_FOLDERS, ids);
         }
@@ -1555,7 +1551,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 this.mPendingAppWidgetInsertAtFirst);
         if (this.mFolderInfo != null && this.mWaitingForResult) {
             outState.putBoolean(RUNTIME_STATE_PENDING_FOLDER_RENAME, LOGD);
-            outState.putLong(RUNTIME_STATE_PENDING_FOLDER_RENAME_ID, this.mFolderInfo.f3id);
+            outState.putLong(RUNTIME_STATE_PENDING_FOLDER_RENAME_ID, this.mFolderInfo.id);
         }
     }
 
@@ -2906,15 +2902,15 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         return this.mDock;
     }
 
-    /* access modifiers changed from: protected */
-    public Dialog onCreateDialog(int id) {
+    @Override
+    protected Dialog onCreateDialog(int id) {
         switch (id) {
             case 1:
-                return new LauncherDialog(this, (LauncherDialog) null).createDialog();
+                return new LauncherDialog().createDialog();
             case 2:
-                return new AddDialog(this, (AddDialog) null).createDialog();
+                return new AddDialog().createDialog();
             case 3:
-                return new RenameFolderDialog(this, (RenameFolderDialog) null).createDialog();
+                return new RenameFolderDialog().createDialog();
             default:
                 return super.onCreateDialog(id);
         }
@@ -3075,11 +3071,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private class RenameFolderDialog {
         private EditText mInput;
 
-        private RenameFolderDialog() {
-        }
-
-        /* synthetic */ RenameFolderDialog(Launcher launcher, RenameFolderDialog renameFolderDialog) {
-            this();
+        RenameFolderDialog() {
         }
 
         /* access modifiers changed from: package-private */
@@ -3123,7 +3115,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
         public void changeFolderName() {
             String name = this.mInput.getText().toString();
             if (!TextUtils.isEmpty(name)) {
-                Launcher.this.mFolderInfo = Launcher.sLauncherModel.findFolderById(Launcher.this.mFolderInfo.f3id);
+                Launcher.this.mFolderInfo = Launcher.sLauncherModel.findFolderById(Launcher.this.mFolderInfo.id);
                 Launcher.this.mFolderInfo.title = name;
                 LauncherModel.updateItemInDatabase(Launcher.this, Launcher.this.mFolderInfo);
                 if (Launcher.this.mDesktopLocked) {
@@ -3154,11 +3146,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private class LauncherDialog implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener, DialogInterface.OnDismissListener {
         private LauncherDialogAdapter mHomeDialogAdapter;
 
-        private LauncherDialog() {
-        }
-
-        /* synthetic */ LauncherDialog(Launcher launcher, LauncherDialog launcherDialog) {
-            this();
+        LauncherDialog() {
         }
 
         /* access modifiers changed from: package-private */
@@ -3196,7 +3184,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             LauncherDialogAdapter.ListItem selectedItem =
                     (LauncherDialogAdapter.ListItem) this.mHomeDialogAdapter.getItem(which);
             cleanup();
-            switch (selectedItem.mActionTag) {
+            switch (selectedItem.actionTag) {
                 case AddDialogAdapter.ITEM_WIDGETS:
                     Launcher.this.startAddWidgets();
                     return;
@@ -3214,7 +3202,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                     return;
                 default:
                     throw new IllegalArgumentException(
-                            "Unknown launcher dialog action tag: " + selectedItem.mActionTag);
+                            "Unknown launcher dialog action tag: " + selectedItem.actionTag);
             }
         }
     }
@@ -3222,11 +3210,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     private class AddDialog implements DialogInterface.OnClickListener, DialogInterface.OnCancelListener, DialogInterface.OnDismissListener {
         private AddDialogAdapter mAdapter;
 
-        private AddDialog() {
-        }
-
-        /* synthetic */ AddDialog(Launcher launcher, AddDialog addDialog) {
-            this();
+        AddDialog() {
         }
 
         /* access modifiers changed from: package-private */
@@ -3265,7 +3249,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
             AddDialogAdapter.ListItem selectedItem =
                     (AddDialogAdapter.ListItem) this.mAdapter.getItem(which);
             cleanup();
-            switch (selectedItem.mActionTag) {
+            switch (selectedItem.actionTag) {
                 case AddDialogAdapter.ITEM_WIDGETS:
                     Launcher.this.startAddWidgets();
                     return;
@@ -3277,17 +3261,13 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                     return;
                 default:
                     throw new IllegalArgumentException(
-                            "Unknown add dialog action tag: " + selectedItem.mActionTag);
+                            "Unknown add dialog action tag: " + selectedItem.actionTag);
             }
         }
     }
 
     private class ApplicationsIntentReceiver extends BroadcastReceiver {
-        private ApplicationsIntentReceiver() {
-        }
-
-        /* synthetic */ ApplicationsIntentReceiver(Launcher launcher, ApplicationsIntentReceiver applicationsIntentReceiver) {
-            this();
+        ApplicationsIntentReceiver() {
         }
 
         public void onReceive(Context context, Intent intent) {
@@ -3328,11 +3308,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
     }
 
     private class CloseSystemDialogsIntentReceiver extends BroadcastReceiver {
-        private CloseSystemDialogsIntentReceiver() {
-        }
-
-        /* synthetic */ CloseSystemDialogsIntentReceiver(Launcher launcher, CloseSystemDialogsIntentReceiver closeSystemDialogsIntentReceiver) {
-            this();
+        CloseSystemDialogsIntentReceiver() {
         }
 
         public void onReceive(Context context, Intent intent) {
@@ -3712,7 +3688,7 @@ public final class Launcher extends Activity implements View.OnClickListener, Vi
                 return;
             case 5:
                 if (!this.mPreviewsShowing) {
-                    showPreviews(0, this.mWorkspace.mScreenCount);
+                    showPreviews(0, this.mWorkspace.getScreenCount());
                     return;
                 } else {
                     dismissPreviews();

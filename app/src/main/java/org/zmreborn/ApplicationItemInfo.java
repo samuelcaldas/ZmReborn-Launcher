@@ -10,12 +10,15 @@ import android.util.Log;
 import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.Iterator;
+import java.util.List;
 import org.zmreborn.LauncherSettings;
 
+/**
+ * Item model representing an installed launcher activity, application shortcut, or custom shortcut tile.
+ */
 class ApplicationItemInfo extends ItemInfo {
-    /* access modifiers changed from: private */
-    public static final Collator sCollator = Collator.getInstance();
+    private static final Collator COLLATOR = Collator.getInstance();
+
     boolean customIcon;
     boolean filtered;
     String componentName;
@@ -27,13 +30,16 @@ class ApplicationItemInfo extends ItemInfo {
     Bitmap titleBitmap;
 
     ApplicationItemInfo() {
-        this.itemType = 1;
+        this.itemType = LauncherSettings.Favorites.ITEM_TYPE_SHORTCUT;
     }
 
-    public ApplicationItemInfo(ApplicationItemInfo info) {
+    ApplicationItemInfo(ApplicationItemInfo info) {
         super(info);
-        this.title = info.title.toString();
-        this.intent = new Intent(info.intent);
+        if (info == null) {
+            return;
+        }
+        this.title = info.title != null ? info.title.toString() : null;
+        this.intent = info.intent != null ? new Intent(info.intent) : null;
         if (info.iconResource != null) {
             this.iconResource = new Intent.ShortcutIconResource();
             this.iconResource.packageName = info.iconResource.packageName;
@@ -45,20 +51,28 @@ class ApplicationItemInfo extends ItemInfo {
         this.componentName = info.componentName;
     }
 
-    /* access modifiers changed from: package-private */
-    public final void setIntent(Intent intent2) {
+    final void setIntent(Intent intent) {
+        this.intent = intent;
     }
 
-    /* access modifiers changed from: package-private */
-    public final void setActivity(ComponentName className, int launchFlags) {
+    /**
+     * Sets the launch activity ComponentName and standard launcher flags.
+     */
+    final void setActivity(ComponentName className, int launchFlags) {
+        if (className == null) {
+            return;
+        }
         this.componentName = className.flattenToString();
-        this.intent = new Intent("android.intent.action.MAIN");
-        this.intent.addCategory("android.intent.category.LAUNCHER");
+        this.intent = new Intent(Intent.ACTION_MAIN);
+        this.intent.addCategory(Intent.CATEGORY_LAUNCHER);
         this.intent.setComponent(className);
         this.intent.setFlags(launchFlags);
-        this.itemType = 0;
+        this.itemType = LauncherSettings.Favorites.ITEM_TYPE_APPLICATION;
     }
 
+    /**
+     * Returns a stable unique key identifying this application item across drawer rebuilds and sorting.
+     */
     String getStableKey() {
         if (this.componentName != null && this.componentName.length() > 0) {
             return "component:" + this.componentName;
@@ -72,60 +86,64 @@ class ApplicationItemInfo extends ItemInfo {
         return "title:" + String.valueOf(this.title);
     }
 
-    /* access modifiers changed from: package-private */
-    public void onAddToDatabase(ContentValues values) {
-        String titleStr;
-        String uri;
-        Bitmap bitmap;
+    @Override
+    void onAddToDatabase(ContentValues values) {
         super.onAddToDatabase(values);
-        if (this.title != null) {
-            titleStr = this.title.toString();
-        } else {
-            titleStr = null;
-        }
+        String titleStr = this.title != null ? this.title.toString() : null;
         values.put(LauncherSettings.BaseLauncherColumns.TITLE, titleStr);
-        if (this.intent != null) {
-            uri = this.intent.toUri(0);
-        } else {
-            uri = null;
-        }
+        String uri = this.intent != null ? this.intent.toUri(0) : null;
         values.put(LauncherSettings.BaseLauncherColumns.INTENT, uri);
         if (this.customIcon) {
-            values.put(LauncherSettings.BaseLauncherColumns.ICON_TYPE, 1);
-            if (this.icon instanceof BitmapDrawable) {
-                bitmap = ((BitmapDrawable) this.icon).getBitmap();
-            } else {
-                bitmap = ((FastBitmapDrawable) this.icon).getBitmap();
-            }
+            values.put(LauncherSettings.BaseLauncherColumns.ICON_TYPE, LauncherSettings.Favorites.ICON_TYPE_BITMAP);
+            Bitmap bitmap = extractBitmap(this.icon);
             writeBitmap(values, bitmap);
             return;
         }
-        values.put(LauncherSettings.BaseLauncherColumns.ICON_TYPE, 0);
+        values.put(LauncherSettings.BaseLauncherColumns.ICON_TYPE, LauncherSettings.Favorites.ICON_TYPE_RESOURCE);
         if (this.iconResource != null) {
             values.put(LauncherSettings.BaseLauncherColumns.ICON_PACKAGE, this.iconResource.packageName);
             values.put(LauncherSettings.BaseLauncherColumns.ICON_RESOURCE, this.iconResource.resourceName);
         }
     }
 
-    public static void dumpApplicationInfoList(String tag, String label, ArrayList<ApplicationItemInfo> list) {
-        Log.d(tag, String.valueOf(label) + " size=" + list.size());
-        Iterator<ApplicationItemInfo> it = list.iterator();
-        while (it.hasNext()) {
-            ApplicationItemInfo info = it.next();
+    private static Bitmap extractBitmap(Drawable icon) {
+        if (icon instanceof BitmapDrawable) {
+            return ((BitmapDrawable) icon).getBitmap();
+        }
+        if (icon instanceof FastBitmapDrawable) {
+            return ((FastBitmapDrawable) icon).getBitmap();
+        }
+        return null;
+    }
+
+    /**
+     * Diagnostic utility dumping an application info list to Logcat.
+     */
+    public static void dumpApplicationInfoList(String tag, String label, List<ApplicationItemInfo> list) {
+        if (list == null) {
+            Log.d(tag, label + " size=0 (null)");
+            return;
+        }
+        Log.d(tag, label + " size=" + list.size());
+        for (ApplicationItemInfo info : list) {
             Log.d(tag, "   title=\"" + info.title + "\" titleBitmap=" + info.titleBitmap + " iconBitmap=" + info.iconBitmap);
         }
     }
 
+    @Override
     public String toString() {
-        return this.title.toString();
+        return this.title != null ? this.title.toString() : "";
     }
 
+    /**
+     * Orders application items alphabetically by their localized title using Collator.
+     */
     static class TitleComparator implements Comparator<ApplicationItemInfo> {
-        TitleComparator() {
-        }
-
-        public final int compare(ApplicationItemInfo a, ApplicationItemInfo b) {
-            return ApplicationItemInfo.sCollator.compare(a.title.toString(), b.title.toString());
+        @Override
+        public int compare(ApplicationItemInfo first, ApplicationItemInfo second) {
+            String titleA = first.title != null ? first.title.toString() : "";
+            String titleB = second.title != null ? second.title.toString() : "";
+            return COLLATOR.compare(titleA, titleB);
         }
     }
 }

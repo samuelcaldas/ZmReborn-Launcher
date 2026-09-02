@@ -8,131 +8,161 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+/**
+ * Dialog preference displaying an interactive seek bar with custom suffix formatting.
+ */
 public class DialogSeekBarPreference extends DialogPreference implements SeekBar.OnSeekBarChangeListener {
-
     private static final String ATTRIBUTE_NAMESPACE = "http://schemas.android.com/apk/res-auto";
-    private int mMax;
-    private int mMin;
-    private SeekBar mSeekBar;
-    private String mSuffix;
-    private int mValue = 0;
-    private TextView mValueText;
 
+    private int max;
+    private int min;
+    private SeekBar seekBar;
+    private String suffix;
+    private int value;
+    private TextView valueText;
+
+    /**
+     * Constructs a dialog seek bar preference with context and XML attributes.
+     */
     public DialogSeekBarPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setPersistent(true);
-        this.mSuffix = attrs.getAttributeValue(ATTRIBUTE_NAMESPACE, "text");
-        this.mMin = attrs.getAttributeIntValue(ATTRIBUTE_NAMESPACE, "min", 0);
-        this.mMax = attrs.getAttributeIntValue(ATTRIBUTE_NAMESPACE, "max", 100);
+        this.suffix = attrs.getAttributeValue(ATTRIBUTE_NAMESPACE, "text");
+        this.min = attrs.getAttributeIntValue(ATTRIBUTE_NAMESPACE, "min", 0);
+        this.max = attrs.getAttributeIntValue(ATTRIBUTE_NAMESPACE, "max", 100);
         setDialogLayoutResource(R.layout.dialog_seekbar_preference);
     }
 
-    /* access modifiers changed from: protected */
-    public void onBindDialogView(View view) {
+    @Override
+    protected void onBindDialogView(View view) {
         super.onBindDialogView(view);
         ((TextView) view.findViewById(R.id.dialog_message)).setText(getDialogMessage());
-        this.mValueText = (TextView) view.findViewById(R.id.actual_value);
-        this.mSeekBar = (SeekBar) view.findViewById(R.id.my_bar);
-        this.mSeekBar.setOnSeekBarChangeListener(this);
-        this.mSeekBar.setMax(Math.max(0, this.mMax - this.mMin));
-        this.mValue = clampStoredValue(this.mValue);
-        this.mSeekBar.setProgress(this.mValue - this.mMin);
-        String t = String.valueOf(this.mValue);
-        TextView textView = this.mValueText;
-        if (this.mSuffix != null) {
-            t = t.concat(this.mSuffix);
+        this.valueText = (TextView) view.findViewById(R.id.actual_value);
+        this.seekBar = (SeekBar) view.findViewById(R.id.my_bar);
+        this.seekBar.setOnSeekBarChangeListener(this);
+        this.seekBar.setMax(Math.max(0, this.max - this.min));
+        this.value = clampStoredValue(this.value);
+        this.seekBar.setProgress(this.value - this.min);
+        String text = String.valueOf(this.value);
+        if (this.suffix != null) {
+            text = text.concat(this.suffix);
         }
-        textView.setText(t);
+        this.valueText.setText(text);
     }
 
-    /* access modifiers changed from: protected */
-    public Object onGetDefaultValue(TypedArray a, int index) {
-        return Integer.valueOf(a.getInt(index, 0));
+    @Override
+    protected Object onGetDefaultValue(TypedArray a, int index) {
+        return a.getInt(index, 0);
     }
 
-    /* access modifiers changed from: protected */
-    public void onSetInitialValue(boolean restore, Object defaultValue) {
-        this.mValue = getPersistedInt(defaultValue == null ? 0 : ((Integer) defaultValue).intValue());
+    @Override
+    protected void onSetInitialValue(boolean restore, Object defaultValue) {
+        this.value = getPersistedInt(defaultValue == null ? 0 : ((Integer) defaultValue).intValue());
     }
 
-    /* access modifiers changed from: protected */
-    public void onDialogClosed(boolean positiveResult) {
+    @Override
+    protected void onDialogClosed(boolean positiveResult) {
         super.onDialogClosed(positiveResult);
-        if (positiveResult) {
-            int value = this.mSeekBar.getProgress();
-            if (callChangeListener(Integer.valueOf(value))) {
-                setValue(value);
+        if (positiveResult && this.seekBar != null) {
+            int progress = this.seekBar.getProgress();
+            if (callChangeListener(progress)) {
+                setValue(progress);
             }
         }
     }
 
-    public void setValue(int value) {
-        setStoredValue(value + this.mMin);
+    /**
+     * Sets the preference value relative to the minimum bound.
+     */
+    public void setValue(int val) {
+        setStoredValue(val + this.min);
     }
 
-    public void setMax(int max) {
-        this.mMax = Math.max(this.mMin, max);
-        if (this.mValue > this.mMax) {
-            setStoredValue(this.mMax);
+    /**
+     * Sets the maximum value bound.
+     */
+    public void setMax(int maxVal) {
+        this.max = Math.max(this.min, maxVal);
+        if (this.value > this.max) {
+            setStoredValue(this.max);
         }
     }
 
-    public void setMin(int min) {
-        if (min < this.mMax) {
-            this.mMin = min;
-            if (this.mValue < this.mMin) {
-                setStoredValue(this.mMin);
+    /**
+     * Sets the minimum value bound.
+     */
+    public void setMin(int minVal) {
+        if (minVal < this.max) {
+            this.min = minVal;
+            if (this.value < this.min) {
+                setStoredValue(this.min);
             }
         }
     }
 
+    /**
+     * Returns the minimum value bound.
+     */
     public int getMin() {
-        return this.mMin;
+        return this.min;
     }
 
+    /**
+     * Returns the maximum value bound.
+     */
     public int getMax() {
-        return this.mMax;
+        return this.max;
     }
 
+    /**
+     * Returns the currently stored value clamped between bounds.
+     */
     public int getValue() {
-        return clampStoredValue(this.mValue);
+        return clampStoredValue(this.value);
     }
 
+    /**
+     * Returns the formatted display string with suffix.
+     */
     public String getDisplayValue() {
-        String value = String.valueOf(getValue());
-        if (this.mSuffix != null) {
-            return value.concat(this.mSuffix);
+        String text = String.valueOf(getValue());
+        if (this.suffix != null) {
+            return text.concat(this.suffix);
         }
-        return value;
+        return text;
     }
 
-    private void setStoredValue(int value) {
-        this.mValue = clampStoredValue(value);
-        persistInt(this.mValue);
+    private void setStoredValue(int val) {
+        this.value = clampStoredValue(val);
+        persistInt(this.value);
     }
 
-    private int clampStoredValue(int value) {
-        if (value < this.mMin) {
-            return this.mMin;
+    private int clampStoredValue(int val) {
+        if (val < this.min) {
+            return this.min;
         }
-        if (value > this.mMax) {
-            return this.mMax;
+        if (val > this.max) {
+            return this.max;
         }
-        return value;
+        return val;
     }
 
-    public void onProgressChanged(SeekBar seek, int value, boolean fromTouch) {
-        String t = String.valueOf(this.mMin + value);
-        TextView textView = this.mValueText;
-        if (this.mSuffix != null) {
-            t = t.concat(this.mSuffix);
+    @Override
+    public void onProgressChanged(SeekBar seek, int progress, boolean fromTouch) {
+        String text = String.valueOf(this.min + progress);
+        if (this.suffix != null) {
+            text = text.concat(this.suffix);
         }
-        textView.setText(t);
+        if (this.valueText != null) {
+            this.valueText.setText(text);
+        }
     }
 
+    @Override
     public void onStartTrackingTouch(SeekBar seek) {
     }
 
+    @Override
     public void onStopTrackingTouch(SeekBar seek) {
     }
 }

@@ -5,10 +5,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Normalizes queries and filters application items by prefix and substring matching with diacritics removal.
+ */
 final class DrawerSearchFilter {
     private DrawerSearchFilter() {
     }
 
+    /**
+     * Filters the given list of applications matching the query text.
+     */
     static ArrayList<ApplicationItemInfo> filter(
             List<ApplicationItemInfo> source,
             CharSequence query) {
@@ -26,10 +32,16 @@ final class DrawerSearchFilter {
         return prefixMatches;
     }
 
+    /**
+     * Returns true if the query string is empty or contains only whitespace/diacritics.
+     */
     static boolean isEmptyQuery(CharSequence query) {
         return normalize(query).length() == 0;
     }
 
+    /**
+     * Normalizes text by decomposing diacritics, lowercasing, and stripping whitespace.
+     */
     static String normalize(CharSequence value) {
         if (value == null) {
             return "";
@@ -70,8 +82,8 @@ final class DrawerSearchFilter {
     private static ArrayList<ApplicationItemInfo> snapshot(
             List<ApplicationItemInfo> source) {
         if (source == null) {
-            return new ArrayList<ApplicationItemInfo>();
+            return new ArrayList<>();
         }
-        return new ArrayList<ApplicationItemInfo>(source);
+        return new ArrayList<>(source);
     }
 }

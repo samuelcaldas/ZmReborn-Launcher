@@ -1,13 +1,31 @@
 package org.zmreborn;
 
+/**
+ * Target view capable of accepting dropped items during drag operations.
+ */
 public interface DropTarget {
-    boolean acceptDrop(DragSource dragSource, int i, int i2, int i3, int i4, Object obj);
+    /**
+     * Queries whether this target can accept the dragged item at the specified coordinates.
+     */
+    boolean acceptDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo);
 
-    void onDragEnter(DragSource dragSource, int i, int i2, int i3, int i4, Object obj);
+    /**
+     * Called when a drag enters this target's bounds.
+     */
+    void onDragEnter(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo);
 
-    void onDragExit(DragSource dragSource, int i, int i2, int i3, int i4, Object obj);
+    /**
+     * Called when a drag exits this target's bounds.
+     */
+    void onDragExit(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo);
 
-    void onDragOver(DragSource dragSource, int i, int i2, int i3, int i4, Object obj);
+    /**
+     * Called continuously while a drag is moved over this target.
+     */
+    void onDragOver(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo);
 
-    void onDrop(DragSource dragSource, int i, int i2, int i3, int i4, Object obj);
+    /**
+     * Called when an item is dropped onto this target.
+     */
+    void onDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo);
 }

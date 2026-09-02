@@ -3,27 +3,36 @@ package org.zmreborn;
 import android.net.Uri;
 import android.provider.BaseColumns;
 
+/**
+ * Contract definitions, column names, and content URIs for launcher SQLite persistence.
+ */
 class LauncherSettings {
     static final String AUTHORITY = BuildConfig.APPLICATION_ID + ".provider";
     private static final String CONTENT_URI_PREFIX = "content://" + AUTHORITY + "/";
 
+    /**
+     * Common columns for launcher items.
+     */
     interface BaseLauncherColumns extends BaseColumns {
-        public static final String ICON = "icon";
-        public static final String ICON_PACKAGE = "iconPackage";
-        public static final String ICON_RESOURCE = "iconResource";
-        public static final String ICON_TYPE = "iconType";
-        public static final int ICON_TYPE_BITMAP = 1;
-        public static final int ICON_TYPE_RESOURCE = 0;
-        public static final String INTENT = "intent";
-        public static final String ITEM_TYPE = "itemType";
-        public static final int ITEM_TYPE_APPLICATION = 0;
-        public static final int ITEM_TYPE_SHORTCUT = 1;
-        public static final String TITLE = "title";
+        String ICON = "icon";
+        String ICON_PACKAGE = "iconPackage";
+        String ICON_RESOURCE = "iconResource";
+        String ICON_TYPE = "iconType";
+        int ICON_TYPE_BITMAP = 1;
+        int ICON_TYPE_RESOURCE = 0;
+        String INTENT = "intent";
+        String ITEM_TYPE = "itemType";
+        int ITEM_TYPE_APPLICATION = 0;
+        int ITEM_TYPE_SHORTCUT = 1;
+        String TITLE = "title";
     }
 
     LauncherSettings() {
     }
 
+    /**
+     * Content schema for app list drawer folder definitions and members.
+     */
     static final class AppListFolders {
         static final String COMPONENT_NAME = "componentName";
         static final String CONTENT_URI_STRING = CONTENT_URI_PREFIX + "appListFolders?notify=true";
@@ -42,6 +51,9 @@ class LauncherSettings {
         }
     }
 
+    /**
+     * Content schema for desktop and dock favorites.
+     */
     static final class Favorites implements BaseLauncherColumns {
         static final String APPWIDGET_ID = "appWidgetId";
         static final String CELLX = "cellX";

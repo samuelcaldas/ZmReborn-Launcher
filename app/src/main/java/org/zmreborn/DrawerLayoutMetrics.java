@@ -1,6 +1,8 @@
 package org.zmreborn;
 
-/** Computes drawer grid dimensions from measured bounds without allowing invalid values. */
+/**
+ * Computes drawer grid dimensions from measured bounds without allowing invalid values.
+ */
 final class DrawerLayoutMetrics {
     private final int columns;
     private final int rows;
@@ -19,6 +21,9 @@ final class DrawerLayoutMetrics {
         this.availableHeight = availableHeight;
     }
 
+    /**
+     * Calculates layout metrics given available dimensions and constraints.
+     */
     static DrawerLayoutMetrics calculate(int width, int height, int requestedRows,
             int requestedColumns, int horizontalPadding, int verticalPadding,
             int minimumCellWidth, int minimumCellHeight) {
@@ -35,60 +40,60 @@ final class DrawerLayoutMetrics {
     }
 
     int getColumns() {
-        return columns;
+        return this.columns;
     }
 
     int getRows() {
-        return rows;
+        return this.rows;
     }
 
     int getCellWidth() {
-        return cellWidth;
+        return this.cellWidth;
     }
 
     int getCellHeight() {
-        return cellHeight;
+        return this.cellHeight;
     }
 
     int getAvailableWidth() {
-        return availableWidth;
+        return this.availableWidth;
     }
 
     int getAvailableHeight() {
-        return availableHeight;
+        return this.availableHeight;
     }
 
     int columnLeft(int columnIndex) {
         validateColumnIndex(columnIndex);
-        return columnIndex * availableWidth / columns;
+        return columnIndex * this.availableWidth / this.columns;
     }
 
     int columnRight(int columnIndex) {
         validateColumnIndex(columnIndex);
-        return (columnIndex + 1) * availableWidth / columns;
+        return (columnIndex + 1) * this.availableWidth / this.columns;
     }
 
     int rowTop(int rowIndex) {
         validateRowIndex(rowIndex);
-        return rowIndex * availableHeight / rows;
+        return rowIndex * this.availableHeight / this.rows;
     }
 
     int rowBottom(int rowIndex) {
         validateRowIndex(rowIndex);
-        return (rowIndex + 1) * availableHeight / rows;
+        return (rowIndex + 1) * this.availableHeight / this.rows;
     }
 
     private void validateColumnIndex(int columnIndex) {
-        if (columnIndex < 0 || columnIndex >= columns) {
+        if (columnIndex < 0 || columnIndex >= this.columns) {
             throw new IllegalArgumentException(
-                    "Column index " + columnIndex + " out of range [0, " + columns + ")");
+                    "Column index " + columnIndex + " out of range [0, " + this.columns + ")");
         }
     }
 
     private void validateRowIndex(int rowIndex) {
-        if (rowIndex < 0 || rowIndex >= rows) {
+        if (rowIndex < 0 || rowIndex >= this.rows) {
             throw new IllegalArgumentException(
-                    "Row index " + rowIndex + " out of range [0, " + rows + ")");
+                    "Row index " + rowIndex + " out of range [0, " + this.rows + ")");
         }
     }
 }

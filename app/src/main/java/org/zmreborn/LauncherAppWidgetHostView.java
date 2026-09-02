@@ -6,39 +6,45 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 
+/**
+ * AppWidgetHostView with touch interception and custom long-press detection for workspace drag routing.
+ */
 public class LauncherAppWidgetHostView extends AppWidgetHostView {
     private static final long WIDGET_LONG_CLICK_TIMEOUT = 700;
-    /* access modifiers changed from: private */
-    public boolean mHasPerformedLongPress;
-    private LayoutInflater mInflater;
-    private CheckForLongPress mPendingCheckForLongPress;
+    private boolean hasPerformedLongPress;
+    private LayoutInflater inflater;
+    private CheckForLongPress pendingCheckForLongPress;
 
+    /**
+     * Constructs a launcher app widget host view with context.
+     */
     public LauncherAppWidgetHostView(Context context) {
         super(context);
-        this.mInflater = (LayoutInflater) context.getSystemService("layout_inflater");
+        this.inflater = (LayoutInflater) context.getSystemService("layout_inflater");
     }
 
-    /* access modifiers changed from: protected */
-    public View getErrorView() {
-        return this.mInflater.inflate(R.layout.appwidget_error, this, false);
+    @Override
+    protected View getErrorView() {
+        return this.inflater.inflate(R.layout.appwidget_error, this, false);
     }
 
+    @Override
     public boolean onInterceptTouchEvent(MotionEvent motionEvent) {
-        if (this.mHasPerformedLongPress) {
-            this.mHasPerformedLongPress = false;
+        if (this.hasPerformedLongPress) {
+            this.hasPerformedLongPress = false;
             return true;
         }
         switch (motionEvent.getAction()) {
-            case 0:
+            case MotionEvent.ACTION_DOWN:
                 postCheckForLongClick();
                 return false;
-            case 1:
-            case 3:
-                this.mHasPerformedLongPress = false;
-                if (this.mPendingCheckForLongPress == null) {
+            case MotionEvent.ACTION_UP:
+            case MotionEvent.ACTION_CANCEL:
+                this.hasPerformedLongPress = false;
+                if (this.pendingCheckForLongPress == null) {
                     return false;
                 }
-                removeCallbacks(this.mPendingCheckForLongPress);
+                removeCallbacks(this.pendingCheckForLongPress);
                 return false;
             default:
                 return false;
@@ -46,36 +52,40 @@ public class LauncherAppWidgetHostView extends AppWidgetHostView {
     }
 
     class CheckForLongPress implements Runnable {
-        private int mOriginalWindowAttachCount;
+        private int originalWindowAttachCount;
 
         CheckForLongPress() {
         }
 
+        @Override
         public void run() {
-            if (LauncherAppWidgetHostView.this.getParent() != null && LauncherAppWidgetHostView.this.hasWindowFocus() && this.mOriginalWindowAttachCount == LauncherAppWidgetHostView.this.getWindowAttachCount() && !LauncherAppWidgetHostView.this.mHasPerformedLongPress && LauncherAppWidgetHostView.this.performLongClick()) {
-                LauncherAppWidgetHostView.this.mHasPerformedLongPress = true;
+            if (getParent() != null && hasWindowFocus()
+                    && this.originalWindowAttachCount == getWindowAttachCount()
+                    && !hasPerformedLongPress && performLongClick()) {
+                hasPerformedLongPress = true;
             }
         }
 
         public void rememberWindowAttachCount() {
-            this.mOriginalWindowAttachCount = LauncherAppWidgetHostView.this.getWindowAttachCount();
+            this.originalWindowAttachCount = getWindowAttachCount();
         }
     }
 
     private void postCheckForLongClick() {
-        this.mHasPerformedLongPress = false;
-        if (this.mPendingCheckForLongPress == null) {
-            this.mPendingCheckForLongPress = new CheckForLongPress();
+        this.hasPerformedLongPress = false;
+        if (this.pendingCheckForLongPress == null) {
+            this.pendingCheckForLongPress = new CheckForLongPress();
         }
-        this.mPendingCheckForLongPress.rememberWindowAttachCount();
-        postDelayed(this.mPendingCheckForLongPress, WIDGET_LONG_CLICK_TIMEOUT);
+        this.pendingCheckForLongPress.rememberWindowAttachCount();
+        postDelayed(this.pendingCheckForLongPress, WIDGET_LONG_CLICK_TIMEOUT);
     }
 
+    @Override
     public void cancelLongPress() {
         super.cancelLongPress();
-        this.mHasPerformedLongPress = false;
-        if (this.mPendingCheckForLongPress != null) {
-            removeCallbacks(this.mPendingCheckForLongPress);
+        this.hasPerformedLongPress = false;
+        if (this.pendingCheckForLongPress != null) {
+            removeCallbacks(this.pendingCheckForLongPress);
         }
     }
 }

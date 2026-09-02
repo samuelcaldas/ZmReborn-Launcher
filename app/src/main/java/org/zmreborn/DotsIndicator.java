@@ -1,22 +1,35 @@
 package org.zmreborn;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.graphics.drawable.TransitionDrawable;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+/**
+ * Pager dots indicator displaying transitions between active and inactive dot states.
+ */
 public class DotsIndicator extends ViewGroup {
-    private int mCurrentItem;
-    private int mDotDrawableId;
-    private int mTotalItems;
+    private static final int DOT_TRANSITION_SHORT_MS = 50;
+    private static final int DOT_TRANSITION_LONG_MS = 200;
 
+    private int currentItem;
+    private int dotDrawableId;
+    private int totalItems;
+
+    /**
+     * Constructs a DotsIndicator with the given context and XML attributes.
+     */
     public DotsIndicator(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
+    /**
+     * Constructs a DotsIndicator with the given context.
+     */
     public DotsIndicator(Context context) {
         super(context);
         init();
@@ -25,21 +38,23 @@ public class DotsIndicator extends ViewGroup {
     private void init() {
         setFocusable(false);
         setWillNotDraw(false);
-        this.mDotDrawableId = R.drawable.pager_dots;
+        this.dotDrawableId = R.drawable.pager_dots;
     }
 
-    /* access modifiers changed from: protected */
-    public void onLayout(boolean changed, int l, int t, int r, int b) {
-        if (this.mTotalItems > 0) {
+    @Override
+    protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
+        if (this.totalItems > 0) {
             createLayout();
         }
     }
 
     private void updateLayout() {
-        for (int i = 0; i < getChildCount(); i++) {
-            TransitionDrawable transitionDrawable = (TransitionDrawable) ((ImageView) getChildAt(i)).getDrawable();
-            if (i == this.mCurrentItem) {
-                transitionDrawable.startTransition(50);
+        int childCount = getChildCount();
+        for (int index = 0; index < childCount; index++) {
+            ImageView dotView = (ImageView) getChildAt(index);
+            TransitionDrawable transitionDrawable = (TransitionDrawable) dotView.getDrawable();
+            if (index == this.currentItem) {
+                transitionDrawable.startTransition(DOT_TRANSITION_SHORT_MS);
             } else {
                 transitionDrawable.resetTransition();
             }
@@ -48,50 +63,70 @@ public class DotsIndicator extends ViewGroup {
 
     private void createLayout() {
         detachAllViewsFromParent();
-        int dotWidth = getResources().getDrawable(this.mDotDrawableId).getIntrinsicWidth();
+        Drawable templateDrawable = getContext().getDrawable(this.dotDrawableId);
+        if (templateDrawable == null) {
+            return;
+        }
+        int dotWidth = templateDrawable.getIntrinsicWidth();
         int separation = dotWidth;
-        int marginLeft = (getWidth() / 2) - (((this.mTotalItems * dotWidth) / 2) + (((this.mTotalItems - 1) * separation) / 2));
-        int marginTop = (getHeight() / 2) - (dotWidth / 2);
-        for (int i = 0; i < this.mTotalItems; i++) {
+        int totalDotsWidth = (this.totalItems * dotWidth) + ((this.totalItems - 1) * separation);
+        int marginLeft = (getWidth() - totalDotsWidth) / 2;
+        int marginTop = (getHeight() - dotWidth) / 2;
+
+        for (int index = 0; index < this.totalItems; index++) {
             ImageView dotImageView = new ImageView(getContext());
-            TransitionDrawable transitionDrawable = (TransitionDrawable) getResources().getDrawable(this.mDotDrawableId);
-            transitionDrawable.setCrossFadeEnabled(true);
-            dotImageView.setImageDrawable(transitionDrawable);
-            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(-1, -1);
+            Drawable drawable = getContext().getDrawable(this.dotDrawableId);
+            if (drawable instanceof TransitionDrawable) {
+                TransitionDrawable transitionDrawable = (TransitionDrawable) drawable;
+                transitionDrawable.setCrossFadeEnabled(true);
+                dotImageView.setImageDrawable(transitionDrawable);
+            }
+            ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
             dotImageView.setLayoutParams(layoutParams);
-            dotImageView.measure(getChildMeasureSpec(View.MeasureSpec.makeMeasureSpec(dotWidth, 1073741824), 0, layoutParams.width), getChildMeasureSpec(View.MeasureSpec.makeMeasureSpec(dotWidth, 0), 0, layoutParams.height));
-            int left = marginLeft + ((dotWidth + separation) * i);
+            int widthSpec = View.MeasureSpec.makeMeasureSpec(dotWidth, MeasureSpec.EXACTLY);
+            int heightSpec = View.MeasureSpec.makeMeasureSpec(dotWidth, MeasureSpec.EXACTLY);
+            dotImageView.measure(widthSpec, heightSpec);
+            int left = marginLeft + ((dotWidth + separation) * index);
             dotImageView.layout(left, marginTop, left + dotWidth, marginTop + dotWidth);
             addViewInLayout(dotImageView, getChildCount(), layoutParams, true);
-            if (i == this.mCurrentItem) {
-                ((TransitionDrawable) dotImageView.getDrawable()).startTransition(200);
+            if (index == this.currentItem && dotImageView.getDrawable() instanceof TransitionDrawable) {
+                ((TransitionDrawable) dotImageView.getDrawable()).startTransition(DOT_TRANSITION_LONG_MS);
             }
         }
         postInvalidate();
     }
 
-    /* access modifiers changed from: protected */
-    public int getTotalItems() {
-        return this.mTotalItems;
+    /**
+     * Returns the total number of page items.
+     */
+    protected int getTotalItems() {
+        return this.totalItems;
     }
 
-    /* access modifiers changed from: protected */
-    public void setTotalItems(int totalItems) {
-        if (totalItems != this.mTotalItems) {
-            this.mTotalItems = totalItems;
+    /**
+     * Updates the total number of page items and rebuilds dot views.
+     */
+    protected void setTotalItems(int totalItems) {
+        if (totalItems != this.totalItems) {
+            this.totalItems = totalItems;
             createLayout();
         }
     }
 
-    /* access modifiers changed from: protected */
-    public int getCurrentItem() {
-        return this.mCurrentItem;
+    /**
+     * Returns the currently active item index.
+     */
+    protected int getCurrentItem() {
+        return this.currentItem;
     }
 
-    /* access modifiers changed from: protected */
-    public void setCurrentItem(int currentItem) {
-        if (currentItem != this.mCurrentItem) {
-            this.mCurrentItem = currentItem;
+    /**
+     * Updates the currently active item index and triggers transition animations.
+     */
+    protected void setCurrentItem(int currentItem) {
+        if (currentItem != this.currentItem) {
+            this.currentItem = currentItem;
             updateLayout();
         }
     }

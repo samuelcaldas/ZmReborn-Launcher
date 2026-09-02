@@ -6,20 +6,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+/**
+ * Alphabetical index mapping letter sections to first-match application list positions.
+ */
 final class DrawerAlphabetIndex {
     private static final String OTHER_SECTION = "#";
 
-    private final ArrayList<String> mSections;
-    private final ArrayList<Integer> mPositions;
+    private final ArrayList<String> sections;
+    private final ArrayList<Integer> positions;
 
     private DrawerAlphabetIndex(
             ArrayList<String> sections, ArrayList<Integer> positions) {
-        this.mSections = sections;
-        this.mPositions = positions;
+        this.sections = sections;
+        this.positions = positions;
     }
 
+    /**
+     * Builds an alphabet index from an ordered application list.
+     */
     static DrawerAlphabetIndex from(List<ApplicationItemInfo> applications) {
-        TreeMap<String, Integer> positions = new TreeMap<String, Integer>();
+        TreeMap<String, Integer> positions = new TreeMap<>();
         if (applications != null) {
             indexApplications(applications, positions);
         }
@@ -31,15 +37,15 @@ final class DrawerAlphabetIndex {
         for (int position = 0; position < applications.size(); position++) {
             String section = sectionFor(applications.get(position));
             if (!positions.containsKey(section)) {
-                positions.put(section, Integer.valueOf(position));
+                positions.put(section, position);
             }
         }
     }
 
     private static DrawerAlphabetIndex create(Map<String, Integer> positions) {
-        ArrayList<String> sections = new ArrayList<String>(positions.keySet());
+        ArrayList<String> sections = new ArrayList<>(positions.keySet());
         Collections.sort(sections);
-        ArrayList<Integer> indexedPositions = new ArrayList<Integer>();
+        ArrayList<Integer> indexedPositions = new ArrayList<>();
         for (String section : sections) {
             indexedPositions.add(positions.get(section));
         }
@@ -64,7 +70,7 @@ final class DrawerAlphabetIndex {
     }
 
     DrawerAlphabetIndex compact(int maximumSections, String retainedSection) {
-        if (maximumSections >= this.mSections.size()) {
+        if (maximumSections >= this.sections.size()) {
             return this;
         }
         if (maximumSections < 2) {
@@ -75,14 +81,14 @@ final class DrawerAlphabetIndex {
     }
 
     private DrawerAlphabetIndex compactWithoutRetention(int maximumSections) {
-        ArrayList<String> sections = new ArrayList<String>();
-        ArrayList<Integer> positions = new ArrayList<Integer>();
+        ArrayList<String> compactedSections = new ArrayList<>();
+        ArrayList<Integer> compactedPositions = new ArrayList<>();
         for (int slot = 0; slot < maximumSections; slot++) {
-            int index = Math.round(slot * (this.mSections.size() - 1)
+            int index = Math.round(slot * (this.sections.size() - 1)
                     / (float) (maximumSections - 1));
-            addSection(index, sections, positions);
+            addSection(index, compactedSections, compactedPositions);
         }
-        return new DrawerAlphabetIndex(sections, positions);
+        return new DrawerAlphabetIndex(compactedSections, compactedPositions);
     }
 
     private DrawerAlphabetIndex retainSection(
@@ -90,33 +96,33 @@ final class DrawerAlphabetIndex {
         if (!canRetainSection(sourceIndex, retainedSection)) {
             return this;
         }
-        TreeMap<String, Integer> positions = indexedPositions();
-        positions.remove(getSectionAt(sectionToReplaceIndex(
+        TreeMap<String, Integer> currentPositions = indexedPositions();
+        currentPositions.remove(getSectionAt(sectionToReplaceIndex(
                 sourceIndex, retainedSection)));
-        positions.put(retainedSection, Integer.valueOf(sourceIndex.getPositionAt(
-                sourceIndex.indexOf(retainedSection))));
-        return create(positions);
+        currentPositions.put(retainedSection, sourceIndex.getPositionAt(
+                sourceIndex.indexOf(retainedSection)));
+        return create(currentPositions);
     }
 
     private boolean canRetainSection(
             DrawerAlphabetIndex sourceIndex, String retainedSection) {
         return retainedSection != null && retainedSection.length() > 0
-                && this.mSections.size() >= 2
+                && this.sections.size() >= 2
                 && this.indexOf(retainedSection) < 0
                 && sourceIndex.indexOf(retainedSection) >= 0;
     }
 
     private TreeMap<String, Integer> indexedPositions() {
-        TreeMap<String, Integer> positions = new TreeMap<String, Integer>();
-        for (int index = 0; index < this.mSections.size(); index++) {
-            positions.put(getSectionAt(index), Integer.valueOf(getPositionAt(index)));
+        TreeMap<String, Integer> indexed = new TreeMap<>();
+        for (int index = 0; index < this.sections.size(); index++) {
+            indexed.put(getSectionAt(index), getPositionAt(index));
         }
-        return positions;
+        return indexed;
     }
 
     private int sectionToReplaceIndex(
             DrawerAlphabetIndex sourceIndex, String retainedSection) {
-        if (this.mSections.size() == 2) {
+        if (this.sections.size() == 2) {
             return farthestEndpointIndex(sourceIndex, retainedSection);
         }
         return closestInteriorSectionIndex(sourceIndex, retainedSection);
@@ -126,7 +132,7 @@ final class DrawerAlphabetIndex {
             DrawerAlphabetIndex sourceIndex, String retainedSection) {
         int retainedIndex = sourceIndex.indexOf(retainedSection);
         int firstDistance = Math.abs(sourceIndex.indexOf(getSectionAt(0)) - retainedIndex);
-        int lastIndex = this.mSections.size() - 1;
+        int lastIndex = this.sections.size() - 1;
         int lastDistance = Math.abs(sourceIndex.indexOf(getSectionAt(lastIndex)) - retainedIndex);
         return firstDistance > lastDistance ? 0 : lastIndex;
     }
@@ -136,7 +142,7 @@ final class DrawerAlphabetIndex {
         int retainedIndex = sourceIndex.indexOf(retainedSection);
         int closestIndex = 1;
         int minimumDistance = Integer.MAX_VALUE;
-        for (int index = 1; index < this.mSections.size() - 1; index++) {
+        for (int index = 1; index < this.sections.size() - 1; index++) {
             int sourceDistance = Math.abs(sourceIndex.indexOf(getSectionAt(index))
                     - retainedIndex);
             if (sourceDistance < minimumDistance) {
@@ -148,32 +154,32 @@ final class DrawerAlphabetIndex {
     }
 
     private void addSection(
-            int index, ArrayList<String> sections, ArrayList<Integer> positions) {
-        String section = this.mSections.get(index);
-        if (sections.contains(section)) {
+            int index, ArrayList<String> targetSections, ArrayList<Integer> targetPositions) {
+        String section = this.sections.get(index);
+        if (targetSections.contains(section)) {
             return;
         }
-        sections.add(section);
-        positions.add(this.mPositions.get(index));
+        targetSections.add(section);
+        targetPositions.add(this.positions.get(index));
     }
 
     boolean hasMultipleSections() {
-        return this.mSections.size() > 1;
+        return this.sections.size() > 1;
     }
 
     int size() {
-        return this.mSections.size();
+        return this.sections.size();
     }
 
     String getSectionAt(int index) {
-        return this.mSections.get(index);
+        return this.sections.get(index);
     }
 
     int getPositionAt(int index) {
-        return this.mPositions.get(index).intValue();
+        return this.positions.get(index);
     }
 
     int indexOf(String section) {
-        return this.mSections.indexOf(section);
+        return this.sections.indexOf(section);
     }
 }

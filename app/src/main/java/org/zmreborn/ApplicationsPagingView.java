@@ -25,77 +25,92 @@ import java.util.List;
 import org.zmreborn.ViewPager;
 import org.zmreborn.theme.WallpaperColorExtractor;
 
-public class ApplicationsPagingView extends FrameLayout implements ApplicationsView, View.OnClickListener, View.OnLongClickListener, DragSource {
+/**
+ * Paging view implementation for horizontally paginated app drawer.
+ */
+public class ApplicationsPagingView extends FrameLayout implements ApplicationsView,
+        View.OnClickListener, View.OnLongClickListener, DragSource {
     private static final int CLOSE_DRAG_THRESHOLD_DP = 72;
-    private static int sColumns;
-    private static int sRows;
-    private ArrayList<ApplicationItemInfo> mApplicationItemInfos;
-    private ArrayList<ApplicationItemInfo> mSourceItems = new ArrayList<>();
-    private String mQuery = "";
-    private boolean mActionsEnabled = true;
-    private boolean mClosing;
-    private DragController mDragController;
-    private boolean mDestroyed;
-    private Launcher mLauncher;
-    public int mMode = 0;
-    private boolean mResetMode;
-    private ScreenIndicator mScreenIndicator;
-    private int mIndicatorType = ScreenIndicator.TYPE_DOTS;
-    private boolean mIndicatorEnabled = true;
-    private ViewPager mViewPager;
-    private FrameLayout mSearchContainer;
-    private EditText mSearchInput;
-    private ImageButton mClearSearch;
-    private TextView mNoResults;
-    private boolean mInterceptingClose;
-    private float mCloseStartX;
-    private float mCloseStartY;
-    private int mBasePaddingBottom;
-    private int mBasePaddingLeft;
-    private int mBasePaddingRight;
-    private int mBasePaddingTop;
-    private Rect mSystemGestureInsets;
-    private boolean mBuiltWithFallbackDimensions;
+    private static int staticColumns;
+    private static int staticRows;
+    private ArrayList<ApplicationItemInfo> applicationItemInfos;
+    private ArrayList<ApplicationItemInfo> sourceItems = new ArrayList<>();
+    private String query = "";
+    private boolean actionsEnabled = true;
+    private boolean closing;
+    private DragController dragController;
+    private boolean destroyed;
+    private Launcher launcher;
+    public int mode = 0;
+    private boolean resetMode;
+    private ScreenIndicator screenIndicator;
+    private int indicatorType = ScreenIndicator.TYPE_DOTS;
+    private boolean indicatorEnabled = true;
+    private ViewPager viewPager;
+    private FrameLayout searchContainer;
+    private EditText searchInput;
+    private ImageButton clearSearch;
+    private TextView noResults;
+    private boolean interceptingClose;
+    private float closeStartX;
+    private float closeStartY;
+    private int basePaddingBottom;
+    private int basePaddingLeft;
+    private int basePaddingRight;
+    private int basePaddingTop;
+    private Rect systemGestureInsets;
+    private boolean builtWithFallbackDimensions;
 
+    /**
+     * Constructs applications paging view with style.
+     */
     public ApplicationsPagingView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
     }
 
+    /**
+     * Constructs applications paging view with XML attributes.
+     */
     public ApplicationsPagingView(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
+    /**
+     * Constructs applications paging view with context.
+     */
     public ApplicationsPagingView(Context context) {
         super(context);
     }
 
-    /* access modifiers changed from: protected */
-    public void onFinishInflate() {
+    @Override
+    protected void onFinishInflate() {
         super.onFinishInflate();
         setElevation(getResources().getDimension(R.dimen.elevation_drawer_header));
-        this.mBasePaddingLeft = getPaddingLeft();
-        this.mBasePaddingTop = getPaddingTop();
-        this.mBasePaddingRight = getPaddingRight();
-        this.mBasePaddingBottom = getPaddingBottom();
-        this.mResetMode = true;
-        this.mViewPager = (ViewPager) findViewById(R.id.view_pager);
-        this.mViewPager.setDrawingCacheEnabled(false);
+        this.basePaddingLeft = getPaddingLeft();
+        this.basePaddingTop = getPaddingTop();
+        this.basePaddingRight = getPaddingRight();
+        this.basePaddingBottom = getPaddingBottom();
+        this.resetMode = true;
+        this.viewPager = (ViewPager) findViewById(R.id.view_pager);
+        this.viewPager.setDrawingCacheEnabled(false);
         setDrawingCacheEnabled(false);
-        this.mViewPager.setOnPageScrollListener(new ViewPager.OnPageScrollListener() {
+        this.viewPager.setOnPageScrollListener(new ViewPager.OnPageScrollListener() {
+            @Override
             public void onScroll() {
                 ApplicationsPagingView.this.indicate();
             }
         });
-        this.mViewPager.setOnViewportChangedListener(new ViewPager.OnViewportChangedListener() {
+        this.viewPager.setOnViewportChangedListener(new ViewPager.OnViewportChangedListener() {
+            @Override
             public void onViewportChanged(int width, int height) {
                 ApplicationsPagingView.this.onPagerViewportChanged();
             }
         });
-        this.mSearchContainer = (FrameLayout) findViewById(R.id.drawer_search_container);
-        this.mSearchInput = (EditText) findViewById(R.id.drawer_search_input);
-        this.mClearSearch = (ImageButton) findViewById(R.id.drawer_search_clear);
-        this.mNoResults = (TextView) findViewById(R.id.drawer_search_empty);
-        if (this.mSearchInput != null) {
+        this.searchContainer = (FrameLayout) findViewById(R.id.drawer_search_container);
+        this.searchInput = (EditText) findViewById(R.id.drawer_search_input);
+        this.clearSearch = (ImageButton) findViewById(R.id.drawer_search_clear);
+        this.noResults = (TextView) findViewById(R.id.drawer_search_empty);
+        if (this.searchInput != null) {
             bindSearch();
         }
     }
@@ -104,21 +119,21 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     public boolean onInterceptTouchEvent(MotionEvent event) {
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                this.mCloseStartX = event.getX();
-                this.mCloseStartY = event.getY();
-                this.mInterceptingClose = false;
+                this.closeStartX = event.getX();
+                this.closeStartY = event.getY();
+                this.interceptingClose = false;
                 break;
             case MotionEvent.ACTION_MOVE:
-                float dx = Math.abs(event.getX() - this.mCloseStartX);
-                float dy = event.getY() - this.mCloseStartY;
+                float dx = Math.abs(event.getX() - this.closeStartX);
+                float dy = event.getY() - this.closeStartY;
                 int slop = ViewConfiguration.get(getContext()).getScaledTouchSlop();
                 if (dy > slop && dy > dx) {
-                    this.mInterceptingClose = true;
+                    this.interceptingClose = true;
                     return true;
                 }
                 break;
             case MotionEvent.ACTION_CANCEL:
-                this.mInterceptingClose = false;
+                this.interceptingClose = false;
                 break;
         }
         return super.onInterceptTouchEvent(event);
@@ -126,22 +141,22 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!this.mInterceptingClose) {
+        if (!this.interceptingClose) {
             return super.onTouchEvent(event);
         }
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_MOVE:
                 return true;
             case MotionEvent.ACTION_UP:
-                float dy = event.getY() - this.mCloseStartY;
-                this.mInterceptingClose = false;
+                float dy = event.getY() - this.closeStartY;
+                this.interceptingClose = false;
                 performClick();
-                if (dy >= closeDragThresholdPx() && this.mLauncher != null) {
-                    this.mLauncher.closeAllApplications();
+                if (dy >= closeDragThresholdPx() && this.launcher != null) {
+                    this.launcher.closeAllApplications();
                 }
                 return true;
             case MotionEvent.ACTION_CANCEL:
-                this.mInterceptingClose = false;
+                this.interceptingClose = false;
                 return true;
         }
         return super.onTouchEvent(event);
@@ -157,80 +172,89 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     }
 
     private void bindSearch() {
-        this.mSearchInput.addTextChangedListener(new TextWatcher() {
+        this.searchInput.addTextChangedListener(new TextWatcher() {
+            @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
             public void afterTextChanged(Editable s) {
-                updateQuery(s.toString());
+                updateQuery(s != null ? s.toString() : "");
             }
         });
-        this.mClearSearch.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                mSearchInput.setText("");
-            }
-        });
+        if (this.clearSearch != null) {
+            this.clearSearch.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (searchInput != null) {
+                        searchInput.setText("");
+                    }
+                }
+            });
+        }
     }
 
-    private void updateQuery(String query) {
-        this.mQuery = query;
-        boolean hasQuery = !DrawerSearchFilter.isEmptyQuery(query);
-        if (this.mClearSearch != null) {
-            this.mClearSearch.setVisibility(hasQuery ? VISIBLE : GONE);
+    private void updateQuery(String newQuery) {
+        this.query = newQuery;
+        boolean hasQuery = !DrawerSearchFilter.isEmptyQuery(newQuery);
+        if (this.clearSearch != null) {
+            this.clearSearch.setVisibility(hasQuery ? VISIBLE : GONE);
         }
-        ArrayList<ApplicationItemInfo> filtered = DrawerSearchFilter.filter(this.mSourceItems, query);
-        this.mApplicationItemInfos = filtered;
+        ArrayList<ApplicationItemInfo> filtered = DrawerSearchFilter.filter(this.sourceItems, newQuery);
+        this.applicationItemInfos = filtered;
         buildPages();
         initIndicator();
-        if (this.mNoResults != null) {
-            this.mNoResults.setVisibility(hasQuery && filtered.isEmpty() ? VISIBLE : GONE);
+        if (this.noResults != null) {
+            this.noResults.setVisibility(hasQuery && filtered.isEmpty() ? VISIBLE : GONE);
         }
     }
 
     private void clearSearchOnClose() {
-        if (DrawerSearchFilter.isEmptyQuery(this.mQuery)) {
+        if (DrawerSearchFilter.isEmptyQuery(this.query)) {
             return;
         }
-        this.mQuery = "";
-        if (this.mSearchInput != null) {
-            this.mSearchInput.setText("");
-            this.mSearchInput.clearFocus();
+        this.query = "";
+        if (this.searchInput != null) {
+            this.searchInput.setText("");
+            this.searchInput.clearFocus();
         }
-        if (this.mClearSearch != null) {
-            this.mClearSearch.setVisibility(GONE);
+        if (this.clearSearch != null) {
+            this.clearSearch.setVisibility(GONE);
         }
-        if (this.mNoResults != null) {
-            this.mNoResults.setVisibility(GONE);
+        if (this.noResults != null) {
+            this.noResults.setVisibility(GONE);
         }
-        this.mApplicationItemInfos = new ArrayList<>(this.mSourceItems);
+        this.applicationItemInfos = new ArrayList<>(this.sourceItems);
         buildPages();
         initIndicator();
         hideSearchKeyboard();
     }
 
     private void hideSearchKeyboard() {
-        if (this.mSearchInput == null) {
+        if (this.searchInput == null) {
             return;
         }
-        InputMethodManager imm = (InputMethodManager)
-                getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(getWindowToken(), 0);
         }
     }
 
     private void applySearchPalette() {
-        if (this.mSearchInput == null) {
+        if (this.searchInput == null) {
             return;
         }
         int onSurface = WallpaperColorExtractor.getOnSurface(getContext());
-        this.mSearchInput.setTextColor(onSurface);
-        this.mSearchInput.setHintTextColor(WallpaperColorExtractor.getOutline(getContext()));
-        this.mSearchInput.setBackground(createSearchBackground());
-        if (this.mClearSearch != null) {
-            this.mClearSearch.setColorFilter(onSurface);
+        this.searchInput.setTextColor(onSurface);
+        this.searchInput.setHintTextColor(WallpaperColorExtractor.getOutline(getContext()));
+        this.searchInput.setBackground(createSearchBackground());
+        if (this.clearSearch != null) {
+            this.clearSearch.setColorFilter(onSurface);
         }
-        if (this.mNoResults != null) {
-            this.mNoResults.setTextColor(onSurface);
+        if (this.noResults != null) {
+            this.noResults.setTextColor(onSurface);
         }
     }
 
@@ -245,38 +269,40 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
 
     /**
      * Configures the external ScreenIndicator provided by Launcher from DragLayer.
-     * Called after the paging view is inflated and after preference changes via loadIndicator().
-     *
-     * @param indicator  the ScreenIndicator instance from DragLayer
-     * @param enabled    false when workspace indicator preference is None
-     * @param type       ScreenIndicator.TYPE_DOTS or TYPE_SLIDER_BOTTOM
      */
     public void configureIndicator(ScreenIndicator indicator, boolean enabled, int type) {
-        this.mScreenIndicator = indicator;
-        this.mIndicatorEnabled = enabled;
-        this.mIndicatorType = type;
+        this.screenIndicator = indicator;
+        this.indicatorEnabled = enabled;
+        this.indicatorType = type;
     }
 
+    @Override
     public void setNumColumns(int columns) {
-        sColumns = columns;
+        staticColumns = columns;
     }
 
+    /**
+     * Configures rows per page.
+     */
     public void setNumRows(int rows) {
-        sRows = rows;
+        staticRows = rows;
     }
 
+    @Override
     public void setSystemBarInsets(int left, int top, int right, int bottom) {
-        setPadding(this.mBasePaddingLeft + Math.max(0, left),
-                this.mBasePaddingTop + Math.max(0, top),
-                this.mBasePaddingRight + Math.max(0, right),
-                this.mBasePaddingBottom + Math.max(0, bottom));
+        setPadding(this.basePaddingLeft + Math.max(0, left),
+                this.basePaddingTop + Math.max(0, top),
+                this.basePaddingRight + Math.max(0, right),
+                this.basePaddingBottom + Math.max(0, bottom));
         requestLayout();
     }
 
+    @Override
     public void setSystemGestureInsets(Rect insets) {
-        this.mSystemGestureInsets = insets;
+        this.systemGestureInsets = insets;
     }
 
+    @Override
     public void setBackgroundAlpha(int alpha) {
         int surface = WallpaperColorExtractor.getSurface(getContext());
         int background = Color.argb(alpha, Color.red(surface),
@@ -287,10 +313,10 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
 
     @Override
     public void refreshPalette() {
-        if (this.mDestroyed || this.mViewPager == null) {
+        if (this.destroyed || this.viewPager == null) {
             return;
         }
-        View pageHolder = this.mViewPager.getChildAt(0);
+        View pageHolder = this.viewPager.getChildAt(0);
         if (pageHolder instanceof ViewGroup) {
             ViewGroup holder = (ViewGroup) pageHolder;
             for (int index = 0; index < holder.getChildCount(); index++) {
@@ -300,110 +326,113 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
                 }
             }
         }
-        if (this.mScreenIndicator != null) {
-            this.mScreenIndicator.refreshPalette();
+        if (this.screenIndicator != null) {
+            this.screenIndicator.refreshPalette();
         }
-        if (this.mSearchContainer != null) {
+        if (this.searchContainer != null) {
             applySearchPalette();
         }
         invalidate();
     }
 
+    @Override
     public void setLoading() {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
-        this.mActionsEnabled = false;
+        this.actionsEnabled = false;
         setEnabled(false);
-        if (this.mLauncher != null) {
-            this.mLauncher.onApplicationsLoading();
+        if (this.launcher != null) {
+            this.launcher.onApplicationsLoading();
         }
     }
 
-    public void setApplications(ArrayList<ApplicationItemInfo> applicationItemInfos) {
-        if (this.mDestroyed) {
+    @Override
+    public void setApplications(ArrayList<ApplicationItemInfo> infos) {
+        if (this.destroyed) {
             return;
         }
-        this.mSourceItems = applicationItemInfos == null
-                ? new ArrayList<ApplicationItemInfo>()
-                : new ArrayList<ApplicationItemInfo>(applicationItemInfos);
-        this.mApplicationItemInfos = DrawerSearchFilter.filter(this.mSourceItems, this.mQuery);
+        this.sourceItems = infos == null ? new ArrayList<ApplicationItemInfo>() : new ArrayList<>(infos);
+        this.applicationItemInfos = DrawerSearchFilter.filter(this.sourceItems, this.query);
         buildPages();
         initIndicator();
     }
 
+    @Override
     public void setEmpty() {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
-        this.mActionsEnabled = false;
+        this.actionsEnabled = false;
         setEnabled(false);
-        if (this.mLauncher != null) {
-            this.mLauncher.onApplicationsEmpty();
+        if (this.launcher != null) {
+            this.launcher.onApplicationsEmpty();
         }
     }
 
+    @Override
     public void setError() {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
-        this.mActionsEnabled = false;
+        this.actionsEnabled = false;
         setEnabled(false);
-        if (this.mLauncher != null) {
-            this.mLauncher.onApplicationsError();
+        if (this.launcher != null) {
+            this.launcher.onApplicationsError();
         }
     }
 
+    @Override
     public void clearState() {
-        if (this.mDestroyed) {
+        if (this.destroyed) {
             return;
         }
-        this.mActionsEnabled = true;
+        this.actionsEnabled = true;
         setEnabled(true);
-        if (this.mLauncher != null) {
-            this.mLauncher.onApplicationsReady();
+        if (this.launcher != null) {
+            this.launcher.onApplicationsReady();
         }
     }
 
     private void buildPages() {
-        if (this.mViewPager == null) {
+        if (this.viewPager == null) {
             return;
         }
         int priorFirstOrdinal = captureFirstVisibleOrdinal();
-        ArrayList<ApplicationItemInfo> applicationItemInfos = this.mApplicationItemInfos;
-        int viewportWidth = this.mViewPager.getWidth();
-        int viewportHeight = this.mViewPager.getHeight();
-        this.mBuiltWithFallbackDimensions = (viewportWidth <= 0 || viewportHeight <= 0);
+        ArrayList<ApplicationItemInfo> items = this.applicationItemInfos;
+        int viewportWidth = this.viewPager.getWidth();
+        int viewportHeight = this.viewPager.getHeight();
+        this.builtWithFallbackDimensions = (viewportWidth <= 0 || viewportHeight <= 0);
         DrawerLayoutMetrics metrics = calculatePageMetrics();
         LinkedHashMap<Integer, List<ApplicationItemInfo>> pageContents = loadPageContents(
-                metrics.getRows(), metrics.getColumns(), applicationItemInfos);
-        boolean uninstalling = this.mMode == 1;
+                metrics.getRows(), metrics.getColumns(), items);
+        boolean uninstalling = this.mode == 1;
         LayoutInflater layoutInflater = LayoutInflater.from(getContext());
         ArrayList<View> pageViews = new ArrayList<>();
         for (Integer intValue : pageContents.keySet()) {
             int page = intValue.intValue();
             ApplicationsPageView applicationsPageView = (ApplicationsPageView) layoutInflater.inflate(
-                    R.layout.apps_page_view, (ViewGroup) null);
+                    R.layout.apps_page_view, this.viewPager, false);
             applicationsPageView.populatePage(uninstalling, metrics.getRows(), metrics.getColumns(),
                     pageContents.get(Integer.valueOf(page)), this, this);
             pageViews.add(applicationsPageView);
         }
-        this.mViewPager.clearPagingViews();
-        this.mViewPager.setPagingViews(pageViews);
+        this.viewPager.clearPagingViews();
+        this.viewPager.setPagingViews(pageViews);
         clampCurrentPageIndex(priorFirstOrdinal, metrics.getRows(), metrics.getColumns());
     }
 
     private int captureFirstVisibleOrdinal() {
-        if (this.mViewPager == null) {
+        if (this.viewPager == null) {
             return 0;
         }
-        int currentPage = this.mViewPager.getCurrentPageIndex();
-        return ApplicationsPagePartition.calculatePageStart(currentPage, sRows, sColumns);
+        int currentPage = this.viewPager.getCurrentPageIndex();
+        return ApplicationsPagePartition.calculatePageStart(currentPage, staticRows, staticColumns);
     }
 
     private void onPagerViewportChanged() {
-        if (this.mBuiltWithFallbackDimensions && this.mApplicationItemInfos != null
-                && !this.mApplicationItemInfos.isEmpty()) {
+        if (this.builtWithFallbackDimensions && this.applicationItemInfos != null
+                && !this.applicationItemInfos.isEmpty()) {
             buildPages();
             initIndicator();
         }
@@ -416,11 +445,9 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
             width = getResources().getDisplayMetrics().widthPixels;
             height = getResources().getDisplayMetrics().heightPixels;
         }
-        int minimumCellWidth = getResources().getDimensionPixelSize(
-                R.dimen.drawer_cell_min_width);
-        int minimumCellHeight = getResources().getDimensionPixelSize(
-                R.dimen.drawer_cell_min_height);
-        return DrawerLayoutMetrics.calculate(width, height, sRows, sColumns,
+        int minimumCellWidth = getResources().getDimensionPixelSize(R.dimen.drawer_cell_min_width);
+        int minimumCellHeight = getResources().getDimensionPixelSize(R.dimen.drawer_cell_min_height);
+        return DrawerLayoutMetrics.calculate(width, height, staticRows, staticColumns,
                 getPaddingLeft() + getPaddingRight(), getPaddingTop() + getPaddingBottom(),
                 minimumCellWidth, minimumCellHeight);
     }
@@ -428,7 +455,7 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
     private static LinkedHashMap<Integer, List<ApplicationItemInfo>> loadPageContents(int rows, int columns,
             ArrayList<ApplicationItemInfo> applicationItemInfos) {
         LinkedHashMap<Integer, List<ApplicationItemInfo>> pageContents = new LinkedHashMap<>();
-        if (applicationItemInfos == null || applicationItemInfos.size() == 0) {
+        if (applicationItemInfos == null || applicationItemInfos.isEmpty()) {
             return pageContents;
         }
         int pageCount = ApplicationsPagePartition.calculatePageCount(applicationItemInfos.size(), rows, columns);
@@ -436,63 +463,65 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
             int start = ApplicationsPagePartition.calculatePageStart(page, rows, columns);
             int end = ApplicationsPagePartition.calculatePageEnd(page, applicationItemInfos.size(), rows, columns);
             List<ApplicationItemInfo> pageList = applicationItemInfos.subList(start, end);
-            if (pageList.size() > 0) {
+            if (!pageList.isEmpty()) {
                 pageContents.put(Integer.valueOf(page + 1), pageList);
             }
         }
         return pageContents;
     }
 
+    @Override
     public void onDestroy() {
-        this.mDestroyed = true;
-        this.mActionsEnabled = false;
+        this.destroyed = true;
+        this.actionsEnabled = false;
         setEnabled(false);
-        this.mApplicationItemInfos = null;
+        this.applicationItemInfos = null;
     }
 
     private void initIndicator() {
-        if (this.mScreenIndicator == null) {
+        if (this.screenIndicator == null) {
             return;
         }
-        int pageCount = this.mViewPager.getPageCount();
-        this.mScreenIndicator.setItems(pageCount);
-        if (!this.mIndicatorEnabled) {
-            this.mScreenIndicator.hide();
+        int pageCount = this.viewPager.getPageCount();
+        this.screenIndicator.setItems(pageCount);
+        if (!this.indicatorEnabled) {
+            this.screenIndicator.hide();
             return;
         }
-        this.mScreenIndicator.setType(this.mIndicatorType);
-        this.mScreenIndicator.setAutoHide(false);
+        this.screenIndicator.setType(this.indicatorType);
+        this.screenIndicator.setAutoHide(false);
         if (pageCount <= 0) {
-            this.mScreenIndicator.fullIndicate(0);
-            this.mViewPager.resetScroll();
+            this.screenIndicator.fullIndicate(0);
+            this.viewPager.resetScroll();
             return;
         }
-        this.mScreenIndicator.fullIndicate(this.mViewPager.getCurrentPageIndex());
+        this.screenIndicator.fullIndicate(this.viewPager.getCurrentPageIndex());
     }
 
+    @Override
     public void open(boolean animated) {
-        this.mClosing = false;
+        this.closing = false;
         resetVisualState();
         buildPages();
         initIndicator();
         setVisibility(VISIBLE);
         if (animated) {
-            startAnimation(AnimationUtils.loadAnimation(
-                    getContext(), R.anim.apps_scale_in));
+            startAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.apps_scale_in));
         }
         invalidate();
     }
 
+    @Override
     public boolean close(boolean animated) {
-        if (this.mMode != 0) {
-            if (this.mResetMode) {
+        if (this.mode != 0) {
+            if (this.resetMode) {
                 setMode(0);
             }
-            this.mResetMode = true;
+            this.resetMode = true;
             return false;
         }
         clearSearchOnClose();
-        this.mClosing = true;
+        this.closing = true;
         resetVisualState();
         if (!animated) {
             setVisibility(INVISIBLE);
@@ -502,111 +531,120 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         return true;
     }
 
-    public void setDragController(DragController dragController) {
-        this.mDragController = dragController;
+    @Override
+    public void setDragController(DragController controller) {
+        this.dragController = controller;
     }
 
-    public void setLauncher(Launcher launcher) {
-        this.mLauncher = launcher;
+    @Override
+    public void setLauncher(Launcher launcherInstance) {
+        this.launcher = launcherInstance;
     }
 
+    @Override
     public View getImplementingView() {
         return this;
     }
 
-    public void setMode(int mode) {
-        if (this.mMode == mode) {
-            if (mode != MODE_DEFAULT) {
+    @Override
+    public void setMode(int newMode) {
+        if (this.mode == newMode) {
+            if (newMode != MODE_DEFAULT) {
                 setMode(MODE_DEFAULT);
             }
             return;
         }
-        this.mMode = mode;
+        this.mode = newMode;
         buildPages();
     }
 
+    @Override
     public Launcher getLauncher() {
-        return this.mLauncher;
+        return this.launcher;
     }
 
     @Override
     public int getMode() {
-        return this.mMode;
+        return this.mode;
     }
 
+    @Override
     public void onDropCompleted(View target, boolean success) {
     }
 
+    @Override
     public boolean onLongClick(View view) {
-        if (!this.mActionsEnabled || this.mClosing
-                || this.mMode != 0 || !view.isInTouchMode()) {
+        if (!this.actionsEnabled || this.closing || this.mode != 0 || !view.isInTouchMode()) {
             return false;
         }
-        ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) view.getTag();
-        if (applicationItemInfo instanceof AppListFolderInfo) {
-            this.mLauncher.showAppListFolderActions((AppListFolderInfo) applicationItemInfo);
+        ApplicationItemInfo item = (ApplicationItemInfo) view.getTag();
+        if (item instanceof AppListFolderInfo) {
+            if (this.launcher != null) {
+                this.launcher.showAppListFolderActions((AppListFolderInfo) item);
+            }
             return true;
         }
-        ApplicationItemInfo copiedItem = new ApplicationItemInfo(applicationItemInfo);
-        this.mDragController.startDrag(view, this, copiedItem, 1);
-        this.mLauncher.closeAllApplications();
+        ApplicationItemInfo copiedItem = new ApplicationItemInfo(item);
+        if (this.dragController != null) {
+            this.dragController.startDrag(view, this, copiedItem, DragController.DRAG_ACTION_COPY);
+        }
+        if (this.launcher != null) {
+            this.launcher.closeAllApplications();
+        }
         return true;
     }
 
+    @Override
     public void onClick(View view) {
-        if (!this.mActionsEnabled || this.mClosing) {
+        if (!this.actionsEnabled || this.closing) {
             return;
         }
-        ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) view.getTag();
-        if (applicationItemInfo instanceof AppListFolderInfo) {
-            if (this.mMode == 0) {
-                this.mLauncher.openAppListFolder((AppListFolderInfo) applicationItemInfo);
+        ApplicationItemInfo item = (ApplicationItemInfo) view.getTag();
+        if (item instanceof AppListFolderInfo) {
+            if (this.mode == 0 && this.launcher != null) {
+                this.launcher.openAppListFolder((AppListFolderInfo) item);
             }
             return;
         }
-        switch (this.mMode) {
-            case 0:
-                this.mResetMode = true;
-                this.mLauncher.startActivitySafely(applicationItemInfo.intent);
-                return;
-            case 1:
-                if (Utilities.canUninstallApplication(getContext(), applicationItemInfo)) {
-                    this.mResetMode = false;
-                    this.mLauncher.uninstallApplication(applicationItemInfo);
-                    return;
-                }
-                return;
-            default:
-                return;
+        if (this.mode == 0 && this.launcher != null) {
+            this.resetMode = true;
+            this.launcher.startActivitySafely(item.intent);
+            return;
+        }
+        if (this.mode == 1 && Utilities.canUninstallApplication(getContext(), item) && this.launcher != null) {
+            this.resetMode = false;
+            this.launcher.uninstallApplication(item);
         }
     }
 
-    /* access modifiers changed from: private */
-    public void indicate() {
-        int pageCount = this.mViewPager.getPageCount();
-        int pageWidth = this.mViewPager.getPageWidth();
+    private void indicate() {
+        if (this.screenIndicator == null || this.viewPager == null) {
+            return;
+        }
+        int pageCount = this.viewPager.getPageCount();
+        int pageWidth = this.viewPager.getPageWidth();
         if (pageCount <= 0 || pageWidth <= 0) {
             return;
         }
-        float progress = ((float) this.mViewPager.getScrollX()) / ((float) (pageCount * pageWidth));
-        this.mScreenIndicator.indicate(progress);
+        float progress = ((float) this.viewPager.getScrollX()) / ((float) (pageCount * pageWidth));
+        this.screenIndicator.indicate(progress);
     }
 
     private void clampCurrentPageIndex(int priorFirstOrdinal, int rows, int columns) {
-        int pageCount = this.mViewPager.getPageCount();
+        int pageCount = this.viewPager.getPageCount();
         if (pageCount <= 0) {
-            this.mViewPager.resetScroll();
+            this.viewPager.resetScroll();
             return;
         }
         if (!PreferencesUtil.rememberApplicationsPosition(getContext())) {
-            this.mViewPager.resetScroll();
+            this.viewPager.resetScroll();
             return;
         }
         int restoredPage = ApplicationsPagePartition.pageIndexForItemOrdinal(
                 priorFirstOrdinal, rows, columns);
         int clampedPage = Math.min(restoredPage, pageCount - 1);
-        if (clampedPage != this.mViewPager.getCurrentPageIndex()) {
-            this.mViewPager.moveToPageForced(clampedPage);
+        if (clampedPage != this.viewPager.getCurrentPageIndex()) {
+            this.viewPager.moveToPageForced(clampedPage);
         }
     }
 
@@ -623,12 +661,15 @@ public class ApplicationsPagingView extends FrameLayout implements ApplicationsV
         Animation animation = AnimationUtils.loadAnimation(
                 getContext(), R.anim.apps_scale_out);
         animation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
             public void onAnimationStart(Animation ignored) {
             }
 
+            @Override
             public void onAnimationRepeat(Animation ignored) {
             }
 
+            @Override
             public void onAnimationEnd(Animation ignored) {
                 setVisibility(INVISIBLE);
                 resetVisualState();

@@ -14,36 +14,49 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import org.zmreborn.theme.WallpaperColorExtractor;
 
+/**
+ * Base popup container view displaying a folder's shortcuts and providing rename and close actions.
+ */
 public class Folder extends LinearLayout implements DragSource, AdapterView.OnItemLongClickListener, AdapterView.OnItemClickListener {
-    protected AbsListView mContent;
-    protected ApplicationItemInfo mDragItem;
-    protected DragController mDragger;
-    protected FolderInfo mFolderInfo;
-    protected Launcher mLauncher;
-    protected TextView mTextView;
+    protected AbsListView content;
+    protected ApplicationItemInfo dragItem;
+    protected DragController dragger;
+    protected FolderInfo folderInfo;
+    protected Launcher launcher;
+    protected TextView textView;
 
+    /**
+     * Constructs a folder layout with context and XML attributes.
+     */
     public Folder(Context context, AttributeSet attrs) {
         super(context, attrs);
         setAlwaysDrawnWithCacheEnabled(false);
     }
 
-    /* access modifiers changed from: protected */
-    public void onFinishInflate() {
+    @Override
+    protected void onFinishInflate() {
         super.onFinishInflate();
         setElevation(getResources().getDimension(R.dimen.elevation_folder));
         Context context = getContext();
-        this.mTextView = (TextView) findViewById(R.id.folder_name);
-        this.mContent = (AbsListView) findViewById(R.id.folder_content);
+        this.textView = (TextView) findViewById(R.id.folder_name);
+        this.content = (AbsListView) findViewById(R.id.folder_content);
         refreshPalette();
-        this.mContent.setOnItemClickListener(this);
-        this.mContent.setOnItemLongClickListener(this);
+        this.content.setOnItemClickListener(this);
+        this.content.setOnItemLongClickListener(this);
+        setupButtons(context);
+        this.content.setSelector(SelectorDrawable.createSelector(context, this.content instanceof GridView));
+    }
+
+    private void setupButtons(Context context) {
         ImageButton renameButton = (ImageButton) findViewById(R.id.folder_button_rename);
         renameButton.setBackgroundDrawable(SelectorDrawable.createSelector(context, true));
         renameButton.setContentDescription(context.getString(R.string.accessibility_folder_rename));
         renameButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                Folder.this.mLauncher.closeFolder(Folder.this);
-                Folder.this.mLauncher.showRenameDialog(Folder.this.mFolderInfo);
+                if (Folder.this.launcher != null) {
+                    Folder.this.launcher.closeFolder(Folder.this);
+                    Folder.this.launcher.showRenameDialog(Folder.this.folderInfo);
+                }
             }
         });
         ImageButton closeButton = (ImageButton) findViewById(R.id.folder_button_close);
@@ -51,83 +64,99 @@ public class Folder extends LinearLayout implements DragSource, AdapterView.OnIt
         closeButton.setContentDescription(context.getString(R.string.accessibility_folder_close));
         closeButton.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-                Folder.this.mLauncher.closeFolder(Folder.this);
+                if (Folder.this.launcher != null) {
+                    Folder.this.launcher.closeFolder(Folder.this);
+                }
             }
         });
-        this.mContent.setSelector(SelectorDrawable.createSelector(context, this.mContent instanceof GridView));
     }
 
-    public void onItemClick(AdapterView parent, View view, int position, long id) {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) parent.getItemAtPosition(position);
-        if (view != null) {
+        if (view != null && applicationItemInfo != null && applicationItemInfo.intent != null) {
             Rect sourceBounds = new Rect();
             view.getGlobalVisibleRect(sourceBounds);
-            try {
-                applicationItemInfo.intent.setSourceBounds(sourceBounds);
-            } catch (NoSuchMethodError e) {
-            }
+            applicationItemInfo.intent.setSourceBounds(sourceBounds);
         }
-        this.mLauncher.startActivitySafely(applicationItemInfo.intent);
+        if (this.launcher != null && applicationItemInfo != null) {
+            this.launcher.startActivitySafely(applicationItemInfo.intent);
+        }
     }
 
+    @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
         if (!view.isInTouchMode()) {
             return false;
         }
         ApplicationItemInfo applicationItemInfo = (ApplicationItemInfo) parent.getItemAtPosition(position);
-        this.mDragger.startDrag(view, this, applicationItemInfo, 1);
-        this.mDragItem = applicationItemInfo;
-        this.mLauncher.closeFolder(this);
+        if (this.dragger != null) {
+            this.dragger.startDrag(view, this, applicationItemInfo, DragController.DRAG_ACTION_COPY);
+        }
+        this.dragItem = applicationItemInfo;
+        if (this.launcher != null) {
+            this.launcher.closeFolder(this);
+        }
         return true;
     }
 
+    /**
+     * Sets the drag controller used to initiate dragging folder items.
+     */
     public void setDragger(DragController dragger) {
-        this.mDragger = dragger;
+        this.dragger = dragger;
     }
 
+    @Override
     public void onDropCompleted(View target, boolean success) {
     }
 
-    /* access modifiers changed from: package-private */
-    public void setContentAdapter(BaseAdapter adapter) {
-        this.mContent.setAdapter(adapter);
+    void setContentAdapter(BaseAdapter adapter) {
+        this.content.setAdapter(adapter);
     }
 
-    /* access modifiers changed from: package-private */
-    public void notifyDataSetChanged() {
-        ((BaseAdapter) this.mContent.getAdapter()).notifyDataSetChanged();
+    void notifyDataSetChanged() {
+        if (this.content != null && this.content.getAdapter() instanceof BaseAdapter) {
+            ((BaseAdapter) this.content.getAdapter()).notifyDataSetChanged();
+        }
     }
 
-    /* access modifiers changed from: package-private */
     void refreshPalette() {
         Context context = getContext();
-        this.mTextView.setTextColor(WallpaperColorExtractor.getOnSurface(context));
+        if (this.textView != null) {
+            this.textView.setTextColor(WallpaperColorExtractor.getOnSurface(context));
+        }
         tintBackground(WallpaperColorExtractor.getSurface(context));
-        if (this.mContent.getAdapter() instanceof BaseAdapter) {
-            ((BaseAdapter) this.mContent.getAdapter()).notifyDataSetChanged();
+        if (this.content != null && this.content.getAdapter() instanceof BaseAdapter) {
+            ((BaseAdapter) this.content.getAdapter()).notifyDataSetChanged();
         }
         invalidate();
     }
 
-    /* access modifiers changed from: package-private */
-    public void setLauncher(Launcher launcher) {
-        this.mLauncher = launcher;
+    void setLauncher(Launcher launcher) {
+        this.launcher = launcher;
     }
 
-    /* access modifiers changed from: package-private */
-    public FolderInfo getInfo() {
-        return this.mFolderInfo;
+    FolderInfo getInfo() {
+        return this.folderInfo;
     }
 
-    /* access modifiers changed from: package-private */
-    public void onOpen() {
-        this.mContent.requestLayout();
+    void onOpen() {
+        if (this.content != null) {
+            this.content.requestLayout();
+        }
     }
 
-    /* access modifiers changed from: package-private */
-    public void onClose() {
-        Workspace workspace = this.mLauncher.getWorkspace();
-        workspace.getChildAt(workspace.getCurrentScreen()).requestFocus();
+    void onClose() {
+        if (this.launcher != null) {
+            Workspace workspace = this.launcher.getWorkspace();
+            if (workspace != null) {
+                View child = workspace.getChildAt(workspace.getCurrentScreen());
+                if (child != null) {
+                    child.requestFocus();
+                }
+            }
+        }
     }
 
     private void tintBackground(int color) {
@@ -138,58 +167,65 @@ public class Folder extends LinearLayout implements DragSource, AdapterView.OnIt
         background.mutate().setTint(color);
     }
 
-    private int getGridViewColumns(GridView gridView) {
-        return gridView.getNumColumns();
-    }
-
-    /* access modifiers changed from: package-private */
-    public void handleFolderKeyEvent(int keyCode) {
+    void handleFolderKeyEvent(int keyCode) {
         if (keyCode == 4) {
-            this.mLauncher.closeFolder(this);
-        } else if (this.mContent instanceof GridView) {
-            GridView gridView = (GridView) this.mContent;
-            int selection = gridView.getSelectedItemPosition();
-            int newSelection = selection;
-            int columns = getGridViewColumns(gridView);
-            int count = this.mContent.getAdapter().getCount();
-            switch (keyCode) {
-                case 19:
-                    if (selection <= columns - 1) {
-                        this.mLauncher.closeFolder(this);
-                    } else {
-                        newSelection = selection - columns;
-                    }
-                    break;
-                case 20:
-                    if (selection >= count - columns) {
-                        return;
-                    }
-                    newSelection = Math.min(selection + columns, count - 1);
-                    break;
-                case 21:
-                    if ((selection % columns) == 0) {
-                        this.mLauncher.closeFolder(this);
-                    } else {
-                        newSelection = selection - 1;
-                    }
-                    break;
-                case 22:
-                    if ((selection % columns) == (columns - 1)) {
-                        return;
-                    }
-                    newSelection = Math.min(selection + 1, count - 1);
-                    break;
+            if (this.launcher != null) {
+                this.launcher.closeFolder(this);
             }
-            if (newSelection != selection) {
-                gridView.setSelection(newSelection);
-            }
+            return;
+        }
+        if (!(this.content instanceof GridView)) {
+            return;
+        }
+        GridView gridView = (GridView) this.content;
+        int selection = gridView.getSelectedItemPosition();
+        int columns = gridView.getNumColumns();
+        int count = this.content.getAdapter().getCount();
+        int newSelection = computeNewKeySelection(keyCode, selection, columns, count);
+        if (newSelection != selection) {
+            gridView.setSelection(newSelection);
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public void bind(FolderInfo info) {
-        this.mFolderInfo = info;
-        this.mTextView.setText(info.title);
+    private int computeNewKeySelection(int keyCode, int selection, int columns, int count) {
+        if (keyCode == 19) {
+            if (selection <= columns - 1) {
+                if (this.launcher != null) {
+                    this.launcher.closeFolder(this);
+                }
+                return selection;
+            }
+            return selection - columns;
+        }
+        if (keyCode == 20) {
+            if (selection >= count - columns) {
+                return selection;
+            }
+            return Math.min(selection + columns, count - 1);
+        }
+        if (keyCode == 21) {
+            if ((selection % columns) == 0) {
+                if (this.launcher != null) {
+                    this.launcher.closeFolder(this);
+                }
+                return selection;
+            }
+            return selection - 1;
+        }
+        if (keyCode == 22) {
+            if ((selection % columns) == (columns - 1)) {
+                return selection;
+            }
+            return Math.min(selection + 1, count - 1);
+        }
+        return selection;
+    }
+
+    void bind(FolderInfo info) {
+        this.folderInfo = info;
+        if (this.textView != null) {
+            this.textView.setText(info.title);
+        }
         int itemCount = 0;
         if (info instanceof UserFolderInfo) {
             itemCount = ((UserFolderInfo) info).contents.size();

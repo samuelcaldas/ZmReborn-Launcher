@@ -25,12 +25,25 @@ public final class FrostedGlassDrawable extends Drawable {
         this.tintLayer = new FrostedGlassTintLayer(style);
     }
 
-    /** Creates dock glass with a fixed translucent tint. */
+    /**
+     * Creates dock glass with a fixed translucent tint.
+     *
+     * @param backdrop background wallpaper drawable, or null if wallpaper backdrop disabled
+     * @param tintColor base surface tint color
+     * @return a configured FrostedGlassDrawable for the dock
+     */
     public static FrostedGlassDrawable forDock(Drawable backdrop, int tintColor) {
         return new FrostedGlassDrawable(backdrop, new FrostedGlassStyle(tintColor, 104));
     }
 
-    /** Creates drawer glass whose tint strength follows configured background opacity. */
+    /**
+     * Creates drawer glass whose tint strength follows configured background opacity.
+     *
+     * @param backdrop background wallpaper drawable, or null if wallpaper backdrop disabled
+     * @param tintColor base surface tint color
+     * @param configuredAlpha configured background alpha [0..255]
+     * @return a configured FrostedGlassDrawable for the app drawer
+     */
     public static FrostedGlassDrawable forDrawer(Drawable backdrop, int tintColor,
             int configuredAlpha) {
         int boundedAlpha = Math.max(0, Math.min(255, configuredAlpha));

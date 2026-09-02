@@ -15,36 +15,37 @@ import android.widget.TextView;
 import java.lang.ref.SoftReference;
 import java.net.URISyntaxException;
 import java.util.HashMap;
-import org.zmreborn.LauncherSettings;
 
+/**
+ * Cursor adapter for populating live folder views from external content providers.
+ */
 class LiveFolderAdapter extends CursorAdapter {
-    private final HashMap<Long, SoftReference<Drawable>> mCustomIcons = new HashMap<>();
-    private final HashMap<String, Drawable> mIcons = new HashMap<>();
-    private LayoutInflater mInflater;
-    private boolean mIsList;
-    private final Launcher mLauncher;
+    private final HashMap<Long, SoftReference<Drawable>> customIcons = new HashMap<>();
+    private final HashMap<String, Drawable> icons = new HashMap<>();
+    private final LayoutInflater inflater;
+    private final boolean isList;
+    private final Launcher launcher;
 
-    /* JADX INFO: super call moved to the top of the method (can break code semantics) */
     LiveFolderAdapter(Launcher launcher, LiveFolderInfo info, Cursor cursor) {
         super(launcher, cursor, true);
-        boolean z = true;
-        this.mLauncher = launcher;
-        this.mInflater = LayoutInflater.from(launcher);
-        this.mLauncher.startManagingCursor(getCursor());
-        this.mIsList = info.displayMode != 2 ? false : z;
+        this.launcher = launcher;
+        this.inflater = LayoutInflater.from(launcher);
+        this.launcher.startManagingCursor(getCursor());
+        this.isList = info.displayMode == 2;
     }
 
     static Cursor query(Context context, LiveFolderInfo info) {
-        return context.getContentResolver().query(info.uri, (String[]) null, (String) null, (String[]) null, "name ASC");
+        return context.getContentResolver().query(info.uri, null, null, null, "name ASC");
     }
 
+    @Override
     public View newView(Context context, Cursor cursor, ViewGroup parent) {
         View view;
         ViewHolder viewHolder = new ViewHolder();
-        if (!this.mIsList) {
-            view = this.mInflater.inflate(R.layout.application_boxed_grid, parent, false);
+        if (!this.isList) {
+            view = this.inflater.inflate(R.layout.application_boxed_grid, parent, false);
         } else {
-            view = this.mInflater.inflate(R.layout.application_list, parent, false);
+            view = this.inflater.inflate(R.layout.application_list, parent, false);
             viewHolder.description = (TextView) view.findViewById(R.id.description);
             viewHolder.icon = (ImageView) view.findViewById(R.id.icon);
         }
@@ -60,108 +61,112 @@ class LiveFolderAdapter extends CursorAdapter {
         return view;
     }
 
+    @Override
     public void bindView(View view, Context context, Cursor cursor) {
-        boolean hasIcon;
-        int i;
         ViewHolder viewHolder = (ViewHolder) view.getTag();
-        viewHolder.f4id = cursor.getLong(viewHolder.idIndex);
+        viewHolder.id = cursor.getLong(viewHolder.idIndex);
         Drawable icon = loadIcon(context, cursor, viewHolder);
         viewHolder.name.setText(cursor.getString(viewHolder.nameIndex));
-        if (!this.mIsList) {
-            viewHolder.name.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, icon, (Drawable) null, (Drawable) null);
+        if (!this.isList) {
+            viewHolder.name.setCompoundDrawablesWithIntrinsicBounds(null, icon, null, null);
         } else {
-            if (icon != null) {
-                hasIcon = true;
-            } else {
-                hasIcon = false;
-            }
-            ImageView imageView = viewHolder.icon;
-            if (hasIcon) {
-                i = 0;
-            } else {
-                i = 8;
-            }
-            imageView.setVisibility(i);
-            if (hasIcon) {
-                viewHolder.icon.setImageDrawable(icon);
-            }
-            if (viewHolder.descriptionIndex != -1) {
-                String description = cursor.getString(viewHolder.descriptionIndex);
-                if (description != null) {
-                    viewHolder.description.setText(description);
-                    viewHolder.description.setVisibility(0);
-                } else {
-                    viewHolder.description.setVisibility(8);
-                }
-            } else {
-                viewHolder.description.setVisibility(8);
-            }
+            bindListView(viewHolder, icon, cursor);
         }
         if (viewHolder.intentIndex != -1) {
             try {
                 viewHolder.intent = Intent.parseUri(cursor.getString(viewHolder.intentIndex), 0);
-            } catch (URISyntaxException e) {
+            } catch (URISyntaxException ignored) {
             }
         } else {
             viewHolder.useBaseIntent = true;
         }
     }
 
+    private void bindListView(ViewHolder viewHolder, Drawable icon, Cursor cursor) {
+        boolean hasIcon = icon != null;
+        viewHolder.icon.setVisibility(hasIcon ? View.VISIBLE : View.GONE);
+        if (hasIcon) {
+            viewHolder.icon.setImageDrawable(icon);
+        }
+        if (viewHolder.descriptionIndex != -1) {
+            String description = cursor.getString(viewHolder.descriptionIndex);
+            if (description != null) {
+                viewHolder.description.setText(description);
+                viewHolder.description.setVisibility(View.VISIBLE);
+            } else {
+                viewHolder.description.setVisibility(View.GONE);
+            }
+        } else {
+            viewHolder.description.setVisibility(View.GONE);
+        }
+    }
+
     private Drawable loadIcon(Context context, Cursor cursor, ViewHolder holder) {
-        Drawable icon = null;
         byte[] data = null;
         if (holder.iconBitmapIndex != -1) {
             data = cursor.getBlob(holder.iconBitmapIndex);
         }
         if (data != null) {
-            SoftReference<Drawable> reference = this.mCustomIcons.get(Long.valueOf(holder.f4id));
-            if (reference != null) {
-                icon = reference.get();
-            }
-            if (icon != null) {
-                return icon;
-            }
-            Drawable icon2 = new FastBitmapDrawable(Utilities.createBitmapThumbnail(BitmapFactory.decodeByteArray(data, 0, data.length), context));
-            this.mCustomIcons.put(Long.valueOf(holder.f4id), new SoftReference(icon2));
-            return icon2;
-        } else if (holder.iconResourceIndex == -1 || holder.iconPackageIndex == -1) {
+            return loadBitmapIcon(context, holder.id, data);
+        }
+        if (holder.iconResourceIndex == -1 || holder.iconPackageIndex == -1) {
             return null;
-        } else {
-            String resource = cursor.getString(holder.iconResourceIndex);
-            Drawable icon3 = this.mIcons.get(resource);
-            if (icon3 != null) {
-                return icon3;
+        }
+        return loadResourceIcon(context, cursor, holder);
+    }
+
+    private Drawable loadBitmapIcon(Context context, long iconId, byte[] data) {
+        SoftReference<Drawable> reference = this.customIcons.get(iconId);
+        if (reference != null) {
+            Drawable cached = reference.get();
+            if (cached != null) {
+                return cached;
             }
-            try {
-                Resources resources = context.getPackageManager().getResourcesForApplication(cursor.getString(holder.iconPackageIndex));
-                icon3 = Utilities.createIconThumbnail(resources.getDrawable(resources.getIdentifier(resource, (String) null, (String) null)), context);
-                this.mIcons.put(resource, icon3);
-                return icon3;
-            } catch (Exception e) {
-                return icon3;
-            }
+        }
+        Drawable icon = new FastBitmapDrawable(Utilities.createBitmapThumbnail(
+                BitmapFactory.decodeByteArray(data, 0, data.length), context));
+        this.customIcons.put(iconId, new SoftReference<>(icon));
+        return icon;
+    }
+
+    private Drawable loadResourceIcon(Context context, Cursor cursor, ViewHolder holder) {
+        String resource = cursor.getString(holder.iconResourceIndex);
+        Drawable cached = this.icons.get(resource);
+        if (cached != null) {
+            return cached;
+        }
+        try {
+            Resources resources = context.getPackageManager().getResourcesForApplication(
+                    cursor.getString(holder.iconPackageIndex));
+            Drawable icon = Utilities.createIconThumbnail(resources.getDrawable(
+                    resources.getIdentifier(resource, null, null)), context);
+            this.icons.put(resource, icon);
+            return icon;
+        } catch (Exception ignored) {
+            return null;
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public void cleanup() {
-        for (Drawable icon : this.mIcons.values()) {
-            icon.setCallback((Drawable.Callback) null);
-        }
-        this.mIcons.clear();
-        for (SoftReference<Drawable> icon2 : this.mCustomIcons.values()) {
-            Drawable drawable = icon2.get();
-            if (drawable != null) {
-                drawable.setCallback((Drawable.Callback) null);
+    void cleanup() {
+        for (Drawable icon : this.icons.values()) {
+            if (icon != null) {
+                icon.setCallback(null);
             }
         }
-        this.mCustomIcons.clear();
+        this.icons.clear();
+        for (SoftReference<Drawable> ref : this.customIcons.values()) {
+            Drawable drawable = ref != null ? ref.get() : null;
+            if (drawable != null) {
+                drawable.setCallback(null);
+            }
+        }
+        this.customIcons.clear();
         Cursor cursor = getCursor();
         if (cursor != null) {
             try {
                 cursor.close();
             } finally {
-                this.mLauncher.stopManagingCursor(cursor);
+                this.launcher.stopManagingCursor(cursor);
             }
         }
     }
@@ -173,17 +178,12 @@ class LiveFolderAdapter extends CursorAdapter {
         int iconBitmapIndex = -1;
         int iconPackageIndex = -1;
         int iconResourceIndex = -1;
-
-        /* renamed from: id */
-        long f4id;
+        long id;
         int idIndex;
         Intent intent;
         int intentIndex = -1;
         TextView name;
         int nameIndex;
         boolean useBaseIntent;
-
-        ViewHolder() {
-        }
     }
 }

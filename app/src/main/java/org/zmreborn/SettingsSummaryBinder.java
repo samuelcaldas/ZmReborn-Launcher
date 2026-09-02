@@ -6,14 +6,16 @@ import android.preference.Preference;
 import android.preference.PreferenceGroup;
 import android.preference.PreferenceScreen;
 
-/** Keeps visible preference state synchronized with persisted values. */
+/**
+ * Keeps visible preference state synchronized with persisted values.
+ */
 final class SettingsSummaryBinder implements SharedPreferences.OnSharedPreferenceChangeListener {
-    private final PreferenceScreen mScreen;
-    private final SharedPreferences mPreferences;
+    private final PreferenceScreen screen;
+    private final SharedPreferences preferences;
 
     private SettingsSummaryBinder(PreferenceScreen screen, SharedPreferences preferences) {
-        mScreen = screen;
-        mPreferences = preferences;
+        this.screen = screen;
+        this.preferences = preferences;
     }
 
     static SettingsSummaryBinder attach(PreferenceScreen screen, SharedPreferences preferences) {
@@ -24,13 +26,14 @@ final class SettingsSummaryBinder implements SharedPreferences.OnSharedPreferenc
     }
 
     void refresh() {
-        bindGroup(mScreen);
+        bindGroup(this.screen);
     }
 
     void detach() {
-        mPreferences.unregisterOnSharedPreferenceChangeListener(this);
+        this.preferences.unregisterOnSharedPreferenceChangeListener(this);
     }
 
+    @Override
     public void onSharedPreferenceChanged(SharedPreferences preferences, String key) {
         refresh();
     }

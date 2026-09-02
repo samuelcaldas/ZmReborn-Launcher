@@ -31,7 +31,11 @@ public final class WallpaperColorExtractor {
     private WallpaperColorExtractor() {
     }
 
-    /** Refreshes the current pre-Android-12 wallpaper cache on a background thread. */
+    /**
+     * Refreshes the current pre-Android-12 wallpaper cache on a background thread.
+     *
+     * @param context application context for wallpaper service and preferences access
+     */
     public static void refresh(Context context) {
         requireContext(context);
         if (usesSystemDynamicRoles(Build.VERSION.SDK_INT)) {
@@ -46,32 +50,62 @@ public final class WallpaperColorExtractor {
         cache(context, derive(primary, night), night);
     }
 
-    /** Returns primary role for current brightness and SDK. */
+    /**
+     * Returns the primary theme color for current brightness mode and SDK level.
+     *
+     * @param context application or view context
+     * @return 32-bit ARGB color value
+     */
     public static int getPrimary(Context context) {
         return palette(context).primary;
     }
 
-    /** Returns on-primary role for current brightness and SDK. */
+    /**
+     * Returns the on-primary contrast text/icon color for current brightness and SDK.
+     *
+     * @param context application or view context
+     * @return 32-bit ARGB color value
+     */
     public static int getOnPrimary(Context context) {
         return palette(context).onPrimary;
     }
 
-    /** Returns surface role for current brightness and SDK. */
+    /**
+     * Returns the surface background color for current brightness mode and SDK level.
+     *
+     * @param context application or view context
+     * @return 32-bit ARGB color value
+     */
     public static int getSurface(Context context) {
         return palette(context).surface;
     }
 
-    /** Returns on-surface role for current brightness and SDK. */
+    /**
+     * Returns the on-surface foreground text/icon color for current brightness and SDK.
+     *
+     * @param context application or view context
+     * @return 32-bit ARGB color value
+     */
     public static int getOnSurface(Context context) {
         return palette(context).onSurface;
     }
 
-    /** Returns surface-variant role for current brightness and SDK. */
+    /**
+     * Returns the surface-variant background color for containers and cards.
+     *
+     * @param context application or view context
+     * @return 32-bit ARGB color value
+     */
     public static int getSurfaceVariant(Context context) {
         return palette(context).surfaceVariant;
     }
 
-    /** Returns outline role for current brightness and SDK. */
+    /**
+     * Returns the outline color for divider lines and borders.
+     *
+     * @param context application or view context
+     * @return 32-bit ARGB color value
+     */
     public static int getOutline(Context context) {
         return palette(context).outline;
     }

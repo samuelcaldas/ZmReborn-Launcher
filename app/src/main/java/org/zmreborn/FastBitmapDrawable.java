@@ -4,46 +4,70 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.ColorFilter;
 import android.graphics.Paint;
+import android.graphics.PixelFormat;
 import android.graphics.drawable.Drawable;
 
+/**
+ * Lightweight, non-scaling bitmap drawable wrapper for launcher thumbnails.
+ */
 class FastBitmapDrawable extends Drawable {
-    private Bitmap mBitmap;
+    private final Bitmap bitmap;
+    private final Paint paint;
 
     FastBitmapDrawable(Bitmap bitmap) {
-        this.mBitmap = bitmap;
+        if (bitmap == null) {
+            throw new IllegalArgumentException("Bitmap must not be null");
+        }
+        this.bitmap = bitmap;
+        this.paint = new Paint(Paint.FILTER_BITMAP_FLAG);
     }
 
+    @Override
     public void draw(Canvas canvas) {
-        canvas.drawBitmap(this.mBitmap, 0.0f, 0.0f, (Paint) null);
+        if (!this.bitmap.isRecycled()) {
+            canvas.drawBitmap(this.bitmap, 0.0f, 0.0f, this.paint);
+        }
     }
 
+    @Override
     public int getOpacity() {
-        return -3;
+        return PixelFormat.TRANSLUCENT;
     }
 
+    @Override
     public void setAlpha(int alpha) {
+        this.paint.setAlpha(alpha);
     }
 
-    public void setColorFilter(ColorFilter cf) {
+    @Override
+    public void setColorFilter(ColorFilter colorFilter) {
+        this.paint.setColorFilter(colorFilter);
     }
 
+    @Override
     public int getIntrinsicWidth() {
-        return this.mBitmap.getWidth();
+        return this.bitmap.getWidth();
     }
 
+    @Override
     public int getIntrinsicHeight() {
-        return this.mBitmap.getHeight();
+        return this.bitmap.getHeight();
     }
 
+    @Override
     public int getMinimumWidth() {
-        return this.mBitmap.getWidth();
+        return this.bitmap.getWidth();
     }
 
+    @Override
     public int getMinimumHeight() {
-        return this.mBitmap.getHeight();
+        return this.bitmap.getHeight();
     }
 
+    /**
+     * Returns the underlying wrapped bitmap.
+     */
     public Bitmap getBitmap() {
-        return this.mBitmap;
+        return this.bitmap;
     }
 }

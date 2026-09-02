@@ -14,7 +14,6 @@ import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.content.res.XmlResourceParser;
-import android.database.ContentObserver;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -32,6 +31,9 @@ import java.util.ArrayList;
 import org.xmlpull.v1.XmlPullParserException;
 import org.zmreborn.LauncherSettings;
 
+/**
+ * ContentProvider exposing SQLite favorites, gestures, and drawer folder tables for the launcher.
+ */
 public class LauncherProvider extends ContentProvider {
     static final String AUTHORITY = LauncherSettings.AUTHORITY;
     static final Uri CONTENT_APPWIDGET_RESET_URI = Uri.parse("content://" + AUTHORITY + "/appWidgetReset");
@@ -40,39 +42,42 @@ public class LauncherProvider extends ContentProvider {
     static final String EXTRA_BIND_SOURCES = AUTHORITY + ".bindsources";
     static final String EXTRA_BIND_TARGETS = AUTHORITY + ".bindtargets";
     private static final boolean LOGD = true;
-    /* access modifiers changed from: private */
-    public static final String LOG_TAG = LauncherProvider.class.getSimpleName();
+    static final String LOG_TAG = LauncherProvider.class.getSimpleName();
     static final String PARAMETER_NOTIFY = "notify";
     static final String TABLE_FAVORITES = "favorites";
     static final String TABLE_GESTURES = "gestures";
     static final String TABLE_APP_LIST_FOLDERS = "appListFolders";
     static final String TABLE_APP_LIST_FOLDER_ITEMS = "appListFolderItems";
-    private SQLiteOpenHelper mOpenHelper;
+    private SQLiteOpenHelper openHelper;
 
+    @Override
     public boolean onCreate() {
-        this.mOpenHelper = new DatabaseHelper(getContext());
+        this.openHelper = new DatabaseHelper(getContext());
         return LOGD;
     }
 
+    @Override
     public String getType(Uri uri) {
-        SqlArguments sqlArguments = new SqlArguments(uri, (String) null, (String[]) null);
+        SqlArguments sqlArguments = new SqlArguments(uri, null, null);
         if (TextUtils.isEmpty(sqlArguments.where)) {
             return "vnd.android.cursor.dir/" + sqlArguments.table;
         }
         return "vnd.android.cursor.item/" + sqlArguments.table;
     }
 
+    @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         SqlArguments args = new SqlArguments(uri, selection, selectionArgs);
         SQLiteQueryBuilder qb = new SQLiteQueryBuilder();
         qb.setTables(args.table);
-        Cursor result = qb.query(this.mOpenHelper.getWritableDatabase(), projection, args.where, args.args, (String) null, (String) null, sortOrder);
+        Cursor result = qb.query(this.openHelper.getWritableDatabase(), projection, args.where, args.args, null, null, sortOrder);
         result.setNotificationUri(getContext().getContentResolver(), uri);
         return result;
     }
 
+    @Override
     public Uri insert(Uri uri, ContentValues initialValues) {
-        long rowId = this.mOpenHelper.getWritableDatabase().insert(new SqlArguments(uri).table, (String) null, initialValues);
+        long rowId = this.openHelper.getWritableDatabase().insert(new SqlArguments(uri).table, null, initialValues);
         if (rowId <= 0) {
             return null;
         }
@@ -81,14 +86,14 @@ public class LauncherProvider extends ContentProvider {
         return uri2;
     }
 
-    /* JADX INFO: finally extract failed */
+    @Override
     public int bulkInsert(Uri uri, ContentValues[] values) {
         SqlArguments args = new SqlArguments(uri);
-        SQLiteDatabase db = this.mOpenHelper.getWritableDatabase();
+        SQLiteDatabase db = this.openHelper.getWritableDatabase();
         db.beginTransaction();
         try {
             for (ContentValues insert : values) {
-                if (db.insert(args.table, (String) null, insert) < 0) {
+                if (db.insert(args.table, null, insert) < 0) {
                     db.endTransaction();
                     return 0;
                 }
@@ -103,18 +108,20 @@ public class LauncherProvider extends ContentProvider {
         }
     }
 
+    @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         SqlArguments args = new SqlArguments(uri, selection, selectionArgs);
-        int count = this.mOpenHelper.getWritableDatabase().delete(args.table, args.where, args.args);
+        int count = this.openHelper.getWritableDatabase().delete(args.table, args.where, args.args);
         if (count > 0) {
             sendNotify(uri);
         }
         return count;
     }
 
+    @Override
     public int update(Uri uri, ContentValues values, String selection, String[] selectionArgs) {
         SqlArguments args = new SqlArguments(uri, selection, selectionArgs);
-        int count = this.mOpenHelper.getWritableDatabase().update(args.table, values, args.where, args.args);
+        int count = this.openHelper.getWritableDatabase().update(args.table, values, args.where, args.args);
         if (count > 0) {
             sendNotify(uri);
         }
@@ -124,7 +131,7 @@ public class LauncherProvider extends ContentProvider {
     private void sendNotify(Uri uri) {
         String notify = uri.getQueryParameter(PARAMETER_NOTIFY);
         if (notify == null || "true".equals(notify)) {
-            getContext().getContentResolver().notifyChange(uri, (ContentObserver) null);
+            getContext().getContentResolver().notifyChange(uri, null);
         }
     }
 
@@ -135,26 +142,27 @@ public class LauncherProvider extends ContentProvider {
         private static final String TAG_FAVORITES = "favorites";
         private static final String TAG_SEARCH = "search";
         private static final String TAG_SHORTCUT = "shortcut";
-        private final AppWidgetHost mAppWidgetHost;
-        private final Context mContext;
+        private final AppWidgetHost appWidgetHost;
+        private final Context context;
 
         DatabaseHelper(Context context) {
-            super(context, LauncherProvider.DATABASE_NAME, (SQLiteDatabase.CursorFactory) null, LauncherProvider.DATABASE_VERSION);
-            this.mContext = context;
-            this.mAppWidgetHost = new AppWidgetHost(context, 1024);
+            super(context, LauncherProvider.DATABASE_NAME, null, LauncherProvider.DATABASE_VERSION);
+            this.context = context;
+            this.appWidgetHost = new AppWidgetHost(context, 1024);
         }
 
         private void sendAppWidgetResetNotify() {
-            this.mContext.getContentResolver().notifyChange(LauncherProvider.CONTENT_APPWIDGET_RESET_URI, (ContentObserver) null);
+            this.context.getContentResolver().notifyChange(LauncherProvider.CONTENT_APPWIDGET_RESET_URI, null);
         }
 
+        @Override
         public void onCreate(SQLiteDatabase db) {
             Log.d(LauncherProvider.LOG_TAG, "creating new launcher database");
             db.execSQL("CREATE TABLE favorites (_id INTEGER PRIMARY KEY,title TEXT,intent TEXT,container INTEGER,screen INTEGER,cellX INTEGER,cellY INTEGER,spanX INTEGER,spanY INTEGER,itemType INTEGER,appWidgetId INTEGER NOT NULL DEFAULT -1,isShortcut INTEGER,iconType INTEGER,iconPackage TEXT,iconResource TEXT,icon BLOB,uri TEXT,action INTEGER,displayMode INTEGER);");
             db.execSQL("CREATE TABLE gestures (_id INTEGER PRIMARY KEY,title TEXT,intent TEXT,itemType INTEGER,iconType INTEGER,iconPackage TEXT,iconResource TEXT,icon BLOB);");
             createAppListFolderTables(db);
-            if (this.mAppWidgetHost != null) {
-                this.mAppWidgetHost.deleteHost();
+            if (this.appWidgetHost != null) {
+                this.appWidgetHost.deleteHost();
                 sendAppWidgetResetNotify();
             }
             if (!convertDatabase(db)) {
@@ -166,17 +174,17 @@ public class LauncherProvider extends ContentProvider {
             Log.d(LauncherProvider.LOG_TAG, "converting database from an older format, but not onUpgrade");
             boolean converted = false;
             Uri uri = Uri.parse("content://settings/old_favorites?notify=true");
-            ContentResolver resolver = this.mContext.getContentResolver();
+            ContentResolver resolver = this.context.getContentResolver();
             Cursor cursor = null;
             try {
-                cursor = resolver.query(uri, (String[]) null, (String) null, (String[]) null, (String) null);
-            } catch (Exception e) {
+                cursor = resolver.query(uri, null, null, null, null);
+            } catch (Exception ignored) {
             }
             if (cursor != null && cursor.getCount() > 0) {
                 try {
-                    converted = copyFromCursor(db, cursor) > 0 ? LauncherProvider.LOGD : false;
+                    converted = copyFromCursor(db, cursor) > 0;
                     if (converted) {
-                        resolver.delete(uri, (String) null, (String[]) null);
+                        resolver.delete(uri, null, null);
                     }
                 } finally {
                     cursor.close();
@@ -189,7 +197,6 @@ public class LauncherProvider extends ContentProvider {
             return converted;
         }
 
-        /* JADX INFO: finally extract failed */
         private int copyFromCursor(SQLiteDatabase db, Cursor cursor) {
             int idIndex = cursor.getColumnIndexOrThrow("_id");
             int intentIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.INTENT);
@@ -231,7 +238,7 @@ public class LauncherProvider extends ContentProvider {
             int total = 0;
             try {
                 for (ContentValues insert : rows) {
-                    if (db.insert(TAG_FAVORITES, (String) null, insert) < 0) {
+                    if (db.insert(TAG_FAVORITES, null, insert) < 0) {
                         db.endTransaction();
                         return 0;
                     }
@@ -246,6 +253,7 @@ public class LauncherProvider extends ContentProvider {
             }
         }
 
+        @Override
         public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
             Log.d(LauncherProvider.LOG_TAG, "onUpgrade triggered");
             int version = oldVersion;
@@ -328,19 +336,19 @@ public class LauncherProvider extends ContentProvider {
             boolean allocatedAppWidgets = false;
             db.beginTransaction();
             try {
-                cursor = db.query(TAG_FAVORITES, new String[]{"_id"}, selectWhere, (String[]) null, (String) null, (String) null, (String) null);
+                cursor = db.query(TAG_FAVORITES, new String[]{"_id"}, selectWhere, null, null, null, null);
                 Log.d(LauncherProvider.LOG_TAG, "found upgrade cursor count=" + cursor.getCount());
                 ContentValues values = new ContentValues();
                 while (cursor != null && cursor.moveToNext()) {
                     long favoriteId = cursor.getLong(0);
                     try {
-                        int appWidgetId = this.mAppWidgetHost.allocateAppWidgetId();
+                        int appWidgetId = this.appWidgetHost.allocateAppWidgetId();
                         Log.d(LauncherProvider.LOG_TAG, "allocated appWidgetId=" + appWidgetId + " for favoriteId=" + favoriteId);
                         values.clear();
                         values.put("appWidgetId", Integer.valueOf(appWidgetId));
                         values.put("spanX", 2);
                         values.put("spanY", 2);
-                        db.update(TAG_FAVORITES, values, "_id=" + favoriteId, (String[]) null);
+                        db.update(TAG_FAVORITES, values, "_id=" + favoriteId, null);
                         allocatedAppWidgets = LauncherProvider.LOGD;
                     } catch (RuntimeException ex) {
                         Log.e(LauncherProvider.LOG_TAG, "Problem allocating appWidgetId", ex);
@@ -377,17 +385,17 @@ public class LauncherProvider extends ContentProvider {
             extras.putIntArray(LauncherProvider.EXTRA_BIND_SOURCES, bindSources);
             extras.putParcelableArrayList(LauncherProvider.EXTRA_BIND_TARGETS, bindTargets);
             intent.putExtras(extras);
-            this.mContext.startActivity(intent);
+            this.context.startActivity(intent);
         }
 
         private int loadFavorites(SQLiteDatabase db) {
-            Intent intent = new Intent("android.intent.action.MAIN", (Uri) null);
+            Intent intent = new Intent("android.intent.action.MAIN", null);
             intent.addCategory("android.intent.category.LAUNCHER");
             ContentValues values = new ContentValues();
-            PackageManager packageManager = this.mContext.getPackageManager();
+            PackageManager packageManager = this.context.getPackageManager();
             int i = 0;
             try {
-                XmlResourceParser parser = this.mContext.getResources().getXml(R.xml.default_workspace);
+                XmlResourceParser parser = this.context.getResources().getXml(R.xml.default_workspace);
                 AttributeSet attrs = Xml.asAttributeSet(parser);
                 XmlUtils.beginDocument(parser, TAG_FAVORITES);
                 int depth = parser.getDepth();
@@ -395,10 +403,11 @@ public class LauncherProvider extends ContentProvider {
                     int type = parser.next();
                     if ((type == 3 && parser.getDepth() <= depth) || type == 1) {
                         break;
-                    } else if (type == 2) {
+                    }
+                    if (type == 2) {
                         boolean added = false;
                         String name = parser.getName();
-                        TypedArray a = this.mContext.obtainStyledAttributes(attrs, R.styleable.Favorite);
+                        TypedArray a = this.context.obtainStyledAttributes(attrs, R.styleable.Favorite);
                         values.clear();
                         String container = a.getString(10);
                         if (container == null) {
@@ -445,7 +454,7 @@ public class LauncherProvider extends ContentProvider {
                 contentValues.put(LauncherSettings.BaseLauncherColumns.ITEM_TYPE, 0);
                 contentValues.put("spanX", 1);
                 contentValues.put("spanY", 1);
-                db.insert(TAG_FAVORITES, (String) null, contentValues);
+                db.insert(TAG_FAVORITES, null, contentValues);
                 return LauncherProvider.LOGD;
             } catch (PackageManager.NameNotFoundException e) {
                 return false;
@@ -473,10 +482,7 @@ public class LauncherProvider extends ContentProvider {
             ComponentName componentName = new ComponentName(packageName, className);
             try {
                 packageManager.getReceiverInfo(componentName, 0);
-            } catch (Exception e) {
-            }
-            if (1 == 0) {
-                return false;
+            } catch (Exception ignored) {
             }
             return addAppWidget(db, contentValues, componentName, typedArray.getInt(5, 0), typedArray.getInt(6, 0));
         }
@@ -488,14 +494,14 @@ public class LauncherProvider extends ContentProvider {
 
         private boolean addAppWidget(SQLiteDatabase db, ContentValues contentValues, ComponentName componentName, int spanX, int spanY) {
             boolean allocatedAppWidgets = false;
-            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this.mContext);
+            AppWidgetManager appWidgetManager = AppWidgetManager.getInstance(this.context);
             try {
-                int appWidgetId = this.mAppWidgetHost.allocateAppWidgetId();
+                int appWidgetId = this.appWidgetHost.allocateAppWidgetId();
                 contentValues.put(LauncherSettings.BaseLauncherColumns.ITEM_TYPE, 4);
                 contentValues.put("spanX", Integer.valueOf(spanX));
                 contentValues.put("spanY", Integer.valueOf(spanY));
                 contentValues.put("appWidgetId", Integer.valueOf(appWidgetId));
-                db.insert(TAG_FAVORITES, (String) null, contentValues);
+                db.insert(TAG_FAVORITES, null, contentValues);
                 allocatedAppWidgets = LauncherProvider.LOGD;
                 if (!bindAppWidgetId(appWidgetManager, appWidgetId, componentName)) {
                     Log.w(LauncherProvider.LOG_TAG, "App widget binding was not allowed for " + componentName);
@@ -508,7 +514,7 @@ public class LauncherProvider extends ContentProvider {
         }
 
         private boolean addUriShortcut(SQLiteDatabase db, ContentValues values, TypedArray a) {
-            Resources resources = this.mContext.getResources();
+            Resources resources = this.context.getResources();
             int iconResId = a.getResourceId(7, 0);
             int titleResId = a.getResourceId(8, 0);
             String uri = null;
@@ -526,9 +532,9 @@ public class LauncherProvider extends ContentProvider {
                 values.put("spanX", 1);
                 values.put("spanY", 1);
                 values.put(LauncherSettings.BaseLauncherColumns.ICON_TYPE, 0);
-                values.put(LauncherSettings.BaseLauncherColumns.ICON_PACKAGE, this.mContext.getPackageName());
+                values.put(LauncherSettings.BaseLauncherColumns.ICON_PACKAGE, this.context.getPackageName());
                 values.put(LauncherSettings.BaseLauncherColumns.ICON_RESOURCE, resources.getResourceName(iconResId));
-                db.insert(TAG_FAVORITES, (String) null, values);
+                db.insert(TAG_FAVORITES, null, values);
                 return LauncherProvider.LOGD;
             } catch (URISyntaxException e) {
                 Log.w(LauncherProvider.LOG_TAG, "Shortcut has malformed uri: " + uri);

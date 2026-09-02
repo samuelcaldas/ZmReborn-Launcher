@@ -5,6 +5,9 @@ import android.content.Context;
 import android.content.pm.PackageManager;
 import android.util.Log;
 
+/**
+ * Application class initializing locale wraps and lifecycle configuration.
+ */
 public class LauncherApplication extends Application {
     private static final String LOG_TAG = LauncherApplication.class.getSimpleName();
 
@@ -13,6 +16,7 @@ public class LauncherApplication extends Application {
         super.attachBaseContext(LocaleUtil.wrap(base));
     }
 
+    @Override
     public void onCreate() {
         Log.i(LOG_TAG, "\n--- " + getString(R.string.application_name).toUpperCase() + " " + getVersionName(getApplicationContext()) + " ---");
         super.onCreate();

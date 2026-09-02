@@ -11,47 +11,51 @@ import android.graphics.drawable.shapes.RoundRectShape;
 import android.graphics.drawable.shapes.Shape;
 
 // TODO(move): belongs in util/
-/** StateListDrawable that highlights pressed and focused states with Material You colors. */
+/**
+ * StateListDrawable that highlights pressed and focused states with Material You colors.
+ */
 public final class SelectorDrawable extends StateListDrawable {
     private static final float CORNER_RADIUS_ROUNDED = 6.0f;
     private static final float CORNER_RADIUS_OBLONG = 999.0f;
 
     private SelectorDrawable(int pressedColor, int focusedColor, float cornerRadius) {
-        SelectorShapeDrawable pressedSelectorShapeDrawable = new SelectorShapeDrawable(pressedColor, cornerRadius);
-        SelectorShapeDrawable focusedSelectorShapeDrawable = new SelectorShapeDrawable(focusedColor, cornerRadius);
-        SelectorShapeDrawable transparentSelectorShapeDrawable = new SelectorShapeDrawable(this, 0, (SelectorShapeDrawable) null);
-        addState(new int[]{16842919}, pressedSelectorShapeDrawable);
-        addState(new int[]{-16842908}, transparentSelectorShapeDrawable);
-        addState(new int[]{16842909}, focusedSelectorShapeDrawable);
-        addState(new int[]{-16842909}, transparentSelectorShapeDrawable);
+        SelectorShapeDrawable pressedDrawable = new SelectorShapeDrawable(pressedColor, cornerRadius);
+        SelectorShapeDrawable focusedDrawable = new SelectorShapeDrawable(focusedColor, cornerRadius);
+        SelectorShapeDrawable transparentDrawable = new SelectorShapeDrawable(0, 0.0f);
+        addState(new int[]{android.R.attr.state_pressed}, pressedDrawable);
+        addState(new int[]{-android.R.attr.state_focused}, transparentDrawable);
+        addState(new int[]{android.R.attr.state_focused}, focusedDrawable);
+        addState(new int[]{-android.R.attr.state_focused}, transparentDrawable);
     }
 
-    /** Creates a selector drawable using the current Material You palette. */
+    /**
+     * Creates a selector drawable using the current Material You palette.
+     */
     static SelectorDrawable createSelector(Context context, boolean roundCorners) {
-        int pressed = context.getResources().getColor(R.color.m3_primary);
-        int focused = context.getResources().getColor(R.color.m3_primary_container);
+        if (context == null) {
+            throw new IllegalArgumentException("Context must not be null");
+        }
+        int pressed = context.getColor(R.color.m3_primary);
+        int focused = context.getColor(R.color.m3_primary_container);
         return new SelectorDrawable(pressed, focused, roundCorners ? CORNER_RADIUS_ROUNDED : 0.0f);
     }
 
-    /** Creates a fully-rounded OneUI-style pill selector for the drawer-open dock button. */
+    /**
+     * Creates a fully-rounded OneUI-style pill selector for the drawer-open dock button.
+     */
     static SelectorDrawable createOblongSelector(Context context) {
-        int pressed = context.getResources().getColor(R.color.m3_primary);
-        int focused = context.getResources().getColor(R.color.m3_primary_container);
+        if (context == null) {
+            throw new IllegalArgumentException("Context must not be null");
+        }
+        int pressed = context.getColor(R.color.m3_primary);
+        int focused = context.getColor(R.color.m3_primary_container);
         return new SelectorDrawable(pressed, focused, CORNER_RADIUS_OBLONG);
     }
 
-    private class SelectorShapeDrawable extends ShapeDrawable {
-        private Paint mStrokePaint;
+    private static final class SelectorShapeDrawable extends ShapeDrawable {
+        private final Paint strokePaint;
 
-        /* synthetic */ SelectorShapeDrawable(SelectorDrawable selectorDrawable, int i, SelectorShapeDrawable selectorShapeDrawable) {
-            this(selectorDrawable, i);
-        }
-
-        private SelectorShapeDrawable(SelectorDrawable selectorDrawable, int color) {
-            this(color, 0.0f);
-        }
-
-        private SelectorShapeDrawable(int color, float cornerRadius) {
+        SelectorShapeDrawable(int color, float cornerRadius) {
             if (cornerRadius > 0.0f) {
                 float[] radius = {cornerRadius, cornerRadius, cornerRadius, cornerRadius,
                         cornerRadius, cornerRadius, cornerRadius, cornerRadius};
@@ -59,13 +63,13 @@ public final class SelectorDrawable extends StateListDrawable {
             } else {
                 setShape(new RectShape());
             }
-            this.mStrokePaint = new Paint(1);
-            this.mStrokePaint.setColor(color);
+            this.strokePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+            this.strokePaint.setColor(color);
         }
 
-        /* access modifiers changed from: protected */
-        public void onDraw(Shape shape, Canvas canvas, Paint paint) {
-            shape.draw(canvas, this.mStrokePaint);
+        @Override
+        protected void onDraw(Shape shape, Canvas canvas, Paint paint) {
+            shape.draw(canvas, this.strokePaint);
             paint.setColor(0);
             shape.draw(canvas, paint);
         }

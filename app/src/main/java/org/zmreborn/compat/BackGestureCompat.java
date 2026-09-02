@@ -16,17 +16,36 @@ import android.os.Build;
  */
 public final class BackGestureCompat {
 
+    /**
+     * Listener interface handling predictive back gesture lifecycle callbacks.
+     */
     public interface BackHandler {
+        /**
+         * Invoked when the back action is completed / committed.
+         */
         void onBackInvoked();
 
+        /**
+         * Invoked with continuous progress of the predictive back swipe gesture [0.0, 1.0].
+         */
         void onBackProgressed(float progress);
 
+        /**
+         * Invoked when the predictive back swipe gesture is cancelled.
+         */
         void onBackCancelled();
     }
 
     private BackGestureCompat() {
     }
 
+    /**
+     * Registers a predictive back gesture handler for the given activity on API 33+.
+     *
+     * @param activity the host activity
+     * @param handler the back gesture handler callback
+     * @return an opaque registration token on API 33+, or null on older releases
+     */
     public static Object registerBackHandler(Activity activity, BackHandler handler) {
         if (activity == null || handler == null || Build.VERSION.SDK_INT < 33) {
             return null;
@@ -37,6 +56,12 @@ public final class BackGestureCompat {
         return Api33.register(activity, handler);
     }
 
+    /**
+     * Unregisters a previously registered back gesture handler.
+     *
+     * @param activity the host activity
+     * @param registration the opaque registration token returned from {@link #registerBackHandler}
+     */
     public static void unregisterBackHandler(Activity activity, Object registration) {
         if (activity == null || registration == null || Build.VERSION.SDK_INT < 33) {
             return;

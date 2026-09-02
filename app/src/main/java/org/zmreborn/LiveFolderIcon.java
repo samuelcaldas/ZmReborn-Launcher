@@ -7,11 +7,21 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 
+/**
+ * Desktop icon representing a live folder that queries and displays dynamic provider content.
+ */
 public class LiveFolderIcon extends FolderIcon {
+
+    /**
+     * Constructs a live folder icon with context and XML attributes.
+     */
     public LiveFolderIcon(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
+    /**
+     * Constructs a live folder icon with context.
+     */
     public LiveFolderIcon(Context context) {
         super(context);
     }
@@ -24,7 +34,7 @@ public class LiveFolderIcon extends FolderIcon {
             drawable = Utilities.createIconThumbnail(resources.getDrawable(R.drawable.ic_launcher_folder), launcher);
             folderInfo.filtered = true;
         }
-        icon.setCompoundDrawablesWithIntrinsicBounds((Drawable) null, drawable, (Drawable) null, (Drawable) null);
+        icon.setCompoundDrawablesWithIntrinsicBounds(null, drawable, null, null);
         if (PreferencesUtil.isShowShortcutTitlesEnabled(launcher)) {
             icon.setText(folderInfo.title);
         }
@@ -34,19 +44,24 @@ public class LiveFolderIcon extends FolderIcon {
         return icon;
     }
 
+    @Override
     public boolean acceptDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
         return false;
     }
 
+    @Override
     public void onDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
     }
 
+    @Override
     public void onDragEnter(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
     }
 
+    @Override
     public void onDragOver(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
     }
 
+    @Override
     public void onDragExit(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
     }
 }

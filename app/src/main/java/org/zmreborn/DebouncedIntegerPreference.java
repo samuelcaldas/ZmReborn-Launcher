@@ -8,7 +8,9 @@ import android.os.Looper;
 import android.preference.Preference;
 import android.util.AttributeSet;
 
-/** Stores a bounded integer after a short trailing debounce. */
+/**
+ * Stores a bounded integer preference after a short trailing debounce window.
+ */
 public abstract class DebouncedIntegerPreference extends Preference {
     static final long DEBOUNCE_MILLIS = 250L;
     private static final String ATTRIBUTE_NAMESPACE = "http://schemas.android.com/apk/res-auto";
@@ -17,115 +19,115 @@ public abstract class DebouncedIntegerPreference extends Preference {
         void append(SharedPreferences.Editor editor, int value);
     }
 
-    private final Handler mHandler = new Handler(Looper.getMainLooper());
-    private final Runnable mFlushRunnable = new Runnable() {
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable flushRunnable = new Runnable() {
         public void run() {
             flushPendingValue();
         }
     };
-    private AdditionalValueWriter mAdditionalValueWriter;
-    private int mMax;
-    private int mMin;
-    private int mPersistedValue;
-    private int mValue;
-    private boolean mNeedsDurableFlush;
+    private AdditionalValueWriter additionalValueWriter;
+    private int max;
+    private int min;
+    private int persistedValue;
+    private int value;
+    private boolean needsDurableFlush;
 
     DebouncedIntegerPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mMin = attrs.getAttributeIntValue(ATTRIBUTE_NAMESPACE, "min", 0);
-        mMax = attrs.getAttributeIntValue(ATTRIBUTE_NAMESPACE, "max", 100);
-        validateRange(mMin, mMax);
+        this.min = attrs.getAttributeIntValue(ATTRIBUTE_NAMESPACE, "min", 0);
+        this.max = attrs.getAttributeIntValue(ATTRIBUTE_NAMESPACE, "max", 100);
+        validateRange(this.min, this.max);
         setPersistent(true);
     }
 
     @Override
     protected Object onGetDefaultValue(TypedArray values, int index) {
-        return Integer.valueOf(values.getInt(index, 0));
+        return values.getInt(index, 0);
     }
 
     @Override
     protected void onSetInitialValue(boolean restoreValue, Object defaultValue) {
         int fallback = defaultValue == null ? 0 : ((Integer) defaultValue).intValue();
         int storedValue = getPersistedInt(fallback);
-        mValue = clamp(storedValue);
-        mPersistedValue = storedValue;
-        mNeedsDurableFlush = false;
+        this.value = clamp(storedValue);
+        this.persistedValue = storedValue;
+        this.needsDurableFlush = false;
         schedulePendingValue();
     }
 
     final int getValue() {
-        return mValue;
+        return this.value;
     }
 
     final int getMin() {
-        return mMin;
+        return this.min;
     }
 
     final int getMax() {
-        return mMax;
+        return this.max;
     }
 
     final void setMin(int minimum) {
-        setRange(minimum, mMax);
+        setRange(minimum, this.max);
     }
 
     final void setMax(int maximum) {
-        setRange(mMin, maximum);
+        setRange(this.min, maximum);
     }
 
     final void setRange(int minimum, int maximum) {
         validateRange(minimum, maximum);
-        mMin = minimum;
-        mMax = maximum;
-        int boundedValue = clamp(mValue);
-        if (boundedValue == mValue) {
+        this.min = minimum;
+        this.max = maximum;
+        int boundedValue = clamp(this.value);
+        if (boundedValue == this.value) {
             notifyChanged();
             return;
         }
-        mValue = boundedValue;
+        this.value = boundedValue;
         schedulePendingValue();
         notifyChanged();
     }
 
     final void setValueFromRuntime(int value) {
-        mHandler.removeCallbacks(mFlushRunnable);
-        mValue = clamp(value);
-        mPersistedValue = mValue;
+        this.handler.removeCallbacks(this.flushRunnable);
+        this.value = clamp(value);
+        this.persistedValue = this.value;
         notifyChanged();
     }
 
     final void setAdditionalValueWriter(AdditionalValueWriter writer) {
-        mAdditionalValueWriter = writer;
+        this.additionalValueWriter = writer;
     }
 
     final boolean submitUserValue(int value) {
         int boundedValue = clamp(value);
-        if (boundedValue == mValue) {
+        if (boundedValue == this.value) {
             return false;
         }
-        if (!callChangeListener(Integer.valueOf(boundedValue))) {
+        if (!callChangeListener(boundedValue)) {
             return false;
         }
-        mValue = boundedValue;
+        this.value = boundedValue;
         schedulePendingValue();
         return true;
     }
 
     final void flushPendingValue() {
-        mHandler.removeCallbacks(mFlushRunnable);
-        if (mValue == mPersistedValue) {
+        this.handler.removeCallbacks(this.flushRunnable);
+        if (this.value == this.persistedValue) {
             return;
         }
         SharedPreferences.Editor editor = createEditor();
         appendCurrentValue(editor);
         editor.apply();
-        mPersistedValue = mValue;
-        mNeedsDurableFlush = true;
+        this.persistedValue = this.value;
+        this.needsDurableFlush = true;
     }
 
     final void flushPendingValueDurably() {
-        mHandler.removeCallbacks(mFlushRunnable);
-        if (mValue == mPersistedValue && !mNeedsDurableFlush) {
+        this.handler.removeCallbacks(this.flushRunnable);
+        if (this.value == this.persistedValue && !this.needsDurableFlush) {
             return;
         }
         SharedPreferences.Editor editor = createEditor();
@@ -133,23 +135,23 @@ public abstract class DebouncedIntegerPreference extends Preference {
         if (!editor.commit()) {
             throw new IllegalStateException("Unable to persist numeric preference: " + getKey());
         }
-        mPersistedValue = mValue;
-        mNeedsDurableFlush = false;
+        this.persistedValue = this.value;
+        this.needsDurableFlush = false;
     }
 
     final void cancelPendingValue() {
-        mHandler.removeCallbacks(mFlushRunnable);
-        mValue = clamp(mPersistedValue);
-        mNeedsDurableFlush = false;
+        this.handler.removeCallbacks(this.flushRunnable);
+        this.value = clamp(this.persistedValue);
+        this.needsDurableFlush = false;
         notifyChanged();
     }
 
     private void schedulePendingValue() {
-        mHandler.removeCallbacks(mFlushRunnable);
-        if (mValue == mPersistedValue) {
+        this.handler.removeCallbacks(this.flushRunnable);
+        if (this.value == this.persistedValue) {
             return;
         }
-        mHandler.postDelayed(mFlushRunnable, DEBOUNCE_MILLIS);
+        this.handler.postDelayed(this.flushRunnable, DEBOUNCE_MILLIS);
     }
 
     private SharedPreferences.Editor createEditor() {
@@ -161,14 +163,14 @@ public abstract class DebouncedIntegerPreference extends Preference {
     }
 
     private void appendCurrentValue(SharedPreferences.Editor editor) {
-        editor.putInt(getKey(), mValue);
-        if (mAdditionalValueWriter != null) {
-            mAdditionalValueWriter.append(editor, mValue);
+        editor.putInt(getKey(), this.value);
+        if (this.additionalValueWriter != null) {
+            this.additionalValueWriter.append(editor, this.value);
         }
     }
 
     private int clamp(int value) {
-        return Math.max(mMin, Math.min(mMax, value));
+        return Math.max(this.min, Math.min(this.max, value));
     }
 
     private static void validateRange(int minimum, int maximum) {

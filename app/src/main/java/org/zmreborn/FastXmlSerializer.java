@@ -4,124 +4,156 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import org.xmlpull.v1.XmlSerializer;
 
+/**
+ * Fast, low-allocation XML serializer optimized for simple structured data persistence.
+ */
 public class FastXmlSerializer implements XmlSerializer {
-    private static final int BUFFER_LEN = 8192;
+    private static final int BUFFER_LENGTH = 8192;
     private static final String[] ESCAPE_TABLE;
-    private boolean mInTag;
-    private int mPos;
-    private final char[] mText = new char[BUFFER_LEN];
-    private Writer mWriter;
+    private boolean inTag;
+    private int position;
+    private final char[] buffer = new char[BUFFER_LENGTH];
+    private Writer writer;
 
     static {
-        String[] strArr = new String[64];
-        strArr[34] = "&quot;";
-        strArr[38] = "&amp;";
-        strArr[60] = "&lt;";
-        strArr[62] = "&gt;";
-        ESCAPE_TABLE = strArr;
+        String[] escapeTable = new String[64];
+        escapeTable[34] = "&quot;";
+        escapeTable[38] = "&amp;";
+        escapeTable[60] = "&lt;";
+        escapeTable[62] = "&gt;";
+        ESCAPE_TABLE = escapeTable;
     }
 
-    private void append(char c) throws IOException {
-        int pos = this.mPos;
-        if (pos >= 8191) {
+    private void append(char character) throws IOException {
+        int currentPosition = this.position;
+        if (currentPosition >= BUFFER_LENGTH - 1) {
             flush();
-            pos = this.mPos;
+            currentPosition = this.position;
         }
-        this.mText[pos] = c;
-        this.mPos = pos + 1;
+        this.buffer[currentPosition] = character;
+        this.position = currentPosition + 1;
     }
 
-    private void append(String str, int i, int length) throws IOException {
-        if (length > BUFFER_LEN) {
-            int end = i + length;
-            while (i < end) {
-                int next = i + BUFFER_LEN;
-                append(str, i, next < end ? BUFFER_LEN : end - i);
-                i = next;
+    private void append(String text, int offset, int length) throws IOException {
+        if (text == null || length <= 0) {
+            return;
+        }
+        if (length > BUFFER_LENGTH) {
+            int end = offset + length;
+            int current = offset;
+            while (current < end) {
+                int next = current + BUFFER_LENGTH;
+                append(text, current, next < end ? BUFFER_LENGTH : end - current);
+                current = next;
             }
             return;
         }
-        int pos = this.mPos;
-        if (pos + length > BUFFER_LEN) {
+        int currentPosition = this.position;
+        if (currentPosition + length > BUFFER_LENGTH) {
             flush();
-            pos = this.mPos;
+            currentPosition = this.position;
         }
-        str.getChars(i, i + length, this.mText, pos);
-        this.mPos = pos + length;
+        text.getChars(offset, offset + length, this.buffer, currentPosition);
+        this.position = currentPosition + length;
     }
 
-    private void append(char[] buf, int i, int length) throws IOException {
-        if (length > BUFFER_LEN) {
-            int end = i + length;
-            while (i < end) {
-                int next = i + BUFFER_LEN;
-                append(buf, i, next < end ? BUFFER_LEN : end - i);
-                i = next;
+    private void append(char[] characterBuffer, int offset, int length) throws IOException {
+        if (characterBuffer == null || length <= 0) {
+            return;
+        }
+        if (length > BUFFER_LENGTH) {
+            int end = offset + length;
+            int current = offset;
+            while (current < end) {
+                int next = current + BUFFER_LENGTH;
+                append(characterBuffer, current, next < end ? BUFFER_LENGTH : end - current);
+                current = next;
             }
             return;
         }
-        int pos = this.mPos;
-        if (pos + length > BUFFER_LEN) {
+        int currentPosition = this.position;
+        if (currentPosition + length > BUFFER_LENGTH) {
             flush();
-            pos = this.mPos;
+            currentPosition = this.position;
         }
-        System.arraycopy(buf, i, this.mText, pos, length);
-        this.mPos = pos + length;
+        System.arraycopy(characterBuffer, offset, this.buffer, currentPosition, length);
+        this.position = currentPosition + length;
     }
 
-    private void append(String str) throws IOException {
-        append(str, 0, str.length());
+    private void append(String text) throws IOException {
+        if (text != null) {
+            append(text, 0, text.length());
+        }
     }
 
     private void escapeAndAppendString(String string) throws IOException {
-        String escape;
-        int N = string.length();
-        char NE = (char) ESCAPE_TABLE.length;
-        String[] escapes = ESCAPE_TABLE;
-        int lastPos = 0;
-        int pos = 0;
-        while (pos < N) {
-            char c = string.charAt(pos);
-            if (c < NE && (escape = escapes[c]) != null) {
-                if (lastPos < pos) {
-                    append(string, lastPos, pos - lastPos);
-                }
-                lastPos = pos + 1;
-                append(escape);
-            }
-            pos++;
+        if (string == null) {
+            return;
         }
-        if (lastPos < pos) {
-            append(string, lastPos, pos - lastPos);
+        int stringLength = string.length();
+        char escapeTableLength = (char) ESCAPE_TABLE.length;
+        String[] escapes = ESCAPE_TABLE;
+        int lastPosition = 0;
+        int currentPosition = 0;
+        while (currentPosition < stringLength) {
+            char character = string.charAt(currentPosition);
+            if (character < escapeTableLength) {
+                String escape = escapes[character];
+                if (escape != null) {
+                    if (lastPosition < currentPosition) {
+                        append(string, lastPosition, currentPosition - lastPosition);
+                    }
+                    lastPosition = currentPosition + 1;
+                    append(escape);
+                }
+            }
+            currentPosition++;
+        }
+        if (lastPosition < currentPosition) {
+            append(string, lastPosition, currentPosition - lastPosition);
         }
     }
 
-    private void escapeAndAppendString(char[] buf, int start, int len) throws IOException {
-        String escape;
-        char NE = (char) ESCAPE_TABLE.length;
-        String[] escapes = ESCAPE_TABLE;
-        int end = start + len;
-        int lastPos = start;
-        int pos = start;
-        while (pos < end) {
-            char c = buf[pos];
-            if (c < NE && (escape = escapes[c]) != null) {
-                if (lastPos < pos) {
-                    append(buf, lastPos, pos - lastPos);
-                }
-                lastPos = pos + 1;
-                append(escape);
-            }
-            pos++;
+    private void escapeAndAppendString(char[] characterBuffer, int start, int length) throws IOException {
+        if (characterBuffer == null || length <= 0) {
+            return;
         }
-        if (lastPos < pos) {
-            append(buf, lastPos, pos - lastPos);
+        char escapeTableLength = (char) ESCAPE_TABLE.length;
+        String[] escapes = ESCAPE_TABLE;
+        int end = start + length;
+        int lastPosition = start;
+        int currentPosition = start;
+        while (currentPosition < end) {
+            char character = characterBuffer[currentPosition];
+            if (character < escapeTableLength) {
+                String escape = escapes[character];
+                if (escape != null) {
+                    if (lastPosition < currentPosition) {
+                        append(characterBuffer, lastPosition, currentPosition - lastPosition);
+                    }
+                    lastPosition = currentPosition + 1;
+                    append(escape);
+                }
+            }
+            currentPosition++;
+        }
+        if (lastPosition < currentPosition) {
+            append(characterBuffer, lastPosition, currentPosition - lastPosition);
         }
     }
 
-    public XmlSerializer attribute(String namespace, String name, String value) throws IOException, IllegalArgumentException, IllegalStateException {
+    /**
+     * Appends an attribute with optional namespace and escaped value.
+     */
+    @Override
+    public XmlSerializer attribute(String namespace, String name, String value) throws IOException {
+        if (name == null) {
+            throw new IllegalArgumentException("Attribute name must not be null");
+        }
         append(' ');
         if (namespace != null) {
             append(namespace);
@@ -129,119 +161,171 @@ public class FastXmlSerializer implements XmlSerializer {
         }
         append(name);
         append("=\"");
-        escapeAndAppendString(value);
+        escapeAndAppendString(value != null ? value : "");
         append('\"');
         return this;
     }
 
-    public void cdsect(String text) throws IOException, IllegalArgumentException, IllegalStateException {
+    @Override
+    public void cdsect(String text) {
         throw new UnsupportedOperationException();
     }
 
-    public void comment(String text) throws IOException, IllegalArgumentException, IllegalStateException {
+    @Override
+    public void comment(String text) {
         throw new UnsupportedOperationException();
     }
 
-    public void docdecl(String text) throws IOException, IllegalArgumentException, IllegalStateException {
+    @Override
+    public void docdecl(String text) {
         throw new UnsupportedOperationException();
     }
 
-    public void endDocument() throws IOException, IllegalArgumentException, IllegalStateException {
+    @Override
+    public void endDocument() throws IOException {
         flush();
     }
 
-    public XmlSerializer endTag(String namespace, String name) throws IOException, IllegalArgumentException, IllegalStateException {
-        if (this.mInTag) {
+    /**
+     * Closes the currently open tag or emits a matching closing tag.
+     */
+    @Override
+    public XmlSerializer endTag(String namespace, String name) throws IOException {
+        if (this.inTag) {
             append(" />\n");
-        } else {
-            append("</");
-            if (namespace != null) {
-                append(namespace);
-                append(':');
-            }
-            append(name);
-            append(">\n");
+            this.inTag = false;
+            return this;
         }
-        this.mInTag = false;
+        append("</");
+        if (namespace != null) {
+            append(namespace);
+            append(':');
+        }
+        append(name);
+        append(">\n");
+        this.inTag = false;
         return this;
     }
 
-    public void entityRef(String text) throws IOException, IllegalArgumentException, IllegalStateException {
+    @Override
+    public void entityRef(String text) {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Flushes buffered characters to the underlying writer.
+     */
+    @Override
     public void flush() throws IOException {
-        if (this.mPos == 0) {
+        if (this.position == 0) {
             return;
         }
-        this.mWriter.write(this.mText, 0, this.mPos);
-        this.mWriter.flush();
-        this.mPos = 0;
+        if (this.writer == null) {
+            throw new IllegalStateException("Writer output has not been set");
+        }
+        this.writer.write(this.buffer, 0, this.position);
+        this.writer.flush();
+        this.position = 0;
     }
 
+    @Override
     public int getDepth() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public boolean getFeature(String name) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public String getName() {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public String getNamespace() {
         throw new UnsupportedOperationException();
     }
 
-    public String getPrefix(String namespace, boolean generatePrefix) throws IllegalArgumentException {
+    @Override
+    public String getPrefix(String namespace, boolean generatePrefix) {
         throw new UnsupportedOperationException();
     }
 
+    @Override
     public Object getProperty(String name) {
         throw new UnsupportedOperationException();
     }
 
-    public void ignorableWhitespace(String text) throws IOException, IllegalArgumentException, IllegalStateException {
+    @Override
+    public void ignorableWhitespace(String text) {
         throw new UnsupportedOperationException();
     }
 
-    public void processingInstruction(String text) throws IOException, IllegalArgumentException, IllegalStateException {
+    @Override
+    public void processingInstruction(String text) {
         throw new UnsupportedOperationException();
     }
 
-    public void setFeature(String name, boolean state) throws IllegalArgumentException, IllegalStateException {
-        if (!name.equals("http://xmlpull.org/v1/doc/features.html#indent-output")) {
-            throw new UnsupportedOperationException();
+    @Override
+    public void setFeature(String name, boolean state) {
+        if (!"http://xmlpull.org/v1/doc/features.html#indent-output".equals(name)) {
+            throw new UnsupportedOperationException("Unsupported feature: " + name);
         }
     }
 
-    public void setOutput(OutputStream os, String encoding) throws IOException, IllegalArgumentException, IllegalStateException {
-        if (os == null) {
-            throw new IllegalArgumentException();
+    /**
+     * Sets the destination output stream and character encoding.
+     */
+    @Override
+    public void setOutput(OutputStream outputStream, String encoding) throws IOException {
+        if (outputStream == null) {
+            throw new IllegalArgumentException("OutputStream must not be null");
         }
-        this.mWriter = new OutputStreamWriter(os, encoding);
+        Charset charset = encoding != null ? Charset.forName(encoding) : StandardCharsets.UTF_8;
+        this.writer = new OutputStreamWriter(outputStream, charset);
     }
 
-    public void setOutput(Writer writer) throws IOException, IllegalArgumentException, IllegalStateException {
-        this.mWriter = writer;
+    /**
+     * Sets the destination writer directly.
+     */
+    @Override
+    public void setOutput(Writer destinationWriter) {
+        if (destinationWriter == null) {
+            throw new IllegalArgumentException("Writer must not be null");
+        }
+        this.writer = destinationWriter;
     }
 
-    public void setPrefix(String prefix, String namespace) throws IOException, IllegalArgumentException, IllegalStateException {
+    @Override
+    public void setPrefix(String prefix, String namespace) {
         throw new UnsupportedOperationException();
     }
 
-    public void setProperty(String name, Object value) throws IllegalArgumentException, IllegalStateException {
+    @Override
+    public void setProperty(String name, Object value) {
         throw new UnsupportedOperationException();
     }
 
-    public void startDocument(String encoding, Boolean standalone) throws IOException, IllegalArgumentException, IllegalStateException {
-        append("<?xml version='1.0' encoding='utf-8' standalone='" + (standalone.booleanValue() ? "yes" : "no") + "' ?>\n");
+    /**
+     * Writes the standard XML declaration tag.
+     */
+    @Override
+    public void startDocument(String encoding, Boolean standalone) throws IOException {
+        boolean isStandalone = standalone != null && standalone;
+        append("<?xml version='1.0' encoding='utf-8' standalone='" + (isStandalone ? "yes" : "no") + "' ?>\n");
     }
 
-    public XmlSerializer startTag(String namespace, String name) throws IOException, IllegalArgumentException, IllegalStateException {
-        if (this.mInTag) {
+    /**
+     * Opens a new XML element tag.
+     */
+    @Override
+    public XmlSerializer startTag(String namespace, String name) throws IOException {
+        if (name == null) {
+            throw new IllegalArgumentException("Tag name must not be null");
+        }
+        if (this.inTag) {
             append(">\n");
         }
         append('<');
@@ -250,25 +334,33 @@ public class FastXmlSerializer implements XmlSerializer {
             append(':');
         }
         append(name);
-        this.mInTag = true;
+        this.inTag = true;
         return this;
     }
 
-    public XmlSerializer text(char[] buf, int start, int len) throws IOException, IllegalArgumentException, IllegalStateException {
-        if (this.mInTag) {
+    /**
+     * Writes text from a character buffer, escaping XML special characters.
+     */
+    @Override
+    public XmlSerializer text(char[] characterBuffer, int start, int length) throws IOException {
+        if (this.inTag) {
             append(">");
-            this.mInTag = false;
+            this.inTag = false;
         }
-        escapeAndAppendString(buf, start, len);
+        escapeAndAppendString(characterBuffer, start, length);
         return this;
     }
 
-    public XmlSerializer text(String text) throws IOException, IllegalArgumentException, IllegalStateException {
-        if (this.mInTag) {
+    /**
+     * Writes text string, escaping XML special characters.
+     */
+    @Override
+    public XmlSerializer text(String textContent) throws IOException {
+        if (this.inTag) {
             append(">");
-            this.mInTag = false;
+            this.inTag = false;
         }
-        escapeAndAppendString(text);
+        escapeAndAppendString(textContent);
         return this;
     }
 }

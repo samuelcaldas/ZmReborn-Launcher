@@ -7,89 +7,112 @@ import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
 
+/**
+ * View showing a rectangular color preview swatch with alpha grid backing and border.
+ */
 public class ColourPickerPanelView extends View {
     private static final float BORDER_WIDTH_PX = 1.0f;
-    private AlphaPatternDrawable mAlphaPattern;
-    private int mBorderColor;
-    private Paint mBorderPaint;
-    private int mColor;
-    private Paint mColorPaint;
-    private RectF mColorRect;
-    private float mDensity;
-    private RectF mDrawingRect;
+    private AlphaPatternDrawable alphaPattern;
+    private int borderColor;
+    private Paint borderPaint;
+    private int color;
+    private Paint colorPaint;
+    private RectF colorRect;
+    private float density;
+    private RectF drawingRect;
 
+    /**
+     * Constructs a panel view with context.
+     */
     public ColourPickerPanelView(Context context) {
-        this(context, (AttributeSet) null);
+        this(context, null);
     }
 
+    /**
+     * Constructs a panel view with context and XML attributes.
+     */
     public ColourPickerPanelView(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
+    /**
+     * Constructs a panel view with context, XML attributes, and default style.
+     */
     public ColourPickerPanelView(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        this.mDensity = BORDER_WIDTH_PX;
-        this.mColor = -16777216;
-        this.mBorderColor = -9539986;
+        this.density = BORDER_WIDTH_PX;
+        this.color = 0xFF000000;
+        this.borderColor = 0xFF6E6E6E;
         init();
     }
 
     private void init() {
-        this.mBorderPaint = new Paint();
-        this.mColorPaint = new Paint();
-        this.mDensity = getContext().getResources().getDisplayMetrics().density;
+        this.borderPaint = new Paint();
+        this.colorPaint = new Paint();
+        this.density = getContext().getResources().getDisplayMetrics().density;
     }
 
-    /* access modifiers changed from: protected */
-    public void onDraw(Canvas canvas) {
-        RectF rect = this.mColorRect;
-        this.mBorderPaint.setColor(this.mBorderColor);
-        canvas.drawRect(this.mDrawingRect, this.mBorderPaint);
-        if (this.mAlphaPattern != null) {
-            this.mAlphaPattern.draw(canvas);
+    @Override
+    protected void onDraw(Canvas canvas) {
+        this.borderPaint.setColor(this.borderColor);
+        canvas.drawRect(this.drawingRect, this.borderPaint);
+        if (this.alphaPattern != null) {
+            this.alphaPattern.draw(canvas);
         }
-        this.mColorPaint.setColor(this.mColor);
-        canvas.drawRect(rect, this.mColorPaint);
+        this.colorPaint.setColor(this.color);
+        canvas.drawRect(this.colorRect, this.colorPaint);
     }
 
-    /* access modifiers changed from: protected */
-    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         setMeasuredDimension(View.MeasureSpec.getSize(widthMeasureSpec), View.MeasureSpec.getSize(heightMeasureSpec));
     }
 
-    /* access modifiers changed from: protected */
-    public void onSizeChanged(int w, int h, int oldw, int oldh) {
-        super.onSizeChanged(w, h, oldw, oldh);
-        this.mDrawingRect = new RectF();
-        this.mDrawingRect.left = (float) getPaddingLeft();
-        this.mDrawingRect.right = (float) (w - getPaddingRight());
-        this.mDrawingRect.top = (float) getPaddingTop();
-        this.mDrawingRect.bottom = (float) (h - getPaddingBottom());
+    @Override
+    protected void onSizeChanged(int width, int height, int oldWidth, int oldHeight) {
+        super.onSizeChanged(width, height, oldWidth, oldHeight);
+        this.drawingRect = new RectF();
+        this.drawingRect.left = getPaddingLeft();
+        this.drawingRect.right = width - getPaddingRight();
+        this.drawingRect.top = getPaddingTop();
+        this.drawingRect.bottom = height - getPaddingBottom();
         setupColorRect();
     }
 
     private void setupColorRect() {
-        RectF dRect = this.mDrawingRect;
-        this.mColorRect = new RectF(dRect.left + BORDER_WIDTH_PX, dRect.top + BORDER_WIDTH_PX, dRect.right - BORDER_WIDTH_PX, dRect.bottom - BORDER_WIDTH_PX);
-        this.mAlphaPattern = new AlphaPatternDrawable((int) (5.0f * this.mDensity));
-        this.mAlphaPattern.setBounds(Math.round(this.mColorRect.left), Math.round(this.mColorRect.top), Math.round(this.mColorRect.right), Math.round(this.mColorRect.bottom));
+        RectF dRect = this.drawingRect;
+        this.colorRect = new RectF(dRect.left + BORDER_WIDTH_PX, dRect.top + BORDER_WIDTH_PX, dRect.right - BORDER_WIDTH_PX, dRect.bottom - BORDER_WIDTH_PX);
+        this.alphaPattern = new AlphaPatternDrawable((int) (5.0f * this.density));
+        this.alphaPattern.setBounds(Math.round(this.colorRect.left), Math.round(this.colorRect.top), Math.round(this.colorRect.right), Math.round(this.colorRect.bottom));
     }
 
+    /**
+     * Sets the displayed color.
+     */
     public void setColor(int color) {
-        this.mColor = color;
+        this.color = color;
         invalidate();
     }
 
+    /**
+     * Returns the displayed color.
+     */
     public int getColor() {
-        return this.mColor;
+        return this.color;
     }
 
+    /**
+     * Sets the panel border color.
+     */
     public void setBorderColor(int color) {
-        this.mBorderColor = color;
+        this.borderColor = color;
         invalidate();
     }
 
+    /**
+     * Returns the panel border color.
+     */
     public int getBorderColor() {
-        return this.mBorderColor;
+        return this.borderColor;
     }
 }

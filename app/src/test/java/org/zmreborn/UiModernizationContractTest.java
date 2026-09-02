@@ -42,10 +42,10 @@ public class UiModernizationContractTest {
         assertTrue(grid.contains("super.setNumColumns(AUTO_FIT)"));
         assertTrue(grid.contains("R.dimen.drawer_cell_preferred_width"));
         assertFalse(grid.contains("smoothScrollBy"));
-        assertTrue(grid.contains("!this.mActionsEnabled || this.mClosing"));
+        assertTrue(grid.contains("!this.actionsEnabled || this.closing"));
         assertFalse(paging.contains("System.gc()"));
         assertFalse(paging.contains("setDrawingCacheEnabled(true)"));
-        assertTrue(paging.contains("!this.mActionsEnabled || this.mClosing"));
+        assertTrue(paging.contains("!this.actionsEnabled || this.closing"));
         assertTrue(launcher.contains(
                 "!PreferencesUtil.rememberApplicationsPosition(Launcher.this)"));
         assertTrue(launcher.contains(
@@ -84,21 +84,21 @@ public class UiModernizationContractTest {
         assertTrue(landscape.contains("@+id/drawer_fast_scroll"));
         assertTrue(drawer.contains("updateFastScroll()"));
         assertTrue(drawer.contains("setOnSectionSelectedListener"));
-        assertTrue(drawer.contains("this.mGridView.setFastScrollVisible(this.mFastScrollEnabled)"));
-        assertTrue(drawer.contains("this.mClosing || position < 0"));
+        assertTrue(drawer.contains("this.gridView.setFastScrollVisible(this.fastScrollEnabled)"));
+        assertTrue(drawer.contains("this.closing || position < 0"));
         assertTrue(grid.contains("void setFastScrollVisible(boolean visible)"));
         assertTrue(grid.contains("onRtlPropertiesChanged(int layoutDirection)"));
         assertTrue(grid.contains("setNextFocusLeftId(railId)"));
         assertTrue(grid.contains("fastScrollInsetLeft"));
-        assertTrue(drawer.contains("updateFastScrollFocus(this.mFastScrollEnabled)"));
+        assertTrue(drawer.contains("updateFastScrollFocus(this.fastScrollEnabled)"));
         assertTrue(drawer.contains("updateSearchFocus()"));
         assertTrue(drawer.contains("setDrawerControlsEnabled(false)"));
-        assertTrue(grid.contains("setEnabled(this.mActionsEnabled && !this.mClosing)"));
+        assertTrue(grid.contains("setEnabled(this.actionsEnabled && !this.closing)"));
         assertFalse(fastScroll.contains("setSelectionFromTop"));
         assertTrue(fastScroll.contains("onTouchEvent(MotionEvent event)"));
         assertTrue(fastScroll.contains("AccessibilityNodeProvider"));
         assertTrue(fastScroll.contains("onKeyDown(int keyCode, KeyEvent event)"));
-        assertTrue(indexReset.indexOf("this.mSelectedIndex = -1")
+        assertTrue(indexReset.indexOf("this.selectedIndex = -1")
                 < indexReset.indexOf("rebuildDisplayedIndex()"));
         assertTrue(fastScroll.contains("virtualViewIdForSection"));
         assertTrue(alphabetIndex.contains("DrawerSearchFilter.normalize"));
@@ -173,11 +173,11 @@ public class UiModernizationContractTest {
         assertTrue(grid.contains("WallpaperColorExtractor.getSurface(getContext())"));
         assertTrue(grid.contains("applicationsAdapter.notifyDataSetChanged();"));
         assertTrue(paging.contains("((ApplicationsPageView) page).refreshPalette();"));
-        assertTrue(pagingPaletteRefresh.contains("this.mScreenIndicator.refreshPalette();"));
+        assertTrue(pagingPaletteRefresh.contains("this.screenIndicator.refreshPalette();"));
         assertTrue(userFolderPaletteRefresh.contains("super.refreshPalette();"));
-        assertTrue(userFolderPaletteRefresh.contains("this.mSignalRail.refreshPalette();"));
+        assertTrue(userFolderPaletteRefresh.contains("this.signalRail.refreshPalette();"));
         assertTrue(userFolderPaletteRefresh.indexOf("super.refreshPalette();")
-                < userFolderPaletteRefresh.indexOf("this.mSignalRail.refreshPalette();"));
+                < userFolderPaletteRefresh.indexOf("this.signalRail.refreshPalette();"));
         assertTrue(renameDialog.contains("WallpaperColorExtractor.getSurface(Launcher.this)"));
         assertTrue(renameDialog.contains("WallpaperColorExtractor.getSurfaceVariant(Launcher.this)"));
         assertTrue(renameDialog.contains("WallpaperColorExtractor.getOnSurface(Launcher.this)"));
@@ -247,7 +247,7 @@ public class UiModernizationContractTest {
         assertTrue(commit.contains("updateAppWidgetSizeOptions(session.widgetInfo)"));
         assertTrue(commit.indexOf("LauncherModel.updateItemInDatabase")
                 < commit.indexOf("updateAppWidgetSizeOptions"));
-        assertTrue(cellLayout.contains("findOccupiedCells(xCount, yCount, this.mOccupied, ignoredView)"));
+        assertTrue(cellLayout.contains("findOccupiedCells(xCount, yCount, this.occupied, ignoredView)"));
         assertTrue(cellLayout.contains("static ResizeCandidate calculateResizeCandidate"));
         assertTrue(cellLayout.contains("throw new IllegalArgumentException(\"Unknown resize edge\")"));
         assertTrue(resizeFrame.contains("private static final int HANDLE_SIZE_DP = 48"));
@@ -307,8 +307,8 @@ public class UiModernizationContractTest {
                 "    private void updateFastScrollFocus");
         assertFalse("updateFastScroll must not call setVisibility(VISIBLE) directly",
                 updateFastScrollBody.contains("VISIBLE"));
-        assertTrue("updateFastScroll must set mFastScrollEnabled",
-                updateFastScrollBody.contains("mFastScrollEnabled"));
+        assertTrue("updateFastScroll must set fastScrollEnabled",
+                updateFastScrollBody.contains("fastScrollEnabled"));
     }
 
     @Test
@@ -317,7 +317,7 @@ public class UiModernizationContractTest {
         assertTrue("ApplicationsDrawerView must have collapseSearchBar method",
                 drawer.contains("collapseSearchBar()"));
         assertTrue("ApplicationsDrawerView must store max height of search bar",
-                drawer.contains("mSearchBarMaxHeight"));
+                drawer.contains("searchBarMaxHeight"));
         assertTrue("ApplicationsDrawerView must override onInterceptTouchEvent for pull-to-reveal",
                 drawer.contains("onInterceptTouchEvent"));
     }

@@ -6,8 +6,14 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
-/** Presents a bounded integer as inline decrement and increment actions. */
+/**
+ * Presents a bounded integer as inline decrement and increment actions.
+ */
 public final class InlineStepperPreference extends DebouncedIntegerPreference {
+
+    /**
+     * Constructs an inline stepper preference with context and XML attributes.
+     */
     public InlineStepperPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setSelectable(false);

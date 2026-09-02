@@ -16,62 +16,75 @@ import android.view.ViewGroup;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 
+/**
+ * Grid-based container view organizing desktop shortcuts, folders, and widgets into discrete cells.
+ */
 public class CellLayout extends ViewGroup {
     static final int RESIZE_EDGE_NONE = 0;
     static final int RESIZE_EDGE_START = 1;
     static final int RESIZE_EDGE_END = 2;
 
-    private int mCellHeight;
-    private final CellInfo mCellInfo;
-    private int mCellWidth;
-    int[] mCellXY;
-    private int mColumns;
-    private boolean mDirtyTag;
-    private RectF mDragRect;
-    private int mHeightGap;
-    private boolean mLastDownOnOccupiedCell;
-    private int mLongAxisCells;
-    private int mLongAxisEndPadding;
-    private int mLongAxisStartPadding;
-    boolean[][] mOccupied;
-    private boolean mPortrait;
-    private final Rect mRect;
-    private int mRows;
-    private int mShortAxisCells;
-    private int mShortAxisEndPadding;
-    private int mShortAxisStartPadding;
-    private final WallpaperManager mWallpaperManager;
-    private int mWidthGap;
+    private int cellHeight;
+    private final CellInfo cellInfo;
+    private int cellWidth;
+    private final int[] cellXY;
+    private int columns;
+    private boolean dirtyTag;
+    private final RectF dragRect;
+    private int heightGap;
+    private boolean lastDownOnOccupiedCell;
+    private int longAxisCells;
+    private int longAxisEndPadding;
+    private int longAxisStartPadding;
+    private boolean[][] occupied;
+    private boolean portrait;
+    private final Rect rect;
+    private int rows;
+    private int shortAxisCells;
+    private int shortAxisEndPadding;
+    private int shortAxisStartPadding;
+    private final WallpaperManager wallpaperManager;
+    private int widthGap;
 
+    /**
+     * Constructs a cell layout with context.
+     */
     public CellLayout(Context context) {
-        this(context, (AttributeSet) null);
+        this(context, null);
     }
 
+    /**
+     * Constructs a cell layout with context and XML attributes.
+     */
     public CellLayout(Context context, AttributeSet attrs) {
         this(context, attrs, 0);
     }
 
+    /**
+     * Constructs a cell layout with context, XML attributes, and default style.
+     */
     public CellLayout(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
-        this.mRect = new Rect();
-        this.mCellInfo = new CellInfo();
-        this.mCellXY = new int[2];
-        this.mDragRect = new RectF();
-        this.mLastDownOnOccupiedCell = false;
+        this.rect = new Rect();
+        this.cellInfo = new CellInfo();
+        this.cellXY = new int[2];
+        this.dragRect = new RectF();
+        this.lastDownOnOccupiedCell = false;
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.CellLayout, defStyle, 0);
-        this.mCellWidth = typedArray.getDimensionPixelSize(0, 10);
-        this.mCellHeight = typedArray.getDimensionPixelSize(1, 10);
-        this.mLongAxisStartPadding = typedArray.getDimensionPixelSize(2, 10);
-        this.mLongAxisEndPadding = typedArray.getDimensionPixelSize(3, 10);
-        this.mShortAxisStartPadding = typedArray.getDimensionPixelSize(4, 10);
-        this.mShortAxisEndPadding = typedArray.getDimensionPixelSize(5, 10);
-        this.mRows = PreferencesUtil.getContentGridRows(getContext());
-        this.mColumns = PreferencesUtil.getContentGridColumns(getContext());
+        this.cellWidth = typedArray.getDimensionPixelSize(0, 10);
+        this.cellHeight = typedArray.getDimensionPixelSize(1, 10);
+        this.longAxisStartPadding = typedArray.getDimensionPixelSize(2, 10);
+        this.longAxisEndPadding = typedArray.getDimensionPixelSize(3, 10);
+        this.shortAxisStartPadding = typedArray.getDimensionPixelSize(4, 10);
+        this.shortAxisEndPadding = typedArray.getDimensionPixelSize(5, 10);
+        this.rows = PreferencesUtil.getContentGridRows(getContext());
+        this.columns = PreferencesUtil.getContentGridColumns(getContext());
         typedArray.recycle();
         setAlwaysDrawnWithCacheEnabled(false);
-        this.mWallpaperManager = WallpaperManager.getInstance(getContext());
+        this.wallpaperManager = WallpaperManager.getInstance(getContext());
     }
 
+    @Override
     public void cancelLongPress() {
         super.cancelLongPress();
         int count = getChildCount();
@@ -80,127 +93,139 @@ public class CellLayout extends ViewGroup {
         }
     }
 
-    /* access modifiers changed from: package-private */
+    /**
+     * Gets the horizontal cell count depending on screen orientation.
+     */
     public int getCountX() {
-        return this.mPortrait ? this.mShortAxisCells : this.mLongAxisCells;
+        return this.portrait ? this.shortAxisCells : this.longAxisCells;
     }
 
-    /* access modifiers changed from: package-private */
+    /**
+     * Gets the vertical cell count depending on screen orientation.
+     */
     public int getCountY() {
-        return this.mPortrait ? this.mLongAxisCells : this.mShortAxisCells;
+        return this.portrait ? this.longAxisCells : this.shortAxisCells;
     }
 
-    /* access modifiers changed from: protected */
-    public void dispatchDraw(Canvas canvas) {
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
     }
 
+    @Override
     public void addView(View child, int index, ViewGroup.LayoutParams params) {
         ((LayoutParams) params).regenerateId = true;
         super.addView(child, index, params);
     }
 
+    @Override
     public void requestChildFocus(View child, View focused) {
         super.requestChildFocus(child, focused);
         if (child != null) {
-            Rect rect = new Rect();
-            child.getDrawingRect(rect);
-            requestRectangleOnScreen(rect);
+            Rect r = new Rect();
+            child.getDrawingRect(r);
+            requestRectangleOnScreen(r);
         }
     }
 
-    /* access modifiers changed from: protected */
-    public void onAttachedToWindow() {
+    @Override
+    protected void onAttachedToWindow() {
         super.onAttachedToWindow();
-        this.mCellInfo.screen = ((ViewGroup) getParent()).indexOfChild(this);
-    }
-
-    public boolean onInterceptTouchEvent(MotionEvent motionEvent) {
-        int yCount;
-        int action = motionEvent.getAction();
-        CellInfo cellInfo = this.mCellInfo;
-        if (action == 0) {
-            Rect frame = this.mRect;
-            int x = ((int) motionEvent.getX()) + getScrollX();
-            int y = ((int) motionEvent.getY()) + getScrollY();
-            boolean found = false;
-            int i = getChildCount() - 1;
-            while (true) {
-                if (i < 0) {
-                    break;
-                }
-                View child = getChildAt(i);
-                if (child.getVisibility() == 0 || child.getAnimation() != null) {
-                    child.getHitRect(frame);
-                    if (frame.contains(x, y)) {
-                        LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
-                        cellInfo.cell = child;
-                        cellInfo.cellX = layoutParams.cellX;
-                        cellInfo.cellY = layoutParams.cellY;
-                        cellInfo.spanX = layoutParams.cellHSpan;
-                        cellInfo.spanY = layoutParams.cellVSpan;
-                        cellInfo.valid = true;
-                        found = true;
-                        this.mDirtyTag = false;
-                        break;
-                    }
-                }
-                i--;
-            }
-            this.mLastDownOnOccupiedCell = found;
-            if (!found) {
-                int[] cellXY = this.mCellXY;
-                pointToCellExact(x, y, cellXY);
-                boolean portrait = this.mPortrait;
-                int xCount = portrait ? this.mShortAxisCells : this.mLongAxisCells;
-                if (portrait) {
-                    yCount = this.mLongAxisCells;
-                } else {
-                    yCount = this.mShortAxisCells;
-                }
-                boolean[][] occupied = this.mOccupied;
-                findOccupiedCells(xCount, yCount, occupied, (View) null);
-                cellInfo.cell = null;
-                cellInfo.cellX = cellXY[0];
-                cellInfo.cellY = cellXY[1];
-                cellInfo.spanX = 1;
-                cellInfo.spanY = 1;
-                cellInfo.valid = cellXY[0] >= 0 && cellXY[1] >= 0 && cellXY[0] < xCount && cellXY[1] < yCount && !occupied[cellXY[0]][cellXY[1]];
-                this.mDirtyTag = true;
-            }
-            setTag(cellInfo);
-            return false;
-        } else if (action != 1) {
-            return false;
-        } else {
-            cellInfo.cell = null;
-            cellInfo.cellX = -1;
-            cellInfo.cellY = -1;
-            cellInfo.spanX = 0;
-            cellInfo.spanY = 0;
-            cellInfo.valid = false;
-            this.mDirtyTag = false;
-            setTag(cellInfo);
-            return false;
+        if (getParent() instanceof ViewGroup) {
+            this.cellInfo.screen = ((ViewGroup) getParent()).indexOfChild(this);
         }
     }
 
+    @Override
+    public boolean onInterceptTouchEvent(MotionEvent motionEvent) {
+        int action = motionEvent.getAction();
+        CellInfo info = this.cellInfo;
+        if (action == MotionEvent.ACTION_DOWN) {
+            return handleInterceptDown(motionEvent, info);
+        }
+        if (action == MotionEvent.ACTION_UP) {
+            resetCellInfo(info);
+        }
+        return false;
+    }
+
+    private boolean handleInterceptDown(MotionEvent motionEvent, CellInfo info) {
+        Rect frame = this.rect;
+        int x = ((int) motionEvent.getX()) + getScrollX();
+        int y = ((int) motionEvent.getY()) + getScrollY();
+        boolean found = findChildUnderPoint(x, y, frame, info);
+        this.lastDownOnOccupiedCell = found;
+        if (!found) {
+            populateVacantDownCell(x, y, info);
+        }
+        setTag(info);
+        return false;
+    }
+
+    private boolean findChildUnderPoint(int x, int y, Rect frame, CellInfo info) {
+        for (int i = getChildCount() - 1; i >= 0; i--) {
+            View child = getChildAt(i);
+            if (child.getVisibility() == View.VISIBLE || child.getAnimation() != null) {
+                child.getHitRect(frame);
+                if (frame.contains(x, y)) {
+                    LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
+                    info.cell = child;
+                    info.cellX = layoutParams.cellX;
+                    info.cellY = layoutParams.cellY;
+                    info.spanX = layoutParams.cellHSpan;
+                    info.spanY = layoutParams.cellVSpan;
+                    info.valid = true;
+                    this.dirtyTag = false;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private void populateVacantDownCell(int x, int y, CellInfo info) {
+        int[] targetCellXY = this.cellXY;
+        pointToCellExact(x, y, targetCellXY);
+        int xCount = this.portrait ? this.shortAxisCells : this.longAxisCells;
+        int yCount = this.portrait ? this.longAxisCells : this.shortAxisCells;
+        boolean[][] occupiedGrid = this.occupied;
+        findOccupiedCells(xCount, yCount, occupiedGrid, null);
+        info.cell = null;
+        info.cellX = targetCellXY[0];
+        info.cellY = targetCellXY[1];
+        info.spanX = 1;
+        info.spanY = 1;
+        info.valid = targetCellXY[0] >= 0 && targetCellXY[1] >= 0 && targetCellXY[0] < xCount
+                && targetCellXY[1] < yCount && !occupiedGrid[targetCellXY[0]][targetCellXY[1]];
+        this.dirtyTag = true;
+    }
+
+    private void resetCellInfo(CellInfo info) {
+        info.cell = null;
+        info.cellX = -1;
+        info.cellY = -1;
+        info.spanX = 0;
+        info.spanY = 0;
+        info.valid = false;
+        this.dirtyTag = false;
+        setTag(info);
+    }
+
+    @Override
     public CellInfo getTag() {
         CellInfo info = (CellInfo) super.getTag();
-        if (this.mDirtyTag && info.valid) {
-            boolean portrait = this.mPortrait;
-            int xCount = portrait ? this.mShortAxisCells : this.mLongAxisCells;
-            int yCount = portrait ? this.mLongAxisCells : this.mShortAxisCells;
-            boolean[][] occupied = this.mOccupied;
-            findOccupiedCells(xCount, yCount, occupied, (View) null);
-            findIntersectingVacantCells(info, info.cellX, info.cellY, xCount, yCount, occupied);
-            this.mDirtyTag = false;
+        if (info != null && this.dirtyTag && info.valid) {
+            int xCount = this.portrait ? this.shortAxisCells : this.longAxisCells;
+            int yCount = this.portrait ? this.longAxisCells : this.shortAxisCells;
+            boolean[][] occupiedGrid = this.occupied;
+            findOccupiedCells(xCount, yCount, occupiedGrid, null);
+            findIntersectingVacantCells(info, info.cellX, info.cellY, xCount, yCount, occupiedGrid);
+            this.dirtyTag = false;
         }
         return info;
     }
 
-    /* access modifiers changed from: private */
-    public static void findIntersectingVacantCells(CellInfo cellInfo, int x, int y, int xCount, int yCount, boolean[][] occupied) {
+    private static void findIntersectingVacantCells(CellInfo cellInfo, int x, int y, int xCount, int yCount, boolean[][] occupied) {
         cellInfo.maxVacantSpanX = Integer.MIN_VALUE;
         cellInfo.maxVacantSpanXSpanY = Integer.MIN_VALUE;
         cellInfo.maxVacantSpanY = Integer.MIN_VALUE;
@@ -211,15 +236,13 @@ public class CellLayout extends ViewGroup {
                 cellInfo.current.set(x, y, x, y);
                 findVacantCell(cellInfo.current, xCount, yCount, occupied, cellInfo);
             }
-        } catch (IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException ignored) {
         }
     }
 
     private static void findVacantCell(Rect current, int xCount, int yCount, boolean[][] occupied, CellInfo cellInfo) {
-        int l = 0;
-        while (l < xCount) {
-            int r = l;
-            while (r < xCount) {
+        for (int l = 0; l < xCount; l++) {
+            for (int r = l; r < xCount; r++) {
                 for (int t = 0; t < yCount; t++) {
                     int b = t;
                     while (b < yCount && isRowEmpty(b, l, r, occupied)) {
@@ -231,12 +254,13 @@ public class CellLayout extends ViewGroup {
                         b++;
                     }
                 }
-                r++;
             }
-            l++;
         }
     }
 
+    /**
+     * Queries whether all cells in the rectangular span [x0..x1, y0..y1] are empty.
+     */
     public static boolean isEmpty(int x0, int x1, int y0, int y1, boolean[][] occupied) {
         for (int x = x0; x <= x1; x++) {
             for (int y = y0; y <= y1; y++) {
@@ -274,79 +298,61 @@ public class CellLayout extends ViewGroup {
         return true;
     }
 
-    /* access modifiers changed from: package-private */
-    public CellInfo findAllVacantCells(boolean[] occupiedCells, View ignoreView) {
-        boolean portrait = this.mPortrait;
-        int xCount = portrait ? this.mShortAxisCells : this.mLongAxisCells;
-        int yCount = portrait ? this.mLongAxisCells : this.mShortAxisCells;
-        boolean[][] occupied = this.mOccupied;
+    CellInfo findAllVacantCells(boolean[] occupiedCells, View ignoreView) {
+        int xCount = this.portrait ? this.shortAxisCells : this.longAxisCells;
+        int yCount = this.portrait ? this.longAxisCells : this.shortAxisCells;
+        boolean[][] occupiedGrid = this.occupied;
         if (occupiedCells != null) {
             for (int y = 0; y < yCount; y++) {
                 for (int x = 0; x < xCount; x++) {
-                    occupied[x][y] = occupiedCells[(y * xCount) + x];
+                    occupiedGrid[x][y] = occupiedCells[(y * xCount) + x];
                 }
             }
         } else {
-            findOccupiedCells(xCount, yCount, occupied, ignoreView);
+            findOccupiedCells(xCount, yCount, occupiedGrid, ignoreView);
         }
-        return findAllVacantCellsFromOccupied(occupied, xCount, yCount);
+        return findAllVacantCellsFromOccupied(occupiedGrid, xCount, yCount);
     }
 
-    /* access modifiers changed from: package-private */
+    /**
+     * Resolves all vacant rectangular cells from the given occupied occupancy grid.
+     */
     public CellInfo findAllVacantCellsFromOccupied(boolean[][] occupied, int xCount, int yCount) {
-        boolean z = false;
-        CellInfo cellInfo = new CellInfo();
-        cellInfo.cellX = -1;
-        cellInfo.cellY = -1;
-        cellInfo.spanY = 0;
-        cellInfo.spanX = 0;
-        cellInfo.maxVacantSpanX = Integer.MIN_VALUE;
-        cellInfo.maxVacantSpanXSpanY = Integer.MIN_VALUE;
-        cellInfo.maxVacantSpanY = Integer.MIN_VALUE;
-        cellInfo.maxVacantSpanYSpanX = Integer.MIN_VALUE;
-        cellInfo.screen = this.mCellInfo.screen;
-        findVacantCell(cellInfo.current, xCount, yCount, occupied, cellInfo);
-        if (cellInfo.vacantCells.size() > 0) {
-            z = true;
-        }
-        cellInfo.valid = z;
-        return cellInfo;
+        CellInfo info = new CellInfo();
+        info.cellX = -1;
+        info.cellY = -1;
+        info.spanY = 0;
+        info.spanX = 0;
+        info.maxVacantSpanX = Integer.MIN_VALUE;
+        info.maxVacantSpanXSpanY = Integer.MIN_VALUE;
+        info.maxVacantSpanY = Integer.MIN_VALUE;
+        info.maxVacantSpanYSpanX = Integer.MIN_VALUE;
+        info.screen = this.cellInfo.screen;
+        findVacantCell(info.current, xCount, yCount, occupied, info);
+        info.valid = !info.vacantCells.isEmpty();
+        return info;
     }
 
-    /* access modifiers changed from: package-private */
-    public void pointToCellExact(int x, int y, int[] result) {
-        boolean portrait = this.mPortrait;
-        int hStartPadding = portrait ? this.mShortAxisStartPadding : this.mLongAxisStartPadding;
-        int vStartPadding = portrait ? this.mLongAxisStartPadding : this.mShortAxisStartPadding;
-        result[0] = (x - hStartPadding) / (this.mCellWidth + this.mWidthGap);
-        result[1] = (y - vStartPadding) / (this.mCellHeight + this.mHeightGap);
-        int xAxis = portrait ? this.mShortAxisCells : this.mLongAxisCells;
-        int yAxis = portrait ? this.mLongAxisCells : this.mShortAxisCells;
-        if (result[0] < 0) {
-            result[0] = 0;
-        }
-        if (result[0] >= xAxis) {
-            result[0] = xAxis - 1;
-        }
-        if (result[1] < 0) {
-            result[1] = 0;
-        }
-        if (result[1] >= yAxis) {
-            result[1] = yAxis - 1;
-        }
+    void pointToCellExact(int x, int y, int[] result) {
+        int hStartPadding = this.portrait ? this.shortAxisStartPadding : this.longAxisStartPadding;
+        int vStartPadding = this.portrait ? this.longAxisStartPadding : this.shortAxisStartPadding;
+        result[0] = (x - hStartPadding) / (this.cellWidth + this.widthGap);
+        result[1] = (y - vStartPadding) / (this.cellHeight + this.heightGap);
+        int xAxis = this.portrait ? this.shortAxisCells : this.longAxisCells;
+        int yAxis = this.portrait ? this.longAxisCells : this.shortAxisCells;
+        result[0] = Math.max(0, Math.min(xAxis - 1, result[0]));
+        result[1] = Math.max(0, Math.min(yAxis - 1, result[1]));
     }
 
-    /* access modifiers changed from: package-private */
-    public void cellToPoint(int cellX, int cellY, int[] result) {
-        boolean portrait = this.mPortrait;
-        int hStartPadding = portrait ? this.mShortAxisStartPadding : this.mLongAxisStartPadding;
-        int vStartPadding = portrait ? this.mLongAxisStartPadding : this.mShortAxisStartPadding;
-        result[0] = ((this.mCellWidth + this.mWidthGap) * cellX) + hStartPadding;
-        result[1] = ((this.mCellHeight + this.mHeightGap) * cellY) + vStartPadding;
+    void cellToPoint(int cX, int cY, int[] result) {
+        int hStartPadding = this.portrait ? this.shortAxisStartPadding : this.longAxisStartPadding;
+        int vStartPadding = this.portrait ? this.longAxisStartPadding : this.shortAxisStartPadding;
+        result[0] = ((this.cellWidth + this.widthGap) * cX) + hStartPadding;
+        result[1] = ((this.cellHeight + this.heightGap) * cY) + vStartPadding;
     }
 
-    /* access modifiers changed from: protected */
-    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int tmpCellW;
         int tmpCellH;
         boolean autoFit = PreferencesUtil.isAutoFitContentGridItemsEnabled(getContext());
@@ -357,99 +363,94 @@ public class CellLayout extends ViewGroup {
         if (widthSpecMode == 0 || heightSpecMode == 0) {
             throw new RuntimeException("CellLayout cannot have UNSPECIFIED dimensions");
         }
-        this.mPortrait = heightSpecSize > widthSpecSize;
-        int i = this.mCellWidth;
-        int i2 = this.mCellHeight;
-        if (this.mPortrait) {
-            this.mLongAxisCells = this.mRows;
-            this.mShortAxisCells = this.mColumns;
-            tmpCellW = ((widthSpecSize - this.mShortAxisStartPadding) - this.mShortAxisEndPadding) / this.mColumns;
-            tmpCellH = ((heightSpecSize - this.mLongAxisStartPadding) - this.mLongAxisEndPadding) / this.mRows;
+        this.portrait = heightSpecSize > widthSpecSize;
+        if (this.portrait) {
+            this.longAxisCells = this.rows;
+            this.shortAxisCells = this.columns;
+            tmpCellW = ((widthSpecSize - this.shortAxisStartPadding) - this.shortAxisEndPadding) / this.columns;
+            tmpCellH = ((heightSpecSize - this.longAxisStartPadding) - this.longAxisEndPadding) / this.rows;
         } else {
-            this.mShortAxisCells = this.mRows;
-            this.mLongAxisCells = this.mColumns;
-            tmpCellW = ((widthSpecSize - this.mLongAxisStartPadding) - this.mLongAxisEndPadding) / this.mColumns;
-            tmpCellH = ((heightSpecSize - this.mShortAxisStartPadding) - this.mShortAxisEndPadding) / this.mRows;
+            this.shortAxisCells = this.rows;
+            this.longAxisCells = this.columns;
+            tmpCellW = ((widthSpecSize - this.longAxisStartPadding) - this.longAxisEndPadding) / this.columns;
+            tmpCellH = ((heightSpecSize - this.shortAxisStartPadding) - this.shortAxisEndPadding) / this.rows;
         }
         if (autoFit) {
-            this.mCellWidth = tmpCellW;
-            this.mCellHeight = tmpCellH;
+            this.cellWidth = tmpCellW;
+            this.cellHeight = tmpCellH;
         }
-        if (this.mOccupied == null) {
-            if (this.mPortrait) {
-                this.mOccupied = (boolean[][]) Array.newInstance(Boolean.TYPE, new int[]{this.mShortAxisCells, this.mLongAxisCells});
+        if (this.occupied == null) {
+            if (this.portrait) {
+                this.occupied = (boolean[][]) Array.newInstance(Boolean.TYPE, this.shortAxisCells, this.longAxisCells);
             } else {
-                this.mOccupied = (boolean[][]) Array.newInstance(Boolean.TYPE, new int[]{this.mLongAxisCells, this.mShortAxisCells});
+                this.occupied = (boolean[][]) Array.newInstance(Boolean.TYPE, this.longAxisCells, this.shortAxisCells);
             }
         }
-        int shortAxisCells = this.mShortAxisCells;
-        int longAxisCells = this.mLongAxisCells;
-        int longAxisStartPadding = this.mLongAxisStartPadding;
-        int longAxisEndPadding = this.mLongAxisEndPadding;
-        int shortAxisStartPadding = this.mShortAxisStartPadding;
-        int shortAxisEndPadding = this.mShortAxisEndPadding;
-        int cellWidth = this.mCellWidth;
-        int cellHeight = this.mCellHeight;
-        this.mPortrait = heightSpecSize > widthSpecSize;
-        int numShortGaps = shortAxisCells - 1;
-        int numLongGaps = longAxisCells - 1;
-        if (this.mPortrait) {
-            this.mHeightGap = (((heightSpecSize - longAxisStartPadding) - longAxisEndPadding) - (cellHeight * longAxisCells)) / numLongGaps;
-            int hSpaceLeft = ((widthSpecSize - shortAxisStartPadding) - shortAxisEndPadding) - (cellWidth * shortAxisCells);
-            if (numShortGaps > 0) {
-                this.mWidthGap = hSpaceLeft / numShortGaps;
-            } else {
-                this.mWidthGap = 0;
-            }
+        int sCells = this.shortAxisCells;
+        int lCells = this.longAxisCells;
+        int lStartPad = this.longAxisStartPadding;
+        int lEndPad = this.longAxisEndPadding;
+        int sStartPad = this.shortAxisStartPadding;
+        int sEndPad = this.shortAxisEndPadding;
+        int cWidth = this.cellWidth;
+        int cHeight = this.cellHeight;
+        this.portrait = heightSpecSize > widthSpecSize;
+        int numShortGaps = sCells - 1;
+        int numLongGaps = lCells - 1;
+        if (this.portrait) {
+            this.heightGap = (((heightSpecSize - lStartPad) - lEndPad) - (cHeight * lCells)) / numLongGaps;
+            int hSpaceLeft = ((widthSpecSize - sStartPad) - sEndPad) - (cWidth * sCells);
+            this.widthGap = numShortGaps > 0 ? hSpaceLeft / numShortGaps : 0;
         } else {
-            this.mWidthGap = (((widthSpecSize - longAxisStartPadding) - longAxisEndPadding) - (cellWidth * longAxisCells)) / numLongGaps;
-            int vSpaceLeft = ((heightSpecSize - shortAxisStartPadding) - shortAxisEndPadding) - (cellHeight * shortAxisCells);
-            if (numShortGaps > 0) {
-                this.mHeightGap = vSpaceLeft / numShortGaps;
-            } else {
-                this.mHeightGap = 0;
-            }
+            this.widthGap = (((widthSpecSize - lStartPad) - lEndPad) - (cWidth * lCells)) / numLongGaps;
+            int vSpaceLeft = ((heightSpecSize - sStartPad) - sEndPad) - (cHeight * sCells);
+            this.heightGap = numShortGaps > 0 ? vSpaceLeft / numShortGaps : 0;
         }
         int count = getChildCount();
-        for (int i3 = 0; i3 < count; i3++) {
-            View child = getChildAt(i3);
+        for (int i = 0; i < count; i++) {
+            View child = getChildAt(i);
             LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
-            if (this.mPortrait) {
-                layoutParams.setup(cellWidth, cellHeight, this.mWidthGap, this.mHeightGap, shortAxisStartPadding, longAxisStartPadding, autoFit);
+            if (this.portrait) {
+                layoutParams.setup(cWidth, cHeight, this.widthGap, this.heightGap, sStartPad, lStartPad, autoFit);
             } else {
-                layoutParams.setup(cellWidth, cellHeight, this.mWidthGap, this.mHeightGap, longAxisStartPadding, shortAxisStartPadding, autoFit);
+                layoutParams.setup(cWidth, cHeight, this.widthGap, this.heightGap, lStartPad, sStartPad, autoFit);
             }
             if (layoutParams.regenerateId) {
                 child.setId(((getId() & 255) << 16) | ((layoutParams.cellX & 255) << 8) | (layoutParams.cellY & 255));
                 layoutParams.regenerateId = false;
             }
-            child.measure(View.MeasureSpec.makeMeasureSpec(layoutParams.width, 1073741824), View.MeasureSpec.makeMeasureSpec(layoutParams.height, 1073741824));
+            child.measure(View.MeasureSpec.makeMeasureSpec(layoutParams.width, MeasureSpec.EXACTLY),
+                    View.MeasureSpec.makeMeasureSpec(layoutParams.height, MeasureSpec.EXACTLY));
         }
         setMeasuredDimension(widthSpecSize, heightSpecSize);
     }
 
-    /* access modifiers changed from: protected */
-    public void onLayout(boolean changed, int l, int t, int r, int b) {
+    @Override
+    protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int count = getChildCount();
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
-            if (child.getVisibility() != 8) {
+            if (child.getVisibility() != View.GONE) {
                 LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
-                int childLeft = layoutParams.f0x;
-                int childTop = layoutParams.f1y;
+                int childLeft = layoutParams.x;
+                int childTop = layoutParams.y;
                 child.layout(childLeft, childTop, layoutParams.width + childLeft, layoutParams.height + childTop);
                 if (layoutParams.dropped) {
                     layoutParams.dropped = false;
-                    int[] cellXY = this.mCellXY;
-                    getLocationOnScreen(cellXY);
-                    this.mWallpaperManager.sendWallpaperCommand(getWindowToken(), "android.home.drop", cellXY[0] + childLeft + (layoutParams.width / 2), cellXY[1] + childTop + (layoutParams.height / 2), 0, (Bundle) null);
+                    int[] targetCellXY = this.cellXY;
+                    getLocationOnScreen(targetCellXY);
+                    if (this.wallpaperManager != null) {
+                        this.wallpaperManager.sendWallpaperCommand(getWindowToken(), "android.home.drop",
+                                targetCellXY[0] + childLeft + (layoutParams.width / 2),
+                                targetCellXY[1] + childTop + (layoutParams.height / 2), 0, null);
+                    }
                 }
             }
         }
     }
 
-    /* access modifiers changed from: protected */
-    public void setChildrenDrawingCacheEnabled(boolean enabled) {
+    @Override
+    protected void setChildrenDrawingCacheEnabled(boolean enabled) {
         int count = getChildCount();
         for (int i = 0; i < count; i++) {
             View view = getChildAt(i);
@@ -458,25 +459,25 @@ public class CellLayout extends ViewGroup {
         }
     }
 
-    /* access modifiers changed from: protected */
-    public void setChildrenDrawnWithCacheEnabled(boolean enabled) {
+    @Override
+    protected void setChildrenDrawnWithCacheEnabled(boolean enabled) {
         super.setChildrenDrawnWithCacheEnabled(enabled);
     }
 
-    /* access modifiers changed from: package-private */
-    public int[] findNearestVacantArea(int pixelX, int pixelY, int spanX, int spanY, CellInfo vacantCells, int[] recycle) {
+    int[] findNearestVacantArea(int pixelX, int pixelY, int spanX, int spanY, CellInfo vacantCells, int[] recycle) {
         int[] bestXY = recycle != null ? recycle : new int[2];
-        int[] cellXY = this.mCellXY;
+        int[] targetCellXY = this.cellXY;
         double bestDistance = Double.MAX_VALUE;
-        if (!vacantCells.valid) {
+        if (vacantCells == null || !vacantCells.valid) {
             return null;
         }
         int size = vacantCells.vacantCells.size();
         for (int i = 0; i < size; i++) {
             CellInfo.VacantCell cell = vacantCells.vacantCells.get(i);
             if (cell.spanX == spanX && cell.spanY == spanY) {
-                cellToPoint(cell.cellX, cell.cellY, cellXY);
-                double distance = Math.sqrt(Math.pow((double) (cellXY[0] - pixelX), 2.0d) + Math.pow((double) (cellXY[1] - pixelY), 2.0d));
+                cellToPoint(cell.cellX, cell.cellY, targetCellXY);
+                double distance = Math.sqrt(Math.pow((double) (targetCellXY[0] - pixelX), 2.0d)
+                        + Math.pow((double) (targetCellXY[1] - pixelY), 2.0d));
                 if (distance <= bestDistance) {
                     bestDistance = distance;
                     bestXY[0] = cell.cellX;
@@ -490,38 +491,38 @@ public class CellLayout extends ViewGroup {
         return bestXY;
     }
 
-    /* access modifiers changed from: package-private */
-    public void onDropChild(View child, int[] targetXY) {
+    void onDropChild(View child, int[] targetXY) {
         if (child != null) {
             LayoutParams layoutParams = (LayoutParams) child.getLayoutParams();
             layoutParams.cellX = targetXY[0];
             layoutParams.cellY = targetXY[1];
             layoutParams.isDragging = false;
             layoutParams.dropped = true;
-            this.mDragRect.setEmpty();
+            this.dragRect.setEmpty();
             child.requestLayout();
             invalidate();
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public void onDropAborted(View child) {
+    void onDropAborted(View child) {
         if (child != null) {
             ((LayoutParams) child.getLayoutParams()).isDragging = false;
             invalidate();
         }
-        this.mDragRect.setEmpty();
+        this.dragRect.setEmpty();
     }
 
-    /* access modifiers changed from: package-private */
-    public void onDragChild(View child) {
+    void onDragChild(View child) {
         ((LayoutParams) child.getLayoutParams()).isDragging = true;
-        this.mDragRect.setEmpty();
+        this.dragRect.setEmpty();
     }
 
+    /**
+     * Converts a rectangular pixel bounding size to clamped grid cell spans.
+     */
     public int[] rectToCell(int width, int height) {
-        return calculateClampedSpans(width, height, this.mCellWidth, this.mCellHeight,
-                this.mWidthGap, this.mHeightGap, getAvailableColumns(), getAvailableRows());
+        return calculateClampedSpans(width, height, this.cellWidth, this.cellHeight,
+                this.widthGap, this.heightGap, getAvailableColumns(), getAvailableRows());
     }
 
     /**
@@ -530,8 +531,8 @@ public class CellLayout extends ViewGroup {
      */
     public int[] rectToCellFromDp(int widthDp, int heightDp) {
         float density = getResources().getDisplayMetrics().density;
-        return calculateClampedSpansFromDp(widthDp, heightDp, density, this.mCellWidth,
-                this.mCellHeight, this.mWidthGap, this.mHeightGap,
+        return calculateClampedSpansFromDp(widthDp, heightDp, density, this.cellWidth,
+                this.cellHeight, this.widthGap, this.heightGap,
                 getAvailableColumns(), getAvailableRows());
     }
 
@@ -545,8 +546,8 @@ public class CellLayout extends ViewGroup {
     }
 
     int[] spanToPixels(int spanX, int spanY) {
-        return new int[]{calculateSpanPixels(spanX, this.mCellWidth, this.mWidthGap),
-                calculateSpanPixels(spanY, this.mCellHeight, this.mHeightGap)};
+        return new int[]{calculateSpanPixels(spanX, this.cellWidth, this.widthGap),
+                calculateSpanPixels(spanY, this.cellHeight, this.heightGap)};
     }
 
     boolean isWidgetSizingGeometryReady() {
@@ -554,9 +555,9 @@ public class CellLayout extends ViewGroup {
                 && getMeasuredWidth() > 0 && getMeasuredHeight() > 0
                 && getWidth() > 0 && getHeight() > 0
                 && getCountX() > 0 && getCountY() > 0
-                && this.mCellWidth > 0 && this.mCellHeight > 0
-                && ((long) this.mCellWidth + this.mWidthGap) > 0
-                && ((long) this.mCellHeight + this.mHeightGap) > 0;
+                && this.cellWidth > 0 && this.cellHeight > 0
+                && ((long) this.cellWidth + this.widthGap) > 0
+                && ((long) this.cellHeight + this.heightGap) > 0;
     }
 
     static int[] calculateClampedSpans(int width, int height, int cellWidth, int cellHeight,
@@ -620,9 +621,9 @@ public class CellLayout extends ViewGroup {
         if (!candidate.isWithinBounds(xCount, yCount)) {
             return false;
         }
-        findOccupiedCells(xCount, yCount, this.mOccupied, ignoredView);
+        findOccupiedCells(xCount, yCount, this.occupied, ignoredView);
         return isEmpty(candidate.cellX, candidate.lastCellX(),
-                candidate.cellY, candidate.lastCellY(), this.mOccupied);
+                candidate.cellY, candidate.lastCellY(), this.occupied);
     }
 
     boolean applyResizeCandidate(View child, ResizeCandidate candidate) {
@@ -691,9 +692,8 @@ public class CellLayout extends ViewGroup {
 
     private static int calculateResizeLastCell(int cell, int span, int pointerCell,
             int edge, int minimumSpan, int availableCells) {
-        int lastCell = cell + span - 1;
         if (edge != RESIZE_EDGE_END) {
-            return lastCell;
+            return cell + span - 1;
         }
         return clamp(pointerCell, cell + minimumSpan - 1, availableCells - 1);
     }
@@ -718,81 +718,72 @@ public class CellLayout extends ViewGroup {
     }
 
     private int getAvailableColumns() {
-        int columns = getCountX();
-        return Math.max(1, columns > 0 ? columns : this.mColumns);
+        int col = getCountX();
+        return Math.max(1, col > 0 ? col : this.columns);
     }
 
     private int getAvailableRows() {
-        int rows = getCountY();
-        return Math.max(1, rows > 0 ? rows : this.mRows);
+        int row = getCountY();
+        return Math.max(1, row > 0 ? row : this.rows);
     }
 
+    /**
+     * Finds the first available vacant cell spanning spanX by spanY.
+     */
     public boolean getVacantCell(int[] vacant, int spanX, int spanY) {
-        boolean portrait = this.mPortrait;
-        int xCount = portrait ? this.mShortAxisCells : this.mLongAxisCells;
-        int yCount = portrait ? this.mLongAxisCells : this.mShortAxisCells;
-        boolean[][] occupied = this.mOccupied;
-        findOccupiedCells(xCount, yCount, occupied, (View) null);
-        return findVacantCell(vacant, spanX, spanY, xCount, yCount, occupied);
+        int xCount = this.portrait ? this.shortAxisCells : this.longAxisCells;
+        int yCount = this.portrait ? this.longAxisCells : this.shortAxisCells;
+        boolean[][] occupiedGrid = this.occupied;
+        findOccupiedCells(xCount, yCount, occupiedGrid, null);
+        return findVacantCell(vacant, spanX, spanY, xCount, yCount, occupiedGrid);
     }
 
     static boolean findVacantCell(int[] vacant, int spanX, int spanY, int xCount, int yCount, boolean[][] occupied) {
-        boolean available;
-        boolean available2;
-        int x = 0;
-        while (x < xCount) {
-            int y = 0;
-            while (y < yCount) {
-                if (occupied[x][y]) {
-                    available = false;
-                } else {
-                    available = true;
-                }
-                available2 = available;
-                for (int i = x; i < (x + spanX) - 1 && x < xCount; i++) {
-                    for (int j = y; j < (y + spanY) - 1 && y < yCount; j++) {
-                        if (!available2 || occupied[i][j]) {
-                            available2 = false;
-                        } else {
-                            available2 = true;
-                        }
-                        if (!available2) {
-                            break;
-                        }
-                    }
-                }
-                if (available2) {
+        for (int x = 0; x < xCount; x++) {
+            for (int y = 0; y < yCount; y++) {
+                if (!occupied[x][y] && isSpanAvailable(x, y, spanX, spanY, xCount, yCount, occupied)) {
                     vacant[0] = x;
                     vacant[1] = y;
                     return true;
                 }
-                y++;
             }
-            x++;
         }
         return false;
     }
 
-    /* access modifiers changed from: package-private */
-    public boolean[] getOccupiedCells() {
-        boolean portrait = this.mPortrait;
-        int xCount = portrait ? this.mShortAxisCells : this.mLongAxisCells;
-        int yCount = portrait ? this.mLongAxisCells : this.mShortAxisCells;
-        boolean[][] occupied = this.mOccupied;
-        findOccupiedCells(xCount, yCount, occupied, (View) null);
-        boolean[] flat = new boolean[(xCount * yCount)];
+    private static boolean isSpanAvailable(int startX, int startY, int spanX, int spanY,
+            int xCount, int yCount, boolean[][] occupied) {
+        if (startX + spanX > xCount || startY + spanY > yCount) {
+            return false;
+        }
+        for (int i = startX; i < startX + spanX; i++) {
+            for (int j = startY; j < startY + spanY; j++) {
+                if (occupied[i][j]) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    boolean[] getOccupiedCells() {
+        int xCount = this.portrait ? this.shortAxisCells : this.longAxisCells;
+        int yCount = this.portrait ? this.longAxisCells : this.shortAxisCells;
+        boolean[][] occupiedGrid = this.occupied;
+        findOccupiedCells(xCount, yCount, occupiedGrid, null);
+        boolean[] flat = new boolean[xCount * yCount];
         for (int y = 0; y < yCount; y++) {
             for (int x = 0; x < xCount; x++) {
-                flat[(y * xCount) + x] = occupied[x][y];
+                flat[(y * xCount) + x] = occupiedGrid[x][y];
             }
         }
         return flat;
     }
 
-    private void findOccupiedCells(int xCount, int yCount, boolean[][] occupied, View ignoreView) {
+    private void findOccupiedCells(int xCount, int yCount, boolean[][] occupiedGrid, View ignoreView) {
         for (int x = 0; x < xCount; x++) {
             for (int y = 0; y < yCount; y++) {
-                occupied[x][y] = false;
+                occupiedGrid[x][y] = false;
             }
         }
         int count = getChildCount();
@@ -804,8 +795,8 @@ public class CellLayout extends ViewGroup {
                 while (x2 < layoutParams.cellX + layoutParams.cellHSpan && x2 < xCount) {
                     int y2 = layoutParams.cellY;
                     while (y2 < layoutParams.cellY + layoutParams.cellVSpan && y2 < yCount) {
-                        if (!(x2 == -1 || y2 == -1)) {
-                            occupied[x2][y2] = true;
+                        if (x2 != -1 && y2 != -1) {
+                            occupiedGrid[x2][y2] = true;
                         }
                         y2++;
                     }
@@ -815,24 +806,31 @@ public class CellLayout extends ViewGroup {
         }
     }
 
+    /**
+     * Returns true if the last touch down event occurred on an occupied cell.
+     */
     public boolean lastDownOnOccupiedCell() {
-        return this.mLastDownOnOccupiedCell;
+        return this.lastDownOnOccupiedCell;
     }
 
+    @Override
     public ViewGroup.LayoutParams generateLayoutParams(AttributeSet attrs) {
         return new LayoutParams(getContext(), attrs);
     }
 
-    /* access modifiers changed from: protected */
-    public boolean checkLayoutParams(ViewGroup.LayoutParams layoutParams) {
+    @Override
+    protected boolean checkLayoutParams(ViewGroup.LayoutParams layoutParams) {
         return layoutParams instanceof LayoutParams;
     }
 
-    /* access modifiers changed from: protected */
-    public ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams layoutParams) {
+    @Override
+    protected ViewGroup.LayoutParams generateLayoutParams(ViewGroup.LayoutParams layoutParams) {
         return new LayoutParams(layoutParams);
     }
 
+    /**
+     * Per-child layout parameters specifying cell coordinate positions and spans within a CellLayout.
+     */
     public static class LayoutParams extends ViewGroup.MarginLayoutParams {
         @ViewDebug.ExportedProperty
         public int cellHSpan;
@@ -845,48 +843,57 @@ public class CellLayout extends ViewGroup {
         boolean dropped;
         public boolean isDragging;
         boolean regenerateId;
+
         @ViewDebug.ExportedProperty
-
-        /* renamed from: x */
-        int f0x;
+        int x;
         @ViewDebug.ExportedProperty
+        int y;
 
-        /* renamed from: y */
-        int f1y;
-
+        /**
+         * Constructs layout params from XML attributes.
+         */
         public LayoutParams(Context context, AttributeSet attrs) {
             super(context, attrs);
             this.cellHSpan = 1;
             this.cellVSpan = 1;
         }
 
+        /**
+         * Constructs layout params from another ViewGroup.LayoutParams instance.
+         */
         public LayoutParams(ViewGroup.LayoutParams source) {
             super(source);
             this.cellHSpan = 1;
             this.cellVSpan = 1;
         }
 
+        /**
+         * Constructs layout params with explicit cell coordinates and spans.
+         */
         public LayoutParams(int cellX2, int cellY2, int cellHSpan2, int cellVSpan2) {
-            super(-1, -1);
+            super(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
             this.cellX = cellX2;
             this.cellY = cellY2;
             this.cellHSpan = cellHSpan2;
             this.cellVSpan = cellVSpan2;
         }
 
-        public void setup(int cellWidth, int cellHeight, int widthGap, int heightGap, int hStartPadding, int vStartPadding, boolean autoStretch) {
+        /**
+         * Computes pixel dimensions and margins from the parent cell layout metrics.
+         */
+        public void setup(int cWidth, int cHeight, int wGap, int hGap, int hStartPadding, int vStartPadding, boolean autoStretch) {
             int myCellHSpan = this.cellHSpan;
             int myCellVSpan = this.cellVSpan;
             int myCellX = this.cellX;
             int myCellY = this.cellY;
-            this.width = (((myCellHSpan * cellWidth) + ((myCellHSpan - 1) * widthGap)) - this.leftMargin) - this.rightMargin;
-            this.height = (((myCellVSpan * cellHeight) + ((myCellVSpan - 1) * heightGap)) - this.topMargin) - this.bottomMargin;
+            this.width = (((myCellHSpan * cWidth) + ((myCellHSpan - 1) * wGap)) - this.leftMargin) - this.rightMargin;
+            this.height = (((myCellVSpan * cHeight) + ((myCellVSpan - 1) * hGap)) - this.topMargin) - this.bottomMargin;
             if (autoStretch) {
-                this.width = (calculateSpanPixels(myCellHSpan, cellWidth, widthGap) - this.rightMargin) - this.leftMargin;
-                this.height = (calculateSpanPixels(myCellVSpan, cellHeight, heightGap) - this.bottomMargin) - this.topMargin;
+                this.width = (calculateSpanPixels(myCellHSpan, cWidth, wGap) - this.rightMargin) - this.leftMargin;
+                this.height = (calculateSpanPixels(myCellVSpan, cHeight, hGap) - this.bottomMargin) - this.topMargin;
             }
-            this.f0x = ((cellWidth + widthGap) * myCellX) + hStartPadding + this.leftMargin;
-            this.f1y = ((cellHeight + heightGap) * myCellY) + vStartPadding + this.topMargin;
+            this.x = ((cWidth + wGap) * myCellX) + hStartPadding + this.leftMargin;
+            this.y = ((cHeight + hGap) * myCellY) + vStartPadding + this.topMargin;
         }
     }
 
@@ -970,8 +977,7 @@ public class CellLayout extends ViewGroup {
                 return vacantCell;
             }
 
-            /* access modifiers changed from: package-private */
-            public void release() {
+            void release() {
                 synchronized (sLock) {
                     if (sAcquiredCount < POOL_LIMIT) {
                         sAcquiredCount++;
@@ -981,13 +987,13 @@ public class CellLayout extends ViewGroup {
                 }
             }
 
+            @Override
             public String toString() {
                 return "VacantCell[x=" + this.cellX + ", y=" + this.cellY + ", spanX=" + this.spanX + ", spanY=" + this.spanY + "]";
             }
         }
 
-        /* access modifiers changed from: package-private */
-        public void clearVacantCells() {
+        void clearVacantCells() {
             ArrayList<VacantCell> list = this.vacantCells;
             int count = list.size();
             for (int i = 0; i < count; i++) {
@@ -996,8 +1002,7 @@ public class CellLayout extends ViewGroup {
             list.clear();
         }
 
-        /* access modifiers changed from: package-private */
-        public void findVacantCellsFromOccupied(boolean[] occupied, int xCount, int yCount) {
+        public void findVacantCellsFromOccupied(boolean[] occupiedGrid, int xCount, int yCount) {
             if (this.cellX < 0 || this.cellY < 0) {
                 this.maxVacantSpanXSpanY = Integer.MIN_VALUE;
                 this.maxVacantSpanX = Integer.MIN_VALUE;
@@ -1006,57 +1011,43 @@ public class CellLayout extends ViewGroup {
                 clearVacantCells();
                 return;
             }
-            boolean[][] unflattened = (boolean[][]) Array.newInstance(Boolean.TYPE, new int[]{xCount, yCount});
+            boolean[][] unflattened = (boolean[][]) Array.newInstance(Boolean.TYPE, xCount, yCount);
             for (int y = 0; y < yCount; y++) {
                 for (int x = 0; x < xCount; x++) {
-                    unflattened[x][y] = occupied[(y * xCount) + x];
+                    unflattened[x][y] = occupiedGrid[(y * xCount) + x];
                 }
             }
             CellLayout.findIntersectingVacantCells(this, this.cellX, this.cellY, xCount, yCount, unflattened);
         }
 
-        /* access modifiers changed from: package-private */
-        public boolean findCellForSpan(int[] cellXY, int spanX2, int spanY2) {
-            return findCellForSpan(cellXY, spanX2, spanY2, true);
+        boolean findCellForSpan(int[] targetCellXY, int spanX2, int spanY2) {
+            return findCellForSpan(targetCellXY, spanX2, spanY2, true);
         }
 
-        /* access modifiers changed from: package-private */
-        public boolean findCellForSpan(int[] cellXY, int spanX2, int spanY2, boolean clear) {
+        boolean findCellForSpan(int[] targetCellXY, int spanX2, int spanY2, boolean clear) {
             ArrayList<VacantCell> list = this.vacantCells;
             int count = list.size();
             boolean found = false;
             if (this.spanX >= spanX2 && this.spanY >= spanY2) {
-                cellXY[0] = this.cellX;
-                cellXY[1] = this.cellY;
+                targetCellXY[0] = this.cellX;
+                targetCellXY[1] = this.cellY;
                 found = true;
             }
-            int i = 0;
-            while (true) {
-                if (i < count) {
-                    VacantCell cell2 = list.get(i);
-                    if (cell2.spanX == spanX2 && cell2.spanY == spanY2) {
-                        cellXY[0] = cell2.cellX;
-                        cellXY[1] = cell2.cellY;
-                        found = true;
-                        break;
-                    }
-                    i++;
-                } else {
+            for (int i = 0; i < count; i++) {
+                VacantCell cell2 = list.get(i);
+                if (cell2.spanX == spanX2 && cell2.spanY == spanY2) {
+                    targetCellXY[0] = cell2.cellX;
+                    targetCellXY[1] = cell2.cellY;
+                    found = true;
                     break;
                 }
             }
-            int i2 = 0;
-            while (true) {
-                if (i2 < count) {
-                    VacantCell cell3 = list.get(i2);
-                    if (cell3.spanX >= spanX2 && cell3.spanY >= spanY2) {
-                        cellXY[0] = cell3.cellX;
-                        cellXY[1] = cell3.cellY;
-                        found = true;
-                        break;
-                    }
-                    i2++;
-                } else {
+            for (int i2 = 0; i2 < count; i2++) {
+                VacantCell cell3 = list.get(i2);
+                if (cell3.spanX >= spanX2 && cell3.spanY >= spanY2) {
+                    targetCellXY[0] = cell3.cellX;
+                    targetCellXY[1] = cell3.cellY;
+                    found = true;
                     break;
                 }
             }
@@ -1066,6 +1057,7 @@ public class CellLayout extends ViewGroup {
             return found;
         }
 
+        @Override
         public String toString() {
             return "Cell[view=" + (this.cell == null ? "null" : this.cell.getClass()) + ", x=" + this.cellX + ", y=" + this.cellY + "]";
         }

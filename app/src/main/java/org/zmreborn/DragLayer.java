@@ -19,415 +19,475 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.FrameLayout;
 import java.util.ArrayList;
-import org.zmreborn.DragController;
 
+/**
+ * Top-level container view providing animated drag-and-drop overlays, drop target resolution, and edge scrolling.
+ */
 public class DragLayer extends FrameLayout implements DragController {
-    private static final int ANIMATION_STATE_DONE = 3;
-    private static final int ANIMATION_STATE_RUNNING = 2;
     private static final int ANIMATION_STATE_STARTING = 1;
+    private static final int ANIMATION_STATE_RUNNING = 2;
+    private static final int ANIMATION_STATE_DONE = 3;
     private static final int ANIMATION_TYPE_SCALE = 1;
-    private static final int COLOR_NORMAL = 1727987712;
-    private static final int COLOR_TRASH = -1426128896;
-    private static final int SCROLL_LEFT = 0;
+    private static final int COLOR_NORMAL = 0x67000000;
+    private static final int COLOR_TRASH = 0xAA000000;
     private static final int SCROLL_OUTSIDE_ZONE = 0;
-    private static final int SCROLL_RIGHT = 1;
     private static final int SCROLL_WAITING_IN_ZONE = 1;
-    private static final int sAnimationScaleUpDuration = 110;
-    private static final float sDragScale = 24.0f;
-    private static final boolean sProfileDrawingDuringDrag = false;
-    private static final int sScrollDelay = 600;
-    private static final int sScrollZone = 20;
-    private int mAnimationDuration;
-    private float mAnimationFrom;
-    private long mAnimationStartTime;
-    private int mAnimationState = 3;
-    private float mAnimationTo;
-    private int mAnimationType;
-    private int mBitmapOffsetX;
-    private int mBitmapOffsetY;
-    private Bitmap mDragBitmap = null;
-    private Object mDragInfo;
-    private ArrayList<DragController.DragListener> mDragListeners = new ArrayList<>();
-    private Paint mDragPaint;
-    private Rect mDragRect = new Rect();
-    private RectF mDragRegion;
-    /* access modifiers changed from: private */
-    public DragScroller mDragScroller;
-    private DragSource mDragSource;
-    private boolean mDragging = sProfileDrawingDuringDrag;
-    private int mDrawHeight;
-    private boolean mDrawModeBitmap = true;
-    private int mDrawWidth;
-    private final int[] mDropCoordinates = new int[2];
-    private final DragCancellationState mDragCancellationState = new DragCancellationState();
-    private boolean mEnteredRegion;
-    private View mIgnoredDropTarget;
-    private InputMethodManager mInputMethodManager;
-    private DropTarget mLastDropTarget;
-    private float mLastMotionX;
-    private float mLastMotionY;
-    private int mOrientation;
-    private View mOriginator;
-    private DropTarget mRejectedDropTarget;
-    private final Rect mRect = new Rect();
-    private Paint mRectPaint;
-    private ScrollRunnable mScrollRunnable = new ScrollRunnable();
-    /* access modifiers changed from: private */
-    public int mScrollState = 0;
-    private boolean mShouldDrop;
-    private Rect mSystemGestureInsets;
-    private float mTouchOffsetX;
-    private float mTouchOffsetY;
-    private final Paint mTrashPaint = new Paint();
+    private static final int SCROLL_LEFT = 0;
+    private static final int SCROLL_RIGHT = 1;
+    private static final int ANIMATION_SCALE_UP_DURATION = 110;
+    private static final float DRAG_SCALE = 24.0f;
+    private static final int SCROLL_DELAY = 600;
+    private static final int SCROLL_ZONE = 20;
 
+    private int animationDuration;
+    private float animationFrom;
+    private long animationStartTime;
+    private int animationState = ANIMATION_STATE_DONE;
+    private float animationTo;
+    private int animationType;
+    private int bitmapOffsetX;
+    private int bitmapOffsetY;
+    private Bitmap dragBitmap;
+    private Object dragInfo;
+    private final ArrayList<DragController.DragListener> dragListeners = new ArrayList<>();
+    private Paint dragPaint;
+    private final Rect dragRect = new Rect();
+    private RectF dragRegion;
+    private DragScroller dragScroller;
+    private DragSource dragSource;
+    private boolean dragging;
+    private int drawHeight;
+    private boolean drawModeBitmap = true;
+    private int drawWidth;
+    private final int[] dropCoordinates = new int[2];
+    private final DragCancellationState dragCancellationState = new DragCancellationState();
+    private boolean enteredRegion;
+    private View ignoredDropTarget;
+    private InputMethodManager inputMethodManager;
+    private DropTarget lastDropTarget;
+    private float lastMotionX;
+    private float lastMotionY;
+    private int orientation;
+    private View originator;
+    private DropTarget rejectedDropTarget;
+    private final Rect rect = new Rect();
+    private Paint rectPaint;
+    private final ScrollRunnable scrollRunnable = new ScrollRunnable();
+    private int scrollState = SCROLL_OUTSIDE_ZONE;
+    private boolean shouldDrop;
+    private Rect systemGestureInsets;
+    private float touchOffsetX;
+    private float touchOffsetY;
+    private final Paint trashPaint = new Paint();
+
+    /**
+     * Constructs a drag layer with context and XML attributes.
+     */
     public DragLayer(Context context, AttributeSet attrs) {
         super(context, attrs);
-        this.mTrashPaint.setColorFilter(new PorterDuffColorFilter(context.getResources().getColor(R.color.delete_color_filter), PorterDuff.Mode.SRC_ATOP));
+        this.trashPaint.setColorFilter(new PorterDuffColorFilter(
+                context.getResources().getColor(R.color.delete_color_filter), PorterDuff.Mode.SRC_ATOP));
         int snagColor = context.getResources().getColor(R.color.snag_callout_color);
         Paint estimatedPaint = new Paint();
         estimatedPaint.setColor(snagColor);
         estimatedPaint.setStrokeWidth(3.0f);
         estimatedPaint.setAntiAlias(true);
-        this.mRectPaint = new Paint();
-        this.mRectPaint.setColor(COLOR_NORMAL);
-        this.mOrientation = ((WindowManager) context.getSystemService("window")).getDefaultDisplay().getOrientation();
+        this.rectPaint = new Paint();
+        this.rectPaint.setColor(COLOR_NORMAL);
+        WindowManager windowManager = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        if (windowManager != null) {
+            this.orientation = windowManager.getDefaultDisplay().getOrientation();
+        }
     }
 
+    /**
+     * Sets system gesture insets to exclude edge areas from conflicts.
+     */
     public void setSystemGestureInsets(Rect insets) {
-        this.mSystemGestureInsets = insets;
+        this.systemGestureInsets = insets;
     }
 
+    @Override
     public void startDrag(View view, DragSource source, Object dragInfo, int dragAction) {
-        if (this.mInputMethodManager == null) {
-            this.mInputMethodManager = (InputMethodManager) getContext().getSystemService("input_method");
+        if (this.inputMethodManager == null) {
+            this.inputMethodManager = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         }
-        this.mInputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
-        for (int i = 0; i < this.mDragListeners.size(); i++) {
-            this.mDragListeners.get(i).onDragStart(view, source, dragInfo, dragAction);
+        if (this.inputMethodManager != null) {
+            this.inputMethodManager.hideSoftInputFromWindow(getWindowToken(), 0);
         }
-        Rect rect = this.mDragRect;
-        rect.set(view.getScrollX(), view.getScrollY(), 0, 0);
-        offsetDescendantRectToMyCoords(view, rect);
-        this.mTouchOffsetX = this.mLastMotionX - ((float) rect.left);
-        this.mTouchOffsetY = this.mLastMotionY - ((float) rect.top);
+        for (int i = 0; i < this.dragListeners.size(); i++) {
+            this.dragListeners.get(i).onDragStart(view, source, dragInfo, dragAction);
+        }
+        Rect dRect = this.dragRect;
+        dRect.set(view.getScrollX(), view.getScrollY(), 0, 0);
+        offsetDescendantRectToMyCoords(view, dRect);
+        this.touchOffsetX = this.lastMotionX - dRect.left;
+        this.touchOffsetY = this.lastMotionY - dRect.top;
         view.clearFocus();
-        view.setPressed(sProfileDrawingDuringDrag);
+        view.setPressed(false);
         boolean willNotCache = view.willNotCacheDrawing();
-        view.setWillNotCacheDrawing(sProfileDrawingDuringDrag);
+        view.setWillNotCacheDrawing(false);
         int color = view.getDrawingCacheBackgroundColor();
         view.setDrawingCacheBackgroundColor(0);
         if (color != 0) {
             view.destroyDrawingCache();
         }
-        this.mRejectedDropTarget = null;
-        this.mDragCancellationState.reset();
+        this.rejectedDropTarget = null;
+        this.dragCancellationState.reset();
         view.buildDrawingCache();
         Bitmap viewBitmap = view.getDrawingCache();
         if (viewBitmap != null) {
-            this.mDrawModeBitmap = true;
-            int width = viewBitmap.getWidth();
-            int height = viewBitmap.getHeight();
-            Matrix scale = new Matrix();
-            float scaleFactor = (float) view.getWidth();
-            float scaleFactor2 = (sDragScale + scaleFactor) / scaleFactor;
-            scale.setScale(scaleFactor2, scaleFactor2);
-            this.mAnimationTo = 1.0f;
-            this.mAnimationFrom = 1.0f / scaleFactor2;
-            this.mAnimationDuration = sAnimationScaleUpDuration;
-            this.mAnimationState = 1;
-            this.mAnimationType = 1;
-            this.mDragBitmap = Bitmap.createBitmap(viewBitmap, 0, 0, width, height, scale, true);
-            view.destroyDrawingCache();
-            view.setWillNotCacheDrawing(willNotCache);
-            view.setDrawingCacheBackgroundColor(color);
-            Bitmap dragBitmap = this.mDragBitmap;
-            this.mBitmapOffsetX = (dragBitmap.getWidth() - width) / 2;
-            this.mBitmapOffsetY = (dragBitmap.getHeight() - height) / 2;
+            setupBitmapDragMode(view, viewBitmap, willNotCache, color);
         } else {
-            this.mDrawModeBitmap = sProfileDrawingDuringDrag;
-            int width2 = view.getWidth();
-            int height2 = view.getHeight();
-            float scaleFactor3 = (float) view.getWidth();
-            float scaleFactor4 = (sDragScale + scaleFactor3) / scaleFactor3;
-            this.mDrawWidth = (int) (((float) view.getWidth()) * scaleFactor4);
-            this.mDrawHeight = (int) (((float) view.getHeight()) * scaleFactor4);
-            this.mAnimationTo = 1.0f;
-            this.mAnimationFrom = 1.0f / scaleFactor4;
-            this.mAnimationDuration = sAnimationScaleUpDuration;
-            this.mAnimationState = 1;
-            this.mAnimationType = 1;
-            this.mBitmapOffsetX = (this.mDrawWidth - width2) / 2;
-            this.mBitmapOffsetY = (this.mDrawHeight - height2) / 2;
+            setupOutlineDragMode(view);
         }
-        if (dragAction == 0) {
-            view.setVisibility(8);
+        if (dragAction == DRAG_ACTION_MOVE) {
+            view.setVisibility(View.GONE);
         }
-        this.mDragPaint = null;
-        this.mDragging = true;
-        this.mShouldDrop = true;
-        this.mOriginator = view;
-        this.mDragSource = source;
-        this.mDragInfo = dragInfo;
-        this.mEnteredRegion = sProfileDrawingDuringDrag;
+        this.dragPaint = null;
+        this.dragging = true;
+        this.shouldDrop = true;
+        this.originator = view;
+        this.dragSource = source;
+        this.dragInfo = dragInfo;
+        this.enteredRegion = false;
         invalidate();
     }
 
+    private void setupBitmapDragMode(View view, Bitmap viewBitmap, boolean willNotCache, int color) {
+        this.drawModeBitmap = true;
+        int width = viewBitmap.getWidth();
+        int height = viewBitmap.getHeight();
+        Matrix scale = new Matrix();
+        float scaleFactor = view.getWidth();
+        float scaleRatio = (DRAG_SCALE + scaleFactor) / scaleFactor;
+        scale.setScale(scaleRatio, scaleRatio);
+        this.animationTo = 1.0f;
+        this.animationFrom = 1.0f / scaleRatio;
+        this.animationDuration = ANIMATION_SCALE_UP_DURATION;
+        this.animationState = ANIMATION_STATE_STARTING;
+        this.animationType = ANIMATION_TYPE_SCALE;
+        this.dragBitmap = Bitmap.createBitmap(viewBitmap, 0, 0, width, height, scale, true);
+        view.destroyDrawingCache();
+        view.setWillNotCacheDrawing(willNotCache);
+        view.setDrawingCacheBackgroundColor(color);
+        Bitmap bitmap = this.dragBitmap;
+        this.bitmapOffsetX = (bitmap.getWidth() - width) / 2;
+        this.bitmapOffsetY = (bitmap.getHeight() - height) / 2;
+    }
+
+    private void setupOutlineDragMode(View view) {
+        this.drawModeBitmap = false;
+        int width = view.getWidth();
+        int height = view.getHeight();
+        float scaleFactor = view.getWidth();
+        float scaleRatio = (DRAG_SCALE + scaleFactor) / scaleFactor;
+        this.drawWidth = (int) (view.getWidth() * scaleRatio);
+        this.drawHeight = (int) (view.getHeight() * scaleRatio);
+        this.animationTo = 1.0f;
+        this.animationFrom = 1.0f / scaleRatio;
+        this.animationDuration = ANIMATION_SCALE_UP_DURATION;
+        this.animationState = ANIMATION_STATE_STARTING;
+        this.animationType = ANIMATION_TYPE_SCALE;
+        this.bitmapOffsetX = (this.drawWidth - width) / 2;
+        this.bitmapOffsetY = (this.drawHeight - height) / 2;
+    }
+
+    @Override
     public void cancelDrag() {
-        this.mShouldDrop = false;
-        removeCallbacks(this.mScrollRunnable);
-        this.mScrollState = 0;
+        this.shouldDrop = false;
+        removeCallbacks(this.scrollRunnable);
+        this.scrollState = SCROLL_OUTSIDE_ZONE;
         exitLastDropTarget();
         endDrag();
     }
 
     private void exitLastDropTarget() {
-        DropTarget target = this.mLastDropTarget;
-        if (target == null || !this.mDragCancellationState.consumeDropTargetExit()) {
-            this.mLastDropTarget = null;
-            this.mDragCancellationState.reset();
+        DropTarget target = this.lastDropTarget;
+        if (target == null || !this.dragCancellationState.consumeDropTargetExit()) {
+            this.lastDropTarget = null;
+            this.dragCancellationState.reset();
             return;
         }
         try {
-            target.onDragExit(this.mDragSource, this.mDropCoordinates[0], this.mDropCoordinates[1], (int) this.mTouchOffsetX, (int) this.mTouchOffsetY, this.mDragInfo);
+            target.onDragExit(this.dragSource, this.dropCoordinates[0], this.dropCoordinates[1],
+                    (int) this.touchOffsetX, (int) this.touchOffsetY, this.dragInfo);
         } finally {
-            this.mLastDropTarget = null;
-            this.mDragCancellationState.reset();
+            this.lastDropTarget = null;
+            this.dragCancellationState.reset();
         }
     }
 
+    @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
-        if (this.mDragging || super.dispatchKeyEvent(event)) {
-            return true;
-        }
-        return sProfileDrawingDuringDrag;
+        return this.dragging || super.dispatchKeyEvent(event);
     }
 
-    /* access modifiers changed from: protected */
-    public void dispatchDraw(Canvas canvas) {
+    @Override
+    protected void dispatchDraw(Canvas canvas) {
         super.dispatchDraw(canvas);
-        if (this.mDragging) {
-            if (this.mAnimationState == 1) {
-                this.mAnimationStartTime = SystemClock.uptimeMillis();
-                this.mAnimationState = 2;
-            }
-            if (this.mAnimationState == 2) {
-                float normalized = ((float) (SystemClock.uptimeMillis() - this.mAnimationStartTime)) / ((float) this.mAnimationDuration);
-                if (normalized >= 1.0f) {
-                    this.mAnimationState = 3;
-                }
-                float value = this.mAnimationFrom + ((this.mAnimationTo - this.mAnimationFrom) * Math.min(normalized, 1.0f));
-                switch (this.mAnimationType) {
-                    case 1:
-                        if (!this.mDrawModeBitmap || this.mDragBitmap == null) {
-                            canvas.save();
-                            canvas.translate(((((float) getScrollX()) + this.mLastMotionX) - this.mTouchOffsetX) - ((float) this.mBitmapOffsetX), ((((float) getScrollY()) + this.mLastMotionY) - this.mTouchOffsetY) - ((float) this.mBitmapOffsetY));
-                            canvas.translate((((float) this.mDrawWidth) * (1.0f - value)) / 2.0f, (((float) this.mDrawHeight) * (1.0f - value)) / 2.0f);
-                            canvas.drawRoundRect(new RectF(0.0f, 0.0f, (float) this.mDrawWidth, (float) this.mDrawHeight), 8.0f, 8.0f, this.mRectPaint);
-                            canvas.restore();
-                            return;
-                        }
-                        Bitmap dragBitmap = this.mDragBitmap;
-                        canvas.save();
-                        canvas.translate(((((float) getScrollX()) + this.mLastMotionX) - this.mTouchOffsetX) - ((float) this.mBitmapOffsetX), ((((float) getScrollY()) + this.mLastMotionY) - this.mTouchOffsetY) - ((float) this.mBitmapOffsetY));
-                        canvas.translate((((float) dragBitmap.getWidth()) * (1.0f - value)) / 2.0f, (((float) dragBitmap.getHeight()) * (1.0f - value)) / 2.0f);
-                        canvas.scale(value, value);
-                        canvas.drawBitmap(dragBitmap, 0.0f, 0.0f, this.mDragPaint);
-                        canvas.restore();
-                        return;
-                    default:
-                        return;
-                }
-            } else if (!this.mDrawModeBitmap || this.mDragBitmap == null) {
-                canvas.save();
-                canvas.translate(((((float) getScrollX()) + this.mLastMotionX) - this.mTouchOffsetX) - ((float) this.mBitmapOffsetX), ((((float) getScrollY()) + this.mLastMotionY) - this.mTouchOffsetY) - ((float) this.mBitmapOffsetY));
-                canvas.drawRoundRect(new RectF(0.0f, 0.0f, (float) this.mDrawWidth, (float) this.mDrawHeight), 8.0f, 8.0f, this.mRectPaint);
-                canvas.restore();
-            } else {
-                canvas.drawBitmap(this.mDragBitmap, ((((float) getScrollX()) + this.mLastMotionX) - this.mTouchOffsetX) - ((float) this.mBitmapOffsetX), ((((float) getScrollY()) + this.mLastMotionY) - this.mTouchOffsetY) - ((float) this.mBitmapOffsetY), this.mDragPaint);
-            }
+        if (!this.dragging) {
+            return;
         }
+        if (this.animationState == ANIMATION_STATE_STARTING) {
+            this.animationStartTime = SystemClock.uptimeMillis();
+            this.animationState = ANIMATION_STATE_RUNNING;
+        }
+        if (this.animationState == ANIMATION_STATE_RUNNING) {
+            float normalized = ((float) (SystemClock.uptimeMillis() - this.animationStartTime)) / this.animationDuration;
+            if (normalized >= 1.0f) {
+                this.animationState = ANIMATION_STATE_DONE;
+            }
+            float value = this.animationFrom + ((this.animationTo - this.animationFrom) * Math.min(normalized, 1.0f));
+            drawAnimatedDrag(canvas, value);
+            return;
+        }
+        drawStaticDrag(canvas);
+    }
+
+    private void drawAnimatedDrag(Canvas canvas, float value) {
+        if (this.animationType != ANIMATION_TYPE_SCALE) {
+            return;
+        }
+        if (!this.drawModeBitmap || this.dragBitmap == null) {
+            canvas.save();
+            canvas.translate(((getScrollX() + this.lastMotionX) - this.touchOffsetX) - this.bitmapOffsetX,
+                    ((getScrollY() + this.lastMotionY) - this.touchOffsetY) - this.bitmapOffsetY);
+            canvas.translate((this.drawWidth * (1.0f - value)) / 2.0f, (this.drawHeight * (1.0f - value)) / 2.0f);
+            canvas.drawRoundRect(new RectF(0.0f, 0.0f, this.drawWidth, this.drawHeight), 8.0f, 8.0f, this.rectPaint);
+            canvas.restore();
+            return;
+        }
+        Bitmap bitmap = this.dragBitmap;
+        canvas.save();
+        canvas.translate(((getScrollX() + this.lastMotionX) - this.touchOffsetX) - this.bitmapOffsetX,
+                ((getScrollY() + this.lastMotionY) - this.touchOffsetY) - this.bitmapOffsetY);
+        canvas.translate((bitmap.getWidth() * (1.0f - value)) / 2.0f, (bitmap.getHeight() * (1.0f - value)) / 2.0f);
+        canvas.scale(value, value);
+        canvas.drawBitmap(bitmap, 0.0f, 0.0f, this.dragPaint);
+        canvas.restore();
+    }
+
+    private void drawStaticDrag(Canvas canvas) {
+        if (!this.drawModeBitmap || this.dragBitmap == null) {
+            canvas.save();
+            canvas.translate(((getScrollX() + this.lastMotionX) - this.touchOffsetX) - this.bitmapOffsetX,
+                    ((getScrollY() + this.lastMotionY) - this.touchOffsetY) - this.bitmapOffsetY);
+            canvas.drawRoundRect(new RectF(0.0f, 0.0f, this.drawWidth, this.drawHeight), 8.0f, 8.0f, this.rectPaint);
+            canvas.restore();
+            return;
+        }
+        canvas.drawBitmap(this.dragBitmap, ((getScrollX() + this.lastMotionX) - this.touchOffsetX) - this.bitmapOffsetX,
+                ((getScrollY() + this.lastMotionY) - this.touchOffsetY) - this.bitmapOffsetY, this.dragPaint);
     }
 
     private void endDrag() {
-        if (this.mDragging) {
-            this.mDragging = sProfileDrawingDuringDrag;
-            if (this.mDragBitmap != null) {
-                this.mDragBitmap.recycle();
-            }
-            if (this.mOriginator != null) {
-                this.mOriginator.setVisibility(0);
-            }
-            this.mRejectedDropTarget = null;
-            for (int i = 0; i < this.mDragListeners.size(); i++) {
-                this.mDragListeners.get(i).onDragEnd();
-            }
-            this.mLastDropTarget = null;
-            this.mDragCancellationState.reset();
+        if (!this.dragging) {
+            return;
         }
+        this.dragging = false;
+        if (this.dragBitmap != null) {
+            this.dragBitmap.recycle();
+        }
+        if (this.originator != null) {
+            this.originator.setVisibility(View.VISIBLE);
+        }
+        this.rejectedDropTarget = null;
+        for (int i = 0; i < this.dragListeners.size(); i++) {
+            this.dragListeners.get(i).onDragEnd();
+        }
+        this.lastDropTarget = null;
+        this.dragCancellationState.reset();
     }
 
+    @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         int action = ev.getAction();
         float x = ev.getX();
         float y = ev.getY();
         switch (action) {
-            case 0:
-                this.mLastMotionX = x;
-                this.mLastMotionY = y;
-                this.mLastDropTarget = null;
-                this.mDragCancellationState.reset();
+            case MotionEvent.ACTION_DOWN:
+                this.lastMotionX = x;
+                this.lastMotionY = y;
+                this.lastDropTarget = null;
+                this.dragCancellationState.reset();
                 break;
-            case 1:
-                if (this.mShouldDrop) {
+            case MotionEvent.ACTION_UP:
+                if (this.shouldDrop) {
                     drop(x, y);
-                    this.mShouldDrop = sProfileDrawingDuringDrag;
+                    this.shouldDrop = false;
                 }
                 endDrag();
                 break;
-            case 3:
+            case MotionEvent.ACTION_CANCEL:
                 cancelDrag();
                 break;
+            default:
+                break;
         }
-        return this.mDragging;
+        return this.dragging;
     }
 
+    @Override
     public boolean onTouchEvent(MotionEvent ev) {
-        int width;
-        int height;
-        if (!this.mDragging) {
-            return sProfileDrawingDuringDrag;
+        if (!this.dragging) {
+            return false;
         }
         int action = ev.getAction();
         float x = ev.getX();
         float y = ev.getY();
         switch (action) {
-            case 0:
-                this.mLastMotionX = x;
-                this.mLastMotionY = y;
-                if (x >= 20.0f && x <= ((float) (getWidth() - 20))) {
-                    this.mScrollState = 0;
-                    break;
-                } else {
-                    this.mScrollState = 1;
-                    postDelayed(this.mScrollRunnable, 600);
-                    break;
-                }
-            case 1:
-                removeCallbacks(this.mScrollRunnable);
-                if (this.mShouldDrop) {
+            case MotionEvent.ACTION_DOWN:
+                handleTouchDown(x, y);
+                break;
+            case MotionEvent.ACTION_UP:
+                removeCallbacks(this.scrollRunnable);
+                if (this.shouldDrop) {
                     drop(x, y);
-                    this.mShouldDrop = sProfileDrawingDuringDrag;
+                    this.shouldDrop = false;
                 }
                 endDrag();
                 break;
-            case 3:
+            case MotionEvent.ACTION_CANCEL:
                 cancelDrag();
                 break;
-            case 2:
-                int scrollX = getScrollX();
-                int scrollY = getScrollY();
-                float touchX = this.mTouchOffsetX;
-                float touchY = this.mTouchOffsetY;
-                int offsetX = this.mBitmapOffsetX;
-                int offsetY = this.mBitmapOffsetY;
-                int left = (int) (((((float) scrollX) + this.mLastMotionX) - touchX) - ((float) offsetX));
-                int top = (int) (((((float) scrollY) + this.mLastMotionY) - touchY) - ((float) offsetY));
-                if (!this.mDrawModeBitmap || this.mDragBitmap == null) {
-                    width = this.mDrawWidth;
-                    height = this.mDrawHeight;
-                } else {
-                    Bitmap dragBitmap = this.mDragBitmap;
-                    width = dragBitmap.getWidth();
-                    height = dragBitmap.getHeight();
-                }
-                Rect rect = this.mRect;
-                rect.set(left - 1, top - 1, left + width + 1, top + height + 1);
-                this.mLastMotionX = x;
-                this.mLastMotionY = y;
-                int left2 = (int) (((((float) scrollX) + x) - touchX) - ((float) offsetX));
-                int top2 = (int) (((((float) scrollY) + y) - touchY) - ((float) offsetY));
-                rect.union(left2 - 1, top2 - 1, left2 + width + 1, top2 + height + 1);
-                int[] coordinates = this.mDropCoordinates;
-                DropTarget dropTarget = findDropTarget((int) x, (int) y, coordinates);
-                if (dropTarget != null) {
-                    if (this.mLastDropTarget == dropTarget) {
-                        dropTarget.onDragOver(this.mDragSource, coordinates[0], coordinates[1], (int) this.mTouchOffsetX, (int) this.mTouchOffsetY, this.mDragInfo);
-                    } else {
-                        if (this.mLastDropTarget != null) {
-                            this.mLastDropTarget.onDragExit(this.mDragSource, coordinates[0], coordinates[1], (int) this.mTouchOffsetX, (int) this.mTouchOffsetY, this.mDragInfo);
-                        }
-                        dropTarget.onDragEnter(this.mDragSource, coordinates[0], coordinates[1], (int) this.mTouchOffsetX, (int) this.mTouchOffsetY, this.mDragInfo);
-                    }
-                } else if (this.mLastDropTarget != null) {
-                    this.mLastDropTarget.onDragExit(this.mDragSource, coordinates[0], coordinates[1], (int) this.mTouchOffsetX, (int) this.mTouchOffsetY, this.mDragInfo);
-                }
-                invalidate(rect);
-                this.mLastDropTarget = dropTarget;
-                this.mDragCancellationState.setDropTargetActive(dropTarget != null);
-                boolean inDragRegion = sProfileDrawingDuringDrag;
-                if (this.mDragRegion != null) {
-                    boolean inRegion = this.mDragRegion.contains(ev.getRawX(), ev.getRawY());
-                    if (!this.mEnteredRegion && inRegion) {
-                        this.mDragPaint = this.mTrashPaint;
-                        this.mRectPaint.setColor(COLOR_TRASH);
-                        this.mEnteredRegion = true;
-                        inDragRegion = true;
-                    } else if (this.mEnteredRegion && !inRegion) {
-                        this.mDragPaint = null;
-                        this.mRectPaint.setColor(COLOR_NORMAL);
-                        this.mEnteredRegion = sProfileDrawingDuringDrag;
-                    }
-                }
-                if (!inDragRegion && x < 20.0f) {
-                    if (this.mScrollState == 0 && (this.mOrientation != 0 || y <= ((float) getDockY()))) {
-                        this.mScrollState = 1;
-                        this.mScrollRunnable.setDirection(0);
-                        postDelayed(this.mScrollRunnable, 600);
-                        break;
-                    }
-                } else if (!inDragRegion && x > ((float) (getWidth() - 20))) {
-                    if (this.mScrollState == 0 && (this.mOrientation != 0 || y <= ((float) getDockY()))) {
-                        this.mScrollState = 1;
-                        this.mScrollRunnable.setDirection(1);
-                        postDelayed(this.mScrollRunnable, 600);
-                        break;
-                    }
-                } else if (this.mScrollState == 1 && (this.mOrientation != 0 || y <= ((float) getDockY()))) {
-                    this.mScrollState = 0;
-                    this.mScrollRunnable.setDirection(1);
-                    removeCallbacks(this.mScrollRunnable);
-                    break;
-                }
+            case MotionEvent.ACTION_MOVE:
+                handleTouchMove(ev, x, y);
+                break;
+            default:
                 break;
         }
         return true;
     }
 
+    private void handleTouchDown(float x, float y) {
+        this.lastMotionX = x;
+        this.lastMotionY = y;
+        if (x >= SCROLL_ZONE && x <= (getWidth() - SCROLL_ZONE)) {
+            this.scrollState = SCROLL_OUTSIDE_ZONE;
+            return;
+        }
+        this.scrollState = SCROLL_WAITING_IN_ZONE;
+        postDelayed(this.scrollRunnable, SCROLL_DELAY);
+    }
+
+    private void handleTouchMove(MotionEvent ev, float x, float y) {
+        int scrollX = getScrollX();
+        int scrollY = getScrollY();
+        float touchX = this.touchOffsetX;
+        float touchY = this.touchOffsetY;
+        int offsetX = this.bitmapOffsetX;
+        int offsetY = this.bitmapOffsetY;
+        int left = (int) ((((scrollX + this.lastMotionX) - touchX) - offsetX));
+        int top = (int) ((((scrollY + this.lastMotionY) - touchY) - offsetY));
+        int width = (!this.drawModeBitmap || this.dragBitmap == null) ? this.drawWidth : this.dragBitmap.getWidth();
+        int height = (!this.drawModeBitmap || this.dragBitmap == null) ? this.drawHeight : this.dragBitmap.getHeight();
+        Rect r = this.rect;
+        r.set(left - 1, top - 1, left + width + 1, top + height + 1);
+        this.lastMotionX = x;
+        this.lastMotionY = y;
+        int left2 = (int) ((((scrollX + x) - touchX) - offsetX));
+        int top2 = (int) ((((scrollY + y) - touchY) - offsetY));
+        r.union(left2 - 1, top2 - 1, left2 + width + 1, top2 + height + 1);
+        int[] coordinates = this.dropCoordinates;
+        DropTarget dropTarget = findDropTarget((int) x, (int) y, coordinates);
+        routeDragEvents(dropTarget, coordinates);
+        invalidate(r);
+        this.lastDropTarget = dropTarget;
+        this.dragCancellationState.setDropTargetActive(dropTarget != null);
+        boolean inDragRegion = checkDragRegion(ev);
+        handleEdgeScrolling(inDragRegion, x, y);
+    }
+
+    private void routeDragEvents(DropTarget dropTarget, int[] coordinates) {
+        if (dropTarget != null) {
+            if (this.lastDropTarget == dropTarget) {
+                dropTarget.onDragOver(this.dragSource, coordinates[0], coordinates[1],
+                        (int) this.touchOffsetX, (int) this.touchOffsetY, this.dragInfo);
+            } else {
+                if (this.lastDropTarget != null) {
+                    this.lastDropTarget.onDragExit(this.dragSource, coordinates[0], coordinates[1],
+                            (int) this.touchOffsetX, (int) this.touchOffsetY, this.dragInfo);
+                }
+                dropTarget.onDragEnter(this.dragSource, coordinates[0], coordinates[1],
+                        (int) this.touchOffsetX, (int) this.touchOffsetY, this.dragInfo);
+            }
+        } else if (this.lastDropTarget != null) {
+            this.lastDropTarget.onDragExit(this.dragSource, coordinates[0], coordinates[1],
+                    (int) this.touchOffsetX, (int) this.touchOffsetY, this.dragInfo);
+        }
+    }
+
+    private boolean checkDragRegion(MotionEvent ev) {
+        boolean inDragRegion = false;
+        if (this.dragRegion != null) {
+            boolean inRegion = this.dragRegion.contains(ev.getRawX(), ev.getRawY());
+            if (!this.enteredRegion && inRegion) {
+                this.dragPaint = this.trashPaint;
+                this.rectPaint.setColor(COLOR_TRASH);
+                this.enteredRegion = true;
+                inDragRegion = true;
+            } else if (this.enteredRegion && !inRegion) {
+                this.dragPaint = null;
+                this.rectPaint.setColor(COLOR_NORMAL);
+                this.enteredRegion = false;
+            }
+        }
+        return inDragRegion;
+    }
+
+    private void handleEdgeScrolling(boolean inDragRegion, float x, float y) {
+        if (!inDragRegion && x < SCROLL_ZONE) {
+            if (this.scrollState == SCROLL_OUTSIDE_ZONE && (this.orientation != 0 || y <= getDockY())) {
+                this.scrollState = SCROLL_WAITING_IN_ZONE;
+                this.scrollRunnable.setDirection(SCROLL_LEFT);
+                postDelayed(this.scrollRunnable, SCROLL_DELAY);
+            }
+        } else if (!inDragRegion && x > (getWidth() - SCROLL_ZONE)) {
+            if (this.scrollState == SCROLL_OUTSIDE_ZONE && (this.orientation != 0 || y <= getDockY())) {
+                this.scrollState = SCROLL_WAITING_IN_ZONE;
+                this.scrollRunnable.setDirection(SCROLL_RIGHT);
+                postDelayed(this.scrollRunnable, SCROLL_DELAY);
+            }
+        } else if (this.scrollState == SCROLL_WAITING_IN_ZONE && (this.orientation != 0 || y <= getDockY())) {
+            this.scrollState = SCROLL_OUTSIDE_ZONE;
+            this.scrollRunnable.setDirection(SCROLL_RIGHT);
+            removeCallbacks(this.scrollRunnable);
+        }
+    }
+
     private int getDockY() {
+        View dock = findViewById(R.id.dock);
+        if (dock == null) {
+            return getHeight();
+        }
         int[] dockLocation = new int[2];
-        findViewById(R.id.dock).getLocationOnScreen(dockLocation);
+        dock.getLocationOnScreen(dockLocation);
         return dockLocation[1];
     }
 
     private boolean drop(float x, float y) {
         invalidate();
-        int[] coordinates = this.mDropCoordinates;
-        this.mRejectedDropTarget = null;
+        int[] coordinates = this.dropCoordinates;
+        this.rejectedDropTarget = null;
         DropTarget dropTarget = findDropTarget((int) x, (int) y, coordinates);
         if (dropTarget == null) {
             exitLastDropTarget();
-            boolean targetFound = this.mRejectedDropTarget != null;
-            notifyDropCompleted((View) this.mRejectedDropTarget, false, targetFound);
-            return sProfileDrawingDuringDrag;
+            boolean targetFound = this.rejectedDropTarget != null;
+            notifyDropCompleted((View) this.rejectedDropTarget, false, targetFound);
+            return false;
         }
-        if (this.mLastDropTarget != null && this.mLastDropTarget != dropTarget) {
+        if (this.lastDropTarget != null && this.lastDropTarget != dropTarget) {
             exitLastDropTarget();
         }
-        dropTarget.onDragExit(this.mDragSource, coordinates[0], coordinates[1], (int) this.mTouchOffsetX, (int) this.mTouchOffsetY, this.mDragInfo);
-        this.mLastDropTarget = null;
-        this.mDragCancellationState.reset();
-        if (dropTarget.acceptDrop(this.mDragSource, coordinates[0], coordinates[1], (int) this.mTouchOffsetX, (int) this.mTouchOffsetY, this.mDragInfo)) {
-            dropTarget.onDrop(this.mDragSource, coordinates[0], coordinates[1], (int) this.mTouchOffsetX, (int) this.mTouchOffsetY, this.mDragInfo);
+        dropTarget.onDragExit(this.dragSource, coordinates[0], coordinates[1],
+                (int) this.touchOffsetX, (int) this.touchOffsetY, this.dragInfo);
+        this.lastDropTarget = null;
+        this.dragCancellationState.reset();
+        if (dropTarget.acceptDrop(this.dragSource, coordinates[0], coordinates[1],
+                (int) this.touchOffsetX, (int) this.touchOffsetY, this.dragInfo)) {
+            dropTarget.onDrop(this.dragSource, coordinates[0], coordinates[1],
+                    (int) this.touchOffsetX, (int) this.touchOffsetY, this.dragInfo);
             notifyDropCompleted((View) dropTarget, true, true);
             return true;
         }
@@ -436,97 +496,107 @@ public class DragLayer extends FrameLayout implements DragController {
     }
 
     private void notifyDropCompleted(View target, boolean success, boolean targetFound) {
-        if (this.mDragSource instanceof DropResultListener) {
-            ((DropResultListener) this.mDragSource).onDropCompleted(target, success, targetFound);
+        if (this.dragSource instanceof DropResultListener) {
+            ((DropResultListener) this.dragSource).onDropCompleted(target, success, targetFound);
             return;
         }
-        this.mDragSource.onDropCompleted(target, success);
+        if (this.dragSource != null) {
+            this.dragSource.onDropCompleted(target, success);
+        }
     }
 
-    /* access modifiers changed from: package-private */
+    /**
+     * Finds the drop target under the specified layer coordinates.
+     */
     public DropTarget findDropTarget(int x, int y, int[] dropCoordinates) {
         return findDropTarget(this, x, y, dropCoordinates);
     }
 
     private DropTarget findDropTarget(ViewGroup container, int x, int y, int[] dropCoordinates) {
-        Rect rect = this.mDragRect;
+        Rect hitRect = this.dragRect;
         int count = container.getChildCount();
         int scrolledX = x + container.getScrollX();
         int scrolledY = y + container.getScrollY();
-        View ignoredDropTarget = this.mIgnoredDropTarget;
+        View ignored = this.ignoredDropTarget;
         for (int i = count - 1; i >= 0; i--) {
             View child = container.getChildAt(i);
-            if (child.getVisibility() == 0 && child != ignoredDropTarget) {
-                child.getHitRect(rect);
-                if (rect.contains(scrolledX, scrolledY)) {
+            if (child.getVisibility() == View.VISIBLE && child != ignored) {
+                child.getHitRect(hitRect);
+                if (hitRect.contains(scrolledX, scrolledY)) {
                     DropTarget target = null;
                     if (child instanceof ViewGroup) {
-                        x = scrolledX - child.getLeft();
-                        y = scrolledY - child.getTop();
-                        target = findDropTarget((ViewGroup) child, x, y, dropCoordinates);
+                        int childX = scrolledX - child.getLeft();
+                        int childY = scrolledY - child.getTop();
+                        target = findDropTarget((ViewGroup) child, childX, childY, dropCoordinates);
                     }
                     if (target != null) {
                         return target;
                     }
                     if (child instanceof DropTarget) {
-                        if (!((DropTarget) child).acceptDrop(this.mDragSource, x, y, 0, 0, this.mDragInfo)) {
-                            this.mRejectedDropTarget = (DropTarget) child;
+                        if (!((DropTarget) child).acceptDrop(this.dragSource, scrolledX - child.getLeft(),
+                                scrolledY - child.getTop(), 0, 0, this.dragInfo)) {
+                            this.rejectedDropTarget = (DropTarget) child;
                             return null;
                         }
-                        dropCoordinates[0] = x;
-                        dropCoordinates[1] = y;
+                        dropCoordinates[0] = scrolledX - child.getLeft();
+                        dropCoordinates[1] = scrolledY - child.getTop();
                         return (DropTarget) child;
                     }
-                } else {
-                    continue;
                 }
             }
         }
         return null;
     }
 
+    /**
+     * Sets the drag scroller component to receive scroll left/right triggers.
+     */
     public void setDragScoller(DragScroller scroller) {
-        this.mDragScroller = scroller;
+        this.dragScroller = scroller;
     }
 
-    public void addDragListener(DragController.DragListener l) {
-        this.mDragListeners.add(l);
+    /**
+     * Registers a drag listener.
+     */
+    public void addDragListener(DragController.DragListener listener) {
+        this.dragListeners.add(listener);
     }
 
-    public void removeDragListener(DragController.DragListener l) {
-        this.mDragListeners.remove(l);
+    /**
+     * Unregisters a drag listener.
+     */
+    public void removeDragListener(DragController.DragListener listener) {
+        this.dragListeners.remove(listener);
     }
 
-    /* access modifiers changed from: package-private */
-    public void setIgnoredDropTarget(View view) {
-        this.mIgnoredDropTarget = view;
+    void setIgnoredDropTarget(View view) {
+        this.ignoredDropTarget = view;
     }
 
-    /* access modifiers changed from: package-private */
-    public void setDeleteRegion(RectF region) {
-        this.mDragRegion = region;
+    void setDeleteRegion(RectF region) {
+        this.dragRegion = region;
     }
 
     private class ScrollRunnable implements Runnable {
-        private int mDirection;
+        private int direction;
 
         ScrollRunnable() {
         }
 
+        @Override
         public void run() {
-            if (DragLayer.this.mDragScroller != null) {
-                if (this.mDirection == 0) {
-                    DragLayer.this.mDragScroller.scrollLeft();
+            if (DragLayer.this.dragScroller != null) {
+                if (this.direction == SCROLL_LEFT) {
+                    DragLayer.this.dragScroller.scrollLeft();
                 } else {
-                    DragLayer.this.mDragScroller.scrollRight();
+                    DragLayer.this.dragScroller.scrollRight();
                 }
-                DragLayer.this.mScrollState = 0;
+                DragLayer.this.scrollState = SCROLL_OUTSIDE_ZONE;
             }
         }
 
-        /* access modifiers changed from: package-private */
-        public void setDirection(int direction) {
-            this.mDirection = direction;
+        void setDirection(int direction) {
+            this.direction = direction;
         }
     }
 }

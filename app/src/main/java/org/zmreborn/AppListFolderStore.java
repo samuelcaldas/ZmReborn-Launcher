@@ -10,7 +10,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-/** Persists drawer folder metadata independently from workspace favorites. */
+/**
+ * Persists drawer folder metadata independently from workspace favorites.
+ */
 final class AppListFolderStore {
     private static final String[] FOLDER_COLUMNS = {"_id", "title", "position"};
     private static final String[] ITEM_COLUMNS = {"folderId", "componentName", "position"};
@@ -23,9 +25,12 @@ final class AppListFolderStore {
         this.resolver = resolver;
     }
 
+    /**
+     * Loads all configured drawer folders in ascending position order.
+     */
     ArrayList<AppListFolderRecord> loadFolders() {
         ArrayList<AppListFolderRecord> folders = new ArrayList<>();
-        Cursor folderCursor = resolver.query(LauncherSettings.AppListFolders.CONTENT_URI,
+        Cursor folderCursor = this.resolver.query(LauncherSettings.AppListFolders.CONTENT_URI,
                 FOLDER_COLUMNS, null, null, "position ASC, _id ASC");
         if (folderCursor == null) {
             return folders;
@@ -42,46 +47,61 @@ final class AppListFolderStore {
         return folders;
     }
 
+    /**
+     * Inserts a new drawer folder record.
+     */
     long createFolder(String title, int position) {
         validateTitle(title);
         ContentValues values = new ContentValues();
         values.put("title", title.trim());
         values.put("position", Math.max(0, position));
-        Uri result = resolver.insert(LauncherSettings.AppListFolders.CONTENT_URI, values);
+        Uri result = this.resolver.insert(LauncherSettings.AppListFolders.CONTENT_URI, values);
         if (result == null) {
             throw new IllegalStateException("Unable to create app-list folder");
         }
         return ContentUris.parseId(result);
     }
 
+    /**
+     * Updates the title of an existing drawer folder.
+     */
     void renameFolder(long folderId, String title) {
         validateTitle(title);
         ContentValues values = new ContentValues();
         values.put("title", title.trim());
-        int updated = resolver.update(LauncherSettings.AppListFolders.getContentUri(folderId), values,
+        int updated = this.resolver.update(LauncherSettings.AppListFolders.getContentUri(folderId), values,
                 null, null);
         if (updated != 1) {
             throw new IllegalStateException("Unable to rename app-list folder " + folderId);
         }
     }
 
+    /**
+     * Deletes a drawer folder and all its associated component entries.
+     */
     void deleteFolder(long folderId) {
-        resolver.delete(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI, "folderId=?",
+        this.resolver.delete(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI, "folderId=?",
                 new String[]{String.valueOf(folderId)});
-        resolver.delete(LauncherSettings.AppListFolders.getContentUri(folderId), null, null);
+        this.resolver.delete(LauncherSettings.AppListFolders.getContentUri(folderId), null, null);
     }
 
+    /**
+     * Removes all component assignments belonging to the specified uninstalled package.
+     */
     void removePackage(String packageName) {
         if (packageName == null || packageName.trim().length() == 0) {
             return;
         }
-        resolver.delete(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI,
+        this.resolver.delete(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI,
                 "componentName LIKE ?", new String[]{packageName + "/%"});
     }
 
+    /**
+     * Returns a set of all component names currently assigned to any drawer folder.
+     */
     Set<String> loadAssignedComponents() {
         HashSet<String> assigned = new HashSet<>();
-        Cursor cursor = resolver.query(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI,
+        Cursor cursor = this.resolver.query(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI,
                 new String[]{"componentName"}, null, null, null);
         if (cursor == null) {
             return assigned;
@@ -96,6 +116,9 @@ final class AppListFolderStore {
         return assigned;
     }
 
+    /**
+     * Atomically replaces the list of component names assigned to a drawer folder.
+     */
     void replaceContents(long folderId, List<String> componentNames) {
         if (componentNames == null) {
             throw new IllegalArgumentException("componentNames is required");
@@ -109,7 +132,7 @@ final class AppListFolderStore {
                 uniqueNames.add(componentName);
             }
         }
-        resolver.delete(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI, "folderId=?",
+        this.resolver.delete(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI, "folderId=?",
                 new String[]{String.valueOf(folderId)});
         ContentValues[] values = new ContentValues[uniqueNames.size()];
         for (int index = 0; index < uniqueNames.size(); index++) {
@@ -119,7 +142,7 @@ final class AppListFolderStore {
             value.put("position", index);
             values[index] = value;
         }
-        if (values.length > 0 && resolver.bulkInsert(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI,
+        if (values.length > 0 && this.resolver.bulkInsert(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI,
                 values) != values.length) {
             throw new IllegalStateException("Unable to replace app-list folder contents");
         }
@@ -127,7 +150,7 @@ final class AppListFolderStore {
 
     private ArrayList<String> loadComponents(long folderId) {
         ArrayList<String> components = new ArrayList<>();
-        Cursor cursor = resolver.query(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI,
+        Cursor cursor = this.resolver.query(LauncherSettings.AppListFolders.ITEMS_CONTENT_URI,
                 ITEM_COLUMNS, "folderId=?", new String[]{String.valueOf(folderId)},
                 "position ASC, _id ASC");
         if (cursor == null) {

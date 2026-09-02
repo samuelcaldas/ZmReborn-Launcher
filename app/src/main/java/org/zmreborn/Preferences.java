@@ -17,17 +17,20 @@ import java.io.File;
 import java.util.ArrayList;
 import org.zmreborn.theme.WallpaperColorExtractor;
 
+/**
+ * Activity presenting user preferences and configuring launcher behavior settings.
+ */
 public class Preferences extends PreferenceActivity {
-    private final ArrayList<DebouncedIntegerPreference> mNumericPreferences =
-            new ArrayList<DebouncedIntegerPreference>(9);
-    private SettingsSummaryBinder mSummaryBinder;
+    private final ArrayList<DebouncedIntegerPreference> numericPreferences =
+            new ArrayList<>(9);
+    private SettingsSummaryBinder summaryBinder;
 
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(LocaleUtil.wrap(base));
     }
 
-    /* access modifiers changed from: protected */
+    @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         addPreferencesFromResource(R.xml.preferences);
@@ -38,7 +41,7 @@ public class Preferences extends PreferenceActivity {
         bindAppsGridPreferences();
         bindDockPreferences();
         bindApplicationPreferences();
-        mSummaryBinder = SettingsSummaryBinder.attach(getPreferenceScreen(),
+        this.summaryBinder = SettingsSummaryBinder.attach(getPreferenceScreen(),
                 PreferenceManager.getDefaultSharedPreferences(this));
     }
 
@@ -60,9 +63,9 @@ public class Preferences extends PreferenceActivity {
     @Override
     protected void onDestroy() {
         flushNumericPreferences();
-        if (mSummaryBinder != null) {
-            mSummaryBinder.detach();
-            mSummaryBinder = null;
+        if (this.summaryBinder != null) {
+            this.summaryBinder.detach();
+            this.summaryBinder = null;
         }
         super.onDestroy();
     }
@@ -257,8 +260,7 @@ public class Preferences extends PreferenceActivity {
                 });
     }
 
-    /* access modifiers changed from: private */
-    public void loadAppsGridRowsColumns(int appsGridType) {
+    private void loadAppsGridRowsColumns(int appsGridType) {
         validateAppsGridType(appsGridType);
         Preference appsGridDensity = findPreference(
                 getString(R.string.preferences_key_apps_grid_density));
@@ -278,8 +280,8 @@ public class Preferences extends PreferenceActivity {
             return;
         }
         enableHorizontalAppsGridSteppers(appsGridContentRowsPortrait,
-                appsGridContentColumnsPortrait, appsGridContentRowsLandscape,
-                appsGridContentColumnsLandscape);
+                    appsGridContentColumnsPortrait, appsGridContentRowsLandscape,
+                    appsGridContentColumnsLandscape);
     }
 
     private void disableAppsGridSteppers(InlineStepperPreference appsGridContentRowsPortrait,
@@ -392,8 +394,8 @@ public class Preferences extends PreferenceActivity {
     }
 
     private void registerNumericPreference(DebouncedIntegerPreference preference) {
-        if (!mNumericPreferences.contains(preference)) {
-            mNumericPreferences.add(preference);
+        if (!this.numericPreferences.contains(preference)) {
+            this.numericPreferences.add(preference);
         }
     }
 
@@ -409,19 +411,19 @@ public class Preferences extends PreferenceActivity {
     }
 
     private void flushNumericPreferences() {
-        for (DebouncedIntegerPreference preference : mNumericPreferences) {
+        for (DebouncedIntegerPreference preference : this.numericPreferences) {
             preference.flushPendingValue();
         }
     }
 
     private void flushNumericPreferencesDurably() {
-        for (DebouncedIntegerPreference preference : mNumericPreferences) {
+        for (DebouncedIntegerPreference preference : this.numericPreferences) {
             preference.flushPendingValueDurably();
         }
     }
 
     private void cancelPendingNumericPreferences() {
-        for (DebouncedIntegerPreference preference : mNumericPreferences) {
+        for (DebouncedIntegerPreference preference : this.numericPreferences) {
             preference.cancelPendingValue();
         }
     }
@@ -434,8 +436,7 @@ public class Preferences extends PreferenceActivity {
         }
     }
 
-    /* access modifiers changed from: private */
-    public void resetAlertRestart() {
+    private void resetAlertRestart() {
         resetPreferences();
         alertRestart(this);
     }

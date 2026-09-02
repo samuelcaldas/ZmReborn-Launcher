@@ -17,6 +17,12 @@ public final class WindowInsetsCompat {
     private WindowInsetsCompat() {
     }
 
+    /**
+     * Extracts system bar insets (left, top, right, bottom) from WindowInsets.
+     *
+     * @param insets the window insets object
+     * @return a Rect containing the insets dimensions
+     */
     public static Rect getSystemBarInsets(WindowInsets insets) {
         if (insets == null) {
             return new Rect();
@@ -25,10 +31,22 @@ public final class WindowInsetsCompat {
                 insets.getSystemWindowInsetRight(), insets.getSystemWindowInsetBottom());
     }
 
+    /**
+     * Extracts system bar insets from the root insets of a View.
+     *
+     * @param view the view to query
+     * @return a Rect containing the insets dimensions
+     */
     public static Rect getSystemBarInsets(View view) {
         return getSystemBarInsets(rootInsets(view));
     }
 
+    /**
+     * Extracts system gesture insets on API 29+.
+     *
+     * @param insets the window insets object
+     * @return a Rect containing gesture insets, or null if below API 29 / null insets
+     */
     public static Rect getSystemGestureInsets(WindowInsets insets) {
         if (insets == null || Build.VERSION.SDK_INT < 29) {
             return null;
@@ -36,10 +54,22 @@ public final class WindowInsetsCompat {
         return Api29.systemGestureInsets(insets);
     }
 
+    /**
+     * Extracts system gesture insets from the root insets of a View on API 29+.
+     *
+     * @param view the view to query
+     * @return a Rect containing gesture insets, or null if below API 29 / null insets
+     */
     public static Rect getSystemGestureInsets(View view) {
         return getSystemGestureInsets(rootInsets(view));
     }
 
+    /**
+     * Extracts status bar insets from WindowInsets.
+     *
+     * @param insets the window insets object
+     * @return a Rect with top set to status bar height
+     */
     public static Rect getStatusBarInsets(WindowInsets insets) {
         if (insets == null) {
             return new Rect();
@@ -50,10 +80,22 @@ public final class WindowInsetsCompat {
         return new Rect(0, insets.getSystemWindowInsetTop(), 0, 0);
     }
 
+    /**
+     * Extracts status bar insets from the root insets of a View.
+     *
+     * @param view the view to query
+     * @return a Rect with top set to status bar height
+     */
     public static Rect getStatusBarInsets(View view) {
         return getStatusBarInsets(rootInsets(view));
     }
 
+    /**
+     * Extracts navigation bar insets from WindowInsets.
+     *
+     * @param insets the window insets object
+     * @return a Rect with bottom set to navigation bar height
+     */
     public static Rect getNavigationBarInsets(WindowInsets insets) {
         if (insets == null) {
             return new Rect();
@@ -64,6 +106,12 @@ public final class WindowInsetsCompat {
         return new Rect(0, 0, 0, insets.getSystemWindowInsetBottom());
     }
 
+    /**
+     * Extracts navigation bar insets from the root insets of a View.
+     *
+     * @param view the view to query
+     * @return a Rect with bottom set to navigation bar height
+     */
     public static Rect getNavigationBarInsets(View view) {
         return getNavigationBarInsets(rootInsets(view));
     }

@@ -9,6 +9,9 @@ import android.os.LocaleList;
 import android.preference.PreferenceManager;
 import java.util.Locale;
 
+/**
+ * Helper utility for handling runtime locale switching, normalization, and configuration context creation.
+ */
 @SuppressLint("AppBundleLocaleChanges")
 final class LocaleUtil {
     static final String SYSTEM_DEFAULT_LANGUAGE = "";
@@ -18,6 +21,9 @@ final class LocaleUtil {
     private LocaleUtil() {
     }
 
+    /**
+     * Wraps the given context with user-selected locale and appearance configuration.
+     */
     static Context wrap(Context baseContext) {
         requireContext(baseContext);
         Configuration baseConfiguration = baseContext.getResources().getConfiguration();

@@ -6,9 +6,15 @@ import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-/** Presents a bounded integer as an inline slider. */
+/**
+ * Presents a bounded integer as an inline slider.
+ */
 public final class InlineSliderPreference extends DebouncedIntegerPreference
         implements SeekBar.OnSeekBarChangeListener {
+
+    /**
+     * Constructs an inline slider preference with context and XML attributes.
+     */
     public InlineSliderPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setSelectable(false);
@@ -28,6 +34,7 @@ public final class InlineSliderPreference extends DebouncedIntegerPreference
         slider.setOnSeekBarChangeListener(this);
     }
 
+    @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         if (!fromUser) {
             return;
@@ -38,9 +45,11 @@ public final class InlineSliderPreference extends DebouncedIntegerPreference
         bindValue(seekBar, findValueView(seekBar));
     }
 
+    @Override
     public void onStartTrackingTouch(SeekBar seekBar) {
     }
 
+    @Override
     public void onStopTrackingTouch(SeekBar seekBar) {
     }
 

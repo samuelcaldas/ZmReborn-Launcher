@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.util.DisplayMetrics;
 
+/**
+ * Resolves responsive column widths based on screen width and user density preferences.
+ */
 final class DrawerDensityPolicy {
     static final String AUTOMATIC = "automatic";
     static final String COMFORTABLE = "comfortable";
@@ -13,6 +16,9 @@ final class DrawerDensityPolicy {
     private DrawerDensityPolicy() {
     }
 
+    /**
+     * Calculates preferred column width in pixels for the current device and preference configuration.
+     */
     static int getPreferredColumnWidth(Context context) {
         int widthDp = getViewportWidthDp(context);
         String density = PreferencesUtil.getAppsGridDensity(context);
@@ -20,6 +26,9 @@ final class DrawerDensityPolicy {
         return context.getResources().getDimensionPixelSize(dimension);
     }
 
+    /**
+     * Resolves the dimension resource ID for the specified density mode and viewport width.
+     */
     static int resolvePreferredWidthResource(String density, int viewportWidthDp) {
         if (COMPACT.equals(density)) {
             return R.dimen.drawer_cell_compact_width;

@@ -13,17 +13,26 @@ import java.util.ArrayList;
 import java.util.List;
 import org.zmreborn.theme.WallpaperColorExtractor;
 
+/**
+ * Adapter backing the all-applications grid view, managing items, stable multi-profile IDs, and uninstall state.
+ */
 public class ApplicationsAdapter extends ArrayAdapter<ApplicationItemInfo> {
-    private boolean mUninstalling;
-    private final LayoutInflater mLayoutInflater;
-    private final String mProfileToken;
+    private boolean uninstalling;
+    private final LayoutInflater layoutInflater;
+    private final String profileToken;
 
+    /**
+     * Constructs an adapter with context and item list.
+     *
+     * @param context application or view context
+     * @param applicationItemInfos list of applications to display
+     */
     public ApplicationsAdapter(
             Context context,
             List<ApplicationItemInfo> applicationItemInfos) {
         super(context, 0, snapshot(applicationItemInfos));
-        this.mLayoutInflater = LayoutInflater.from(context);
-        this.mProfileToken = resolveProfileToken(context);
+        this.layoutInflater = LayoutInflater.from(context);
+        this.profileToken = resolveProfileToken(context);
     }
 
     @Override
@@ -37,7 +46,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationItemInfo> {
         if (item == null) {
             return position;
         }
-        return stableId(this.mProfileToken + '|' + item.getStableKey());
+        return stableId(this.profileToken + '|' + item.getStableKey());
     }
 
     @Override
@@ -52,7 +61,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationItemInfo> {
         if (convertView != null) {
             return (TextView) convertView;
         }
-        return (TextView) this.mLayoutInflater.inflate(
+        return (TextView) this.layoutInflater.inflate(
                 R.layout.application_boxed_grid, parent, false);
     }
 
@@ -71,7 +80,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationItemInfo> {
 
     private void bindFolderIcon(TextView textView, Context context) {
         textView.setCompoundDrawablesWithIntrinsicBounds(null,
-                context.getResources().getDrawable(R.drawable.ic_launcher_folder),
+                context.getDrawable(R.drawable.ic_launcher_folder),
                 null, null);
     }
 
@@ -81,7 +90,7 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationItemInfo> {
         Context context = getContext();
         Drawable normalizedIcon = Utilities.normalizeApplicationIcon(
                 application == null ? null : application.icon, context);
-        if (!this.mUninstalling) {
+        if (!this.uninstalling) {
             Utilities.setCompoundApplicationIcon(textView, normalizedIcon, context);
             return;
         }
@@ -104,9 +113,8 @@ public class ApplicationsAdapter extends ArrayAdapter<ApplicationItemInfo> {
         Utilities.setCompoundApplicationIcon(textView, icon, context);
     }
 
-    /* access modifiers changed from: package-private */
-    public void setUninstalling(boolean uninstalling) {
-        this.mUninstalling = uninstalling;
+    void setUninstalling(boolean uninstalling) {
+        this.uninstalling = uninstalling;
     }
 
     private CharSequence buildApplicationDescription(ApplicationItemInfo info) {

@@ -20,43 +20,42 @@ import android.widget.ImageView;
 import java.io.IOException;
 import java.util.ArrayList;
 
+/**
+ * Activity for choosing and setting built-in launcher wallpapers.
+ */
 public class WallpaperChooser extends Activity implements AdapterView.OnItemSelectedListener, View.OnClickListener {
-    /* access modifiers changed from: private */
-    public Bitmap mBitmap;
-    private Gallery mGallery;
-    /* access modifiers changed from: private */
-    public ImageView mImageView;
-    /* access modifiers changed from: private */
-    public ArrayList<Integer> mImages;
-    private boolean mIsWallpaperSet;
-    /* access modifiers changed from: private */
-    public WallpaperLoader mLoader;
-    /* access modifiers changed from: private */
-    public ArrayList<Integer> mThumbs;
+    private Bitmap bitmap;
+    private Gallery gallery;
+    private ImageView imageView;
+    private ArrayList<Integer> images;
+    private boolean isWallpaperSet;
+    private WallpaperLoader loader;
+    private ArrayList<Integer> thumbs;
 
     @Override
     protected void attachBaseContext(Context base) {
         super.attachBaseContext(LocaleUtil.wrap(base));
     }
 
+    @Override
     public void onCreate(Bundle icicle) {
         super.onCreate(icicle);
         requestWindowFeature(1);
         findWallpapers();
         setContentView(R.layout.wallpaper_chooser);
-        this.mImageView = (ImageView) findViewById(R.id.wallpaper);
-        this.mGallery = (Gallery) findViewById(R.id.gallery);
-        this.mGallery.setAdapter(new ImageAdapter(this));
-        this.mGallery.setOnItemSelectedListener(this);
-        this.mGallery.setCallbackDuringFling(false);
+        this.imageView = (ImageView) findViewById(R.id.wallpaper);
+        this.gallery = (Gallery) findViewById(R.id.gallery);
+        this.gallery.setAdapter(new ImageAdapter(this));
+        this.gallery.setOnItemSelectedListener(this);
+        this.gallery.setCallbackDuringFling(false);
         View setButton = findViewById(R.id.set);
-        setButton.setEnabled(!this.mImages.isEmpty());
+        setButton.setEnabled(!this.images.isEmpty());
         setButton.setOnClickListener(this);
     }
 
     private void findWallpapers() {
-        this.mThumbs = new ArrayList<>(24);
-        this.mImages = new ArrayList<>(24);
+        this.thumbs = new ArrayList<>(24);
+        this.images = new ArrayList<>(24);
         Resources resources = getResources();
         String packageName = getApplication().getPackageName();
         addWallpapers(resources, packageName, R.array.wallpapers);
@@ -64,51 +63,56 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
     }
 
     private void addWallpapers(Resources resources, String packageName, int list) {
-        int thumbRes;
         for (String extra : resources.getStringArray(list)) {
             int res = resources.getIdentifier(extra, "drawable", packageName);
-            if (!(res == 0 || (thumbRes = resources.getIdentifier(String.valueOf(extra) + "_small", "drawable", packageName)) == 0)) {
-                this.mThumbs.add(Integer.valueOf(thumbRes));
-                this.mImages.add(Integer.valueOf(res));
+            if (res == 0) {
+                continue;
             }
+            int thumbRes = resources.getIdentifier(extra + "_small", "drawable", packageName);
+            if (thumbRes == 0) {
+                continue;
+            }
+            this.thumbs.add(Integer.valueOf(thumbRes));
+            this.images.add(Integer.valueOf(res));
         }
     }
 
-    /* access modifiers changed from: protected */
-    public void onResume() {
+    @Override
+    protected void onResume() {
         super.onResume();
-        this.mIsWallpaperSet = false;
+        this.isWallpaperSet = false;
         View setButton = findViewById(R.id.set);
         if (setButton != null) {
-            setButton.setEnabled(this.mImages != null && !this.mImages.isEmpty());
+            setButton.setEnabled(this.images != null && !this.images.isEmpty());
         }
     }
 
-    /* access modifiers changed from: protected */
-    public void onDestroy() {
+    @Override
+    protected void onDestroy() {
         super.onDestroy();
-        if (this.mLoader != null && this.mLoader.getStatus() != AsyncTask.Status.FINISHED) {
-            this.mLoader.cancel(true);
-            this.mLoader = null;
+        if (this.loader != null && this.loader.getStatus() != AsyncTask.Status.FINISHED) {
+            this.loader.cancel(true);
+            this.loader = null;
         }
-        if (this.mBitmap != null) {
-            this.mBitmap.recycle();
-            this.mBitmap = null;
+        if (this.bitmap != null) {
+            this.bitmap.recycle();
+            this.bitmap = null;
         }
     }
 
-    public void onItemSelected(AdapterView parent, View v, int position, long id) {
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View v, int position, long id) {
         if (!isWallpaperPosition(position)) {
             return;
         }
-        if (!(this.mLoader == null || this.mLoader.getStatus() == AsyncTask.Status.FINISHED)) {
-            this.mLoader.cancel();
+        if (this.loader != null && this.loader.getStatus() != AsyncTask.Status.FINISHED) {
+            this.loader.cancel();
         }
-        this.mLoader = (WallpaperLoader) new WallpaperLoader().execute(new Integer[]{Integer.valueOf(position)});
+        this.loader = (WallpaperLoader) new WallpaperLoader().execute(Integer.valueOf(position));
     }
 
     private void selectWallpaper(int position) {
-        if (this.mIsWallpaperSet || !isWallpaperPosition(position)) {
+        if (this.isWallpaperSet || !isWallpaperPosition(position)) {
             return;
         }
         WallpaperManager wallpaperManager = (WallpaperManager) getSystemService("wallpaper");
@@ -117,8 +121,8 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
             return;
         }
         try {
-            wallpaperManager.setResource(this.mImages.get(position).intValue());
-            this.mIsWallpaperSet = true;
+            wallpaperManager.setResource(this.images.get(position).intValue());
+            this.isWallpaperSet = true;
             setResult(-1);
             finish();
         } catch (IOException e) {
@@ -129,103 +133,112 @@ public class WallpaperChooser extends Activity implements AdapterView.OnItemSele
     }
 
     private boolean isWallpaperPosition(int position) {
-        return this.mImages != null && position >= 0 && position < this.mImages.size();
+        return this.images != null && position >= 0 && position < this.images.size();
     }
 
-    public void onNothingSelected(AdapterView parent) {
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
     }
 
     private class ImageAdapter extends BaseAdapter {
-        private LayoutInflater mLayoutInflater;
+        private final LayoutInflater layoutInflater;
 
         ImageAdapter(WallpaperChooser context) {
-            this.mLayoutInflater = context.getLayoutInflater();
+            this.layoutInflater = context.getLayoutInflater();
         }
 
+        @Override
         public int getCount() {
-            return WallpaperChooser.this.mThumbs.size();
+            return WallpaperChooser.this.thumbs.size();
         }
 
+        @Override
         public Object getItem(int position) {
             return Integer.valueOf(position);
         }
 
+        @Override
         public long getItemId(int position) {
-            return (long) position;
+            return position;
         }
 
+        @Override
         public View getView(int position, View convertView, ViewGroup parent) {
-            ImageView image;
-            if (convertView == null) {
-                image = (ImageView) this.mLayoutInflater.inflate(R.layout.wallpaper_item, parent, false);
-            } else {
-                image = (ImageView) convertView;
-            }
-            int thumbRes = ((Integer) WallpaperChooser.this.mThumbs.get(position)).intValue();
+            View view = convertView == null
+                    ? this.layoutInflater.inflate(R.layout.wallpaper_item, parent, false)
+                    : convertView;
+            ImageView image = (ImageView) view;
+            int thumbRes = WallpaperChooser.this.thumbs.get(position).intValue();
             image.setImageResource(thumbRes);
             Drawable thumbDrawable = image.getDrawable();
             if (thumbDrawable != null) {
                 thumbDrawable.setDither(true);
             } else {
-                Log.e(Launcher.LOG_TAG, String.format("Error decoding thumbnail resId=%d for wallpaper #%d", new Object[]{Integer.valueOf(thumbRes), Integer.valueOf(position)}));
+                Log.e(Launcher.LOG_TAG, String.format(
+                        "Error decoding thumbnail resId=%d for wallpaper #%d",
+                        Integer.valueOf(thumbRes), Integer.valueOf(position)));
             }
             return image;
         }
     }
 
+    @Override
     public void onClick(View v) {
-        selectWallpaper(this.mGallery.getSelectedItemPosition());
+        selectWallpaper(this.gallery.getSelectedItemPosition());
     }
 
     class WallpaperLoader extends AsyncTask<Integer, Void, Bitmap> {
-        BitmapFactory.Options mOptions = new BitmapFactory.Options();
+        BitmapFactory.Options options = new BitmapFactory.Options();
 
         WallpaperLoader() {
-            this.mOptions.inDither = false;
-            this.mOptions.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            this.options.inDither = false;
+            this.options.inPreferredConfig = Bitmap.Config.ARGB_8888;
         }
 
-        /* access modifiers changed from: protected */
-        public Bitmap doInBackground(Integer... params) {
+        @Override
+        protected Bitmap doInBackground(Integer... params) {
             if (isCancelled() || params == null || params.length == 0
                     || !WallpaperChooser.this.isWallpaperPosition(params[0].intValue())) {
                 return null;
             }
             try {
-                return BitmapFactory.decodeResource(WallpaperChooser.this.getResources(), ((Integer) WallpaperChooser.this.mImages.get(params[0].intValue())).intValue(), this.mOptions);
+                return BitmapFactory.decodeResource(WallpaperChooser.this.getResources(),
+                        WallpaperChooser.this.images.get(params[0].intValue()).intValue(), this.options);
             } catch (OutOfMemoryError e) {
                 return null;
             }
         }
 
-        /* access modifiers changed from: protected */
-        public void onPostExecute(Bitmap bitmap) {
-            if (bitmap != null) {
-                if (isCancelled() || this.mOptions.mCancel) {
-                    bitmap.recycle();
-                    return;
-                }
-                if (WallpaperChooser.this.mBitmap != null) {
-                    WallpaperChooser.this.mBitmap.recycle();
-                }
-                ImageView view = WallpaperChooser.this.mImageView;
-                if (view == null) {
-                    bitmap.recycle();
-                    return;
-                }
-                view.setImageBitmap(bitmap);
-                WallpaperChooser.this.mBitmap = bitmap;
-                Drawable drawable = view.getDrawable();
+        @Override
+        protected void onPostExecute(Bitmap loadedBitmap) {
+            if (loadedBitmap == null) {
+                return;
+            }
+            if (isCancelled() || this.options.mCancel) {
+                loadedBitmap.recycle();
+                return;
+            }
+            if (WallpaperChooser.this.bitmap != null) {
+                WallpaperChooser.this.bitmap.recycle();
+            }
+            ImageView view = WallpaperChooser.this.imageView;
+            if (view == null) {
+                loadedBitmap.recycle();
+                return;
+            }
+            view.setImageBitmap(loadedBitmap);
+            WallpaperChooser.this.bitmap = loadedBitmap;
+            Drawable drawable = view.getDrawable();
+            if (drawable != null) {
                 drawable.setFilterBitmap(true);
                 drawable.setDither(true);
-                view.postInvalidate();
-                WallpaperChooser.this.mLoader = null;
             }
+            view.postInvalidate();
+            WallpaperChooser.this.loader = null;
         }
 
-        /* access modifiers changed from: package-private */
-        public void cancel() {
-            this.mOptions.requestCancelDecode();
+        void cancel() {
+            this.options.requestCancelDecode();
             super.cancel(true);
         }
     }

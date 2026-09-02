@@ -19,53 +19,70 @@ import java.util.ArrayList;
 import java.util.Collections;
 import org.zmreborn.DragController;
 
-public class Dock extends LinearLayout implements View.OnLongClickListener, DropTarget, DragSource, DropResultListener, DragController.DragListener {
+/**
+ * Dock bar container providing quick-launch application, folder, and drawer icons.
+ */
+public class Dock extends LinearLayout implements View.OnLongClickListener, DropTarget, DragSource,
+        DropResultListener, DragController.DragListener {
     private static final String POSITION_CENTER = "CENTER";
     private static final String POSITION_END = "END";
     private static final String POSITION_START = "START";
     static final int WIDTH_LARGE = 2;
     static final int WIDTH_MEDIUM = 1;
     static final int WIDTH_SMALL = 0;
-    private int mCellHeight = 20;
-    private int mCellWidth = 20;
-    private DragController mDragController;
-    private LinearLayout mItemHolder;
-    private Launcher mLauncher;
-    private int mOrientation = 1;
-    private View mScrollView;
-    private View mSelectedView;
-    private DockDragTransaction mDragTransaction;
-    private Rect mSystemBarInsets;
+    private int cellHeight = 20;
+    private int cellWidth = 20;
+    private DragController dragController;
+    private LinearLayout itemHolder;
+    private Launcher launcher;
+    private int orientation = 1;
+    private View scrollView;
+    private View selectedView;
+    private DockDragTransaction dragTransaction;
+    private Rect systemBarInsets;
 
+    /**
+     * Constructs a dock view with context.
+     */
     public Dock(Context context) {
         super(context);
     }
 
+    /**
+     * Constructs a dock view with context and XML attributes.
+     */
     public Dock(Context context, AttributeSet attrs) {
         super(context, attrs);
         TypedArray typedArray = context.obtainStyledAttributes(attrs, R.styleable.Dock, 0, 0);
-        this.mCellHeight = typedArray.getDimensionPixelSize(1, this.mCellHeight);
-        this.mCellWidth = typedArray.getDimensionPixelSize(0, this.mCellWidth);
-        this.mOrientation = typedArray.getInt(2, this.mOrientation);
+        this.cellHeight = typedArray.getDimensionPixelSize(1, this.cellHeight);
+        this.cellWidth = typedArray.getDimensionPixelSize(0, this.cellWidth);
+        this.orientation = typedArray.getInt(2, this.orientation);
     }
 
-    public void setDragger(DragController dragController) {
-        this.mDragController = dragController;
+    /**
+     * Sets the drag controller for initiating item movement.
+     */
+    public void setDragger(DragController controller) {
+        this.dragController = controller;
     }
 
+    /**
+     * Sets system bar insets.
+     */
     public void setSystemBarInsets(Rect insets) {
-        this.mSystemBarInsets = insets;
+        this.systemBarInsets = insets;
     }
 
-    /* access modifiers changed from: protected */
-    public void onFinishInflate() {
-        this.mItemHolder = (LinearLayout) findViewById(R.id.dock_item_holder);
-        this.mScrollView = findViewById(R.id.dock_scroll_view);
-        this.mScrollView.setBackgroundColor(0);
+    @Override
+    protected void onFinishInflate() {
+        this.itemHolder = (LinearLayout) findViewById(R.id.dock_item_holder);
+        this.scrollView = findViewById(R.id.dock_scroll_view);
+        this.scrollView.setBackgroundColor(0);
         setElevation(getResources().getDimension(R.dimen.elevation_dock));
         super.onFinishInflate();
     }
 
+    @Override
     public boolean acceptDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
         switch (((ItemInfo) dragInfo).itemType) {
             case 0:
@@ -73,32 +90,35 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
             case 2:
             case 3:
             case 6:
-                this.mScrollView.setBackgroundResource(R.drawable.dock_bg_glow);
+                this.scrollView.setBackgroundResource(R.drawable.dock_bg_glow);
                 return true;
             default:
-                this.mScrollView.setBackgroundDrawable((Drawable) null);
+                this.scrollView.setBackgroundDrawable((Drawable) null);
                 return false;
         }
     }
 
-    public Rect estimateDropLocation(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo, Rect recycle) {
-        return null;
-    }
-
+    /**
+     * Dispatches a drop to the end of the dock.
+     */
     public void sendDrop(ItemInfo itemInfo) {
         sendDrop(itemInfo, -1);
     }
 
+    /**
+     * Dispatches a drop to a specific dock position.
+     */
     public void sendDrop(ItemInfo itemInfo, int position) {
         onDrop((DragSource) null, position, -1, -1, -1, itemInfo);
     }
 
+    @Override
     public void onDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
         int insertAfter = findDropIndex(x, y);
-        this.mScrollView.setBackgroundDrawable((Drawable) null);
+        this.scrollView.setBackgroundDrawable((Drawable) null);
         if (source == this) {
-            if (this.mDragTransaction != null) {
-                this.mDragTransaction.stageDrop(insertAfter);
+            if (this.dragTransaction != null) {
+                this.dragTransaction.stageDrop(insertAfter);
             }
             return;
         }
@@ -106,12 +126,12 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
     }
 
     private int findDropIndex(int x, int y) {
-        int childCount = this.mItemHolder.getChildCount();
+        int childCount = this.itemHolder.getChildCount();
         if (x == -1 && y == -1) {
             return childCount;
         }
         for (int index = 0; index < childCount; index++) {
-            if (isBeforeChild(this.mItemHolder.getChildAt(index), x, y)) {
+            if (isBeforeChild(this.itemHolder.getChildAt(index), x, y)) {
                 return index;
             }
         }
@@ -121,10 +141,10 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
     private boolean isBeforeChild(View childView, int x, int y) {
         int[] childLocation = new int[2];
         childView.getLocationOnScreen(childLocation);
-        int childPosition = this.mOrientation == 1
+        int childPosition = this.orientation == 1
                 ? childLocation[0] + (childView.getWidth() / 2)
                 : childLocation[1] + (childView.getHeight() / 2);
-        return this.mOrientation == 1 ? x <= childPosition : y <= childPosition;
+        return this.orientation == 1 ? x <= childPosition : y <= childPosition;
     }
 
     private void addExternalItem(ItemInfo itemInfo, int position) {
@@ -136,30 +156,38 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
         updateItemsInDatabase();
     }
 
+    @Override
     public void onDragEnter(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
     }
 
+    @Override
     public void onDragOver(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
     }
 
+    @Override
     public void onDragExit(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
-        this.mScrollView.setBackgroundDrawable((Drawable) null);
+        this.scrollView.setBackgroundDrawable((Drawable) null);
     }
 
+    @Override
     public void onDragStart(View v, DragSource source, Object info, int dragAction) {
     }
 
+    @Override
     public void onDragEnd() {
-        if (this.mDragTransaction != null) {
+        if (this.dragTransaction != null) {
             completeDrop((View) null, false, false);
         }
     }
 
+    /**
+     * Adds items to the dock sorted by horizontal cell position.
+     */
     public void addItemViews(ArrayList<ItemInfo> itemInfos) {
         Collections.sort(itemInfos, ItemInfo.createCellXComparator());
         for (int i = 0; i < itemInfos.size(); i++) {
             ItemInfo itemInfo = itemInfos.get(i);
-            if (itemInfo.cellX <= this.mItemHolder.getChildCount()) {
+            if (itemInfo.cellX <= this.itemHolder.getChildCount()) {
                 addItemViewAt(itemInfo, itemInfo.cellX);
             } else {
                 addItemView(itemInfo);
@@ -179,124 +207,141 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
                 if (itemInfo.container == -1) {
                     itemInfo = new ApplicationItemInfo((ApplicationItemInfo) itemInfo);
                 }
-                view = this.mLauncher.createSmallShortcut(R.layout.small_application, this, (ApplicationItemInfo) itemInfo);
+                view = this.launcher.createSmallShortcut(R.layout.small_application, this, (ApplicationItemInfo) itemInfo);
                 break;
             case 2:
-                view = this.mLauncher.createSmallFolder(R.layout.small_application, this, (UserFolderInfo) itemInfo);
+                view = this.launcher.createSmallFolder(R.layout.small_application, this, (UserFolderInfo) itemInfo);
                 break;
             case 3:
-                view = this.mLauncher.createSmallLiveFolder(R.layout.small_application, this, (LiveFolderInfo) itemInfo);
+                view = this.launcher.createSmallLiveFolder(R.layout.small_application, this, (LiveFolderInfo) itemInfo);
                 break;
             case 6:
-                view = this.mLauncher.createSmallApplicationsGridItem(R.layout.small_application, this, (ApplicationsGridItemInfo) itemInfo);
+                view = this.launcher.createSmallApplicationsGridItem(R.layout.small_application, this, (ApplicationsGridItemInfo) itemInfo);
                 break;
         }
         Drawable selectorDrawable = itemInfo.itemType == 6
                 ? SelectorDrawable.createOblongSelector(getContext())
                 : SelectorDrawable.createSelector(getContext(), true);
         ImageView imageView = (ImageView) view;
-        imageView.setMinimumHeight(this.mCellHeight);
-        imageView.setMinimumWidth(this.mCellWidth);
+        imageView.setMinimumHeight(this.cellHeight);
+        imageView.setMinimumWidth(this.cellWidth);
         view.setLongClickable(true);
         view.setFocusable(true);
         view.setOnLongClickListener(this);
         view.setBackgroundDrawable(selectorDrawable);
         if (position == -1) {
-            this.mItemHolder.addView(view);
+            this.itemHolder.addView(view);
         } else {
-            this.mItemHolder.addView(view, position);
+            this.itemHolder.addView(view, position);
         }
-        this.mItemHolder.invalidate();
+        this.itemHolder.invalidate();
         invalidate();
     }
 
-    public boolean onLongClick(View selectedView) {
-        if (this.mDragTransaction != null) {
+    @Override
+    public boolean onLongClick(View longClickedView) {
+        if (this.dragTransaction != null) {
             return false;
         }
-        if (this.mLauncher.isApplicationsGridOpen()) {
-            this.mLauncher.closeAllApplications();
+        if (this.launcher.isApplicationsGridOpen()) {
+            this.launcher.closeAllApplications();
         }
-        int originalIndex = this.mItemHolder.indexOfChild(selectedView);
+        int originalIndex = this.itemHolder.indexOfChild(longClickedView);
         if (originalIndex < 0) {
             return false;
         }
-        this.mSelectedView = selectedView;
-        this.mDragTransaction = new DockDragTransaction(originalIndex);
-        this.mDragController.startDrag(selectedView, this, (ItemInfo) selectedView.getTag(), 0);
+        this.selectedView = longClickedView;
+        this.dragTransaction = new DockDragTransaction(originalIndex);
+        this.dragController.startDrag(longClickedView, this, (ItemInfo) longClickedView.getTag(), 0);
         return true;
     }
 
+    @Override
     public void removeAllViewsInLayout() {
-        this.mItemHolder.removeAllViewsInLayout();
+        this.itemHolder.removeAllViewsInLayout();
     }
 
-    /* access modifiers changed from: package-private */
-    public void removeShortcutsForPackage(String packageName) {
+    void removeShortcutsForPackage(String packageName) {
         Intent intent;
         ComponentName componentName;
-        String packageName1;
-        if (packageName != null) {
-            cancelActiveDragForPackageRemoval();
-            for (int i = 0; i < this.mItemHolder.getChildCount(); i++) {
-                View child = this.mItemHolder.getChildAt(i);
-                ItemInfo itemInfo = (ItemInfo) child.getTag();
-                if (!(itemInfo == null || !(itemInfo instanceof ApplicationItemInfo) || (intent = ((ApplicationItemInfo) itemInfo).intent) == null || (componentName = intent.getComponent()) == null || (packageName1 = componentName.getPackageName()) == null || !packageName1.equals(packageName))) {
-                    this.mSelectedView = child;
-                    removeSelectedItem(true);
+        String pkg;
+        if (packageName == null) {
+            return;
+        }
+        cancelActiveDragForPackageRemoval();
+        for (int i = 0; i < this.itemHolder.getChildCount(); i++) {
+            View child = this.itemHolder.getChildAt(i);
+            ItemInfo itemInfo = (ItemInfo) child.getTag();
+            if (itemInfo instanceof ApplicationItemInfo) {
+                intent = ((ApplicationItemInfo) itemInfo).intent;
+                if (intent != null) {
+                    componentName = intent.getComponent();
+                    if (componentName != null) {
+                        pkg = componentName.getPackageName();
+                        if (pkg != null && pkg.equals(packageName)) {
+                            this.selectedView = child;
+                            removeSelectedItem(true);
+                        }
+                    }
                 }
             }
         }
     }
 
     private void cancelActiveDragForPackageRemoval() {
-        if (this.mDragTransaction == null) {
+        if (this.dragTransaction == null) {
             return;
         }
-        this.mDragController.cancelDrag();
-        if (this.mDragTransaction != null) {
+        this.dragController.cancelDrag();
+        if (this.dragTransaction != null) {
             completeDrop((View) null, false, false);
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public void updateShortcutsForPackage(String packageName) {
+    void updateShortcutsForPackage(String packageName) {
         Folder folder;
         Drawable icon;
-        if (packageName != null) {
-            for (int i = 0; i < this.mItemHolder.getChildCount(); i++) {
-                View itemView = this.mItemHolder.getChildAt(i);
-                ItemInfo itemInfo = (ItemInfo) itemView.getTag();
-                if (itemInfo instanceof ApplicationItemInfo) {
-                    ApplicationItemInfo info = (ApplicationItemInfo) itemInfo;
-                    Intent intent = info.intent;
-                    ComponentName name = intent.getComponent();
-                    if ((info.itemType == 0 || info.itemType == 1) && "android.intent.action.MAIN".equals(intent.getAction()) && name != null) {
-                        if (!(!packageName.equals(name.getPackageName()) || (icon = Launcher.getModel().getApplicationItemInfoIconOrNull(this.mLauncher.getPackageManager(), info)) == null || icon == info.icon)) {
+        if (packageName == null) {
+            return;
+        }
+        for (int i = 0; i < this.itemHolder.getChildCount(); i++) {
+            View itemView = this.itemHolder.getChildAt(i);
+            ItemInfo itemInfo = (ItemInfo) itemView.getTag();
+            if (itemInfo instanceof ApplicationItemInfo) {
+                ApplicationItemInfo info = (ApplicationItemInfo) itemInfo;
+                Intent intent = info.intent;
+                ComponentName name = intent.getComponent();
+                if ((info.itemType == 0 || info.itemType == 1) && "android.intent.action.MAIN".equals(intent.getAction()) && name != null) {
+                    if (packageName.equals(name.getPackageName())) {
+                        icon = Launcher.getModel().getApplicationItemInfoIconOrNull(this.launcher.getPackageManager(), info);
+                        if (icon != null && icon != info.icon) {
                             info.filtered = true;
                             info.icon.setCallback((Drawable.Callback) null);
                             info.icon = Utilities.createIconThumbnail(icon, getContext());
                             ((ImageView) itemView).setImageDrawable(Utilities.createDockIconThumbnail(info.icon, getContext()));
                         }
                     }
-                } else if (itemInfo instanceof UserFolderInfo) {
-                    ArrayList<ApplicationItemInfo> applicationItemInfos = ((UserFolderInfo) itemInfo).contents;
-                    int applicationItemInfoCount = applicationItemInfos.size();
-                    for (int y = 0; y < applicationItemInfoCount; y++) {
-                        ApplicationItemInfo applicationItemInfo = applicationItemInfos.get(y);
-                        Intent intent2 = applicationItemInfo.intent;
-                        ComponentName name2 = intent2.getComponent();
-                        if ((applicationItemInfo.itemType == 0 || applicationItemInfo.itemType == 1) && "android.intent.action.MAIN".equals(intent2.getAction()) && name2 != null) {
-                            if (packageName.equals(name2.getPackageName())) {
-                                Drawable icon2 = Launcher.getModel().getApplicationItemInfoIconOrNull(this.mLauncher.getPackageManager(), applicationItemInfo);
-                                boolean folderUpdated = false;
-                                if (!(icon2 == null || icon2 == applicationItemInfo.icon)) {
-                                    applicationItemInfo.icon.setCallback((Drawable.Callback) null);
-                                    applicationItemInfo.icon = Utilities.createIconThumbnail(icon2, this.mLauncher);
-                                    applicationItemInfo.filtered = true;
-                                    folderUpdated = true;
-                                }
-                                if (folderUpdated && (folder = this.mLauncher.getWorkspace().getOpenFolder()) != null) {
+                }
+            } else if (itemInfo instanceof UserFolderInfo) {
+                ArrayList<ApplicationItemInfo> applicationItemInfos = ((UserFolderInfo) itemInfo).contents;
+                int applicationItemInfoCount = applicationItemInfos.size();
+                for (int y = 0; y < applicationItemInfoCount; y++) {
+                    ApplicationItemInfo applicationItemInfo = applicationItemInfos.get(y);
+                    Intent intent2 = applicationItemInfo.intent;
+                    ComponentName name2 = intent2.getComponent();
+                    if ((applicationItemInfo.itemType == 0 || applicationItemInfo.itemType == 1) && "android.intent.action.MAIN".equals(intent2.getAction()) && name2 != null) {
+                        if (packageName.equals(name2.getPackageName())) {
+                            Drawable icon2 = Launcher.getModel().getApplicationItemInfoIconOrNull(this.launcher.getPackageManager(), applicationItemInfo);
+                            boolean folderUpdated = false;
+                            if (icon2 != null && icon2 != applicationItemInfo.icon) {
+                                applicationItemInfo.icon.setCallback((Drawable.Callback) null);
+                                applicationItemInfo.icon = Utilities.createIconThumbnail(icon2, this.launcher);
+                                applicationItemInfo.filtered = true;
+                                folderUpdated = true;
+                            }
+                            if (folderUpdated) {
+                                folder = this.launcher.getWorkspace().getOpenFolder();
+                                if (folder != null) {
                                     folder.notifyDataSetChanged();
                                 }
                             }
@@ -308,52 +353,51 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
     }
 
     private void updateItemsInDatabase() {
-        this.mItemHolder.forceLayout();
-        this.mItemHolder.invalidate();
-        int count = this.mItemHolder.getChildCount();
+        this.itemHolder.forceLayout();
+        this.itemHolder.invalidate();
+        int count = this.itemHolder.getChildCount();
         for (int i = 0; i < count; i++) {
-            ItemInfo itemInfo = (ItemInfo) this.mItemHolder.getChildAt(i).getTag();
+            ItemInfo itemInfo = (ItemInfo) this.itemHolder.getChildAt(i).getTag();
             itemInfo.cellX = i;
-            LauncherModel.moveItemInDatabase(this.mLauncher, itemInfo, -200, -1, itemInfo.cellX, -1);
+            LauncherModel.moveItemInDatabase(this.launcher, itemInfo, -200, -1, itemInfo.cellX, -1);
         }
     }
 
     private void removeSelectedItem(boolean deleteItemFromDatabase) {
-        if (this.mSelectedView != null) {
-            ItemInfo itemInfo = (ItemInfo) this.mSelectedView.getTag();
-            LauncherModel launcherModel = Launcher.getModel();
-            if (deleteItemFromDatabase) {
-                if (itemInfo instanceof UserFolderInfo) {
-                    UserFolderInfo userFolderInfo = (UserFolderInfo) itemInfo;
-                    LauncherModel.deleteUserFolderContentsFromDatabase(this.mLauncher, userFolderInfo);
-                    launcherModel.removeUserFolder(userFolderInfo);
-                }
-                LauncherModel.deleteItemFromDatabase(this.mLauncher, itemInfo);
-            }
-            launcherModel.removeDesktopItem(itemInfo);
-            this.mItemHolder.removeView(this.mSelectedView);
-            int count = this.mItemHolder.getChildCount();
-            for (int i = 0; i < count; i++) {
-                View cell = this.mItemHolder.getChildAt(i);
-                ItemInfo info = (ItemInfo) cell.getTag();
-                if (info.cellX > itemInfo.cellX) {
-                    info.cellX--;
-                    cell.setTag(info);
-                    LauncherModel.moveItemInDatabase(this.mLauncher, info, -200, -1, info.cellX, -1);
-                }
-            }
-            requestLayout();
-            this.mSelectedView = null;
+        if (this.selectedView == null) {
+            return;
         }
+        ItemInfo itemInfo = (ItemInfo) this.selectedView.getTag();
+        LauncherModel launcherModel = Launcher.getModel();
+        if (deleteItemFromDatabase) {
+            if (itemInfo instanceof UserFolderInfo) {
+                UserFolderInfo userFolderInfo = (UserFolderInfo) itemInfo;
+                LauncherModel.deleteUserFolderContentsFromDatabase(this.launcher, userFolderInfo);
+                launcherModel.removeUserFolder(userFolderInfo);
+            }
+            LauncherModel.deleteItemFromDatabase(this.launcher, itemInfo);
+        }
+        launcherModel.removeDesktopItem(itemInfo);
+        this.itemHolder.removeView(this.selectedView);
+        int count = this.itemHolder.getChildCount();
+        for (int i = 0; i < count; i++) {
+            View cell = this.itemHolder.getChildAt(i);
+            ItemInfo info = (ItemInfo) cell.getTag();
+            if (info.cellX > itemInfo.cellX) {
+                info.cellX--;
+                cell.setTag(info);
+                LauncherModel.moveItemInDatabase(this.launcher, info, -200, -1, info.cellX, -1);
+            }
+        }
+        requestLayout();
+        this.selectedView = null;
     }
 
-    /* access modifiers changed from: package-private */
-    public void setLauncher(Launcher launcher) {
-        this.mLauncher = launcher;
+    void setLauncher(Launcher launcherInstance) {
+        this.launcher = launcherInstance;
     }
 
-    /* access modifiers changed from: package-private */
-    public void setItemWidth(int width) {
+    void setItemWidth(int width) {
         double spacing;
         switch (width) {
             case 0:
@@ -365,60 +409,59 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
             default:
                 return;
         }
-        int size = (int) (((double) this.mLauncher.getDisplayMetrics().density) * spacing);
-        if (this.mOrientation == 1) {
-            this.mCellWidth = size;
+        int size = (int) (((double) this.launcher.getDisplayMetrics().density) * spacing);
+        if (this.orientation == 1) {
+            this.cellWidth = size;
         } else {
-            this.mCellHeight = size;
+            this.cellHeight = size;
         }
         invalidate();
         requestLayout();
     }
 
-    /* access modifiers changed from: package-private */
-    public void scrollReset() {
+    void scrollReset() {
         String resetTo = PreferencesUtil.getDockResetTo(getContext());
-        if (this.mScrollView instanceof HorizontalScrollView) {
-            HorizontalScrollView hScrollView = (HorizontalScrollView) this.mScrollView;
+        if (this.scrollView instanceof HorizontalScrollView) {
+            HorizontalScrollView hScrollView = (HorizontalScrollView) this.scrollView;
             if (resetTo.equalsIgnoreCase(POSITION_START)) {
                 hScrollView.fullScroll(17);
             } else if (resetTo.equalsIgnoreCase(POSITION_CENTER)) {
-                hScrollView.smoothScrollTo((this.mItemHolder.getMeasuredWidth() - getMeasuredWidth()) / 2, 0);
+                hScrollView.smoothScrollTo((this.itemHolder.getMeasuredWidth() - getMeasuredWidth()) / 2, 0);
             } else if (resetTo.equalsIgnoreCase(POSITION_END)) {
                 hScrollView.fullScroll(66);
             } else {
                 hScrollView.fullScroll(17);
             }
-        } else if (this.mScrollView instanceof ScrollView) {
-            ScrollView scrollView = (ScrollView) this.mScrollView;
+        } else if (this.scrollView instanceof ScrollView) {
+            ScrollView scrView = (ScrollView) this.scrollView;
             if (resetTo.equalsIgnoreCase(POSITION_START)) {
-                scrollView.fullScroll(33);
+                scrView.fullScroll(33);
             } else if (resetTo.equalsIgnoreCase(POSITION_CENTER)) {
-                scrollView.smoothScrollTo(0, (this.mItemHolder.getMeasuredHeight() - getMeasuredHeight()) / 2);
+                scrView.smoothScrollTo(0, (this.itemHolder.getMeasuredHeight() - getMeasuredHeight()) / 2);
             } else if (resetTo.equalsIgnoreCase(POSITION_END)) {
-                scrollView.fullScroll(130);
+                scrView.fullScroll(130);
             } else {
-                scrollView.fullScroll(33);
+                scrView.fullScroll(33);
             }
         }
     }
 
-    /* access modifiers changed from: protected */
-    public void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+    @Override
+    protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int itemHolderSize;
         int i = 3;
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-        int dockSize = this.mOrientation == 1 ? getMeasuredWidth() : getMeasuredHeight();
-        if (this.mOrientation == 1) {
-            itemHolderSize = this.mItemHolder.getMeasuredWidth();
+        int dockSize = this.orientation == 1 ? getMeasuredWidth() : getMeasuredHeight();
+        if (this.orientation == 1) {
+            itemHolderSize = this.itemHolder.getMeasuredWidth();
         } else {
-            itemHolderSize = this.mItemHolder.getMeasuredHeight();
+            itemHolderSize = this.itemHolder.getMeasuredHeight();
         }
         if (itemHolderSize != 0) {
-            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) this.mItemHolder.getLayoutParams();
+            FrameLayout.LayoutParams layoutParams = (FrameLayout.LayoutParams) this.itemHolder.getLayoutParams();
             if (itemHolderSize <= dockSize) {
                 String itemAlignment = PreferencesUtil.getDockItemAlignment(getContext());
-                if (this.mOrientation == 1) {
+                if (this.orientation == 1) {
                     if (itemAlignment.equalsIgnoreCase(POSITION_START)) {
                         layoutParams.gravity = 3;
                     } else if (itemAlignment.equalsIgnoreCase(POSITION_CENTER)) {
@@ -438,27 +481,29 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
                     layoutParams.gravity = 1;
                 }
             } else {
-                if (this.mOrientation != 1) {
+                if (this.orientation != 1) {
                     i = 48;
                 }
                 layoutParams.gravity = i;
             }
-            this.mItemHolder.setLayoutParams(layoutParams);
+            this.itemHolder.setLayoutParams(layoutParams);
             postInvalidate();
             requestLayout();
         }
     }
 
+    @Override
     public void onDropCompleted(View target, boolean success) {
         completeDrop(target, success, target != null);
     }
 
+    @Override
     public void onDropCompleted(View target, boolean success, boolean targetFound) {
         completeDrop(target, success, targetFound);
     }
 
     private void completeDrop(View target, boolean success, boolean targetFound) {
-        DockDragTransaction transaction = this.mDragTransaction;
+        DockDragTransaction transaction = this.dragTransaction;
         if (transaction == null) {
             return;
         }
@@ -478,40 +523,40 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
     }
 
     private boolean commitDrop(View target, DockDragTransaction transaction) {
-        if (this.mSelectedView == null || this.mItemHolder.indexOfChild(this.mSelectedView) < 0) {
+        if (this.selectedView == null || this.itemHolder.indexOfChild(this.selectedView) < 0) {
             return false;
         }
         if (target == this) {
             return commitDockMove(transaction);
         }
-        Launcher.getModel().removeDesktopItem((ItemInfo) this.mSelectedView.getTag());
-        this.mItemHolder.removeView(this.mSelectedView);
+        Launcher.getModel().removeDesktopItem((ItemInfo) this.selectedView.getTag());
+        this.itemHolder.removeView(this.selectedView);
         updateItemsInDatabase();
         return true;
     }
 
     private boolean commitDockMove(DockDragTransaction transaction) {
-        int insertionIndex = transaction.getInsertionIndex(this.mItemHolder.getChildCount());
-        this.mItemHolder.removeView(this.mSelectedView);
-        this.mItemHolder.addView(this.mSelectedView, insertionIndex);
-        this.mSelectedView.setVisibility(0);
+        int insertionIndex = transaction.getInsertionIndex(this.itemHolder.getChildCount());
+        this.itemHolder.removeView(this.selectedView);
+        this.itemHolder.addView(this.selectedView, insertionIndex);
+        this.selectedView.setVisibility(0);
         updateItemsInDatabase();
         return true;
     }
 
     private void restoreSelectedView(DockDragTransaction transaction) {
-        if (this.mSelectedView == null) {
+        if (this.selectedView == null) {
             return;
         }
-        int currentIndex = this.mItemHolder.indexOfChild(this.mSelectedView);
-        int originalIndex = Math.min(transaction.getOriginalIndex(), this.mItemHolder.getChildCount());
+        int currentIndex = this.itemHolder.indexOfChild(this.selectedView);
+        int originalIndex = Math.min(transaction.getOriginalIndex(), this.itemHolder.getChildCount());
         if (currentIndex < 0) {
-            this.mItemHolder.addView(this.mSelectedView, originalIndex);
+            this.itemHolder.addView(this.selectedView, originalIndex);
         } else if (currentIndex != originalIndex) {
-            this.mItemHolder.removeView(this.mSelectedView);
-            this.mItemHolder.addView(this.mSelectedView, originalIndex);
+            this.itemHolder.removeView(this.selectedView);
+            this.itemHolder.addView(this.selectedView, originalIndex);
         }
-        this.mSelectedView.setVisibility(0);
+        this.selectedView.setVisibility(0);
         requestLayout();
     }
 
@@ -522,28 +567,25 @@ public class Dock extends LinearLayout implements View.OnLongClickListener, Drop
     }
 
     private void clearDragState() {
-        this.mDragTransaction = null;
-        this.mSelectedView = null;
+        this.dragTransaction = null;
+        this.selectedView = null;
     }
 
-    /* access modifiers changed from: package-private */
-    public void hide(boolean animated) {
+    void hide(boolean animated) {
         if (animated) {
             setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.dock_fade_out));
         }
         setVisibility(View.INVISIBLE);
     }
 
-    /* access modifiers changed from: package-private */
-    public void show(boolean animated) {
+    void show(boolean animated) {
         if (animated) {
             setAnimation(AnimationUtils.loadAnimation(getContext(), R.anim.dock_fade_in));
         }
         setVisibility(View.VISIBLE);
     }
 
-    /* access modifiers changed from: package-private */
-    public boolean isEmpty() {
-        return this.mItemHolder.getChildCount() == 0;
+    boolean isEmpty() {
+        return this.itemHolder.getChildCount() == 0;
     }
 }

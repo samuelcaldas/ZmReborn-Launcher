@@ -35,4 +35,21 @@ public class XmlUtilsTest {
         assertEquals(-1, XmlUtils.convertValueToList(null, options, -1));
         assertEquals(-1, XmlUtils.convertValueToList("d", options, -1));
     }
+
+    @Test
+    public void testConvertValueToUnsignedInt() {
+        assertEquals(42, XmlUtils.convertValueToUnsignedInt("42", 0));
+        assertEquals(0, XmlUtils.convertValueToUnsignedInt(null, 0));
+        assertEquals(255, XmlUtils.convertValueToUnsignedInt("0xff", 0));
+        assertEquals(255, XmlUtils.convertValueToUnsignedInt("#ff", 0));
+        assertEquals(8, XmlUtils.convertValueToUnsignedInt("010", 0));
+    }
+
+    @Test
+    public void testParseUnsignedIntAttribute() {
+        assertEquals(0, XmlUtils.parseUnsignedIntAttribute("0"));
+        assertEquals(12345, XmlUtils.parseUnsignedIntAttribute("12345"));
+        assertEquals(0xABCD, XmlUtils.parseUnsignedIntAttribute("0xABCD"));
+        assertEquals(0x12, XmlUtils.parseUnsignedIntAttribute("#12"));
+    }
 }

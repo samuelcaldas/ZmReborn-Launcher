@@ -824,8 +824,8 @@ public class SettingsResourceContractTest {
 
         assertTrue("Paging drawer must use DrawerSearchFilter",
                 pagingView.contains("DrawerSearchFilter"));
-        assertTrue("Paging drawer must have mSourceItems for full app list",
-                pagingView.contains("mSourceItems"));
+        assertTrue("Paging drawer must have sourceItems for full app list",
+                pagingView.contains("sourceItems"));
         assertTrue("Paging drawer must bind search input",
                 pagingView.contains("drawer_search_input"));
         assertTrue("Paging drawer must clear search on close",

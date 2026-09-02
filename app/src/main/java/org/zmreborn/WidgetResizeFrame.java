@@ -11,6 +11,9 @@ import android.view.View;
 import android.view.ViewConfiguration;
 import android.widget.FrameLayout;
 
+/**
+ * Overlay frame for interactive cell-snapped widget resizing on workspace desktops.
+ */
 @SuppressLint("ViewConstructor")
 // TODO(move): belongs in org.zmreborn.widget after CellLayout APIs are isolated.
 final class WidgetResizeFrame extends FrameLayout {
@@ -26,31 +29,31 @@ final class WidgetResizeFrame extends FrameLayout {
         void onWidgetResizeCommitted(CellLayout.ResizeCandidate candidate);
     }
 
-    private final CellLayout mCellLayout;
-    private final View mWidgetView;
-    private final Callback mCallback;
-    private final boolean mHorizontalResizeEnabled;
-    private final boolean mVerticalResizeEnabled;
-    private final int mMinimumSpanX;
-    private final int mMinimumSpanY;
-    private final int mHandleSize;
-    private final int mTouchSlopSquared;
-    private final Rect mCandidateBounds = new Rect();
-    private final int[] mCellLocation = new int[2];
-    private final int[] mFrameLocation = new int[2];
-    private final int[] mCellPoint = new int[2];
-    private final Paint mOutlinePaint = new Paint(1);
-    private final Paint mLabelBackgroundPaint = new Paint(1);
-    private final Paint mLabelPaint = new Paint(1);
+    private final CellLayout cellLayout;
+    private final View widgetView;
+    private final Callback callback;
+    private final boolean horizontalResizeEnabled;
+    private final boolean verticalResizeEnabled;
+    private final int minimumSpanX;
+    private final int minimumSpanY;
+    private final int handleSize;
+    private final int touchSlopSquared;
+    private final Rect candidateBounds = new Rect();
+    private final int[] cellLocation = new int[2];
+    private final int[] frameLocation = new int[2];
+    private final int[] cellPoint = new int[2];
+    private final Paint outlinePaint = new Paint(1);
+    private final Paint labelBackgroundPaint = new Paint(1);
+    private final Paint labelPaint = new Paint(1);
 
-    private ResizeHandleView mActiveHandle;
-    private CellLayout.ResizeCandidate mCandidate;
-    private final CellLayout.ResizeCandidate mOriginalCandidate;
-    private boolean mCandidateValid;
-    private boolean mTrackWidgetDrag;
-    private float mWidgetDragDownX;
-    private float mWidgetDragDownY;
-    private boolean mFinished;
+    private ResizeHandleView activeHandle;
+    private CellLayout.ResizeCandidate candidate;
+    private final CellLayout.ResizeCandidate originalCandidate;
+    private boolean candidateValid;
+    private boolean trackWidgetDrag;
+    private float widgetDragDownX;
+    private float widgetDragDownY;
+    private boolean finished;
 
     WidgetResizeFrame(Context context, CellLayout cellLayout, View widgetView,
             AppWidgetProviderInfo providerInfo, Callback callback) {
@@ -62,41 +65,41 @@ final class WidgetResizeFrame extends FrameLayout {
         if (!(widgetView.getLayoutParams() instanceof CellLayout.LayoutParams)) {
             throw new IllegalArgumentException("Widget must use CellLayout.LayoutParams");
         }
-        this.mCellLayout = cellLayout;
-        this.mWidgetView = widgetView;
-        this.mCallback = callback;
-        this.mHorizontalResizeEnabled = supportsHorizontalResize(providerInfo);
-        this.mVerticalResizeEnabled = supportsVerticalResize(providerInfo);
+        this.cellLayout = cellLayout;
+        this.widgetView = widgetView;
+        this.callback = callback;
+        this.horizontalResizeEnabled = supportsHorizontalResize(providerInfo);
+        this.verticalResizeEnabled = supportsVerticalResize(providerInfo);
         CellLayout.LayoutParams params = (CellLayout.LayoutParams) widgetView.getLayoutParams();
         int[] minimumSpans = calculateMinimumSpans(providerInfo);
-        this.mMinimumSpanX = this.mHorizontalResizeEnabled
+        this.minimumSpanX = this.horizontalResizeEnabled
                 ? minimumSpans[0] : params.cellHSpan;
-        this.mMinimumSpanY = this.mVerticalResizeEnabled
+        this.minimumSpanY = this.verticalResizeEnabled
                 ? minimumSpans[1] : params.cellVSpan;
-        this.mOriginalCandidate = new CellLayout.ResizeCandidate(params.cellX, params.cellY,
+        this.originalCandidate = new CellLayout.ResizeCandidate(params.cellX, params.cellY,
                 params.cellHSpan, params.cellVSpan);
-        this.mCandidate = this.mOriginalCandidate;
-        this.mCandidateValid = true;
-        this.mHandleSize = dimensionToPixels(HANDLE_SIZE_DP);
+        this.candidate = this.originalCandidate;
+        this.candidateValid = true;
+        this.handleSize = dimensionToPixels(HANDLE_SIZE_DP);
         int touchSlop = ViewConfiguration.get(context).getScaledTouchSlop();
-        this.mTouchSlopSquared = touchSlop * touchSlop;
+        this.touchSlopSquared = touchSlop * touchSlop;
         configureDrawing();
         addSupportedHandles();
     }
 
     boolean supportsResize() {
-        return this.mHorizontalResizeEnabled || this.mVerticalResizeEnabled;
+        return this.horizontalResizeEnabled || this.verticalResizeEnabled;
     }
 
     private void configureDrawing() {
         setWillNotDraw(false);
         setClickable(true);
         setFocusable(true);
-        this.mOutlinePaint.setStyle(Paint.Style.STROKE);
-        this.mOutlinePaint.setStrokeWidth(dimensionToPixels(OUTLINE_WIDTH_DP));
-        this.mLabelBackgroundPaint.setStyle(Paint.Style.FILL);
-        this.mLabelPaint.setTextAlign(Paint.Align.CENTER);
-        this.mLabelPaint.setTextSize(dimensionToPixels(14));
+        this.outlinePaint.setStyle(Paint.Style.STROKE);
+        this.outlinePaint.setStrokeWidth(dimensionToPixels(OUTLINE_WIDTH_DP));
+        this.labelBackgroundPaint.setStyle(Paint.Style.FILL);
+        this.labelPaint.setTextAlign(Paint.Align.CENTER);
+        this.labelPaint.setTextSize(dimensionToPixels(14));
     }
 
     private int[] calculateMinimumSpans(AppWidgetProviderInfo providerInfo) {
@@ -104,7 +107,7 @@ final class WidgetResizeFrame extends FrameLayout {
                 providerInfo.minWidth);
         int height = preferredResizeDimension(providerInfo.minResizeHeight,
                 providerInfo.minHeight);
-        return this.mCellLayout.rectToCellFromDp(width, height);
+        return this.cellLayout.rectToCellFromDp(width, height);
     }
 
     private int preferredResizeDimension(int resizeDimension, int minimumDimension) {
@@ -126,7 +129,7 @@ final class WidgetResizeFrame extends FrameLayout {
         if (!supportsResize()) {
             return;
         }
-        if (this.mHorizontalResizeEnabled && this.mVerticalResizeEnabled) {
+        if (this.horizontalResizeEnabled && this.verticalResizeEnabled) {
             addHandle(CellLayout.RESIZE_EDGE_START, CellLayout.RESIZE_EDGE_START,
                     R.string.widget_resize_handle_top_left);
             addHandle(CellLayout.RESIZE_EDGE_END, CellLayout.RESIZE_EDGE_START,
@@ -137,7 +140,7 @@ final class WidgetResizeFrame extends FrameLayout {
                     R.string.widget_resize_handle_bottom_right);
             return;
         }
-        if (this.mHorizontalResizeEnabled) {
+        if (this.horizontalResizeEnabled) {
             addHandle(CellLayout.RESIZE_EDGE_START, CellLayout.RESIZE_EDGE_NONE,
                     R.string.widget_resize_handle_left);
             addHandle(CellLayout.RESIZE_EDGE_END, CellLayout.RESIZE_EDGE_NONE,
@@ -157,6 +160,7 @@ final class WidgetResizeFrame extends FrameLayout {
         handle.setFocusable(true);
         handle.setClickable(true);
         handle.setOnTouchListener(new OnTouchListener() {
+            @Override
             public boolean onTouch(View view, MotionEvent event) {
                 boolean handled = onHandleTouch(handle, event);
                 if (handled && event.getActionMasked() == MotionEvent.ACTION_UP) {
@@ -166,35 +170,36 @@ final class WidgetResizeFrame extends FrameLayout {
             }
         });
         handle.setOnClickListener(new OnClickListener() {
+            @Override
             public void onClick(View view) {
                 resizeOneCell(handle);
             }
         });
-        addView(handle, new FrameLayout.LayoutParams(this.mHandleSize, this.mHandleSize));
+        addView(handle, new FrameLayout.LayoutParams(this.handleSize, this.handleSize));
     }
 
     private boolean onHandleTouch(ResizeHandleView handle, MotionEvent event) {
-        if (this.mFinished) {
+        if (this.finished) {
             return true;
         }
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                this.mActiveHandle = handle;
+                this.activeHandle = handle;
                 updatePreview(handle, event);
                 return true;
             case MotionEvent.ACTION_MOVE:
-                if (this.mActiveHandle == handle) {
+                if (this.activeHandle == handle) {
                     updatePreview(handle, event);
                 }
                 return true;
             case MotionEvent.ACTION_UP:
-                if (this.mActiveHandle == handle) {
+                if (this.activeHandle == handle) {
                     updatePreview(handle, event);
                     finishResize();
                 }
                 return true;
             case MotionEvent.ACTION_CANCEL:
-                if (this.mActiveHandle == handle) {
+                if (this.activeHandle == handle) {
                     finishCancelled();
                 }
                 return true;
@@ -205,55 +210,55 @@ final class WidgetResizeFrame extends FrameLayout {
 
     private void updatePreview(ResizeHandleView handle, MotionEvent event) {
         updateCellPoint(handle, event);
-        CellLayout.LayoutParams params = (CellLayout.LayoutParams) this.mWidgetView.getLayoutParams();
-        this.mCandidate = this.mCellLayout.findResizeCandidate(params,
-                this.mCellPoint[0], this.mCellPoint[1], handle.horizontalEdge,
-                handle.verticalEdge, this.mMinimumSpanX, this.mMinimumSpanY);
-        this.mCandidateValid = this.mCellLayout.isResizeCandidateVacant(this.mCandidate,
-                this.mWidgetView);
+        CellLayout.LayoutParams params = (CellLayout.LayoutParams) this.widgetView.getLayoutParams();
+        this.candidate = this.cellLayout.findResizeCandidate(params,
+                this.cellPoint[0], this.cellPoint[1], handle.horizontalEdge,
+                handle.verticalEdge, this.minimumSpanX, this.minimumSpanY);
+        this.candidateValid = this.cellLayout.isResizeCandidateVacant(this.candidate,
+                this.widgetView);
         requestLayout();
         invalidate();
     }
 
     private void updateCellPoint(ResizeHandleView handle, MotionEvent event) {
-        this.mCellLayout.getLocationOnScreen(this.mCellLocation);
-        this.mCellPoint[0] = Math.round(event.getRawX() - this.mCellLocation[0]);
-        this.mCellPoint[1] = Math.round(event.getRawY() - this.mCellLocation[1]);
+        this.cellLayout.getLocationOnScreen(this.cellLocation);
+        this.cellPoint[0] = Math.round(event.getRawX() - this.cellLocation[0]);
+        this.cellPoint[1] = Math.round(event.getRawY() - this.cellLocation[1]);
         if (handle.horizontalEdge == CellLayout.RESIZE_EDGE_END) {
-            this.mCellPoint[0]--;
+            this.cellPoint[0]--;
         }
         if (handle.verticalEdge == CellLayout.RESIZE_EDGE_END) {
-            this.mCellPoint[1]--;
+            this.cellPoint[1]--;
         }
     }
 
     private void finishResize() {
-        if (this.mCandidateValid && !this.mCandidate.matches(
-                (CellLayout.LayoutParams) this.mWidgetView.getLayoutParams())) {
-            finishCommitted(this.mCandidate);
+        if (this.candidateValid && !this.candidate.matches(
+                (CellLayout.LayoutParams) this.widgetView.getLayoutParams())) {
+            finishCommitted(this.candidate);
             return;
         }
         finishCancelled();
     }
 
     private void resizeOneCell(ResizeHandleView handle) {
-        if (this.mFinished) {
+        if (this.finished) {
             return;
         }
-        CellLayout.LayoutParams params = (CellLayout.LayoutParams) this.mWidgetView.getLayoutParams();
-        CellLayout.ResizeCandidate candidate = CellLayout.calculateResizeCandidate(
+        CellLayout.LayoutParams params = (CellLayout.LayoutParams) this.widgetView.getLayoutParams();
+        CellLayout.ResizeCandidate resCandidate = CellLayout.calculateResizeCandidate(
                 params.cellX, params.cellY, params.cellHSpan, params.cellVSpan,
                 keyboardPointerCell(params.cellX, params.cellHSpan, handle.horizontalEdge),
                 keyboardPointerCell(params.cellY, params.cellVSpan, handle.verticalEdge),
-                handle.horizontalEdge, handle.verticalEdge, this.mMinimumSpanX,
-                this.mMinimumSpanY, this.mCellLayout.getCountX(), this.mCellLayout.getCountY());
-        if (!this.mCellLayout.isResizeCandidateVacant(candidate, this.mWidgetView)) {
+                handle.horizontalEdge, handle.verticalEdge, this.minimumSpanX,
+                this.minimumSpanY, this.cellLayout.getCountX(), this.cellLayout.getCountY());
+        if (!this.cellLayout.isResizeCandidateVacant(resCandidate, this.widgetView)) {
             return;
         }
-        if (candidate.matches(params)) {
+        if (resCandidate.matches(params)) {
             return;
         }
-        finishCommitted(candidate);
+        finishCommitted(resCandidate);
     }
 
     private int keyboardPointerCell(int cell, int span, int edge) {
@@ -266,56 +271,55 @@ final class WidgetResizeFrame extends FrameLayout {
         return cell;
     }
 
-    private void finishCommitted(CellLayout.ResizeCandidate candidate) {
-        if (this.mFinished) {
+    private void finishCommitted(CellLayout.ResizeCandidate resCandidate) {
+        if (this.finished) {
             return;
         }
-        this.mFinished = true;
-        this.mCallback.onWidgetResizeCommitted(candidate);
+        this.finished = true;
+        this.callback.onWidgetResizeCommitted(resCandidate);
     }
 
     private void finishCancelled() {
-        if (this.mFinished) {
+        if (this.finished) {
             return;
         }
-        this.mFinished = true;
-        this.mCallback.onWidgetResizeCancelled();
+        this.finished = true;
+        this.callback.onWidgetResizeCancelled();
     }
 
     private void finishDragRequested() {
-        if (this.mFinished) {
+        if (this.finished) {
             return;
         }
-        this.mFinished = true;
-        this.mCallback.onWidgetDragRequested();
+        this.finished = true;
+        this.callback.onWidgetDragRequested();
     }
 
     private boolean isWidgetDragPastTouchSlop(MotionEvent event) {
-        float distanceX = event.getX() - this.mWidgetDragDownX;
-        float distanceY = event.getY() - this.mWidgetDragDownY;
+        float distanceX = event.getX() - this.widgetDragDownX;
+        float distanceY = event.getY() - this.widgetDragDownY;
         return (distanceX * distanceX) + (distanceY * distanceY)
-                > this.mTouchSlopSquared;
+                > this.touchSlopSquared;
     }
 
-    /** Handles body drags and dismissal taps outside resize handles. */
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (this.mFinished) {
+        if (this.finished) {
             return true;
         }
         switch (event.getActionMasked()) {
             case MotionEvent.ACTION_DOWN:
-                this.mTrackWidgetDrag = false;
+                this.trackWidgetDrag = false;
                 updateCandidateBounds();
-                if (this.mActiveHandle == null && this.mCandidateBounds.contains(
+                if (this.activeHandle == null && this.candidateBounds.contains(
                         Math.round(event.getX()), Math.round(event.getY()))) {
-                    this.mTrackWidgetDrag = true;
-                    this.mWidgetDragDownX = event.getX();
-                    this.mWidgetDragDownY = event.getY();
+                    this.trackWidgetDrag = true;
+                    this.widgetDragDownX = event.getX();
+                    this.widgetDragDownY = event.getY();
                 }
                 return true;
             case MotionEvent.ACTION_MOVE:
-                if (this.mTrackWidgetDrag && isWidgetDragPastTouchSlop(event)) {
+                if (this.trackWidgetDrag && isWidgetDragPastTouchSlop(event)) {
                     finishDragRequested();
                 }
                 return true;
@@ -349,7 +353,7 @@ final class WidgetResizeFrame extends FrameLayout {
             ResizeHandleView handle = (ResizeHandleView) getChildAt(index);
             int centerX = handleCenterX(handle);
             int centerY = handleCenterY(handle);
-            int halfSize = this.mHandleSize / 2;
+            int halfSize = this.handleSize / 2;
             handle.layout(centerX - halfSize, centerY - halfSize,
                     centerX + halfSize, centerY + halfSize);
         }
@@ -357,72 +361,72 @@ final class WidgetResizeFrame extends FrameLayout {
 
     private int handleCenterX(ResizeHandleView handle) {
         if (handle.horizontalEdge == CellLayout.RESIZE_EDGE_START) {
-            return this.mCandidateBounds.left;
+            return this.candidateBounds.left;
         }
         if (handle.horizontalEdge == CellLayout.RESIZE_EDGE_END) {
-            return this.mCandidateBounds.right;
+            return this.candidateBounds.right;
         }
-        return this.mCandidateBounds.centerX();
+        return this.candidateBounds.centerX();
     }
 
     private int handleCenterY(ResizeHandleView handle) {
         if (handle.verticalEdge == CellLayout.RESIZE_EDGE_START) {
-            return this.mCandidateBounds.top;
+            return this.candidateBounds.top;
         }
         if (handle.verticalEdge == CellLayout.RESIZE_EDGE_END) {
-            return this.mCandidateBounds.bottom;
+            return this.candidateBounds.bottom;
         }
-        return this.mCandidateBounds.centerY();
+        return this.candidateBounds.centerY();
     }
 
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
         updateCandidateBounds();
-        int outlineColor = getResources().getColor(this.mCandidateValid
+        int outlineColor = getResources().getColor(this.candidateValid
                 ? R.color.m3_primary : R.color.m3_error);
-        this.mOutlinePaint.setColor(outlineColor);
-        canvas.drawRect(this.mCandidateBounds, this.mOutlinePaint);
+        this.outlinePaint.setColor(outlineColor);
+        canvas.drawRect(this.candidateBounds, this.outlinePaint);
         drawSpanLabel(canvas);
     }
 
     private void updateCandidateBounds() {
-        CellLayout.ResizeCandidate candidate = visibleCandidate();
-        this.mCellLayout.cellToPoint(candidate.cellX, candidate.cellY, this.mCellPoint);
-        int[] size = this.mCellLayout.spanToPixels(candidate.spanX, candidate.spanY);
-        this.mCellLayout.getLocationOnScreen(this.mCellLocation);
-        getLocationOnScreen(this.mFrameLocation);
-        int left = this.mCellLocation[0] - this.mFrameLocation[0] + this.mCellPoint[0];
-        int top = this.mCellLocation[1] - this.mFrameLocation[1] + this.mCellPoint[1];
-        this.mCandidateBounds.set(left, top, left + size[0], top + size[1]);
+        CellLayout.ResizeCandidate resCandidate = visibleCandidate();
+        this.cellLayout.cellToPoint(resCandidate.cellX, resCandidate.cellY, this.cellPoint);
+        int[] size = this.cellLayout.spanToPixels(resCandidate.spanX, resCandidate.spanY);
+        this.cellLayout.getLocationOnScreen(this.cellLocation);
+        getLocationOnScreen(this.frameLocation);
+        int left = this.cellLocation[0] - this.frameLocation[0] + this.cellPoint[0];
+        int top = this.cellLocation[1] - this.frameLocation[1] + this.cellPoint[1];
+        this.candidateBounds.set(left, top, left + size[0], top + size[1]);
     }
 
     private CellLayout.ResizeCandidate visibleCandidate() {
-        if (this.mCandidate != null) {
-            return this.mCandidate;
+        if (this.candidate != null) {
+            return this.candidate;
         }
-        return this.mOriginalCandidate;
+        return this.originalCandidate;
     }
 
     private void drawSpanLabel(Canvas canvas) {
-        CellLayout.ResizeCandidate candidate = visibleCandidate();
-        int labelId = this.mCandidateValid
+        CellLayout.ResizeCandidate resCandidate = visibleCandidate();
+        int labelId = this.candidateValid
                 ? R.string.widget_resize_span
                 : R.string.widget_resize_invalid_span;
         String text = getResources().getString(labelId,
-                candidate.spanX, candidate.spanY);
-        float labelWidth = this.mLabelPaint.measureText(text) + dimensionToPixels(16);
+                resCandidate.spanX, resCandidate.spanY);
+        float labelWidth = this.labelPaint.measureText(text) + dimensionToPixels(16);
         float labelHeight = dimensionToPixels(28);
-        float centerX = this.mCandidateBounds.centerX();
-        float top = Math.max(0, this.mCandidateBounds.top - labelHeight);
+        float centerX = this.candidateBounds.centerX();
+        float top = Math.max(0, this.candidateBounds.top - labelHeight);
         float left = Math.max(0, centerX - (labelWidth / 2.0f));
         float right = Math.min(getWidth(), centerX + (labelWidth / 2.0f));
-        this.mLabelBackgroundPaint.setColor(getResources().getColor(R.color.m3_surface));
-        canvas.drawRect(left, top, right, top + labelHeight, this.mLabelBackgroundPaint);
-        this.mLabelPaint.setColor(getResources().getColor(R.color.m3_on_surface));
-        float baseline = top + ((labelHeight - (this.mLabelPaint.descent()
-                + this.mLabelPaint.ascent())) / 2.0f);
-        canvas.drawText(text, centerX, baseline, this.mLabelPaint);
+        this.labelBackgroundPaint.setColor(getResources().getColor(R.color.m3_surface));
+        canvas.drawRect(left, top, right, top + labelHeight, this.labelBackgroundPaint);
+        this.labelPaint.setColor(getResources().getColor(R.color.m3_on_surface));
+        float baseline = top + ((labelHeight - (this.labelPaint.descent()
+                + this.labelPaint.ascent())) / 2.0f);
+        canvas.drawText(text, centerX, baseline, this.labelPaint);
     }
 
     private int dimensionToPixels(int dimension) {
@@ -432,14 +436,14 @@ final class WidgetResizeFrame extends FrameLayout {
     private static final class ResizeHandleView extends View {
         final int horizontalEdge;
         final int verticalEdge;
-        private final int mRadius;
-        private final Paint mPaint = new Paint(1);
+        private final int radius;
+        private final Paint paint = new Paint(1);
 
         ResizeHandleView(Context context, int horizontalEdge, int verticalEdge, int radius) {
             super(context);
             this.horizontalEdge = horizontalEdge;
             this.verticalEdge = verticalEdge;
-            this.mRadius = radius;
+            this.radius = radius;
             setWillNotDraw(false);
         }
 
@@ -451,9 +455,9 @@ final class WidgetResizeFrame extends FrameLayout {
         @Override
         protected void onDraw(Canvas canvas) {
             super.onDraw(canvas);
-            this.mPaint.setColor(getResources().getColor(R.color.m3_primary));
+            this.paint.setColor(getResources().getColor(R.color.m3_primary));
             canvas.drawCircle(getWidth() / 2.0f, getHeight() / 2.0f,
-                    this.mRadius, this.mPaint);
+                    this.radius, this.paint);
         }
     }
 }

@@ -10,92 +10,99 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import java.lang.ref.WeakReference;
-import org.zmreborn.LiveFolderAdapter;
 
+/**
+ * Container view displaying contents of a live folder as an interactive grid or list.
+ */
 public class LiveFolder extends Folder {
-    private AsyncTask<LiveFolderInfo, Void, Cursor> mLoadingTask;
+    private AsyncTask<LiveFolderInfo, Void, Cursor> loadingTask;
 
+    /**
+     * Constructs a live folder view with context and XML attributes.
+     */
     public LiveFolder(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     static LiveFolder fromXml(Context context, FolderInfo folderInfo) {
-        return (LiveFolder) LayoutInflater.from(context).inflate(isDisplayModeList(folderInfo) ? R.layout.live_folder_list : R.layout.live_folder_grid, (ViewGroup) null);
+        return (LiveFolder) LayoutInflater.from(context).inflate(
+                isDisplayModeList(folderInfo) ? R.layout.live_folder_list : R.layout.live_folder_grid, null);
     }
 
     private static boolean isDisplayModeList(FolderInfo folderInfo) {
         return ((LiveFolderInfo) folderInfo).displayMode == 2;
     }
 
-    public void onItemClick(AdapterView parent, View view, int position, long id) {
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         LiveFolderAdapter.ViewHolder viewHolder = (LiveFolderAdapter.ViewHolder) view.getTag();
         if (viewHolder.useBaseIntent) {
-            Intent baseIntent = ((LiveFolderInfo) this.mFolderInfo).baseIntent;
-            if (baseIntent != null) {
+            Intent baseIntent = ((LiveFolderInfo) this.folderInfo).baseIntent;
+            if (baseIntent != null && baseIntent.getData() != null) {
                 Intent intent = new Intent(baseIntent);
-                intent.setData(baseIntent.getData().buildUpon().appendPath(Long.toString(viewHolder.f4id)).build());
-                this.mLauncher.startActivitySafely(intent);
+                intent.setData(baseIntent.getData().buildUpon().appendPath(Long.toString(viewHolder.id)).build());
+                this.launcher.startActivitySafely(intent);
             }
         } else if (viewHolder.intent != null) {
-            this.mLauncher.startActivitySafely(viewHolder.intent);
+            this.launcher.startActivitySafely(viewHolder.intent);
         }
     }
 
+    @Override
     public boolean onItemLongClick(AdapterView<?> adapterView, View view, int position, long id) {
         return false;
     }
 
-    /* access modifiers changed from: package-private */
-    public void bind(FolderInfo info) {
+    @Override
+    void bind(FolderInfo info) {
         super.bind(info);
-        if (this.mLoadingTask != null && this.mLoadingTask.getStatus() == AsyncTask.Status.RUNNING) {
-            this.mLoadingTask.cancel(true);
+        if (this.loadingTask != null && this.loadingTask.getStatus() == AsyncTask.Status.RUNNING) {
+            this.loadingTask.cancel(true);
         }
-        this.mLoadingTask = new FolderLoadingTask(this).execute(new LiveFolderInfo[]{(LiveFolderInfo) info});
+        this.loadingTask = new FolderLoadingTask(this).execute((LiveFolderInfo) info);
     }
 
-    /* access modifiers changed from: package-private */
-    public void onOpen() {
+    @Override
+    void onOpen() {
         super.onOpen();
         requestFocus();
     }
 
-    /* access modifiers changed from: package-private */
-    public void onClose() {
+    @Override
+    void onClose() {
         super.onClose();
-        if (this.mLoadingTask != null && this.mLoadingTask.getStatus() == AsyncTask.Status.RUNNING) {
-            this.mLoadingTask.cancel(true);
+        if (this.loadingTask != null && this.loadingTask.getStatus() == AsyncTask.Status.RUNNING) {
+            this.loadingTask.cancel(true);
         }
-        LiveFolderAdapter adapter = (LiveFolderAdapter) this.mContent.getAdapter();
-        if (adapter != null) {
-            adapter.cleanup();
+        if (this.content != null && this.content.getAdapter() instanceof LiveFolderAdapter) {
+            ((LiveFolderAdapter) this.content.getAdapter()).cleanup();
         }
     }
 
     static class FolderLoadingTask extends AsyncTask<LiveFolderInfo, Void, Cursor> {
-        private final WeakReference<LiveFolder> mFolder;
-        private LiveFolderInfo mInfo;
+        private final WeakReference<LiveFolder> folderRef;
+        private LiveFolderInfo info;
 
         FolderLoadingTask(LiveFolder folder) {
-            this.mFolder = new WeakReference<>(folder);
+            this.folderRef = new WeakReference<>(folder);
         }
 
-        /* access modifiers changed from: protected */
-        public Cursor doInBackground(LiveFolderInfo... params) {
-            LiveFolder folder = (LiveFolder) this.mFolder.get();
+        @Override
+        protected Cursor doInBackground(LiveFolderInfo... params) {
+            LiveFolder folder = this.folderRef.get();
             if (folder == null) {
                 return null;
             }
-            this.mInfo = params[0];
-            return LiveFolderAdapter.query(folder.mLauncher, this.mInfo);
+            this.info = params[0];
+            return LiveFolderAdapter.query(folder.launcher, this.info);
         }
 
-        /* access modifiers changed from: protected */
-        public void onPostExecute(Cursor cursor) {
+        @Override
+        protected void onPostExecute(Cursor cursor) {
             LiveFolder folder;
             if (!isCancelled()) {
-                if (cursor != null && (folder = (LiveFolder) this.mFolder.get()) != null) {
-                    folder.setContentAdapter(new LiveFolderAdapter(folder.mLauncher, this.mInfo, cursor));
+                if (cursor != null && (folder = this.folderRef.get()) != null) {
+                    folder.setContentAdapter(new LiveFolderAdapter(folder.launcher, this.info, cursor));
                 }
             } else if (cursor != null) {
                 cursor.close();

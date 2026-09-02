@@ -5,6 +5,9 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.preference.PreferenceManager;
 
+/**
+ * Manages application light, dark, and system theme appearance preferences and configuration.
+ */
 final class Appearance {
     static final String SYSTEM = "system";
     static final String LIGHT = "light";
@@ -19,6 +22,9 @@ final class Appearance {
     private Appearance() {
     }
 
+    /**
+     * Retrieves the configured appearance setting from shared preferences.
+     */
     static String getSelectedAppearance(Context context) {
         requireContext(context);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -28,6 +34,9 @@ final class Appearance {
         return normalizeAppearance(preferences.getString(key, defaultValue));
     }
 
+    /**
+     * Persists the requested appearance setting to shared preferences.
+     */
     static boolean persistSelectedAppearance(Context context, String requestedAppearance) {
         requireContext(context);
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);
@@ -45,6 +54,9 @@ final class Appearance {
         return effectiveAppearanceChanged;
     }
 
+    /**
+     * Normalizes an appearance key string to a known constant.
+     */
     static String normalizeAppearance(String appearance) {
         if (appearance == null) {
             return SYSTEM;
@@ -59,6 +71,9 @@ final class Appearance {
         return SYSTEM;
     }
 
+    /**
+     * Returns the brightness enum corresponding to an appearance setting.
+     */
     static Brightness brightnessFor(String appearance) {
         String normalizedAppearance = normalizeAppearance(appearance);
         if (LIGHT.equals(normalizedAppearance)) {
@@ -70,6 +85,9 @@ final class Appearance {
         return Brightness.SYSTEM;
     }
 
+    /**
+     * Applies brightness mode to a configuration instance.
+     */
     static Configuration applyBrightness(Configuration configuration, Brightness brightness) {
         requireConfiguration(configuration);
         Configuration updatedConfiguration = new Configuration(configuration);
@@ -78,6 +96,9 @@ final class Appearance {
         return updatedConfiguration;
     }
 
+    /**
+     * Applies system night mode configuration.
+     */
     static Configuration applySystemNightMode(
             Configuration configuration, Configuration systemConfiguration) {
         requireConfiguration(configuration);
@@ -88,6 +109,9 @@ final class Appearance {
         return updatedConfiguration;
     }
 
+    /**
+     * Computes the effective night mode integer for a brightness setting.
+     */
     static int effectiveNightMode(Brightness brightness, Configuration configuration) {
         requireConfiguration(configuration);
         if (brightness == Brightness.LIGHT) {
@@ -99,11 +123,17 @@ final class Appearance {
         return configuration.uiMode & Configuration.UI_MODE_NIGHT_MASK;
     }
 
+    /**
+     * Computes the theme fingerprint string for the active context.
+     */
     static String fingerprint(Context context) {
         requireContext(context);
         return fingerprint(getSelectedAppearance(context), context.getResources().getConfiguration());
     }
 
+    /**
+     * Computes the theme fingerprint string for appearance and configuration.
+     */
     static String fingerprint(String appearance, Configuration configuration) {
         requireConfiguration(configuration);
         String normalizedAppearance = normalizeAppearance(appearance);

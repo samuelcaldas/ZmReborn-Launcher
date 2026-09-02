@@ -6,8 +6,13 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.widget.TextView;
 
-/** Applies destructive styling to reset without changing preference behavior. */
+/**
+ * Custom preference view applying theme-safe styling to reset options.
+ */
 public class SettingsPreference extends Preference {
+    /**
+     * Constructs a settings preference with context and XML attributes.
+     */
     public SettingsPreference(Context context, AttributeSet attrs) {
         super(context, attrs);
         setLayoutResource(R.layout.settings_preference);

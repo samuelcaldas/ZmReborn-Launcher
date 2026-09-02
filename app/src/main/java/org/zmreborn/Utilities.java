@@ -18,35 +18,40 @@ import android.graphics.drawable.PaintDrawable;
 import android.widget.TextView;
 import org.zmreborn.compat.AdaptiveIconCompat;
 
+/**
+ * Common graphics, icon normalization, thumbnail rendering, and package utilities.
+ */
 final class Utilities {
-    private static final Rect sBounds = new Rect();
-    private static Canvas sCanvas = new Canvas();
+    private static final Rect BOUNDS = new Rect();
+    private static final Rect OLD_BOUNDS = new Rect();
+    private static final Paint PAINT = new Paint();
+    private static final Canvas CANVAS = new Canvas();
     private static int sIconHeight = -1;
     private static int sIconWidth = -1;
-    private static final Rect sOldBounds = new Rect();
-    private static final Paint sPaint = new Paint();
 
-    Utilities() {
+    private Utilities() {
     }
 
     static {
-        sCanvas.setDrawFilter(new PaintFlagsDrawFilter(4, 2));
+        CANVAS.setDrawFilter(new PaintFlagsDrawFilter(4, 2));
     }
 
-    private static void ensureIconSize(Context context) {
+    private static synchronized void ensureIconSize(Context context) {
         if (sIconWidth > 0 && sIconHeight > 0) {
             return;
         }
-        int dimension = Math.max(1,
-                (int) context.getResources().getDimension(17104896));
+        int dimension = Math.max(1, (int) context.getResources().getDimension(android.R.dimen.app_icon_size));
         sIconHeight = dimension;
         sIconWidth = dimension;
     }
 
+    /**
+     * Returns a normalized application icon drawable suitable for display.
+     */
     static Drawable normalizeApplicationIcon(Drawable icon, Context context) {
         Drawable resolvedIcon = icon;
         if (resolvedIcon == null) {
-            resolvedIcon = context.getResources().getDrawable(R.drawable.ic_launcher_application);
+            resolvedIcon = context.getDrawable(R.drawable.ic_launcher_application);
         }
         if (AdaptiveIconCompat.isAdaptiveIcon(resolvedIcon)) {
             return resolvedIcon;
@@ -54,16 +59,37 @@ final class Utilities {
         return createIconThumbnail(resolvedIcon, context);
     }
 
-    static Drawable setCompoundApplicationIcon(
-            TextView view, Drawable icon, Context context) {
+    /**
+     * Sets the application icon as the top compound drawable on the provided TextView and returns the normalized icon.
+     */
+    static Drawable setCompoundApplicationIcon(TextView view, Drawable icon, Context context) {
         Drawable resolvedIcon = normalizeApplicationIcon(icon, context);
+        ensureIconSize(context);
+        if (view != null) {
+            Drawable boundIcon = copyDrawable(resolvedIcon, context);
+            boundIcon.setBounds(0, 0, sIconWidth, sIconHeight);
+            view.setCompoundDrawables(null, boundIcon, null, null);
+        }
+        return resolvedIcon;
+    }
+
+    /**
+     * Sets the top compound drawable for an icon view, scaling to standard launcher icon dimensions.
+     */
+    public static void setCompoundDrawables(TextView view, Drawable icon, Context context) {
+        if (view == null) {
+            return;
+        }
+        Drawable resolvedIcon = icon != null ? icon : context.getDrawable(R.drawable.ic_launcher_application);
         ensureIconSize(context);
         Drawable boundIcon = copyDrawable(resolvedIcon, context);
         boundIcon.setBounds(0, 0, sIconWidth, sIconHeight);
         view.setCompoundDrawables(null, boundIcon, null, null);
-        return resolvedIcon;
     }
 
+    /**
+     * Generates a scaled thumbnail drawable matching launcher icon dimensions.
+     */
     static Drawable createIconThumbnail(Drawable icon, Context context) {
         if (icon == null) {
             return normalizeApplicationIcon(null, context);
@@ -72,94 +98,121 @@ final class Utilities {
             return icon;
         }
         ensureIconSize(context);
-        int width = sIconWidth;
-        int height = sIconHeight;
+        int targetWidth = sIconWidth;
+        int targetHeight = sIconHeight;
+        prepareDrawableForThumbnail(icon, context, targetWidth, targetHeight);
+
+        int intrinsicWidth = icon.getIntrinsicWidth();
+        int intrinsicHeight = icon.getIntrinsicHeight();
+        if (targetWidth <= 0 || targetHeight <= 0) {
+            return icon;
+        }
+        if (targetWidth < intrinsicWidth || targetHeight < intrinsicHeight) {
+            return scaleDownIconThumbnail(icon, intrinsicWidth, intrinsicHeight, targetWidth, targetHeight);
+        }
+        if (intrinsicWidth >= targetWidth || intrinsicHeight >= targetHeight) {
+            return icon;
+        }
+        return centerIconThumbnail(icon, intrinsicWidth, intrinsicHeight, targetWidth, targetHeight);
+    }
+
+    private static void prepareDrawableForThumbnail(Drawable icon, Context context, int targetWidth, int targetHeight) {
         if (icon instanceof PaintDrawable) {
             PaintDrawable painter = (PaintDrawable) icon;
-            painter.setIntrinsicWidth(width);
-            painter.setIntrinsicHeight(height);
-        } else if (icon instanceof BitmapDrawable) {
+            painter.setIntrinsicWidth(targetWidth);
+            painter.setIntrinsicHeight(targetHeight);
+            return;
+        }
+        if (icon instanceof BitmapDrawable) {
             BitmapDrawable bitmapDrawable = (BitmapDrawable) icon;
             if (bitmapDrawable.getBitmap().getDensity() == 0) {
                 bitmapDrawable.setTargetDensity(context.getResources().getDisplayMetrics());
             }
         }
-        int iconWidth = icon.getIntrinsicWidth();
-        int iconHeight = icon.getIntrinsicHeight();
-        if (width <= 0 || height <= 0) {
-            return icon;
-        }
-        if (width < iconWidth || height < iconHeight) {
-            float ratio = ((float) iconWidth) / ((float) iconHeight);
-            if (iconWidth > iconHeight) {
-                height = (int) (((float) width) / ratio);
-            } else if (iconHeight > iconWidth) {
-                width = (int) (((float) height) * ratio);
-            }
-            Bitmap thumb = Bitmap.createBitmap(sIconWidth, sIconHeight, icon.getOpacity() != -1 ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
-            Canvas canvas = sCanvas;
-            canvas.setBitmap(thumb);
-            sOldBounds.set(icon.getBounds());
-            int x = (sIconWidth - width) / 2;
-            int y = (sIconHeight - height) / 2;
-            icon.setBounds(x, y, x + width, y + height);
-            icon.draw(canvas);
-            icon.setBounds(sOldBounds);
-            return new FastBitmapDrawable(thumb);
-        } else if (iconWidth >= width || iconHeight >= height) {
-            return icon;
-        } else {
-            Bitmap thumb2 = Bitmap.createBitmap(sIconWidth, sIconHeight, Bitmap.Config.ARGB_8888);
-            Canvas canvas2 = sCanvas;
-            canvas2.setBitmap(thumb2);
-            sOldBounds.set(icon.getBounds());
-            int x2 = (width - iconWidth) / 2;
-            int y2 = (height - iconHeight) / 2;
-            icon.setBounds(x2, y2, x2 + iconWidth, y2 + iconHeight);
-            icon.draw(canvas2);
-            icon.setBounds(sOldBounds);
-            return new FastBitmapDrawable(thumb2);
-        }
     }
 
-    static Bitmap createBitmapThumbnail(Bitmap bitmap, Context context) {
+    private static synchronized Drawable scaleDownIconThumbnail(
+            Drawable icon, int intrinsicWidth, int intrinsicHeight, int targetWidth, int targetHeight) {
+        float ratio = ((float) intrinsicWidth) / ((float) intrinsicHeight);
+        int scaledWidth = targetWidth;
+        int scaledHeight = targetHeight;
+        if (intrinsicWidth > intrinsicHeight) {
+            scaledHeight = (int) (((float) targetWidth) / ratio);
+        } else if (intrinsicHeight > intrinsicWidth) {
+            scaledWidth = (int) (((float) targetHeight) * ratio);
+        }
+        Bitmap thumbnail = Bitmap.createBitmap(
+                sIconWidth, sIconHeight,
+                icon.getOpacity() != -1 ? Bitmap.Config.ARGB_8888 : Bitmap.Config.RGB_565);
+        CANVAS.setBitmap(thumbnail);
+        OLD_BOUNDS.set(icon.getBounds());
+        int left = (sIconWidth - scaledWidth) / 2;
+        int top = (sIconHeight - scaledHeight) / 2;
+        icon.setBounds(left, top, left + scaledWidth, top + scaledHeight);
+        icon.draw(CANVAS);
+        icon.setBounds(OLD_BOUNDS);
+        return new FastBitmapDrawable(thumbnail);
+    }
+
+    private static synchronized Drawable centerIconThumbnail(
+            Drawable icon, int intrinsicWidth, int intrinsicHeight, int targetWidth, int targetHeight) {
+        Bitmap thumbnail = Bitmap.createBitmap(sIconWidth, sIconHeight, Bitmap.Config.ARGB_8888);
+        CANVAS.setBitmap(thumbnail);
+        OLD_BOUNDS.set(icon.getBounds());
+        int left = (targetWidth - intrinsicWidth) / 2;
+        int top = (targetHeight - intrinsicHeight) / 2;
+        icon.setBounds(left, top, left + intrinsicWidth, top + intrinsicHeight);
+        icon.draw(CANVAS);
+        icon.setBounds(OLD_BOUNDS);
+        return new FastBitmapDrawable(thumbnail);
+    }
+
+    /**
+     * Creates a scaled bitmap thumbnail conforming to standard icon dimensions.
+     */
+    static synchronized Bitmap createBitmapThumbnail(Bitmap bitmap, Context context) {
         ensureIconSize(context);
-        int width = sIconWidth;
-        int height = sIconHeight;
+        int targetWidth = sIconWidth;
+        int targetHeight = sIconHeight;
         int bitmapWidth = bitmap.getWidth();
         int bitmapHeight = bitmap.getHeight();
-        if (width > 0 && height > 0) {
-            if (width < bitmapWidth || height < bitmapHeight) {
-                float ratio = ((float) bitmapWidth) / ((float) bitmapHeight);
-                if (bitmapWidth > bitmapHeight) {
-                    height = (int) (((float) width) / ratio);
-                } else if (bitmapHeight > bitmapWidth) {
-                    width = (int) (((float) height) * ratio);
-                }
-                Bitmap thumb = Bitmap.createBitmap(sIconWidth, sIconHeight, (width == sIconWidth && height == sIconHeight) ? bitmap.getConfig() : Bitmap.Config.ARGB_8888);
-                Canvas canvas = sCanvas;
-                Paint paint = sPaint;
-                canvas.setBitmap(thumb);
-                paint.setDither(false);
-                paint.setFilterBitmap(true);
-                sBounds.set((sIconWidth - width) / 2, (sIconHeight - height) / 2, width, height);
-                sOldBounds.set(0, 0, bitmapWidth, bitmapHeight);
-                canvas.drawBitmap(bitmap, sOldBounds, sBounds, paint);
-                return thumb;
-            } else if (bitmapWidth < width || bitmapHeight < height) {
-                Bitmap thumb2 = Bitmap.createBitmap(sIconWidth, sIconHeight, Bitmap.Config.ARGB_8888);
-                Canvas canvas2 = sCanvas;
-                Paint paint2 = sPaint;
-                canvas2.setBitmap(thumb2);
-                paint2.setDither(false);
-                paint2.setFilterBitmap(true);
-                canvas2.drawBitmap(bitmap, (float) ((sIconWidth - bitmapWidth) / 2), (float) ((sIconHeight - bitmapHeight) / 2), paint2);
-                return thumb2;
+        if (targetWidth <= 0 || targetHeight <= 0) {
+            return bitmap;
+        }
+        if (targetWidth < bitmapWidth || targetHeight < bitmapHeight) {
+            float ratio = ((float) bitmapWidth) / ((float) bitmapHeight);
+            int scaledWidth = targetWidth;
+            int scaledHeight = targetHeight;
+            if (bitmapWidth > bitmapHeight) {
+                scaledHeight = (int) (((float) targetWidth) / ratio);
+            } else if (bitmapHeight > bitmapWidth) {
+                scaledWidth = (int) (((float) targetHeight) * ratio);
             }
+            Bitmap thumbnail = Bitmap.createBitmap(
+                    sIconWidth, sIconHeight,
+                    (scaledWidth == sIconWidth && scaledHeight == sIconHeight) ? bitmap.getConfig() : Bitmap.Config.ARGB_8888);
+            CANVAS.setBitmap(thumbnail);
+            PAINT.setDither(false);
+            PAINT.setFilterBitmap(true);
+            BOUNDS.set((sIconWidth - scaledWidth) / 2, (sIconHeight - scaledHeight) / 2, scaledWidth, scaledHeight);
+            OLD_BOUNDS.set(0, 0, bitmapWidth, bitmapHeight);
+            CANVAS.drawBitmap(bitmap, OLD_BOUNDS, BOUNDS, PAINT);
+            return thumbnail;
+        }
+        if (bitmapWidth < targetWidth || bitmapHeight < targetHeight) {
+            Bitmap thumbnail = Bitmap.createBitmap(sIconWidth, sIconHeight, Bitmap.Config.ARGB_8888);
+            CANVAS.setBitmap(thumbnail);
+            PAINT.setDither(false);
+            PAINT.setFilterBitmap(true);
+            CANVAS.drawBitmap(bitmap, (float) ((sIconWidth - bitmapWidth) / 2), (float) ((sIconHeight - bitmapHeight) / 2), PAINT);
+            return thumbnail;
         }
         return bitmap;
     }
 
+    /**
+     * Creates a dock thumbnail drawable for adaptive or legacy icons.
+     */
     static Drawable createDockIconThumbnail(Drawable icon, Context context) {
         Drawable normalizedIcon = normalizeApplicationIcon(icon, context);
         if (!AdaptiveIconCompat.isAdaptiveIcon(normalizedIcon)) {
@@ -169,21 +222,36 @@ final class Utilities {
         return rasterizeDrawableCopy(normalizedIcon);
     }
 
+    /**
+     * Determines whether the given application can be uninstalled by the user.
+     */
     static boolean canUninstallApplication(Context context, ApplicationItemInfo applicationItemInfo) {
-        ActivityInfo activityInfo;
-        ApplicationInfo applicationInfo;
-        String sourceDir;
-        ResolveInfo resolveInfo = context.getPackageManager().resolveActivity(applicationItemInfo.intent, 0);
-        if (resolveInfo == null || (activityInfo = resolveInfo.activityInfo) == null || (applicationInfo = activityInfo.applicationInfo) == null || (sourceDir = applicationInfo.sourceDir) == null || sourceDir.startsWith("/system")) {
+        if (context == null || applicationItemInfo == null || applicationItemInfo.intent == null) {
             return false;
         }
-        return true;
+        ResolveInfo resolveInfo = context.getPackageManager().resolveActivity(applicationItemInfo.intent, 0);
+        if (resolveInfo == null) {
+            return false;
+        }
+        ActivityInfo activityInfo = resolveInfo.activityInfo;
+        if (activityInfo == null) {
+            return false;
+        }
+        ApplicationInfo applicationInfo = activityInfo.applicationInfo;
+        if (applicationInfo == null) {
+            return false;
+        }
+        String sourceDir = applicationInfo.sourceDir;
+        return sourceDir != null && !sourceDir.startsWith("/system");
     }
 
+    /**
+     * Overlays an uninstall badge on top of the given icon drawable.
+     */
     static Drawable overlayUninstallIcon(Context context, Drawable iconDrawable) {
         Drawable normalizedIcon = normalizeApplicationIcon(iconDrawable, context);
         Bitmap iconBitmap = getMutableBitmap(normalizedIcon);
-        Drawable overlay = context.getResources().getDrawable(R.drawable.overlay_uninstall);
+        Drawable overlay = context.getDrawable(R.drawable.overlay_uninstall);
         if (iconBitmap != null && overlay instanceof BitmapDrawable) {
             Bitmap overlayBitmap = ((BitmapDrawable) overlay).getBitmap();
             return new FastBitmapDrawable(addOverlay(iconBitmap, overlayBitmap));
@@ -192,6 +260,9 @@ final class Utilities {
                 copyDrawable(normalizedIcon, context), overlay});
     }
 
+    /**
+     * Adjusts the opacity of an icon drawable for disabled or hidden states.
+     */
     static Drawable adjustIconOpacity(Drawable iconDrawable) {
         if (iconDrawable == null) {
             return null;
@@ -213,14 +284,12 @@ final class Utilities {
             return copy;
         }
         if (drawable instanceof FastBitmapDrawable) {
-            return new FastBitmapDrawable(
-                    ((FastBitmapDrawable) drawable).getBitmap());
+            return new FastBitmapDrawable(((FastBitmapDrawable) drawable).getBitmap());
         }
         return rasterizeDrawableCopy(drawable);
     }
 
-    private static void copyDrawableProperties(
-            Drawable source, Drawable destination) {
+    private static void copyDrawableProperties(Drawable source, Drawable destination) {
         destination.setAlpha(source.getAlpha());
         destination.setColorFilter(source.getColorFilter());
         destination.setLevel(source.getLevel());
@@ -229,8 +298,7 @@ final class Utilities {
     }
 
     private static Drawable rasterizeDrawableCopy(Drawable drawable) {
-        Bitmap bitmap = Bitmap.createBitmap(
-                sIconWidth, sIconHeight, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(sIconWidth, sIconHeight, Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(bitmap);
         Rect oldBounds = new Rect(drawable.getBounds());
         try {
@@ -265,7 +333,7 @@ final class Utilities {
 
     private static Bitmap addOverlay(Bitmap mutableBitmap, Bitmap overlay) {
         Bitmap bitmapOverlay = Bitmap.createBitmap(mutableBitmap.getWidth(), mutableBitmap.getHeight(), mutableBitmap.getConfig());
-        Paint paint = new Paint(2);
+        Paint paint = new Paint(Paint.FILTER_BITMAP_FLAG);
         Canvas canvas = new Canvas(bitmapOverlay);
         canvas.drawBitmap(mutableBitmap, new Matrix(), paint);
         canvas.drawBitmap(overlay, new Matrix(), paint);

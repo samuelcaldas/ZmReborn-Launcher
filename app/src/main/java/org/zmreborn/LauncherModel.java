@@ -23,79 +23,76 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.zmreborn.ApplicationItemInfo;
-import org.zmreborn.LauncherSettings;
 
+/**
+ * Coordinates in-memory launcher models, background workspace and application loading, and database persistence.
+ */
 public class LauncherModel {
     static final boolean DEBUG_LOADERS = false;
     static final String LOG_TAG = LauncherModel.class.getSimpleName();
-    private static AsyncTask<Object, ArrayList<ApplicationItemInfo>, ArrayList<ApplicationItemInfo>> mLoadApplicationsAsyncTask;
-    private final ApplicationsLoadGeneration mApplicationsLoadGeneration = new ApplicationsLoadGeneration();
-    /* access modifiers changed from: private */
-    public static ArrayList<ApplicationItemInfo> sCachedApplicationItemInfos;
-    private static ArrayList<ApplicationItemInfo> sAllApplicationItemInfos;
-    /* access modifiers changed from: private */
+    private static AsyncTask<Object, ArrayList<ApplicationItemInfo>, ArrayList<ApplicationItemInfo>> loadApplicationsAsyncTask;
+    private final ApplicationsLoadGeneration applicationsLoadGeneration = new ApplicationsLoadGeneration();
+    private static ArrayList<ApplicationItemInfo> cachedApplicationItemInfos;
+    private static ArrayList<ApplicationItemInfo> allApplicationItemInfos;
     public static final AtomicInteger sWorkspaceLoaderCount = new AtomicInteger(1);
-    /* access modifiers changed from: private */
-    public ArrayList<LauncherAppWidgetInfo> mDesktopAppWidgets;
-    private int mDesktopColumns;
-    /* access modifiers changed from: private */
-    public ArrayList<ItemInfo> mDesktopItems;
-    /* access modifiers changed from: private */
-    public boolean mDesktopItemsLoaded;
-    private DesktopItemsLoader mDesktopItemsLoader;
-    private Thread mDesktopLoaderThread;
-    private int mDesktopRows;
-    /* access modifiers changed from: private */
-    public HashMap<Long, FolderInfo> mFolders;
+    private ArrayList<LauncherAppWidgetInfo> desktopAppWidgets;
+    private int desktopColumns;
+    private ArrayList<ItemInfo> desktopItems;
+    private boolean desktopItemsLoaded;
+    private DesktopItemsLoader desktopItemsLoader;
+    private Thread desktopLoaderThread;
+    private int desktopRows;
+    private HashMap<Long, FolderInfo> folders;
 
-    /* access modifiers changed from: package-private */
+    /**
+     * Aborts active background loaders.
+     */
     public synchronized void abortLoaders() {
-        if (this.mDesktopItemsLoader != null && this.mDesktopItemsLoader.isRunning()) {
-            this.mDesktopItemsLoader.stop();
-            this.mDesktopItemsLoaded = false;
+        if (this.desktopItemsLoader != null && this.desktopItemsLoader.isRunning()) {
+            this.desktopItemsLoader.stop();
+            this.desktopItemsLoaded = false;
         }
     }
 
+    /**
+     * Returns a copy of all loaded application items.
+     */
     static ArrayList<ApplicationItemInfo> getAllApplications() {
-        if (sAllApplicationItemInfos == null) {
+        if (allApplicationItemInfos == null) {
             return new ArrayList<>();
         }
-        return new ArrayList<>(sAllApplicationItemInfos);
+        return new ArrayList<>(allApplicationItemInfos);
     }
 
-    /* access modifiers changed from: package-private */
+    /**
+     * Asynchronously loads installed applications and delivers them to the applications view.
+     */
     public void loadApplications(final boolean isLaunching, final ApplicationsView applicationsView) {
         if (applicationsView == null) {
             return;
         }
-        final int generation = this.mApplicationsLoadGeneration.start();
+        final int generation = this.applicationsLoadGeneration.start();
         applicationsView.setLoading();
-        if (mLoadApplicationsAsyncTask != null) {
-            mLoadApplicationsAsyncTask.cancel(true);
-            mLoadApplicationsAsyncTask = null;
+        if (loadApplicationsAsyncTask != null) {
+            loadApplicationsAsyncTask.cancel(true);
+            loadApplicationsAsyncTask = null;
         }
-        boolean load;
-        if (!isLaunching) {
-            load = true;
-        } else {
-            load = sCachedApplicationItemInfos == null;
-        }
-        if (!load) {
+        boolean shouldLoad = !isLaunching || cachedApplicationItemInfos == null;
+        if (!shouldLoad) {
             ArrayList<ApplicationItemInfo> cachedApplications;
             synchronized (this) {
-                cachedApplications = sCachedApplicationItemInfos;
+                cachedApplications = cachedApplicationItemInfos;
             }
-            if (this.mApplicationsLoadGeneration.isCurrent(generation)) {
+            if (this.applicationsLoadGeneration.isCurrent(generation)) {
                 deliverApplications(applicationsView, cachedApplications);
             }
             return;
         }
-        mLoadApplicationsAsyncTask = new AsyncTask<Object, ArrayList<ApplicationItemInfo>, ArrayList<ApplicationItemInfo>>() {
-            private ArrayList<ApplicationItemInfo> mAllApplicationItemInfos;
+        loadApplicationsAsyncTask = new AsyncTask<Object, ArrayList<ApplicationItemInfo>, ArrayList<ApplicationItemInfo>>() {
+            private ArrayList<ApplicationItemInfo> localAllApplicationItemInfos;
 
-            /* access modifiers changed from: protected */
-            public ArrayList<ApplicationItemInfo> doInBackground(Object... arg0) {
+            @Override
+            protected ArrayList<ApplicationItemInfo> doInBackground(Object... arg0) {
                 int priority = isLaunching ? 0 : 10;
                 Process.setThreadPriority(priority);
                 try {
@@ -103,7 +100,7 @@ public class LauncherModel {
                         return null;
                     }
                     Launcher launcher = applicationsView.getLauncher();
-                    Intent mainIntent = new Intent("android.intent.action.MAIN", (Uri) null);
+                    Intent mainIntent = new Intent("android.intent.action.MAIN", null);
                     mainIntent.addCategory("android.intent.category.LAUNCHER");
                     PackageManager packageManager = launcher.getPackageManager();
                     List<ResolveInfo> apps = packageManager.queryIntentActivities(mainIntent, 0);
@@ -116,37 +113,35 @@ public class LauncherModel {
                         }
                     }
                     ArrayList<ApplicationItemInfo> applicationItemInfos = new ArrayList<>();
-                    if (apps != null) {
-                        for (int i = 0; i < apps.size(); i++) {
-                            if (isCancelled()) {
-                                return null;
-                            }
-                            ResolveInfo resolveInfo = apps.get(i);
-                            ComponentName componentName = new ComponentName(resolveInfo.activityInfo.applicationInfo.packageName, resolveInfo.activityInfo.name);
-                            ApplicationItemInfo applicationItemInfo = new ApplicationItemInfo();
-                            applicationItemInfo.container = -1;
-                            applicationItemInfo.title = resolveInfo.loadLabel(packageManager);
-                            if (applicationItemInfo.title == null) {
-                                applicationItemInfo.title = resolveInfo.activityInfo.name;
-                            }
-                            applicationItemInfo.icon = Utilities.normalizeApplicationIcon(resolveInfo.activityInfo.loadIcon(packageManager), launcher);
-                            applicationItemInfo.filtered = true;
-                            applicationItemInfo.setActivity(componentName, 270532608);
-                            applicationItemInfos.add(applicationItemInfo);
+                    for (int i = 0; i < apps.size(); i++) {
+                        if (isCancelled()) {
+                            return null;
                         }
+                        ResolveInfo resolveInfo = apps.get(i);
+                        ComponentName componentName = new ComponentName(resolveInfo.activityInfo.applicationInfo.packageName, resolveInfo.activityInfo.name);
+                        ApplicationItemInfo applicationItemInfo = new ApplicationItemInfo();
+                        applicationItemInfo.container = -1;
+                        applicationItemInfo.title = resolveInfo.loadLabel(packageManager);
+                        if (applicationItemInfo.title == null) {
+                            applicationItemInfo.title = resolveInfo.activityInfo.name;
+                        }
+                        applicationItemInfo.icon = Utilities.normalizeApplicationIcon(resolveInfo.activityInfo.loadIcon(packageManager), launcher);
+                        applicationItemInfo.filtered = true;
+                        applicationItemInfo.setActivity(componentName, 270532608);
+                        applicationItemInfos.add(applicationItemInfo);
                     }
                     Collections.sort(applicationItemInfos, new ApplicationItemInfo.TitleComparator());
                     if (isCancelled()) {
                         return null;
                     }
-                    ArrayList<AppListFolderRecord> folders = new AppListFolderStore(
+                    ArrayList<AppListFolderRecord> folderRecords = new AppListFolderStore(
                             launcher.getContentResolver()).loadFolders();
                     ArrayList<ApplicationItemInfo> projectedItems = AppListFolderProjection.project(
-                            folders, applicationItemInfos);
+                            folderRecords, applicationItemInfos);
                     if (isCancelled()) {
                         return null;
                     }
-                    this.mAllApplicationItemInfos = new ArrayList<>(applicationItemInfos);
+                    this.localAllApplicationItemInfos = new ArrayList<>(applicationItemInfos);
                     return projectedItems;
                 } catch (RuntimeException exception) {
                     Log.e(LOG_TAG, "Applications loading failed", exception);
@@ -156,23 +151,23 @@ public class LauncherModel {
                 }
             }
 
-            /* access modifiers changed from: protected */
-            public void onPostExecute(ArrayList<ApplicationItemInfo> result) {
+            @Override
+            protected void onPostExecute(ArrayList<ApplicationItemInfo> result) {
                 super.onPostExecute(result);
-                if (!LauncherModel.this.mApplicationsLoadGeneration.isCurrent(generation)) {
+                if (!LauncherModel.this.applicationsLoadGeneration.isCurrent(generation)) {
                     return;
                 }
                 synchronized (LauncherModel.this) {
-                    if (!LauncherModel.this.mApplicationsLoadGeneration.isCurrent(generation)) {
+                    if (!LauncherModel.this.applicationsLoadGeneration.isCurrent(generation)) {
                         return;
                     }
-                    if (result == null || this.mAllApplicationItemInfos == null) {
+                    if (result == null || this.localAllApplicationItemInfos == null) {
                         applicationsView.setError();
                         return;
                     }
-                    LauncherModel.sAllApplicationItemInfos = new ArrayList<>(this.mAllApplicationItemInfos);
+                    LauncherModel.allApplicationItemInfos = new ArrayList<>(this.localAllApplicationItemInfos);
                     applicationsView.setApplications(result);
-                    LauncherModel.sCachedApplicationItemInfos = result;
+                    LauncherModel.cachedApplicationItemInfos = result;
                     if (result.isEmpty()) {
                         applicationsView.setEmpty();
                     } else {
@@ -181,15 +176,15 @@ public class LauncherModel {
                 }
             }
 
-            /* access modifiers changed from: protected */
-            public void onCancelled() {
+            @Override
+            protected void onCancelled() {
                 super.onCancelled();
-                if (LauncherModel.this.mApplicationsLoadGeneration.isCurrent(generation)) {
+                if (LauncherModel.this.applicationsLoadGeneration.isCurrent(generation)) {
                     applicationsView.setError();
                 }
             }
         };
-        mLoadApplicationsAsyncTask.execute(new Object[0]);
+        loadApplicationsAsyncTask.execute(new Object[0]);
     }
 
     private void deliverApplications(ApplicationsView applicationsView,
@@ -206,26 +201,22 @@ public class LauncherModel {
         applicationsView.clearState();
     }
 
-    /* access modifiers changed from: package-private */
-    public synchronized void addPackage(ApplicationsView applicationsView, String packageName) {
+    synchronized void addPackage(ApplicationsView applicationsView, String packageName) {
         loadApplications(false, applicationsView);
     }
 
-    /* access modifiers changed from: package-private */
-    public synchronized void removePackage(ApplicationsView applicationsView, String packageName) {
+    synchronized void removePackage(ApplicationsView applicationsView, String packageName) {
         if (applicationsView != null && applicationsView.getLauncher() != null) {
             new AppListFolderStore(applicationsView.getLauncher().getContentResolver()).removePackage(packageName);
         }
         loadApplications(false, applicationsView);
     }
 
-    /* access modifiers changed from: package-private */
-    public synchronized void updatePackage(ApplicationsView applicationsView, String packageName) {
+    synchronized void updatePackage(ApplicationsView applicationsView, String packageName) {
         loadApplications(false, applicationsView);
     }
 
-    /* access modifiers changed from: package-private */
-    public Drawable getApplicationItemInfoIconOrNull(PackageManager packageManager, ApplicationItemInfo applicationItemInfo) {
+    Drawable getApplicationItemInfoIconOrNull(PackageManager packageManager, ApplicationItemInfo applicationItemInfo) {
         ResolveInfo resolveInfo = packageManager.resolveActivity(applicationItemInfo.intent, 0);
         if (resolveInfo == null) {
             return null;
@@ -233,95 +224,86 @@ public class LauncherModel {
         return resolveInfo.activityInfo.loadIcon(packageManager);
     }
 
-    /* access modifiers changed from: package-private */
-    public boolean isDesktopLoaded() {
-        return (this.mDesktopItems == null || this.mDesktopAppWidgets == null || !this.mDesktopItemsLoaded) ? false : true;
+    boolean isDesktopLoaded() {
+        return this.desktopItems != null && this.desktopAppWidgets != null && this.desktopItemsLoaded;
     }
 
-    /* access modifiers changed from: package-private */
-    public void loadUserItems(boolean isLaunching, Launcher launcher, boolean localeChanged) {
-        this.mDesktopRows = PreferencesUtil.getContentGridRows(launcher);
-        this.mDesktopColumns = PreferencesUtil.getContentGridColumns(launcher);
+    void loadUserItems(boolean isLaunching, Launcher launcher, boolean localeChanged) {
+        this.desktopRows = PreferencesUtil.getContentGridRows(launcher);
+        this.desktopColumns = PreferencesUtil.getContentGridColumns(launcher);
         if (!isLaunching || !isDesktopLoaded()) {
-            if (this.mDesktopItemsLoader != null && this.mDesktopItemsLoader.isRunning()) {
-                this.mDesktopItemsLoader.stop();
+            if (this.desktopItemsLoader != null && this.desktopItemsLoader.isRunning()) {
+                this.desktopItemsLoader.stop();
                 try {
-                    this.mDesktopLoaderThread.join();
+                    this.desktopLoaderThread.join();
                 } catch (InterruptedException e) {
-                    Log.e(LOG_TAG, "mDesktopLoaderThread didn't exit in time");
+                    Log.e(LOG_TAG, "desktopLoaderThread didn't exit in time");
                 }
             }
-            this.mDesktopItemsLoaded = false;
-            this.mDesktopItemsLoader = new DesktopItemsLoader(launcher, localeChanged);
-            this.mDesktopLoaderThread = new Thread(this.mDesktopItemsLoader, "Desktop Items Loader");
-            this.mDesktopLoaderThread.start();
+            this.desktopItemsLoaded = false;
+            this.desktopItemsLoader = new DesktopItemsLoader(launcher, localeChanged);
+            this.desktopLoaderThread = new Thread(this.desktopItemsLoader, "Desktop Items Loader");
+            this.desktopLoaderThread.start();
             return;
         }
-        launcher.onDesktopItemsLoaded(this.mDesktopItems, this.mDesktopAppWidgets);
+        launcher.onDesktopItemsLoaded(this.desktopItems, this.desktopAppWidgets);
     }
 
-    /* access modifiers changed from: private */
-    public static String getLabel(PackageManager manager, ActivityInfo activityInfo) {
+    private static String getLabel(PackageManager manager, ActivityInfo activityInfo) {
         String label = activityInfo.loadLabel(manager).toString();
         if (label != null) {
             return label;
         }
-        String label2 = manager.getApplicationLabel(activityInfo.applicationInfo).toString();
-        if (label2 == null) {
-            return activityInfo.name;
-        }
-        return label2;
+        String appLabel = manager.getApplicationLabel(activityInfo.applicationInfo).toString();
+        return appLabel != null ? appLabel : activityInfo.name;
     }
 
     private class DesktopItemsLoader implements Runnable {
-        final /* synthetic */ boolean $assertionsDisabled = (!LauncherModel.class.desiredAssertionStatus());
-        private volatile boolean mFinished;
-        private final int mId = LauncherModel.sWorkspaceLoaderCount.getAndIncrement();
-        private final WeakReference<Launcher> mLauncher;
-        private final boolean mLocaleChanged;
-        private volatile boolean mStopped;
+        private volatile boolean finished;
+        private final int id = LauncherModel.sWorkspaceLoaderCount.getAndIncrement();
+        private final WeakReference<Launcher> launcherRef;
+        private final boolean localeChanged;
+        private volatile boolean stopped;
 
         DesktopItemsLoader(Launcher launcher, boolean localeChanged) {
-            this.mLauncher = new WeakReference<>(launcher);
-            this.mLocaleChanged = localeChanged;
-            this.mFinished = false;
+            this.launcherRef = new WeakReference<>(launcher);
+            this.localeChanged = localeChanged;
+            this.finished = false;
         }
 
-        /* access modifiers changed from: package-private */
-        public void stop() {
-            Log.d(LauncherModel.LOG_TAG, "  ----> workspace loader " + this.mId + " stopped from " + Thread.currentThread().toString());
-            this.mStopped = true;
+        void stop() {
+            Log.d(LauncherModel.LOG_TAG, "  ----> workspace loader " + this.id + " stopped from " + Thread.currentThread());
+            this.stopped = true;
         }
 
-        /* access modifiers changed from: package-private */
-        public boolean isRunning() {
-            return !this.mFinished;
+        boolean isRunning() {
+            return !this.finished;
         }
 
+        @Override
         public void run() {
-            if ($assertionsDisabled || !this.mFinished) {
-                loadWorkspace();
-                this.mFinished = true;
-                return;
-            }
-            throw new AssertionError();
+            loadWorkspace();
+            this.finished = true;
         }
 
         private void loadWorkspace() {
-            Log.d(LauncherModel.LOG_TAG, "  ----> running workspace loader (" + this.mId + ")");
+            Log.d(LauncherModel.LOG_TAG, "  ----> running workspace loader (" + this.id + ")");
             Process.setThreadPriority(0);
 
-            Launcher launcher = this.mLauncher.get();
+            Launcher launcher = this.launcherRef.get();
+            if (launcher == null) {
+                return;
+            }
             ContentResolver resolver = launcher.getContentResolver();
             PackageManager packageManager = launcher.getPackageManager();
 
-            if (this.mLocaleChanged) {
+            if (this.localeChanged) {
                 updateShortcutLabels(resolver, packageManager);
             }
 
             ArrayList<ItemInfo> items = new ArrayList<>();
             ArrayList<LauncherAppWidgetInfo> appWidgets = new ArrayList<>();
-            HashMap<Long, FolderInfo> folders = new HashMap<>();
+            HashMap<Long, FolderInfo> folderMap = new HashMap<>();
             Cursor cursor = resolver.query(
                     LauncherSettings.Favorites.CONTENT_URI,
                     null,
@@ -329,6 +311,9 @@ public class LauncherModel {
                     null,
                     null
             );
+            if (cursor == null) {
+                return;
+            }
 
             try {
                 int idIndex = cursor.getColumnIndexOrThrow("_id");
@@ -349,7 +334,7 @@ public class LauncherModel {
                 int uriIndex = cursor.getColumnIndexOrThrow(LauncherSettings.Favorites.URI);
                 int displayModeIndex = cursor.getColumnIndexOrThrow(LauncherSettings.Favorites.DISPLAY_MODE);
 
-                while (!this.mStopped && cursor.moveToNext()) {
+                while (!this.stopped && cursor.moveToNext()) {
                     try {
                         int itemType = cursor.getInt(itemTypeIndex);
 
@@ -386,7 +371,7 @@ public class LauncherModel {
 
                                 applicationItemInfo.title = cursor.getString(titleIndex);
                                 applicationItemInfo.intent = intent;
-                                applicationItemInfo.f3id = cursor.getLong(idIndex);
+                                applicationItemInfo.id = cursor.getLong(idIndex);
                                 int applicationContainer = cursor.getInt(containerIndex);
                                 applicationItemInfo.container = applicationContainer;
                                 applicationItemInfo.screen = cursor.getInt(screenIndex);
@@ -399,13 +384,13 @@ public class LauncherModel {
                                     continue;
                                 }
 
-                                LauncherModel.this.findOrMakeUserFolder(folders, applicationContainer)
+                                LauncherModel.this.findOrMakeUserFolder(folderMap, applicationContainer)
                                         .add(applicationItemInfo);
                                 continue;
 
                             case LauncherSettings.Favorites.ITEM_TYPE_APPS_GRID:
                                 ApplicationsGridItemInfo applicationsGridItemInfo = new ApplicationsGridItemInfo(launcher);
-                                applicationsGridItemInfo.f3id = cursor.getLong(idIndex);
+                                applicationsGridItemInfo.id = cursor.getLong(idIndex);
                                 applicationsGridItemInfo.container = cursor.getInt(containerIndex);
                                 applicationsGridItemInfo.screen = cursor.getInt(screenIndex);
                                 applicationsGridItemInfo.cellX = cursor.getInt(cellXIndex);
@@ -417,9 +402,9 @@ public class LauncherModel {
 
                             case LauncherSettings.Favorites.ITEM_TYPE_USER_FOLDER:
                                 long userFolderId = cursor.getLong(idIndex);
-                                UserFolderInfo userFolderInfo = LauncherModel.this.findOrMakeUserFolder(folders, userFolderId);
+                                UserFolderInfo userFolderInfo = LauncherModel.this.findOrMakeUserFolder(folderMap, userFolderId);
                                 userFolderInfo.title = cursor.getString(titleIndex);
-                                userFolderInfo.f3id = userFolderId;
+                                userFolderInfo.id = userFolderId;
                                 int userFolderContainer = cursor.getInt(containerIndex);
                                 userFolderInfo.container = userFolderContainer;
                                 userFolderInfo.screen = cursor.getInt(screenIndex);
@@ -434,19 +419,19 @@ public class LauncherModel {
 
                             case LauncherSettings.Favorites.ITEM_TYPE_LIVE_FOLDER:
                                 long liveFolderId = cursor.getLong(idIndex);
-                                LiveFolderInfo liveFolderInfo = LauncherModel.this.findOrMakeLiveFolder(folders, liveFolderId);
+                                LiveFolderInfo liveFolderInfo = LauncherModel.this.findOrMakeLiveFolder(folderMap, liveFolderId);
                                 String liveFolderIntentUri = cursor.getString(intentIndex);
                                 Intent baseIntent = null;
 
                                 if (liveFolderIntentUri != null) {
                                     try {
                                         baseIntent = Intent.parseUri(liveFolderIntentUri, 0);
-                                    } catch (URISyntaxException e) {
+                                    } catch (URISyntaxException ignored) {
                                     }
                                 }
 
                                 liveFolderInfo.title = cursor.getString(titleIndex);
-                                liveFolderInfo.f3id = liveFolderId;
+                                liveFolderInfo.id = liveFolderId;
                                 int liveFolderContainer = cursor.getInt(containerIndex);
                                 liveFolderInfo.container = liveFolderContainer;
                                 liveFolderInfo.screen = cursor.getInt(screenIndex);
@@ -479,7 +464,7 @@ public class LauncherModel {
                                     continue;
                                 }
 
-                                searchWidget.f3id = cursor.getLong(idIndex);
+                                searchWidget.id = cursor.getLong(idIndex);
                                 searchWidget.screen = cursor.getInt(screenIndex);
                                 searchWidget.container = searchWidgetContainer;
                                 searchWidget.cellX = cursor.getInt(cellXIndex);
@@ -491,7 +476,7 @@ public class LauncherModel {
 
                             case LauncherSettings.Favorites.ITEM_TYPE_APPWIDGET:
                                 LauncherAppWidgetInfo appWidgetInfo = new LauncherAppWidgetInfo(cursor.getInt(appWidgetIdIndex));
-                                appWidgetInfo.f3id = cursor.getLong(idIndex);
+                                appWidgetInfo.id = cursor.getLong(idIndex);
                                 appWidgetInfo.screen = cursor.getInt(screenIndex);
                                 appWidgetInfo.cellX = cursor.getInt(cellXIndex);
                                 appWidgetInfo.cellY = cursor.getInt(cellYIndex);
@@ -520,40 +505,44 @@ public class LauncherModel {
             }
 
             synchronized (LauncherModel.this) {
-                if (this.mStopped) {
+                if (this.stopped) {
                     return;
                 }
 
                 final ArrayList<ItemInfo> itemsToBind = new ArrayList<>(items);
                 final ArrayList<LauncherAppWidgetInfo> appWidgetsToBind = new ArrayList<>(appWidgets);
 
-                if (!this.mStopped) {
+                if (!this.stopped) {
                     Log.d(LauncherModel.LOG_TAG, "  ----> items cloned, ready to refresh UI");
                     final Launcher launcherToBind = launcher;
                     launcherToBind.runOnUiThread(new Runnable() {
+                        @Override
                         public void run() {
                             launcherToBind.onDesktopItemsLoaded(itemsToBind, appWidgetsToBind);
                         }
                     });
                 }
 
-                LauncherModel.this.mDesktopItems = items;
-                LauncherModel.this.mDesktopAppWidgets = appWidgets;
-                LauncherModel.this.mFolders = folders;
-                LauncherModel.this.mDesktopItemsLoaded = true;
+                LauncherModel.this.desktopItems = items;
+                LauncherModel.this.desktopAppWidgets = appWidgets;
+                LauncherModel.this.folders = folderMap;
+                LauncherModel.this.desktopItemsLoaded = true;
             }
         }
 
         private void updateShortcutLabels(ContentResolver resolver, PackageManager manager) {
             String intentUri;
             ComponentName name;
-            Cursor cursor = resolver.query(LauncherSettings.Favorites.CONTENT_URI, new String[]{"_id", LauncherSettings.BaseLauncherColumns.TITLE, LauncherSettings.BaseLauncherColumns.INTENT, LauncherSettings.BaseLauncherColumns.ITEM_TYPE}, (String) null, (String[]) null, (String) null);
+            Cursor cursor = resolver.query(LauncherSettings.Favorites.CONTENT_URI, new String[]{"_id", LauncherSettings.BaseLauncherColumns.TITLE, LauncherSettings.BaseLauncherColumns.INTENT, LauncherSettings.BaseLauncherColumns.ITEM_TYPE}, null, null, null);
+            if (cursor == null) {
+                return;
+            }
             try {
                 int idIndex = cursor.getColumnIndexOrThrow("_id");
                 int intentIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.INTENT);
                 int itemTypeIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.ITEM_TYPE);
                 int titleIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.TITLE);
-                while (!this.mStopped && cursor.moveToNext()) {
+                while (!this.stopped && cursor.moveToNext()) {
                     try {
                         if (cursor.getInt(itemTypeIndex) == 0 && (intentUri = cursor.getString(intentIndex)) != null) {
                             Intent shortcut = Intent.parseUri(intentUri, 0);
@@ -568,7 +557,7 @@ public class LauncherModel {
                                 }
                             }
                         }
-                    } catch (PackageManager.NameNotFoundException | URISyntaxException e) {
+                    } catch (PackageManager.NameNotFoundException | URISyntaxException ignored) {
                     }
                 }
             } finally {
@@ -577,109 +566,95 @@ public class LauncherModel {
         }
     }
 
-    /* access modifiers changed from: private */
-    public static void loadLiveFolderIcon(Launcher launcher, Cursor cursor, int iconTypeIndex, int iconPackageIndex, int iconResourceIndex, LiveFolderInfo liveFolderInfo) {
-        switch (cursor.getInt(iconTypeIndex)) {
-            case 0:
-                String packageName = cursor.getString(iconPackageIndex);
-                String resourceName = cursor.getString(iconResourceIndex);
-                try {
-                    Resources resources = launcher.getPackageManager().getResourcesForApplication(packageName);
-                    liveFolderInfo.icon = resources.getDrawable(resources.getIdentifier(resourceName, (String) null, (String) null));
-                } catch (Exception e) {
-                    liveFolderInfo.icon = launcher.getResources().getDrawable(R.drawable.ic_launcher_folder);
-                }
-                liveFolderInfo.iconResource = new Intent.ShortcutIconResource();
-                liveFolderInfo.iconResource.packageName = packageName;
-                liveFolderInfo.iconResource.resourceName = resourceName;
-                return;
-            default:
+    private static void loadLiveFolderIcon(Launcher launcher, Cursor cursor, int iconTypeIndex, int iconPackageIndex, int iconResourceIndex, LiveFolderInfo liveFolderInfo) {
+        if (cursor.getInt(iconTypeIndex) == 0) {
+            String packageName = cursor.getString(iconPackageIndex);
+            String resourceName = cursor.getString(iconResourceIndex);
+            try {
+                Resources resources = launcher.getPackageManager().getResourcesForApplication(packageName);
+                liveFolderInfo.icon = resources.getDrawable(resources.getIdentifier(resourceName, null, null));
+            } catch (Exception e) {
                 liveFolderInfo.icon = launcher.getResources().getDrawable(R.drawable.ic_launcher_folder);
-                return;
+            }
+            liveFolderInfo.iconResource = new Intent.ShortcutIconResource();
+            liveFolderInfo.iconResource.packageName = packageName;
+            liveFolderInfo.iconResource.resourceName = resourceName;
+            return;
         }
+        liveFolderInfo.icon = launcher.getResources().getDrawable(R.drawable.ic_launcher_folder);
     }
 
-    /* access modifiers changed from: package-private */
-    public FolderInfo findFolderById(long id) {
-        if (this.mFolders != null) {
-            return this.mFolders.get(Long.valueOf(id));
+    FolderInfo findFolderById(long id) {
+        if (this.folders != null) {
+            return this.folders.get(Long.valueOf(id));
         }
         return null;
     }
 
-    /* access modifiers changed from: package-private */
-    public void addFolder(FolderInfo info) {
-        this.mFolders.put(Long.valueOf(info.f3id), info);
+    void addFolder(FolderInfo info) {
+        this.folders.put(Long.valueOf(info.id), info);
     }
 
-    /* access modifiers changed from: private */
-    public UserFolderInfo findOrMakeUserFolder(HashMap<Long, FolderInfo> folders, long id) {
-        FolderInfo folderInfo = folders.get(Long.valueOf(id));
+    private UserFolderInfo findOrMakeUserFolder(HashMap<Long, FolderInfo> folderMap, long id) {
+        FolderInfo folderInfo = folderMap.get(Long.valueOf(id));
         if (folderInfo == null || !(folderInfo instanceof UserFolderInfo)) {
             folderInfo = new UserFolderInfo();
-            folders.put(Long.valueOf(id), folderInfo);
+            folderMap.put(Long.valueOf(id), folderInfo);
         }
         return (UserFolderInfo) folderInfo;
     }
 
-    /* access modifiers changed from: private */
-    public LiveFolderInfo findOrMakeLiveFolder(HashMap<Long, FolderInfo> folders, long id) {
-        FolderInfo folderInfo = folders.get(Long.valueOf(id));
+    private LiveFolderInfo findOrMakeLiveFolder(HashMap<Long, FolderInfo> folderMap, long id) {
+        FolderInfo folderInfo = folderMap.get(Long.valueOf(id));
         if (folderInfo == null || !(folderInfo instanceof LiveFolderInfo)) {
             folderInfo = new LiveFolderInfo();
-            folders.put(Long.valueOf(id), folderInfo);
+            folderMap.put(Long.valueOf(id), folderInfo);
         }
         return (LiveFolderInfo) folderInfo;
     }
 
-    /* access modifiers changed from: package-private */
-    public void unbind() {
-        unbindDrawables(this.mDesktopItems);
-        unbindAppWidgetHostViews(this.mDesktopAppWidgets);
+    void unbind() {
+        unbindDrawables(this.desktopItems);
+        unbindAppWidgetHostViews(this.desktopAppWidgets);
     }
 
-    private void unbindDrawables(ArrayList<ItemInfo> desktopItems) {
-        if (desktopItems != null) {
-            int count = desktopItems.size();
+    private void unbindDrawables(ArrayList<ItemInfo> items) {
+        if (items != null) {
+            int count = items.size();
             for (int i = 0; i < count; i++) {
-                ItemInfo item = desktopItems.get(i);
-                switch (item.itemType) {
-                    case 0:
-                    case 1:
-                        ((ApplicationItemInfo) item).icon.setCallback((Drawable.Callback) null);
-                        break;
+                ItemInfo item = items.get(i);
+                if (item.itemType == 0 || item.itemType == 1) {
+                    ((ApplicationItemInfo) item).icon.setCallback(null);
                 }
             }
         }
     }
 
-    private void unbindAppWidgetHostViews(ArrayList<LauncherAppWidgetInfo> appWidgets) {
-        if (appWidgets != null) {
-            int count = appWidgets.size();
+    private void unbindAppWidgetHostViews(ArrayList<LauncherAppWidgetInfo> widgets) {
+        if (widgets != null) {
+            int count = widgets.size();
             for (int i = 0; i < count; i++) {
-                appWidgets.get(i).hostView = null;
+                widgets.get(i).hostView = null;
             }
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public void findAllOccupiedCells(boolean[][] occupied, int countX, int countY, int screen) {
-        ArrayList<ItemInfo> desktopItems = this.mDesktopItems;
-        if (desktopItems != null) {
-            int count = desktopItems.size();
+    void findAllOccupiedCells(boolean[][] occupied, int countX, int countY, int screen) {
+        ArrayList<ItemInfo> items = this.desktopItems;
+        if (items != null) {
+            int count = items.size();
             for (int i = 0; i < count; i++) {
-                if ((desktopItems.get(i).spanX - 1) + desktopItems.get(i).cellX < this.mDesktopColumns) {
-                    if ((desktopItems.get(i).spanY - 1) + desktopItems.get(i).cellY < this.mDesktopRows) {
-                        addOccupiedCells(occupied, screen, desktopItems.get(i));
-                    }
+                if ((items.get(i).spanX - 1) + items.get(i).cellX < this.desktopColumns
+                        && (items.get(i).spanY - 1) + items.get(i).cellY < this.desktopRows) {
+                    addOccupiedCells(occupied, screen, items.get(i));
                 }
             }
         }
-        ArrayList<LauncherAppWidgetInfo> desktopAppWidgets = this.mDesktopAppWidgets;
-        if (desktopAppWidgets != null) {
-            int count2 = desktopAppWidgets.size();
+        ArrayList<LauncherAppWidgetInfo> widgets = this.desktopAppWidgets;
+        if (widgets != null) {
+            int count2 = widgets.size();
             for (int i2 = 0; i2 < count2; i2++) {
-                addOccupiedCells(occupied, screen, desktopAppWidgets.get(i2));
+                addOccupiedCells(occupied, screen, widgets.get(i2));
             }
         }
     }
@@ -688,7 +663,7 @@ public class LauncherModel {
         if (item.screen == screen) {
             for (int xx = item.cellX; xx < item.cellX + item.spanX; xx++) {
                 for (int yy = item.cellY; yy < item.cellY + item.spanY; yy++) {
-                    if (xx < this.mDesktopColumns && yy < this.mDesktopRows) {
+                    if (xx < this.desktopColumns && yy < this.desktopRows) {
                         occupied[xx][yy] = true;
                     }
                 }
@@ -696,32 +671,27 @@ public class LauncherModel {
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public void addDesktopItem(ItemInfo info) {
+    void addDesktopItem(ItemInfo info) {
         if (isDesktopLoaded()) {
-            this.mDesktopItems.add(info);
+            this.desktopItems.add(info);
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public void removeDesktopItem(ItemInfo info) {
-        this.mDesktopItems.remove(info);
+    void removeDesktopItem(ItemInfo info) {
+        this.desktopItems.remove(info);
     }
 
-    /* access modifiers changed from: package-private */
-    public void addDesktopAppWidget(LauncherAppWidgetInfo info) {
+    void addDesktopAppWidget(LauncherAppWidgetInfo info) {
         if (isDesktopLoaded()) {
-            this.mDesktopAppWidgets.add(info);
+            this.desktopAppWidgets.add(info);
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public void removeDesktopAppWidget(LauncherAppWidgetInfo info) {
-        this.mDesktopAppWidgets.remove(info);
+    void removeDesktopAppWidget(LauncherAppWidgetInfo info) {
+        this.desktopAppWidgets.remove(info);
     }
 
-    /* access modifiers changed from: private */
-    public static ApplicationItemInfo getApplicationInfo(PackageManager packageManager, Intent intent, Context context) {
+    private static ApplicationItemInfo getApplicationInfo(PackageManager packageManager, Intent intent, Context context) {
         ResolveInfo resolveInfo = packageManager.resolveActivity(intent, 0);
         if (resolveInfo == null) {
             return null;
@@ -739,8 +709,7 @@ public class LauncherModel {
         return applicationItemInfo;
     }
 
-    /* access modifiers changed from: private */
-    public ApplicationItemInfo getApplicationInfoShortcut(Cursor cursor, Context context, int iconTypeIndex, int iconPackageIndex, int iconResourceIndex, int iconIndex) {
+    private ApplicationItemInfo getApplicationInfoShortcut(Cursor cursor, Context context, int iconTypeIndex, int iconPackageIndex, int iconResourceIndex, int iconIndex) {
         ApplicationItemInfo applicationItemInfo = new ApplicationItemInfo();
         applicationItemInfo.itemType = 1;
         switch (cursor.getInt(iconTypeIndex)) {
@@ -750,7 +719,7 @@ public class LauncherModel {
                 PackageManager packageManager = context.getPackageManager();
                 try {
                     Resources resources = packageManager.getResourcesForApplication(packageName);
-                    applicationItemInfo.icon = Utilities.normalizeApplicationIcon(resources.getDrawable(resources.getIdentifier(resourceName, (String) null, (String) null)), context);
+                    applicationItemInfo.icon = Utilities.normalizeApplicationIcon(resources.getDrawable(resources.getIdentifier(resourceName, null, null)), context);
                 } catch (Exception e) {
                     applicationItemInfo.icon = packageManager.getDefaultActivityIcon();
                 }
@@ -777,22 +746,20 @@ public class LauncherModel {
         return applicationItemInfo;
     }
 
-    /* access modifiers changed from: package-private */
-    public void removeUserFolderItem(UserFolderInfo folder, ItemInfo info) {
+    void removeUserFolderItem(UserFolderInfo folder, ItemInfo info) {
         folder.contents.remove(info);
     }
 
-    /* access modifiers changed from: package-private */
-    public void removeUserFolder(UserFolderInfo userFolderInfo) {
-        this.mFolders.remove(Long.valueOf(userFolderInfo.f3id));
+    void removeUserFolder(UserFolderInfo userFolderInfo) {
+        this.folders.remove(Long.valueOf(userFolderInfo.id));
     }
 
     static void addOrMoveItemInDatabase(Context context, ItemInfo item, long container, int screen, int cellX, int cellY) {
         if (item.container == -1) {
             addItemToDatabase(context, item, container, screen, cellX, cellY, false);
-        } else {
-            moveItemInDatabase(context, item, container, screen, cellX, cellY);
+            return;
         }
+        moveItemInDatabase(context, item, container, screen, cellX, cellY);
     }
 
     static void moveItemInDatabase(Context context, ItemInfo item, long container, int screen, int cellX, int cellY) {
@@ -806,11 +773,14 @@ public class LauncherModel {
         values.put("cellX", Integer.valueOf(item.cellX));
         values.put("cellY", Integer.valueOf(item.cellY));
         values.put("screen", Integer.valueOf(item.screen));
-        contentResolver.update(LauncherSettings.Favorites.getContentUri(item.f3id, false), values, (String) null, (String[]) null);
+        contentResolver.update(LauncherSettings.Favorites.getContentUri(item.id, false), values, null, null);
     }
 
     static boolean shortcutExists(Context context, String title, Intent intent) {
-        Cursor cursor = context.getContentResolver().query(LauncherSettings.Favorites.CONTENT_URI, new String[]{LauncherSettings.BaseLauncherColumns.TITLE, LauncherSettings.BaseLauncherColumns.INTENT}, "title=? and intent=?", new String[]{title, intent.toUri(0)}, (String) null);
+        Cursor cursor = context.getContentResolver().query(LauncherSettings.Favorites.CONTENT_URI, new String[]{LauncherSettings.BaseLauncherColumns.TITLE, LauncherSettings.BaseLauncherColumns.INTENT}, "title=? and intent=?", new String[]{title, intent.toUri(0)}, null);
+        if (cursor == null) {
+            return false;
+        }
         try {
             return cursor.moveToFirst();
         } finally {
@@ -818,9 +788,11 @@ public class LauncherModel {
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public FolderInfo getFolderById(Context context, long id) {
-        Cursor cursor = context.getContentResolver().query(LauncherSettings.Favorites.CONTENT_URI, (String[]) null, "_id=? and (itemType=? or itemType=?)", new String[]{String.valueOf(id), String.valueOf(2), String.valueOf(3)}, (String) null);
+    FolderInfo getFolderById(Context context, long id) {
+        Cursor cursor = context.getContentResolver().query(LauncherSettings.Favorites.CONTENT_URI, null, "_id=? and (itemType=? or itemType=?)", new String[]{String.valueOf(id), String.valueOf(2), String.valueOf(3)}, null);
+        if (cursor == null) {
+            return null;
+        }
         try {
             if (cursor.moveToFirst()) {
                 int itemTypeIndex = cursor.getColumnIndexOrThrow(LauncherSettings.BaseLauncherColumns.ITEM_TYPE);
@@ -832,21 +804,22 @@ public class LauncherModel {
                 FolderInfo folderInfo = null;
                 switch (cursor.getInt(itemTypeIndex)) {
                     case 2:
-                        folderInfo = findOrMakeUserFolder(this.mFolders, id);
+                        folderInfo = findOrMakeUserFolder(this.folders, id);
                         break;
                     case 3:
-                        folderInfo = findOrMakeLiveFolder(this.mFolders, id);
+                        folderInfo = findOrMakeLiveFolder(this.folders, id);
                         break;
                 }
-                folderInfo.title = cursor.getString(titleIndex);
-                folderInfo.f3id = id;
-                folderInfo.container = (long) cursor.getInt(containerIndex);
-                folderInfo.screen = cursor.getInt(screenIndex);
-                folderInfo.cellX = cursor.getInt(cellXIndex);
-                folderInfo.cellY = cursor.getInt(cellYIndex);
+                if (folderInfo != null) {
+                    folderInfo.title = cursor.getString(titleIndex);
+                    folderInfo.id = id;
+                    folderInfo.container = (long) cursor.getInt(containerIndex);
+                    folderInfo.screen = cursor.getInt(screenIndex);
+                    folderInfo.cellX = cursor.getInt(cellXIndex);
+                    folderInfo.cellY = cursor.getInt(cellYIndex);
+                }
                 return folderInfo;
             }
-            cursor.close();
             return null;
         } finally {
             cursor.close();
@@ -854,7 +827,6 @@ public class LauncherModel {
     }
 
     static void addItemToDatabase(Context context, ItemInfo item, long container, int screen, int cellX, int cellY, boolean notify) {
-        Uri uri;
         item.container = container;
         item.screen = screen;
         item.cellX = cellX;
@@ -862,14 +834,10 @@ public class LauncherModel {
         ContentValues values = new ContentValues();
         ContentResolver contentResolver = context.getContentResolver();
         item.onAddToDatabase(values);
-        if (notify) {
-            uri = LauncherSettings.Favorites.CONTENT_URI;
-        } else {
-            uri = LauncherSettings.Favorites.CONTENT_URI_NO_NOTIFICATION;
-        }
+        Uri uri = notify ? LauncherSettings.Favorites.CONTENT_URI : LauncherSettings.Favorites.CONTENT_URI_NO_NOTIFICATION;
         Uri result = contentResolver.insert(uri, values);
         if (result != null) {
-            item.f3id = (long) Integer.parseInt(result.getPathSegments().get(1));
+            item.id = (long) Integer.parseInt(result.getPathSegments().get(1));
         }
     }
 
@@ -878,17 +846,17 @@ public class LauncherModel {
             ContentValues values = new ContentValues();
             ContentResolver contentResolver = context.getContentResolver();
             item.onAddToDatabase(values);
-            contentResolver.update(LauncherSettings.Favorites.getContentUri(item.f3id, false), values, (String) null, (String[]) null);
+            contentResolver.update(LauncherSettings.Favorites.getContentUri(item.id, false), values, null, null);
         }
     }
 
     static void deleteItemFromDatabase(Context context, ItemInfo item) {
-        context.getContentResolver().delete(LauncherSettings.Favorites.getContentUri(item.f3id, false), (String) null, (String[]) null);
+        context.getContentResolver().delete(LauncherSettings.Favorites.getContentUri(item.id, false), null, null);
     }
 
     static void deleteUserFolderContentsFromDatabase(Context context, UserFolderInfo info) {
         ContentResolver contentResolver = context.getContentResolver();
-        contentResolver.delete(LauncherSettings.Favorites.getContentUri(info.f3id, false), (String) null, (String[]) null);
-        contentResolver.delete(LauncherSettings.Favorites.CONTENT_URI, "container=" + info.f3id, (String[]) null);
+        contentResolver.delete(LauncherSettings.Favorites.getContentUri(info.id, false), null, null);
+        contentResolver.delete(LauncherSettings.Favorites.CONTENT_URI, "container=" + info.id, null);
     }
 }

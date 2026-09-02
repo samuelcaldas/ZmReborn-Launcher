@@ -1,6 +1,8 @@
 package org.zmreborn;
 
-/** Computes bounded folder panel and scrollable content dimensions. */
+/**
+ * Computes bounded folder panel and scrollable content dimensions.
+ */
 final class FolderLayoutMetrics {
     private final int panelWidth;
     private final int panelHeight;
@@ -21,6 +23,9 @@ final class FolderLayoutMetrics {
         this.cellHeight = cellHeight;
     }
 
+    /**
+     * Computes folder layout dimensions from viewport bounds and requested parameters.
+     */
     static FolderLayoutMetrics calculate(int viewportWidth, int viewportHeight, int safeMargin,
             int requestedWidth, int requestedHeight, int headerHeight, int requestedColumns,
             int itemCount, int minimumCellHeight) {
@@ -40,34 +45,34 @@ final class FolderLayoutMetrics {
     }
 
     int getPanelWidth() {
-        return panelWidth;
+        return this.panelWidth;
     }
 
     int getPanelHeight() {
-        return panelHeight;
+        return this.panelHeight;
     }
 
     int getColumns() {
-        return columns;
+        return this.columns;
     }
 
     int getTotalRows() {
-        return totalRows;
+        return this.totalRows;
     }
 
     int getVisibleRows() {
-        return visibleRows;
+        return this.visibleRows;
     }
 
     int getCellWidth() {
-        return cellWidth;
+        return this.cellWidth;
     }
 
     int getCellHeight() {
-        return cellHeight;
+        return this.cellHeight;
     }
 
     boolean isScrollable() {
-        return totalRows > visibleRows;
+        return this.totalRows > this.visibleRows;
     }
 }

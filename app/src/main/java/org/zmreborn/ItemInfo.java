@@ -8,14 +8,16 @@ import java.io.IOException;
 import java.util.Comparator;
 import org.zmreborn.LauncherSettings;
 
+/**
+ * Base data model representing any launchable item, shortcut, widget, or folder placed on the workspace or dock.
+ */
 class ItemInfo {
     static final int NO_ID = -1;
+
+    long id = NO_ID;
     int cellX = NO_ID;
     int cellY = NO_ID;
-    long container = -1;
-
-    /* renamed from: id */
-    long f3id = -1;
+    long container = NO_ID;
     boolean isGesture = false;
     int itemType;
     int screen = NO_ID;
@@ -26,7 +28,10 @@ class ItemInfo {
     }
 
     ItemInfo(ItemInfo info) {
-        this.f3id = info.f3id;
+        if (info == null) {
+            return;
+        }
+        this.id = info.id;
         this.cellX = info.cellX;
         this.cellY = info.cellY;
         this.spanX = info.spanX;
@@ -36,45 +41,47 @@ class ItemInfo {
         this.container = info.container;
     }
 
-    /* access modifiers changed from: package-private */
-    public void onAddToDatabase(ContentValues values) {
-        values.put(LauncherSettings.BaseLauncherColumns.ITEM_TYPE, Integer.valueOf(this.itemType));
+    /**
+     * Serializes core item position and type coordinates into a database ContentValues record.
+     */
+    void onAddToDatabase(ContentValues values) {
+        values.put(LauncherSettings.BaseLauncherColumns.ITEM_TYPE, this.itemType);
         if (!this.isGesture) {
-            values.put("container", Long.valueOf(this.container));
-            values.put("screen", Integer.valueOf(this.screen));
-            values.put("cellX", Integer.valueOf(this.cellX));
-            values.put("cellY", Integer.valueOf(this.cellY));
-            values.put("spanX", Integer.valueOf(this.spanX));
-            values.put("spanY", Integer.valueOf(this.spanY));
+            values.put("container", this.container);
+            values.put("screen", this.screen);
+            values.put("cellX", this.cellX);
+            values.put("cellY", this.cellY);
+            values.put("spanX", this.spanX);
+            values.put("spanY", this.spanY);
         }
     }
 
+    /**
+     * Compresses the given bitmap to PNG byte array and places it into the provided ContentValues.
+     */
     static void writeBitmap(ContentValues values, Bitmap bitmap) {
-        if (bitmap != null) {
-            ByteArrayOutputStream out = new ByteArrayOutputStream(bitmap.getWidth() * bitmap.getHeight() * 4);
-            try {
-                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
-                out.flush();
-                out.close();
-                values.put(LauncherSettings.BaseLauncherColumns.ICON, out.toByteArray());
-            } catch (IOException e) {
-                Log.w("Favorite", "Could not write icon");
-            }
+        if (bitmap == null || values == null) {
+            return;
+        }
+        ByteArrayOutputStream out = new ByteArrayOutputStream(bitmap.getWidth() * bitmap.getHeight() * 4);
+        try {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            out.flush();
+            out.close();
+            values.put(LauncherSettings.BaseLauncherColumns.ICON, out.toByteArray());
+        } catch (IOException e) {
+            Log.w("Favorite", "Could not write icon", e);
         }
     }
 
+    /**
+     * Returns a comparator ordering items horizontally by cellX coordinate.
+     */
     static Comparator<ItemInfo> createCellXComparator() {
         return new Comparator<ItemInfo>() {
-            public int compare(ItemInfo itemInfo1, ItemInfo itemInfo2) {
-                int cellX1 = itemInfo1.cellX;
-                int cellX2 = itemInfo2.cellX;
-                if (cellX1 > cellX2) {
-                    return 1;
-                }
-                if (cellX1 < cellX2) {
-                    return ItemInfo.NO_ID;
-                }
-                return 0;
+            @Override
+            public int compare(ItemInfo first, ItemInfo second) {
+                return Integer.compare(first.cellX, second.cellX);
             }
         };
     }

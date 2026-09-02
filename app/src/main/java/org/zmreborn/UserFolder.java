@@ -1,7 +1,6 @@
 package org.zmreborn;
 
 import android.content.Context;
-import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,90 +8,101 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 
+/**
+ * Folder view containing user-configured shortcuts with an integrated signal rail count indicator.
+ */
 public class UserFolder extends Folder implements DropTarget {
-    private SignalRailView mSignalRail;
-    private FrameLayout mIndicatorFrame;
+    private SignalRailView signalRail;
+    private FrameLayout indicatorFrame;
 
+    /**
+     * Constructs a user folder with context and XML attributes.
+     */
     public UserFolder(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
     static UserFolder fromXml(Context context) {
-        return (UserFolder) LayoutInflater.from(context).inflate(R.layout.user_folder, (ViewGroup) null);
+        return (UserFolder) LayoutInflater.from(context).inflate(R.layout.user_folder, null);
     }
 
     @Override
     public void onFinishInflate() {
         super.onFinishInflate();
-        this.mIndicatorFrame = (FrameLayout) findViewById(R.id.folder_indicator);
-        if (this.mIndicatorFrame != null) {
-            this.mSignalRail = new SignalRailView(getContext(), false);
-            this.mIndicatorFrame.addView(this.mSignalRail, new FrameLayout.LayoutParams(-1, -1));
+        this.indicatorFrame = (FrameLayout) findViewById(R.id.folder_indicator);
+        if (this.indicatorFrame != null) {
+            this.signalRail = new SignalRailView(getContext(), false);
+            this.indicatorFrame.addView(this.signalRail, new FrameLayout.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         }
     }
 
+    @Override
     public boolean acceptDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
+        if (!(dragInfo instanceof ItemInfo) || this.folderInfo == null) {
+            return false;
+        }
         ItemInfo item = (ItemInfo) dragInfo;
         int itemType = item.itemType;
-        if ((itemType == 0 || itemType == 1) && item.container != this.mFolderInfo.f3id) {
-            return true;
-        }
-        return false;
+        return (itemType == 0 || itemType == 1) && item.container != this.folderInfo.id;
     }
 
-    public Rect estimateDropLocation(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo, Rect recycle) {
-        return null;
-    }
-
+    @Override
     public void onDrop(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
-        ((ArrayAdapter) this.mContent.getAdapter()).add((ApplicationItemInfo) dragInfo);
-        LauncherModel.addOrMoveItemInDatabase(this.mLauncher, (ApplicationItemInfo) dragInfo, this.mFolderInfo.f3id, 0, 0, 0);
+        if (this.content != null && this.content.getAdapter() instanceof ArrayAdapter) {
+            ((ArrayAdapter) this.content.getAdapter()).add((ApplicationItemInfo) dragInfo);
+        }
+        if (this.launcher != null && this.folderInfo != null && dragInfo instanceof ApplicationItemInfo) {
+            LauncherModel.addOrMoveItemInDatabase(this.launcher, (ApplicationItemInfo) dragInfo, this.folderInfo.id, 0, 0, 0);
+        }
         updateSignalRail();
     }
 
+    @Override
     public void onDragEnter(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
     }
 
+    @Override
     public void onDragOver(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
     }
 
+    @Override
     public void onDragExit(DragSource source, int x, int y, int xOffset, int yOffset, Object dragInfo) {
     }
 
+    @Override
     public void onDropCompleted(View target, boolean success) {
-        if (success) {
-            ((ArrayAdapter) this.mContent.getAdapter()).remove(this.mDragItem);
+        if (success && this.content != null && this.content.getAdapter() instanceof ArrayAdapter) {
+            ((ArrayAdapter) this.content.getAdapter()).remove(this.dragItem);
             updateSignalRail();
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public void bind(FolderInfo info) {
+    @Override
+    void bind(FolderInfo info) {
         super.bind(info);
-        setContentAdapter(new ApplicationsAdapter(getContext(), ((UserFolderInfo) info).contents));
+        if (info instanceof UserFolderInfo) {
+            setContentAdapter(new ApplicationsAdapter(getContext(), ((UserFolderInfo) info).contents));
+        }
         updateSignalRail();
     }
 
     @Override
     void refreshPalette() {
         super.refreshPalette();
-        if (this.mSignalRail != null) {
-            this.mSignalRail.refreshPalette();
+        if (this.signalRail != null) {
+            this.signalRail.refreshPalette();
         }
     }
 
     private void updateSignalRail() {
-        if (this.mSignalRail != null && this.mFolderInfo != null) {
-            int itemCount = 0;
-            if (this.mFolderInfo instanceof UserFolderInfo) {
-                itemCount = ((UserFolderInfo) this.mFolderInfo).contents.size();
-            }
-            this.mSignalRail.setTotalItems(itemCount);
+        if (this.signalRail != null && this.folderInfo instanceof UserFolderInfo) {
+            this.signalRail.setTotalItems(((UserFolderInfo) this.folderInfo).contents.size());
         }
     }
 
-    /* access modifiers changed from: package-private */
-    public void onOpen() {
+    @Override
+    void onOpen() {
         super.onOpen();
         requestFocus();
     }

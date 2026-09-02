@@ -16,6 +16,12 @@ public final class GestureExclusionCompat {
     private GestureExclusionCompat() {
     }
 
+    /**
+     * Sets the system gesture exclusion rects for a view on API 29+.
+     *
+     * @param view the target view
+     * @param rects the list of exclusion rectangles, or null/empty to clear
+     */
     public static void setSystemGestureExclusionRects(View view, List<Rect> rects) {
         if (view == null || Build.VERSION.SDK_INT < 29) {
             return;
@@ -23,6 +29,11 @@ public final class GestureExclusionCompat {
         Api29.setExclusionRects(view, rects == null ? Collections.<Rect>emptyList() : rects);
     }
 
+    /**
+     * Clears all system gesture exclusion rects for a view.
+     *
+     * @param view the target view
+     */
     public static void clearSystemGestureExclusionRects(View view) {
         setSystemGestureExclusionRects(view, Collections.<Rect>emptyList());
     }

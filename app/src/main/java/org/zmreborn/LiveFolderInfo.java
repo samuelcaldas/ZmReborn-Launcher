@@ -6,6 +6,9 @@ import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import org.zmreborn.LauncherSettings;
 
+/**
+ * Data model for a Live Folder querying content provider items dynamically.
+ */
 class LiveFolderInfo extends FolderInfo {
     Intent baseIntent;
     int displayMode;
@@ -15,26 +18,30 @@ class LiveFolderInfo extends FolderInfo {
     Uri uri;
 
     LiveFolderInfo() {
-        this.itemType = 3;
+        this.itemType = LauncherSettings.Favorites.ITEM_TYPE_LIVE_FOLDER;
     }
 
-    /* access modifiers changed from: package-private */
-    public void onAddToDatabase(ContentValues values) {
+    @Override
+    void onAddToDatabase(ContentValues values) {
         super.onAddToDatabase(values);
-        values.put(LauncherSettings.BaseLauncherColumns.TITLE, this.title.toString());
-        values.put("uri", this.uri.toString());
+        String titleStr = this.title != null ? this.title.toString() : "";
+        values.put(LauncherSettings.BaseLauncherColumns.TITLE, titleStr);
+        if (this.uri != null) {
+            values.put("uri", this.uri.toString());
+        }
         if (this.baseIntent != null) {
             values.put(LauncherSettings.BaseLauncherColumns.INTENT, this.baseIntent.toUri(0));
         }
-        values.put(LauncherSettings.BaseLauncherColumns.ICON_TYPE, 0);
-        values.put("displayMode", Integer.valueOf(this.displayMode));
+        values.put(LauncherSettings.BaseLauncherColumns.ICON_TYPE, LauncherSettings.Favorites.ICON_TYPE_RESOURCE);
+        values.put("displayMode", this.displayMode);
         if (this.iconResource != null) {
             values.put(LauncherSettings.BaseLauncherColumns.ICON_PACKAGE, this.iconResource.packageName);
             values.put(LauncherSettings.BaseLauncherColumns.ICON_RESOURCE, this.iconResource.resourceName);
         }
     }
 
+    @Override
     public String toString() {
-        return this.title.toString();
+        return this.title != null ? this.title.toString() : "";
     }
 }

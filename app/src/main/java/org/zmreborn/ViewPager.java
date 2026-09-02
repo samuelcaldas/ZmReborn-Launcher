@@ -11,32 +11,50 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import java.util.ArrayList;
 
+/**
+ * Horizontal scroll view managing paged screens and gesture navigation.
+ */
 public class ViewPager extends HorizontalScrollView {
     private static final int SWIPE_THRESHOLD_VELOCITY = 500;
-    private int mCurrentPageIndex;
-    private GestureDetector mGestureDetector;
-    private OnPageScrollListener mOnPageScrollListener;
-    private OnViewportChangedListener mOnViewportChangedListener;
-    private LinearLayout mPageViewHolder;
+    private int currentPageIndex;
+    private GestureDetector gestureDetector;
+    private OnPageScrollListener onPageScrollListener;
+    private OnViewportChangedListener onViewportChangedListener;
+    private LinearLayout pageViewHolder;
 
+    /**
+     * Listener interface for page scroll notifications.
+     */
     public static abstract class OnPageScrollListener {
         public abstract void onScroll();
     }
 
+    /**
+     * Listener interface for viewport size modifications.
+     */
     public interface OnViewportChangedListener {
         void onViewportChanged(int width, int height);
     }
 
+    /**
+     * Constructs a view pager with context, attributes, and style.
+     */
     public ViewPager(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         init();
     }
 
+    /**
+     * Constructs a view pager with context and attributes.
+     */
     public ViewPager(Context context, AttributeSet attrs) {
         super(context, attrs);
         init();
     }
 
+    /**
+     * Constructs a view pager with context.
+     */
     public ViewPager(Context context) {
         super(context);
         init();
@@ -44,20 +62,26 @@ public class ViewPager extends HorizontalScrollView {
 
     private void init() {
         setFillViewport(true);
-        this.mPageViewHolder = new LinearLayout(getContext());
-        this.mPageViewHolder.setOrientation(LinearLayout.HORIZONTAL);
-        addView(this.mPageViewHolder, new FrameLayout.LayoutParams(
+        this.pageViewHolder = new LinearLayout(getContext());
+        this.pageViewHolder.setOrientation(LinearLayout.HORIZONTAL);
+        addView(this.pageViewHolder, new FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.MATCH_PARENT));
-        this.mGestureDetector = new GestureDetector(getContext(), new PageViewGestureDetector());
+        this.gestureDetector = new GestureDetector(getContext(), new PageViewGestureDetector());
         setOnTouchListener(new PageTouchListener());
     }
 
-    public void setOnPageScrollListener(OnPageScrollListener onPageScrollListener) {
-        this.mOnPageScrollListener = onPageScrollListener;
+    /**
+     * Sets the listener for scroll events.
+     */
+    public void setOnPageScrollListener(OnPageScrollListener listener) {
+        this.onPageScrollListener = listener;
     }
 
+    /**
+     * Sets the listener for viewport dimension changes.
+     */
     public void setOnViewportChangedListener(OnViewportChangedListener listener) {
-        this.mOnViewportChangedListener = listener;
+        this.onViewportChangedListener = listener;
     }
 
     protected void setPagingViews(ArrayList<View> items) {
@@ -74,7 +98,7 @@ public class ViewPager extends HorizontalScrollView {
     private void addPage(View page, int pageWidth) {
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 pageWidth, LinearLayout.LayoutParams.MATCH_PARENT);
-        this.mPageViewHolder.addView(page, layoutParams);
+        this.pageViewHolder.addView(page, layoutParams);
     }
 
     private int resolvePageWidth() {
@@ -86,8 +110,8 @@ public class ViewPager extends HorizontalScrollView {
     }
 
     protected void clearPagingViews() {
-        this.mPageViewHolder.removeAllViewsInLayout();
-        this.mPageViewHolder.invalidate();
+        this.pageViewHolder.removeAllViewsInLayout();
+        this.pageViewHolder.invalidate();
         resetScroll();
     }
 
@@ -108,22 +132,22 @@ public class ViewPager extends HorizontalScrollView {
         }
         resizePages(width);
         alignCurrentPage();
-        if (this.mOnViewportChangedListener != null) {
-            this.mOnViewportChangedListener.onViewportChanged(width, height);
+        if (this.onViewportChangedListener != null) {
+            this.onViewportChangedListener.onViewportChanged(width, height);
         }
     }
 
     private void resizePages(int pageWidth) {
         if (updatePageWidths(pageWidth)) {
-            this.mPageViewHolder.requestLayout();
+            this.pageViewHolder.requestLayout();
         }
     }
 
     private boolean updatePageWidths(int pageWidth) {
         boolean changed = false;
-        int pageCount = this.mPageViewHolder.getChildCount();
+        int pageCount = this.pageViewHolder.getChildCount();
         for (int index = 0; index < pageCount; index++) {
-            View page = this.mPageViewHolder.getChildAt(index);
+            View page = this.pageViewHolder.getChildAt(index);
             changed = updatePageWidth(page, pageWidth) || changed;
         }
         return changed;
@@ -141,10 +165,11 @@ public class ViewPager extends HorizontalScrollView {
 
     private void alignCurrentPage() {
         post(new Runnable() {
+            @Override
             public void run() {
                 int pageWidth = getPageWidth();
                 if (pageWidth > 0) {
-                    scrollTo(mCurrentPageIndex * pageWidth, 0);
+                    scrollTo(currentPageIndex * pageWidth, 0);
                 }
             }
         });
@@ -163,8 +188,9 @@ public class ViewPager extends HorizontalScrollView {
 
     private final class PageTouchListener implements View.OnTouchListener {
         @SuppressLint("ClickableViewAccessibility")
+        @Override
         public boolean onTouch(View view, MotionEvent motionEvent) {
-            if (mGestureDetector.onTouchEvent(motionEvent)) {
+            if (gestureDetector.onTouchEvent(motionEvent)) {
                 return true;
             }
             if (!isRelease(motionEvent)) {
@@ -198,7 +224,7 @@ public class ViewPager extends HorizontalScrollView {
                 return false;
             }
             int pageOffset = velocityX < 0.0f ? 1 : -1;
-            return moveToPage(mCurrentPageIndex + pageOffset);
+            return moveToPage(currentPageIndex + pageOffset);
         }
     }
 
@@ -212,28 +238,31 @@ public class ViewPager extends HorizontalScrollView {
         if (pageCount <= 0 || pageWidth <= 0) {
             return false;
         }
-        this.mCurrentPageIndex = Math.max(0, Math.min(requestedPage, pageCount - 1));
-        smoothScrollTo(this.mCurrentPageIndex * pageWidth, 0);
+        this.currentPageIndex = Math.max(0, Math.min(requestedPage, pageCount - 1));
+        smoothScrollTo(this.currentPageIndex * pageWidth, 0);
         return true;
     }
 
     private void onScrolling() {
-        if (this.mOnPageScrollListener != null) {
-            this.mOnPageScrollListener.onScroll();
+        if (this.onPageScrollListener != null) {
+            this.onPageScrollListener.onScroll();
         }
     }
 
+    /**
+     * Resets scroll offset to the initial page.
+     */
     public void resetScroll() {
-        this.mCurrentPageIndex = 0;
+        this.currentPageIndex = 0;
         scrollTo(0, 0);
     }
 
     protected int getPageCount() {
-        return this.mPageViewHolder.getChildCount();
+        return this.pageViewHolder.getChildCount();
     }
 
     protected int getCurrentPageIndex() {
-        return this.mCurrentPageIndex;
+        return this.currentPageIndex;
     }
 
     protected int getPageWidth() {

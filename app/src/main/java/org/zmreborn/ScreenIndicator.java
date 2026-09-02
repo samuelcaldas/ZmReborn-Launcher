@@ -3,6 +3,7 @@ package org.zmreborn;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.os.Handler;
+import android.os.Looper;
 import android.util.AttributeSet;
 import android.view.Gravity;
 import android.view.View;
@@ -11,39 +12,57 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.FrameLayout;
 
+/**
+ * Screen indicator container supporting pager dots and signal rail slider representations.
+ */
 public class ScreenIndicator extends ViewGroup implements Animation.AnimationListener {
     public static final int TYPE_DOTS = 1;
     public static final int TYPE_SLIDER_TOP = 2;
     public static final int TYPE_SLIDER_BOTTOM = 3;
 
-    private final Handler mHandler = new Handler();
-    private final Runnable mAutoHide = new Runnable() {
+    private static final int DEFAULT_ITEM_COUNT = 5;
+
+    private final Handler handler = new Handler(Looper.getMainLooper());
+    private final Runnable autoHideRunnable = new Runnable() {
+        @Override
         public void run() {
             startHideAnimation();
         }
     };
-    private Animation mAnimation;
-    private View mIndicator;
+    private Animation fadeAnimation;
+    private View indicatorView;
     private int mCurrent;
-    private int mItems = 5;
-    private int mType = TYPE_DOTS;
-    private int mVisibleTime = -1;
+    private int mItems = DEFAULT_ITEM_COUNT;
+    private int indicatorType = TYPE_DOTS;
+    private int visibleDurationMs = -1;
 
+    /**
+     * Constructs a ScreenIndicator with the provided context.
+     */
     public ScreenIndicator(Context context) {
         super(context);
         initIndicator();
     }
 
+    /**
+     * Constructs a ScreenIndicator with the provided context and XML attributes.
+     */
     public ScreenIndicator(Context context, AttributeSet attrs) {
         super(context, attrs);
         initIndicator();
     }
 
+    /**
+     * Constructs a ScreenIndicator with the provided context, attributes, and style.
+     */
     public ScreenIndicator(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initIndicator();
     }
 
+    /**
+     * Sets the total number of workspace screens/pages.
+     */
     public void setItems(int items) {
         this.mItems = Math.max(1, items);
         this.mCurrent = clampIndex(this.mCurrent);
@@ -53,17 +72,22 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
         }
     }
 
+    @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int width = resolveDimension(getDesiredWidth(widthMeasureSpec), widthMeasureSpec);
         int height = resolveDimension(getDesiredHeight(heightMeasureSpec), heightMeasureSpec);
         setMeasuredDimension(width, height);
-        this.mIndicator.measure(exactly(width), exactly(height));
+        this.indicatorView.measure(exactly(width), exactly(height));
     }
 
+    @Override
     protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
-        this.mIndicator.layout(0, 0, getWidth(), getHeight());
+        this.indicatorView.layout(0, 0, getWidth(), getHeight());
     }
 
+    /**
+     * Updates the indicator position based on scrolling percentage [0.0, 1.0].
+     */
     public void indicate(float percent) {
         float progress = clampProgress(percent);
         this.mCurrent = clampIndex(Math.round(this.mItems * progress));
@@ -71,60 +95,81 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
         revealAndScheduleHide();
     }
 
+    /**
+     * Updates the indicator directly to an exact page position.
+     */
     public void fullIndicate(int position) {
         this.mCurrent = clampIndex(position);
         updateIndicator(getCurrentProgress());
         revealAndScheduleHide();
     }
 
+    /**
+     * Sets the indicator style type (dots or signal rail).
+     */
     public void setType(int type) {
         validateType(type);
-        if (type == this.mType) {
+        if (type == this.indicatorType) {
             applyLayoutParams();
             return;
         }
-        removeView(this.mIndicator);
-        this.mType = type;
+        removeView(this.indicatorView);
+        this.indicatorType = type;
         initIndicator();
     }
 
+    /**
+     * Configures whether the indicator automatically fades out after user inactivity.
+     */
     public void setAutoHide(boolean autoHide) {
-        this.mVisibleTime = autoHide ? getResources().getInteger(R.integer.duration_long) : -1;
+        this.visibleDurationMs = autoHide ? getResources().getInteger(R.integer.duration_long) : -1;
         setVisibility(autoHide || !hasMultipleItems() ? INVISIBLE : VISIBLE);
     }
 
+    /**
+     * Refreshes dynamic colors from the theme palette.
+     */
     void refreshPalette() {
-        if (this.mIndicator instanceof SignalRailView) {
-            ((SignalRailView) this.mIndicator).refreshPalette();
+        if (this.indicatorView instanceof SignalRailView) {
+            ((SignalRailView) this.indicatorView).refreshPalette();
             return;
         }
-        this.mIndicator.invalidate();
+        this.indicatorView.invalidate();
     }
 
+    @Override
     public void onAnimationEnd(Animation animation) {
         setVisibility(INVISIBLE);
     }
 
+    @Override
     public void onAnimationRepeat(Animation animation) {
     }
 
+    @Override
     public void onAnimationStart(Animation animation) {
     }
 
+    /**
+     * Immediately hides the indicator and cancels pending auto-hide callbacks.
+     */
     public void hide() {
-        this.mHandler.removeCallbacks(this.mAutoHide);
+        this.handler.removeCallbacks(this.autoHideRunnable);
         setVisibility(INVISIBLE);
     }
 
+    /**
+     * Shows the indicator and schedules auto-hide if configured.
+     */
     public void show() {
         revealAndScheduleHide();
     }
 
     private void initIndicator() {
-        this.mIndicator = createIndicator();
-        this.mIndicator.setClickable(false);
-        this.mIndicator.setFocusable(false);
-        addView(this.mIndicator);
+        this.indicatorView = createIndicator();
+        this.indicatorView.setClickable(false);
+        this.indicatorView.setFocusable(false);
+        addView(this.indicatorView);
         setClickable(false);
         setFocusable(false);
         applyLayoutParams();
@@ -132,17 +177,17 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
     }
 
     private View createIndicator() {
-        if (this.mType == TYPE_DOTS) {
+        if (this.indicatorType == TYPE_DOTS) {
             return new DotsIndicator(getContext());
         }
         return new SignalRailView(getContext(), isLandscape());
     }
 
     private void updateIndicator(float progress) {
-        if (this.mIndicator instanceof DotsIndicator) {
-            updateDots((DotsIndicator) this.mIndicator);
+        if (this.indicatorView instanceof DotsIndicator) {
+            updateDots((DotsIndicator) this.indicatorView);
         } else {
-            updateRail((SignalRailView) this.mIndicator, progress);
+            updateRail((SignalRailView) this.indicatorView, progress);
         }
         updateContentDescription();
     }
@@ -164,9 +209,9 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
         }
         clearAnimation();
         setVisibility(VISIBLE);
-        this.mHandler.removeCallbacks(this.mAutoHide);
-        if (this.mVisibleTime > 0) {
-            this.mHandler.postDelayed(this.mAutoHide, this.mVisibleTime);
+        this.handler.removeCallbacks(this.autoHideRunnable);
+        if (this.visibleDurationMs > 0) {
+            this.handler.postDelayed(this.autoHideRunnable, this.visibleDurationMs);
         }
     }
 
@@ -175,12 +220,12 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
             hide();
             return;
         }
-        if (this.mAnimation == null) {
-            this.mAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.screen_indicator_fade_out);
-            this.mAnimation.setAnimationListener(this);
+        if (this.fadeAnimation == null) {
+            this.fadeAnimation = AnimationUtils.loadAnimation(getContext(), R.anim.screen_indicator_fade_out);
+            this.fadeAnimation.setAnimationListener(this);
         }
-        this.mAnimation.reset();
-        startAnimation(this.mAnimation);
+        this.fadeAnimation.reset();
+        startAnimation(this.fadeAnimation);
     }
 
     private void updateContentDescription() {
@@ -218,17 +263,16 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
         }
         params.width = LayoutParams.MATCH_PARENT;
         params.height = activeThickness;
-        params.gravity = this.mType == TYPE_SLIDER_TOP ? Gravity.TOP : Gravity.BOTTOM;
-        params.topMargin = this.mType == TYPE_SLIDER_TOP ? inset : 0;
-        params.bottomMargin = this.mType == TYPE_SLIDER_BOTTOM ? navigationSize + inset : 0;
+        params.gravity = this.indicatorType == TYPE_SLIDER_TOP ? Gravity.TOP : Gravity.BOTTOM;
+        params.topMargin = this.indicatorType == TYPE_SLIDER_TOP ? inset : 0;
+        params.bottomMargin = this.indicatorType == TYPE_SLIDER_BOTTOM ? navigationSize + inset : 0;
     }
 
     private void applyDotsLayout(FrameLayout.LayoutParams params) {
         params.width = LayoutParams.MATCH_PARENT;
         params.height = dimension(R.dimen.screen_indicator_dots_height);
         params.gravity = Gravity.BOTTOM;
-        params.bottomMargin = dimension(R.dimen.navigation_strip_size)
-                + dimension(R.dimen.rail_inset);
+        params.bottomMargin = dimension(R.dimen.navigation_strip_size) + dimension(R.dimen.rail_inset);
     }
 
     private FrameLayout.LayoutParams createLayoutParams() {
@@ -254,7 +298,7 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
     }
 
     private int getDesiredHeight(int measureSpec) {
-        if (this.mType == TYPE_DOTS) {
+        if (this.indicatorType == TYPE_DOTS) {
             return dimension(R.dimen.screen_indicator_dots_height);
         }
         if (isLandscape()) {
@@ -284,12 +328,11 @@ public class ScreenIndicator extends ViewGroup implements Animation.AnimationLis
     }
 
     private boolean isRailType() {
-        return this.mType == TYPE_SLIDER_TOP || this.mType == TYPE_SLIDER_BOTTOM;
+        return this.indicatorType == TYPE_SLIDER_TOP || this.indicatorType == TYPE_SLIDER_BOTTOM;
     }
 
     private boolean isLandscape() {
-        return getResources().getConfiguration().orientation
-                == Configuration.ORIENTATION_LANDSCAPE;
+        return getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE;
     }
 
     private int clampIndex(int index) {

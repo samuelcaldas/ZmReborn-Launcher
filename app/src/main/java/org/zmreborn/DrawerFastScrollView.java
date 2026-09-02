@@ -21,18 +21,18 @@ public final class DrawerFastScrollView extends View {
         void onSectionSelected(int position);
     }
 
-    private final Paint mPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final AlphabetAccessibilityNodeProvider mNodeProvider =
+    private final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final AlphabetAccessibilityNodeProvider nodeProvider =
             new AlphabetAccessibilityNodeProvider();
-    private DrawerAlphabetIndex mSourceIndex = DrawerAlphabetIndex.from(null);
-    private DrawerAlphabetIndex mDisplayedIndex = DrawerAlphabetIndex.from(null);
-    private OnSectionSelectedListener mListener;
-    private int mActiveColor;
-    private int mInactiveColor;
+    private DrawerAlphabetIndex sourceIndex = DrawerAlphabetIndex.from(null);
+    private DrawerAlphabetIndex displayedIndex = DrawerAlphabetIndex.from(null);
+    private OnSectionSelectedListener listener;
+    private int activeColor;
+    private int inactiveColor;
     private static final int VIRTUAL_SECTION_ID_OFFSET = 1;
 
-    private int mMinimumSectionHeight;
-    private int mSelectedIndex = -1;
+    private int minimumSectionHeight;
+    private int selectedIndex = -1;
 
     /** Creates fast-scroll rail without XML attributes. */
     public DrawerFastScrollView(Context context) {
@@ -47,51 +47,66 @@ public final class DrawerFastScrollView extends View {
     /** Creates fast-scroll rail from XML attributes and style. */
     public DrawerFastScrollView(Context context, AttributeSet attributes, int defStyleAttribute) {
         super(context, attributes, defStyleAttribute);
-        this.mPaint.setTextAlign(Paint.Align.CENTER);
-        this.mPaint.setTextSize(getResources().getDimension(
+        this.paint.setTextAlign(Paint.Align.CENTER);
+        this.paint.setTextSize(getResources().getDimension(
                 R.dimen.drawer_fast_scroll_text_size));
-        this.mMinimumSectionHeight = getResources().getDimensionPixelSize(
+        this.minimumSectionHeight = getResources().getDimensionPixelSize(
                 R.dimen.drawer_fast_scroll_min_section_height);
         setFocusable(true);
         refreshPalette();
     }
 
+    /**
+     * Sets the alphabet index model and updates visual display.
+     */
     void setIndex(DrawerAlphabetIndex index) {
-        this.mSourceIndex = index == null ? DrawerAlphabetIndex.from(null) : index;
-        this.mSelectedIndex = -1;
+        this.sourceIndex = index == null ? DrawerAlphabetIndex.from(null) : index;
+        this.selectedIndex = -1;
         rebuildDisplayedIndex();
         updateContentDescription();
         announceIndexChange();
         invalidate();
     }
 
+    /**
+     * Registers a listener for section selection events.
+     */
     void setOnSectionSelectedListener(OnSectionSelectedListener listener) {
-        this.mListener = listener;
+        this.listener = listener;
     }
 
+    /**
+     * Clears current section highlight selection.
+     */
     void clearSelection() {
-        if (this.mSelectedIndex < 0) {
+        if (this.selectedIndex < 0) {
             return;
         }
-        this.mSelectedIndex = -1;
+        this.selectedIndex = -1;
         updateContentDescription();
         invalidate();
         announceIndexChange();
     }
 
+    /**
+     * Refreshes active and inactive text colors according to wallpaper palette.
+     */
     void refreshPalette() {
-        this.mActiveColor = WallpaperColorExtractor.getPrimary(getContext());
+        this.activeColor = WallpaperColorExtractor.getPrimary(getContext());
         int onSurface = WallpaperColorExtractor.getOnSurface(getContext());
-        this.mInactiveColor = Color.argb(191, Color.red(onSurface), Color.green(onSurface),
+        this.inactiveColor = Color.argb(191, Color.red(onSurface), Color.green(onSurface),
                 Color.blue(onSurface));
         invalidate();
     }
 
+    /**
+     * Programmatically selects the specified section letter.
+     */
     boolean selectSection(String section) {
         if (!isEnabled()) {
             return false;
         }
-        int index = this.mDisplayedIndex.indexOf(section);
+        int index = this.displayedIndex.indexOf(section);
         if (index < 0) {
             return false;
         }
@@ -110,22 +125,20 @@ public final class DrawerFastScrollView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        for (int index = 0; index < this.mDisplayedIndex.size(); index++) {
+        for (int index = 0; index < this.displayedIndex.size(); index++) {
             drawSection(canvas, index);
         }
     }
 
     private void drawSection(Canvas canvas, int index) {
-        this.mPaint.setColor(index == this.mSelectedIndex
-                ? this.mActiveColor : this.mInactiveColor);
-        float baseline = sectionCenter(index) - ((this.mPaint.descent() + this.mPaint.ascent()) / 2.0f);
-        canvas.drawText(this.mDisplayedIndex.getSectionAt(index), getWidth() / 2.0f,
-                baseline, this.mPaint);
+        this.paint.setColor(index == this.selectedIndex ? this.activeColor : this.inactiveColor);
+        float baseline = sectionCenter(index) - ((this.paint.descent() + this.paint.ascent()) / 2.0f);
+        canvas.drawText(this.displayedIndex.getSectionAt(index), getWidth() / 2.0f, baseline, this.paint);
     }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        if (!isEnabled() || this.mDisplayedIndex.size() == 0) {
+        if (!isEnabled() || this.displayedIndex.size() == 0) {
             return false;
         }
         switch (event.getActionMasked()) {
@@ -169,31 +182,29 @@ public final class DrawerFastScrollView extends View {
         if (keyCode == KeyEvent.KEYCODE_DPAD_UP) {
             return moveSelection(-1);
         }
-        if (keyCode == KeyEvent.KEYCODE_ENTER
-                || keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
-            if (this.mSelectedIndex < 0 && this.mDisplayedIndex.size() > 0) {
+        if (keyCode == KeyEvent.KEYCODE_ENTER || keyCode == KeyEvent.KEYCODE_DPAD_CENTER) {
+            if (this.selectedIndex < 0 && this.displayedIndex.size() > 0) {
                 selectIndex(0);
             }
-            return this.mSelectedIndex >= 0;
+            return this.selectedIndex >= 0;
         }
         return super.onKeyDown(keyCode, event);
     }
 
     @Override
     public AccessibilityNodeProvider getAccessibilityNodeProvider() {
-        return this.mNodeProvider;
+        return this.nodeProvider;
     }
 
     private boolean moveSelection(int offset) {
-        if (this.mDisplayedIndex.size() == 0) {
+        if (this.displayedIndex.size() == 0) {
             return false;
         }
-        int selected = this.mSelectedIndex;
+        int selected = this.selectedIndex;
         if (selected < 0) {
-            selected = offset < 0 ? this.mDisplayedIndex.size() - 1 : 0;
+            selected = offset < 0 ? this.displayedIndex.size() - 1 : 0;
         } else {
-            selected = Math.max(0, Math.min(selected + offset,
-                    this.mDisplayedIndex.size() - 1));
+            selected = Math.max(0, Math.min(selected + offset, this.displayedIndex.size() - 1));
         }
         selectIndex(selected);
         return true;
@@ -202,53 +213,51 @@ public final class DrawerFastScrollView extends View {
     private int sectionAt(float y) {
         int height = Math.max(1, getHeight());
         float boundedY = Math.max(0.0f, Math.min(y, height - 1.0f));
-        int index = (int) ((boundedY * this.mDisplayedIndex.size()) / height);
-        return Math.min(index, this.mDisplayedIndex.size() - 1);
+        int index = (int) ((boundedY * this.displayedIndex.size()) / height);
+        return Math.min(index, this.displayedIndex.size() - 1);
     }
 
     private float sectionCenter(int index) {
-        return ((index + 0.5f) * getHeight()) / this.mDisplayedIndex.size();
+        return ((index + 0.5f) * getHeight()) / this.displayedIndex.size();
     }
 
     private void selectIndex(int index) {
-        if (index == this.mSelectedIndex) {
+        if (index == this.selectedIndex) {
             return;
         }
-        this.mSelectedIndex = index;
+        this.selectedIndex = index;
         updateContentDescription();
         invalidate();
         sendAccessibilityEvent(AccessibilityEvent.TYPE_VIEW_SELECTED);
-        if (this.mListener != null) {
-            this.mListener.onSectionSelected(this.mDisplayedIndex.getPositionAt(index));
+        if (this.listener != null) {
+            this.listener.onSectionSelected(this.displayedIndex.getPositionAt(index));
         }
     }
 
     private void rebuildDisplayedIndex() {
         String selectedSection = selectedSection();
-        int textHeight = Math.round(this.mPaint.descent() - this.mPaint.ascent());
-        int minimumHeight = Math.max(1, Math.max(this.mMinimumSectionHeight, textHeight));
+        int textHeight = Math.round(this.paint.descent() - this.paint.ascent());
+        int minimumHeight = Math.max(1, Math.max(this.minimumSectionHeight, textHeight));
         int maximumSections = getHeight() / minimumHeight;
-        this.mDisplayedIndex = this.mSourceIndex.compact(
-                maximumSections, selectedSection);
-        this.mSelectedIndex = this.mDisplayedIndex.indexOf(selectedSection);
+        this.displayedIndex = this.sourceIndex.compact(maximumSections, selectedSection);
+        this.selectedIndex = this.displayedIndex.indexOf(selectedSection);
     }
 
     private String selectedSection() {
-        if (this.mSelectedIndex < 0 || this.mSelectedIndex >= this.mDisplayedIndex.size()) {
+        if (this.selectedIndex < 0 || this.selectedIndex >= this.displayedIndex.size()) {
             return "";
         }
-        return this.mDisplayedIndex.getSectionAt(this.mSelectedIndex);
+        return this.displayedIndex.getSectionAt(this.selectedIndex);
     }
 
     private void updateContentDescription() {
-        if (this.mSelectedIndex < 0) {
-            setContentDescription(getResources().getString(
-                    R.string.accessibility_fast_scroll));
+        if (this.selectedIndex < 0) {
+            setContentDescription(getResources().getString(R.string.accessibility_fast_scroll));
             return;
         }
         setContentDescription(getResources().getString(
                 R.string.accessibility_fast_scroll_section,
-                this.mDisplayedIndex.getSectionAt(this.mSelectedIndex)));
+                this.displayedIndex.getSectionAt(this.selectedIndex)));
     }
 
     private void announceIndexChange() {
@@ -263,8 +272,7 @@ public final class DrawerFastScrollView extends View {
     }
 
     private int virtualViewIdForSection(int index) {
-        return this.mDisplayedIndex.getSectionAt(index).charAt(0)
-                + VIRTUAL_SECTION_ID_OFFSET;
+        return this.displayedIndex.getSectionAt(index).charAt(0) + VIRTUAL_SECTION_ID_OFFSET;
     }
 
     private int sectionIndexForVirtualViewId(int virtualViewId) {
@@ -272,7 +280,7 @@ public final class DrawerFastScrollView extends View {
             return -1;
         }
         char sectionCharacter = (char) (virtualViewId - VIRTUAL_SECTION_ID_OFFSET);
-        return this.mDisplayedIndex.indexOf(String.valueOf(sectionCharacter));
+        return this.displayedIndex.indexOf(String.valueOf(sectionCharacter));
     }
 
     private final class AlphabetAccessibilityNodeProvider extends AccessibilityNodeProvider {
@@ -305,14 +313,13 @@ public final class DrawerFastScrollView extends View {
             node.setClassName(DrawerFastScrollView.class.getName());
             node.setContentDescription(getContentDescription());
             node.setEnabled(isEnabled());
-            node.setScrollable(isEnabled() && mDisplayedIndex.size() > 1);
+            node.setScrollable(isEnabled() && displayedIndex.size() > 1);
             if (isEnabled()) {
                 node.addAction(AccessibilityNodeInfo.ACTION_SCROLL_FORWARD);
                 node.addAction(AccessibilityNodeInfo.ACTION_SCROLL_BACKWARD);
             }
-            for (int index = 0; index < mDisplayedIndex.size(); index++) {
-                node.addChild(DrawerFastScrollView.this,
-                        virtualViewIdForSection(index));
+            for (int index = 0; index < displayedIndex.size(); index++) {
+                node.addChild(DrawerFastScrollView.this, virtualViewIdForSection(index));
             }
             return node;
         }
@@ -328,7 +335,7 @@ public final class DrawerFastScrollView extends View {
             node.setClassName(android.widget.Button.class.getName());
             node.setText(getResources().getString(
                     R.string.accessibility_fast_scroll_section,
-                    mDisplayedIndex.getSectionAt(index)));
+                    displayedIndex.getSectionAt(index)));
             boolean enabled = isEnabled();
             node.setClickable(enabled);
             node.setEnabled(enabled);
@@ -354,9 +361,8 @@ public final class DrawerFastScrollView extends View {
     }
 
     private Rect sectionBounds(int index) {
-        int top = Math.round((index * getHeight()) / (float) this.mDisplayedIndex.size());
-        int bottom = Math.round(((index + 1) * getHeight())
-                / (float) this.mDisplayedIndex.size());
+        int top = Math.round((index * getHeight()) / (float) this.displayedIndex.size());
+        int bottom = Math.round(((index + 1) * getHeight()) / (float) this.displayedIndex.size());
         return new Rect(0, top, getWidth(), bottom);
     }
 }
